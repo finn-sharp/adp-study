@@ -13,7 +13,6 @@
 * **Python**: 버전 3.7.4, Jupyter Notebook 제공
 
 
-
 ---
 
 ## Mac (Apple Silicon) 환경 설정: Python 3.7 활성화
@@ -72,7 +71,11 @@ python -m pip install \
 conda install -c conda-forge mecab -y
 conda install -c conda-forge swig -y
 
-# 3. requirements.txt를 통한 추가 패키지 일괄 설치
+# 3. requirements.txt를 통한 추가 패키지 일괄 설치 및 jupyter에 가상환경 커널 추가
 pip install -r requirements.txt
-
+python -m ipykernel install --user --name adp  \
+--display-name "Python (adp)"  
+jupyter kernelspec list # 등록 커널 확인
 ```
+- 이후 환경 재시작하여 커널 지정하기 :
+ > `command` + `shift` + `p` / `developer:reload window` 클릭하기
