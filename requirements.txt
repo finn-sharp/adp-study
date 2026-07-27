@@ -26,3 +26,5 @@ pydot==1.4.1
 
 joblib==0.13.2
 tqdm==4.35.0
+
+jupyter
