@@ -1,0 +1,30 @@
+# OS 및 시스템 파일
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.python-version
+.Trashes
+
+# Python 가상환경
+venv/
+env/
+.env/
+ENV/
+conda/
+
+# IDE 및 편집기 설정
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter Notebook 체크포인트
+.ipynb_checkpoints/
+
+# 패키지 및 빌드 부산물
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
