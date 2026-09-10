@@ -46,6 +46,8 @@ type -a conda
 
 # Python 3.7 가상환경 생성 및 활성화
 conda create -n adp python=3.7
+# 가상환경 Python 버전 확인
+conda list -n adp python
 conda activate adp
 
 # 버전 및 환경 확인
@@ -72,7 +74,7 @@ conda install -c conda-forge mecab -y
 conda install -c conda-forge swig -y
 
 # 3. requirements.txt를 통한 추가 패키지 일괄 설치 및 jupyter에 가상환경 커널 추가
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python -m ipykernel install --user --name adp  \
 --display-name "Python (adp)"  
 jupyter kernelspec list # 등록 커널 확인
