@@ -93,11 +93,25 @@ def _run_two_sample_z_test(
         mean2: float,
         std1: float,
         std2: float) -> TwoSampleTestResult:
-    """두 집단 Z-검정을 수행합니다 (모분산을 아는 경우).
+    
+    """ 두 집단 Z-검정을 수행합니다 (모분산을 아는 경우).
+    
+    Args:
+        data1: 집단 1 표본 데이터 (numpy 배열)
+        data2: 집단 2 표본 데이터 (numpy 배열)
+        profile: 검정 조건 및 모집단 사전 정보를 담은 TwoSampleTestProfile 객체
+        mean1: 집단 1 표본 평균
+        mean2: 집단 2 표본 평균
+        std1: 집단 1 표본 표준편차
+        std2: 집단 2 표본 표준편차
+    
+    Returns:
+        TwoSampleTestResult: 검정 결과를 담은 TwoSampleTestResult 객체
     
     Raises:
-        ValueError: sigma1 또는 sigma2가 지정되지 않았거나 0 이하인 경우.
+        ValueError: sigma1 또는 sigma2가 지정되지 않았거나 0 이하인 경우 Z-검정을 수행할 수 없습니다.
     """
+    
     if profile.sigma1 is None or profile.sigma1 <= 0 or profile.sigma2 is None or profile.sigma2 <= 0:
         raise ValueError("Z-검정을 수행하려면 양수의 sigma1과 sigma2가 모두 지정되어야 합니다.")
 
@@ -139,11 +153,25 @@ def _run_two_sample_t_test(
         mean2: float,
         std1: float,
         std2: float) -> TwoSampleTestResult:
-    """두 집단 T-검정을 수행합니다 (Student T-test 또는 Welch T-test).
+    
+    """ 두 집단 T-검정을 수행합니다 (모분산을 모르는 경우).
+    
+    Args:
+        data1: 집단 1 표본 데이터 (numpy 배열)
+        data2: 집단 2 표본 데이터 (numpy 배열)
+        profile: 검정 조건 및 모집단 사전 정보를 담은 TwoSampleTestProfile 객체
+        mean1: 집단 1 표본 평균
+        mean2: 집단 2 표본 평균
+        std1: 집단 1 표본 표준편차
+        std2: 집단 2 표본 표준편차
+    
+    Returns:
+        TwoSampleTestResult: 검정 결과를 담은 TwoSampleTestResult 객체
     
     Raises:
-        ValueError: 어느 한 집단이라도 표본 크기가 2 미만인 경우.
+        ValueError: 각 집단의 표본 크기가 2 이하인 경우 T-검정을 수행할 수 없습니다.
     """
+    
     n1, n2 = len(data1), len(data2)
     if n1 < 2 or n2 < 2:
         raise ValueError("T-검정을 수행하려면 각 집단의 표본 크기가 최소 2 이상이어야 합니다.")
