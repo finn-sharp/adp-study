@@ -37,7 +37,7 @@ from typing_extensions import Literal  # pip install typing_extensions
 # 1. Data Models (Profile & Result)
 @dataclass
 class TwoWayANOVAProfile:
-    """이원배치 분산분석(Two-way ANOVA) 사전 정보 및 검정 조건을 정의하는 데이터 클래스.
+    """ 이원배치 분산분석(Two-way ANOVA) 사전 정보 및 검정 조건을 정의하는 데이터 클래스.
     
     Attributes:
         interaction: 교호작용항(Factor1 x Factor2) 포함 여부 (기본값 True)
@@ -52,7 +52,7 @@ class TwoWayANOVAProfile:
 
 @dataclass
 class TwoWayANOVAResult:
-    """Two-way ANOVA 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
+    """ Two-way ANOVA 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
     
     Attributes:
         test_type: 수행된 검정 유형 (예: "Two-way ANOVA (With Interaction)", "Two-way ANOVA (Main Effects Only)")
@@ -92,6 +92,7 @@ def _run_twoway_with_interaction(
         f1_name: str,
         f2_name: str,
         response_name: str) -> TwoWayANOVAResult:
+
     """ 교호작용항을 포함한 이원배치 분산분석(Full Factorial Model)을 수행합니다.
     
     Args:
@@ -209,7 +210,7 @@ def run_twoway_anova(
         factor1_name: str = "Factor1",
         factor2_name: str = "Factor2",
         response_name: str = "Response") -> TwoWayANOVAResult:
-    """두 요인에 대한 평균 차이 및 교호작용 검정(Two-way ANOVA)을 유효성 검증 후 적절한 알고리즘으로 수행합니다.
+    """ 두 요인에 대한 평균 차이 및 교호작용 검정(Two-way ANOVA)을 유효성 검증 후 적절한 알고리즘으로 수행합니다.
     
     Args:
         y: 반응 변수 데이터 (수치형 데이터 시퀀스).

@@ -4,6 +4,7 @@ OneWay.py - 세 집단 이상의 평균 검정(One-way ANOVA) 기능 구현
 ================================================================================
 설명:
     - 세 집단 이상의 평균 검정을 수행하는 기능을 제공합니다.
+    - 고전적 ANOVA 및 Welch ANOVA 수행 시 ANOVA 분산분석표(pandas DataFrame)를 생성합니다.
 
 작성 정보:
     - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
@@ -14,18 +15,19 @@ OneWay.py - 세 집단 이상의 평균 검정(One-way ANOVA) 기능 구현
     DATE        AUTHOR           VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-09-10  김재현(Finn)       v1.0.0    최초 작성
+    2026-09-10  김재현(Finn)       v1.1.0    ANOVA 분산분석표(anova_table) 출력 기능 추가
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __status__ = "Development"
 
-import sys
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Union
 import numpy as np
+import pandas as pd
 from scipy import stats
 from typing_extensions import Literal  # pip install typing_extensions
 
@@ -33,7 +35,7 @@ from typing_extensions import Literal  # pip install typing_extensions
 # 1. Data Models (Profile & Result)
 @dataclass
 class OneWayANOVAProfile:
-    """ 세 집단 이상의 평균 검정에 필요한 모집단 사전 정보 및 조건을 정의하는 데이터 클래스.
+    """세 집단 이상의 평균 검정에 필요한 모집단 사전 정보 및 조건을 정의하는 데이터 클래스.
     
     Attributes:
         equal_var: 등분산 가정 여부 (True: Classic ANOVA, False: Welch's ANOVA)
@@ -45,19 +47,20 @@ class OneWayANOVAProfile:
 
 @dataclass
 class OneWayANOVAResult:
-    """ 세 집단 이상의 평균 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
+    """세 집단 이상의 평균 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
     
     Attributes:
-        test_type: 수행된 검정 유형 (예: "One-way ANOVA (Equal Variance)", "Welch's One-way ANOVA (Unequal Variance)")
-        statistic: 검정 통계량 값
+        test_type: 수행된 검정 유형 (예: "One-way ANOVA (Equal Variance)", "Welch's One-way ANOVA")
+        statistic: 검정 통계량 값 (F 값)
         p_value: p-value 값
         reject_h0: 귀무가설 기각 여부 (True/False)
         num_groups: 집단 수
         group_means: 각 집단의 평균 리스트
         group_stds: 각 집단의 표준편차 리스트
         group_ns: 각 집단의 표본 크기 리스트
-        df_between: 집단 간 자유도
-        df_within: 집단 내 자유도
+        df_between: 집단 간 자유도 (df1)
+        df_within: 집단 내 자유도 (df2)
+        anova_table: 전체 ANOVA 분산분석표 (pandas DataFrame)
     """
     test_type: str
     statistic: float
@@ -69,7 +72,7 @@ class OneWayANOVAResult:
     group_ns: List[int]
     df_between: float
     df_within: float
-
+    anova_table: pd.DataFrame
 
 
 # 2. Individual Test Runners (개별 검정 수행 전담 함수)
@@ -79,7 +82,7 @@ def _run_classic_anova(
         means: List[float],
         stds: List[float],
         ns: List[int]) -> OneWayANOVAResult:
-    """ 고전적 일원배치 분산분석을 수행합니다 (등분산 가정: Classic ANOVA).
+    """ 고전적 일원배치 분산분석 및 요약 테이블을 생성합니다 (등분산 가정: Classic Fisher ANOVA).
     
     Args:
         groups: 각 집단의 데이터 리스트/배열 모음
@@ -89,27 +92,53 @@ def _run_classic_anova(
         ns: 각 집단의 표본 크기 리스트
     
     Returns:
-        OneWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
+        OneWayANOVAResult: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체
     
     Raises:
-        ValueError: 집단 수가 2개 미만이거나, 특정 집단의 표본 크기가 2 미만인 경우.
+        ValueError: 집단 수가 2개 미만이거나, 특정 집단의 표본 크기가 2 미만인 경우. 
     """
+    
     if len(groups) < 2:
         raise ValueError("ANOVA를 수행하려면 최소 2개 이상의 집단이 필요합니다.")
     
     k = len(groups)
-    total_n = sum(ns)
+    ns_arr = np.array(ns)
+    means_arr = np.array(means)
+    stds_arr = np.array(stds)
+    
+    # 전체 데이터 및 전체 평균
+    all_data = np.concatenate(groups)
+    grand_mean = float(np.mean(all_data))
+    total_n = len(all_data)
 
-    res = stats.f_oneway(*groups)
-    stat = float(res.statistic)
-    p_val = float(res.pvalue)
+    # 제곱합(SS) 산출
+    ss_between = float(np.sum(ns_arr * ((means_arr - grand_mean) ** 2)))
+    ss_within = float(np.sum((ns_arr - 1) * (stds_arr ** 2)))
+    ss_total = ss_between + ss_within
 
+    # 자유도(df) 산출
     df1 = float(k - 1)
     df2 = float(total_n - k)
+    df_total = float(total_n - 1)
+
+    # 평균제곱(MS) 및 F 통계량 산출
+    ms_between = ss_between / df1
+    ms_within = ss_within / df2
+    stat = ms_between / ms_within
+    p_val = float(stats.f.sf(stat, df1, df2))
+
+    # ANOVA 분산분석표(DataFrame) 구성
+    anova_table = pd.DataFrame({
+        'sum_sq': [ss_between, ss_within, ss_total],
+        'df': [df1, df2, df_total],
+        'mean_sq': [ms_between, ms_within, np.nan],
+        'F': [stat, np.nan, np.nan],
+        'PR(>F)': [p_val, np.nan, np.nan]
+    }, index=['Between Groups', 'Within Groups', 'Total'])
 
     return OneWayANOVAResult(
         test_type="One-way ANOVA (Equal Variance)",
-        statistic=stat,
+        statistic=float(stat),
         p_value=p_val,
         reject_h0=bool(p_val < profile.alpha),
         num_groups=k,
@@ -117,7 +146,8 @@ def _run_classic_anova(
         group_stds=stds,
         group_ns=ns,
         df_between=df1,
-        df_within=df2
+        df_within=df2,
+        anova_table=anova_table
     )
 
 
@@ -127,7 +157,7 @@ def _run_welch_anova(
         means: List[float],
         stds: List[float],
         ns: List[int]) -> OneWayANOVAResult:
-    """Welch의 일원배치 분산분석을 수행합니다 (이분산 허용: Welch's ANOVA).
+    """Welch의 일원배치 분산분석 및 요약 테이블을 생성합니다 (이분산 허용: Welch's ANOVA).
     
     Args:
         groups: 각 집단의 데이터 리스트/배열 모음
@@ -135,13 +165,19 @@ def _run_welch_anova(
         means: 각 집단의 평균 리스트
         stds: 각 집단의 표준편차 리스트
         ns: 각 집단의 표본 크기 리스트
-
+    
     Returns:
-        OneWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
-
+        OneWayANOVAResult: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체
+    
     Raises:
-        ValueError: 어느 한 집단이라도 분산이 0인 경우 (가중치 계산 불가).
+        ValueError: 집단 수가 2개 미만이거나, 특정 집단의 표본 크기가 2 미만인 경우.
+        ValueError: 특정 집단의 표본 표준편차가 0이거나, 다른 유효성 검증 조건을 만족하지 않는 경우.
     """
+
+    if len(groups) < 2:
+        raise ValueError("Welch ANOVA를 수행하려면 최소 2개 이상의 집단이 필요합니다.")
+
+    
     k = len(groups)
     means_arr = np.array(means)
     stds_arr = np.array(stds)
@@ -157,28 +193,37 @@ def _run_welch_anova(
     # 가중평균 산출
     weighted_mean = np.sum(weights * means_arr) / total_weight
 
-    df1 = k - 1
+    df1 = float(k - 1)
     f_num = np.sum(weights * ((means_arr - weighted_mean) ** 2)) / df1
 
     # 보정 인자 (Lambda) 계산
     lambda_term = (3 / (k ** 2 - 1)) * np.sum((1 / (ns_arr - 1)) * ((1 - (weights / total_weight)) ** 2))
 
-    stat = f_num / (1 + (2 * lambda_term * (k - 2) / 3))
-    df2 = 1 / lambda_term
+    stat = float(f_num / (1 + (2 * lambda_term * (k - 2) / 3)))
+    df2 = float(1 / lambda_term)
 
     p_val = float(stats.f.sf(stat, df1, df2))
 
+    # Welch ANOVA 요약표(DataFrame) 구성
+    anova_table = pd.DataFrame({
+        'F': [stat],
+        'df1 (Between)': [df1],
+        'df2 (Within)': [df2],
+        'PR(>F)': [p_val]
+    }, index=['Between Groups (Welch)'])
+
     return OneWayANOVAResult(
         test_type="Welch's One-way ANOVA (Unequal Variance)",
-        statistic=float(stat),
+        statistic=stat,
         p_value=p_val,
         reject_h0=bool(p_val < profile.alpha),
         num_groups=k,
         group_means=means,
         group_stds=stds,
         group_ns=ns,
-        df_between=float(df1),
-        df_within=float(df2)
+        df_between=df1,
+        df_within=df2,
+        anova_table=anova_table
     )
 
 
@@ -193,10 +238,11 @@ def run_oneway_anova(
         profile: 검정 조건을 정의한 OneWayANOVAProfile 객체.
     
     Returns:
-        OneWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
+        OneWayANOVAResult: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체.
     
     Raises:
         ValueError: 집단 수가 2개 미만이거나, 특정 집단의 표본 크기가 2 미만인 경우.
+        ValueError: profile이 None이거나, profile의 alpha가 0보다 작거나 1보다 큰 경우.
     """
     if len(groups) < 2:
         raise ValueError("ANOVA를 수행하려면 최소 2개 이상의 집단이 필요합니다.")
@@ -224,6 +270,10 @@ def run_oneway_anova(
         return _run_welch_anova(formatted_groups, profile, means, stds, ns)
 
 
+# ---------------------------------------------------------------------------
+# 4. Example Execution
+# ---------------------------------------------------------------------------
+
 if __name__ == "__main__":
     # 세 집단 예시 데이터 생성
     group_a = [12.1, 13.4, 11.8, 12.9, 13.0]
@@ -240,8 +290,10 @@ if __name__ == "__main__":
     print(f"Test Type  : {res_classic.test_type}")
     print(f"F Statistic: {res_classic.statistic:.4f}")
     print(f"p-value    : {res_classic.p_value:.4e}")
-    print(f"df1, df2   : ({res_classic.df_between:.0f}, {res_classic.df_within:.0f})")
     print(f"Reject H0  : {res_classic.reject_h0}\n")
+    print("[ANOVA Table]")
+    print(res_classic.anova_table)
+    print("\n" + "=" * 80 + "\n")
 
     # 2. 이분산성을 허용한 Welch's ANOVA
     profile_welch = OneWayANOVAProfile(equal_var=False, alpha=0.05)
@@ -251,5 +303,6 @@ if __name__ == "__main__":
     print(f"Test Type  : {res_welch.test_type}")
     print(f"F Statistic: {res_welch.statistic:.4f}")
     print(f"p-value    : {res_welch.p_value:.4e}")
-    print(f"df1, df2   : ({res_welch.df_between:.0f}, {res_welch.df_within:.2f})")
-    print(f"Reject H0  : {res_welch.reject_h0}")
+    print(f"Reject H0  : {res_welch.reject_h0}\n")
+    print("[ANOVA Table]")
+    print(res_welch.anova_table)
