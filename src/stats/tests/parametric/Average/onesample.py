@@ -3,7 +3,7 @@
 onesample.py - 파일에 대한 간략한 설명
 ================================================================================
 설명:
-    - 이 파일의 주요 기능 및 목적을 작성합니다.
+    - 모집단의 정보가 알려진 경우와 알려지지 않은 경우에 따라 단일 표본 평균 검정을 수행하는 기능을 제공합니다.
 
 작성 정보:
     - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
@@ -173,4 +173,3 @@ if __name__ == "__main__":
     print(f"Statistic: {result.statistic}")
     print(f"P-value: {result.p_value}")
     print(f"Reject H0: {result.reject_h0}") 
-    
