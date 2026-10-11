@@ -81,3 +81,8 @@ jupyter kernelspec list # 등록 커널 확인
 ```
 - 이후 환경 재시작하여 커널 지정하기 :
  > `command` + `shift` + `p` / `developer:reload window` 클릭하기
+
+## 동일 명세의 머신러닝 모델
+
+XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron의 Profile·Output DTO·실행 함수·예제를 제공합니다.
+[모듈 명세 및 실행 안내](docs/MODEL_MODULE_FORMAT.md)를 참고하세요.

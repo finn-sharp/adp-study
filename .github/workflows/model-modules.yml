@@ -1,0 +1,31 @@
+name: Standard model modules
+on: [push, pull_request]
+jobs:
+  models:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - python: '3.7'
+            requirements: requirements-models-py37.txt
+          - python: '3.12'
+            requirements: requirements-models-py312.txt
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -r ${{ matrix.requirements }}
+      - run: python -m unittest discover -s tests -v
+      - name: Execute module examples
+        run: |
+          python -m src.MachineLearning.Trees.xgboost
+          python -m src.MachineLearning.Trees.catboost
+          python -m src.MachineLearning.Trees.lightgbm
+          python -m src.MachineLearning.Trees.adaboost
+          python -m src.MachineLearning.NeuralNetworks.mlp
+          python -m src.MachineLearning.NeuralNetworks.perceptron
