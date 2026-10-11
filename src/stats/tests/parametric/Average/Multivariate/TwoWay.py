@@ -15,15 +15,18 @@ TwoWay.py - 두 요인에 대한 평균 검정(Two-way ANOVA) 기능 구현
     DATE        AUTHOR           VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-09-10  김재현(Finn)       v1.0.0    최초 작성
+    2026-10-10  김재현(Finn)       v1.1.0    Type III 행 추출·Sum 대비 및 설계 검증 추가
 ================================================================================
+Output DTO 갱신: 2026-10-11 v1.2.0 명시적 DTO·사전/JSON 변환 및 Result 호환 별칭 추가
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 __status__ = "Development"
 
 import sys
+from src.output import OutputDTO
 from dataclasses import dataclass
 from typing import Any, Optional, Sequence, Union
 import numpy as np
@@ -31,6 +34,7 @@ import pandas as pd
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from typing_extensions import Literal  # pip install typing_extensions
+from src.stats.analysis import numeric_sample, validate_test_profile
 
 
 
@@ -51,7 +55,7 @@ class TwoWayANOVAProfile:
 
 
 @dataclass
-class TwoWayANOVAResult:
+class TwoWayANOVAOutputDTO(OutputDTO):
     """ Two-way ANOVA 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
     
     Attributes:
@@ -85,13 +89,17 @@ class TwoWayANOVAResult:
     anova_table: pd.DataFrame
 
 
+# 기존 Result 이름을 동일 클래스의 호환 별칭으로 유지합니다.
+TwoWayANOVAResult = TwoWayANOVAOutputDTO
+
+
 # 2. Individual Test Runners (개별 검정 수행 전담 함수)
 def _run_twoway_with_interaction(
         df: pd.DataFrame,
         profile: TwoWayANOVAProfile,
         f1_name: str,
         f2_name: str,
-        response_name: str) -> TwoWayANOVAResult:
+        response_name: str) -> TwoWayANOVAOutputDTO:
 
     """ 교호작용항을 포함한 이원배치 분산분석(Full Factorial Model)을 수행합니다.
     
@@ -103,7 +111,7 @@ def _run_twoway_with_interaction(
         response_name: 반응 변수의 변수명
     
     Returns:
-        TwoWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
+        TwoWayANOVAOutputDTO: 검정 결과를 통일된 규격으로 담은 객체.
     
     Raises:
         ValueError: 입력 데이터가 충분하지 않거나, 교호작용항이 포함되지 않은 경우.
@@ -115,21 +123,26 @@ def _run_twoway_with_interaction(
     if not profile.interaction:
         raise ValueError("교호작용항이 포함되지 않은 프로필에서는 이 함수를 사용할 수 없습니다. interaction=True로 설정하세요.")
     
-    formula = f'Q("{response_name}") ~ C(Q("{f1_name}")) + C(Q("{f2_name}")) + C(Q("{f1_name}")):C(Q("{f2_name}"))'
+    # Type III는 Sum 대비를 사용하고, 절편 행이 있어도 요인 이름으로 결과를 추출합니다.
+    term1 = f'C(Q("{f1_name}"), Sum)'
+    term2 = f'C(Q("{f2_name}"), Sum)'
+    interaction_term = f'{term1}:{term2}'
+    formula = f'Q("{response_name}") ~ {term1} * {term2}'
     model = ols(formula, data=df).fit()
+    _validate_anova_model(model)
     anova_df = sm.stats.anova_lm(model, typ=profile.ss_type)
 
     # ANOVA 표 결과 추출 (Factor1, Factor2, Interaction)
-    f1_f = float(anova_df.iloc[0]['F'])
-    f1_p = float(anova_df.iloc[0]['PR(>F)'])
+    f1_f = float(anova_df.loc[term1, 'F'])
+    f1_p = float(anova_df.loc[term1, 'PR(>F)'])
 
-    f2_f = float(anova_df.iloc[1]['F'])
-    f2_p = float(anova_df.iloc[1]['PR(>F)'])
+    f2_f = float(anova_df.loc[term2, 'F'])
+    f2_p = float(anova_df.loc[term2, 'PR(>F)'])
 
-    inter_f = float(anova_df.iloc[2]['F'])
-    inter_p = float(anova_df.iloc[2]['PR(>F)'])
+    inter_f = float(anova_df.loc[interaction_term, 'F'])
+    inter_p = float(anova_df.loc[interaction_term, 'PR(>F)'])
 
-    return TwoWayANOVAResult(
+    return TwoWayANOVAOutputDTO(
         test_type=f"Two-way ANOVA with Interaction (Type {profile.ss_type} SS)",
         factor1_name=f1_name,
         factor2_name=f2_name,
@@ -151,7 +164,7 @@ def _run_twoway_without_interaction(
         profile: TwoWayANOVAProfile,
         f1_name: str,
         f2_name: str,
-        response_name: str) -> TwoWayANOVAResult:
+        response_name: str) -> TwoWayANOVAOutputDTO:
     """ 교호작용항을 제외한 이원배치 분산분석(Main Effects Only Model)을 수행합니다.
     
     Args:
@@ -162,7 +175,7 @@ def _run_twoway_without_interaction(
         response_name: 반응 변수의 변수명
     
     Returns:
-        TwoWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
+        TwoWayANOVAOutputDTO: 검정 결과를 통일된 규격으로 담은 객체.
     
     Raises:
         ValueError: 입력 데이터가 충분하지 않거나, 교호작용항이 포함된 경우.
@@ -173,18 +186,21 @@ def _run_twoway_without_interaction(
     if profile.interaction:
         raise ValueError("교호작용항이 포함된 프로필에서는 이 함수를 사용할 수 없습니다. interaction=False로 설정하세요.")
     
-    formula = f'Q("{response_name}") ~ C(Q("{f1_name}")) + C(Q("{f2_name}"))'
+    term1 = f'C(Q("{f1_name}"), Sum)'
+    term2 = f'C(Q("{f2_name}"), Sum)'
+    formula = f'Q("{response_name}") ~ {term1} + {term2}'
     model = ols(formula, data=df).fit()
+    _validate_anova_model(model)
     anova_df = sm.stats.anova_lm(model, typ=profile.ss_type)
 
     # ANOVA 표 결과 추출 (Factor1, Factor2)
-    f1_f = float(anova_df.iloc[0]['F'])
-    f1_p = float(anova_df.iloc[0]['PR(>F)'])
+    f1_f = float(anova_df.loc[term1, 'F'])
+    f1_p = float(anova_df.loc[term1, 'PR(>F)'])
 
-    f2_f = float(anova_df.iloc[1]['F'])
-    f2_p = float(anova_df.iloc[1]['PR(>F)'])
+    f2_f = float(anova_df.loc[term2, 'F'])
+    f2_p = float(anova_df.loc[term2, 'PR(>F)'])
 
-    return TwoWayANOVAResult(
+    return TwoWayANOVAOutputDTO(
         test_type=f"Two-way ANOVA Main Effects Only (Type {profile.ss_type} SS)",
         factor1_name=f1_name,
         factor2_name=f2_name,
@@ -201,6 +217,13 @@ def _run_twoway_without_interaction(
     )
 
 
+def _validate_anova_model(model):
+    if model.df_resid <= 0 or np.linalg.matrix_rank(model.model.exog) < model.model.exog.shape[1]:
+        raise ValueError("완전 열 순위와 양의 잔차 자유도를 가진 설계가 필요합니다.")
+    if not np.isfinite(model.mse_resid) or model.mse_resid <= 0:
+        raise ValueError("유한한 양의 잔차분산이 필요합니다.")
+
+
 # 3. Main Dispatcher (유효성 검증 및 분기 담당 메인 함수)
 def run_twoway_anova(
         y: Sequence[Union[float, int]],
@@ -209,7 +232,7 @@ def run_twoway_anova(
         profile: TwoWayANOVAProfile,
         factor1_name: str = "Factor1",
         factor2_name: str = "Factor2",
-        response_name: str = "Response") -> TwoWayANOVAResult:
+        response_name: str = "Response") -> TwoWayANOVAOutputDTO:
     """ 두 요인에 대한 평균 차이 및 교호작용 검정(Two-way ANOVA)을 유효성 검증 후 적절한 알고리즘으로 수행합니다.
     
     Args:
@@ -222,14 +245,22 @@ def run_twoway_anova(
         response_name: 반응 변수의 변수명 (기본값 "Response").
     
     Returns:
-        TwoWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
+        TwoWayANOVAOutputDTO: 검정 결과를 통일된 규격으로 담은 객체.
     
     Raises:
         ValueError: 입력 데이터 간 길이가 다르거나, 표본 크기가 부족한 경우.
     """
-    y_arr = np.asarray(y, dtype=float)
+    validate_test_profile(profile)
+    if profile.ss_type not in (1, 2, 3):
+        raise ValueError("ss_type은 1, 2, 3 중 하나여야 합니다.")
+    names = [response_name, factor1_name, factor2_name]
+    if len(set(names)) != 3 or any(not isinstance(n, str) or not n or '"' in n or '\\' in n for n in names):
+        raise ValueError("열 이름은 고유하고 비어 있지 않아야 하며 따옴표/역슬래시는 지원하지 않습니다.")
+    y_arr = numeric_sample(y, min_size=4)
     f1_arr = np.asarray(factor1)
     f2_arr = np.asarray(factor2)
+    if f1_arr.ndim != 1 or f2_arr.ndim != 1:
+        raise ValueError("두 요인은 1차원이어야 합니다.")
 
     if not (len(y_arr) == len(f1_arr) == len(f2_arr)):
         raise ValueError("반응변수(y)와 두 요인(factor1, factor2)의 데이터 길이가 일치해야 합니다.")
@@ -242,6 +273,8 @@ def run_twoway_anova(
         factor1_name: f1_arr,
         factor2_name: f2_arr
     })
+    if df.isna().any().any() or df[factor1_name].nunique() < 2 or df[factor2_name].nunique() < 2:
+        raise ValueError("각 요인에는 결측값 없이 최소 두 수준이 필요합니다.")
 
     # 책임 분기: 프로필의 interaction 설정에 따라 개별 실행기로 위임
     if profile.interaction:

@@ -1,0 +1,20 @@
+{
+  "task": "classification",
+  "test_size": 0.3,
+  "random_state": 1234,
+  "scaling": "standard",
+  "stratify": true,
+  "param_grid": null,
+  "cv": 3,
+  "scoring": null,
+  "n_jobs": 1,
+  "hidden_layer_sizes": [
+    20,
+    10
+  ],
+  "solver": "adam",
+  "activation": "relu",
+  "alpha": 0.0001,
+  "max_iter": 1000,
+  "early_stopping": false
+}

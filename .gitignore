@@ -7,6 +7,7 @@ Thumbs.db
 
 # Python 가상환경
 venv/
+.venv*/
 env/
 .env/
 ENV/

@@ -1,0 +1,17 @@
+{
+  "task": "classification",
+  "test_size": 0.3,
+  "random_state": 1234,
+  "scaling": "standard",
+  "stratify": true,
+  "param_grid": null,
+  "cv": 3,
+  "scoring": null,
+  "n_jobs": 1,
+  "C": 1.0,
+  "penalty": "l2",
+  "solver": "lbfgs",
+  "max_iter": 1000,
+  "class_weight": null,
+  "l1_ratio": null
+}

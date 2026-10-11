@@ -1,0 +1,13 @@
+{
+  "task": "classification",
+  "test_size": 0.3,
+  "random_state": 1234,
+  "scaling": "none",
+  "stratify": true,
+  "param_grid": null,
+  "cv": 3,
+  "scoring": null,
+  "n_jobs": 1,
+  "n_estimators": 50,
+  "learning_rate": 1.0
+}

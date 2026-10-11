@@ -14,26 +14,30 @@ Bivariate.py - 두 변수 간의 평균 검정(Bivariate Average Test) 기능 �
     DATE        AUTHOR           VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-09-10  김재현(Finn)       v1.0.0    두 표본 평균 검정(Two-sample Average Test) 기능 구현
+    2026-10-10  김재현(Finn)       v1.1.0    공개 실행기와 입력 검증 추가
 ================================================================================
+Output DTO 갱신: 2026-10-11 v1.2.0 명시적 DTO·사전/JSON 변환 및 Result 호환 별칭 추가
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 __status__ = "Development"
 
+from src.output import OutputDTO
 from dataclasses import dataclass
 from typing import Optional
 from typing_extensions import Literal # 3.8 미만 지원 (pip install typing_extensions)
 import numpy as np
 from scipy import stats
+from src.stats.analysis import numeric_sample, validate_test_profile
 
 
 # 1. Data Models (Profile & Result)
 @dataclass
 class TwoSampleTestProfile:
     """두 집단 검정에 필요한 모집단 사전 정보 및 조건을 정의하는 데이터 클래스.
-    
+
     Attributes:
         diff_0: 귀무가설 모평균 차이 (H0: μ1 - μ2 = diff_0, 기본값 0.0)
         known_var: 알려진 모분산(모표준편차) 유무
@@ -43,7 +47,7 @@ class TwoSampleTestProfile:
         alpha: 유의수준 (기본값 0.05)
         alternative: 대립가설 방향 ('two-sided', 'less', 'greater')
     """
-    
+
     diff_0: float = 0.0                             # 귀무가설 모평균 차이 (H0: μ1 - μ2 = diff_0)
     known_var: bool = False                          # 알려진 모분산 유무
     sigma1: Optional[float] = None                  # 집단 1 알려진 모표준편차
@@ -54,9 +58,9 @@ class TwoSampleTestProfile:
 
 
 @dataclass
-class TwoSampleTestResult:
+class TwoSampleTestOutputDTO(OutputDTO):
     """두 집단 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
-    
+
     Attributes:
         test_type: 수행된 검정 유형 (예: "Two-sample Z-test", "Welch's T-test")
         statistic: 검정 통계량 값
@@ -70,7 +74,7 @@ class TwoSampleTestResult:
         n1: 집단 1 표본 크기
         n2: 집단 2 표본 크기
     """
-    
+
     test_type: str
     statistic: float
     p_value: float
@@ -84,6 +88,10 @@ class TwoSampleTestResult:
     n2: int
 
 
+# 기존 Result 이름을 동일 클래스의 호환 별칭으로 유지합니다.
+TwoSampleTestResult = TwoSampleTestOutputDTO
+
+
 # 2. Individual Test Runners (개별 검정 수행 전담 함수)
 def _run_two_sample_z_test(
         data1: np.ndarray,
@@ -92,10 +100,10 @@ def _run_two_sample_z_test(
         mean1: float,
         mean2: float,
         std1: float,
-        std2: float) -> TwoSampleTestResult:
-    
+        std2: float) -> TwoSampleTestOutputDTO:
+
     """ 두 집단 Z-검정을 수행합니다 (모분산을 아는 경우).
-    
+
     Args:
         data1: 집단 1 표본 데이터 (numpy 배열)
         data2: 집단 2 표본 데이터 (numpy 배열)
@@ -104,20 +112,20 @@ def _run_two_sample_z_test(
         mean2: 집단 2 표본 평균
         std1: 집단 1 표본 표준편차
         std2: 집단 2 표본 표준편차
-    
+
     Returns:
-        TwoSampleTestResult: 검정 결과를 담은 TwoSampleTestResult 객체
-    
+        TwoSampleTestOutputDTO: 검정 결과를 담은 TwoSampleTestResult 객체
+
     Raises:
         ValueError: sigma1 또는 sigma2가 지정되지 않았거나 0 이하인 경우 Z-검정을 수행할 수 없습니다.
     """
-    
+
     if profile.sigma1 is None or profile.sigma1 <= 0 or profile.sigma2 is None or profile.sigma2 <= 0:
         raise ValueError("Z-검정을 수행하려면 양수의 sigma1과 sigma2가 모두 지정되어야 합니다.")
 
     n1, n2 = len(data1), len(data2)
     diff_mean = mean1 - mean2
-    
+
     # 두 집단 Z-검정 표준오차: sqrt(σ1²/n1 + σ2²/n2)
     se = np.sqrt((profile.sigma1 ** 2 / n1) + (profile.sigma2 ** 2 / n2))
     stat = (diff_mean - profile.diff_0) / se
@@ -130,7 +138,7 @@ def _run_two_sample_z_test(
     else:  # 'less'
         p_val = stats.norm.cdf(stat)
 
-    return TwoSampleTestResult(
+    return TwoSampleTestOutputDTO(
         test_type="Two-sample Z-test",
         statistic=float(stat),
         p_value=float(p_val),
@@ -152,10 +160,10 @@ def _run_two_sample_t_test(
         mean1: float,
         mean2: float,
         std1: float,
-        std2: float) -> TwoSampleTestResult:
-    
+        std2: float) -> TwoSampleTestOutputDTO:
+
     """ 두 집단 T-검정을 수행합니다 (모분산을 모르는 경우).
-    
+
     Args:
         data1: 집단 1 표본 데이터 (numpy 배열)
         data2: 집단 2 표본 데이터 (numpy 배열)
@@ -164,14 +172,14 @@ def _run_two_sample_t_test(
         mean2: 집단 2 표본 평균
         std1: 집단 1 표본 표준편차
         std2: 집단 2 표본 표준편차
-    
+
     Returns:
-        TwoSampleTestResult: 검정 결과를 담은 TwoSampleTestResult 객체
-    
+        TwoSampleTestOutputDTO: 검정 결과를 담은 TwoSampleTestResult 객체
+
     Raises:
-        ValueError: 각 집단의 표본 크기가 2 이하인 경우 T-검정을 수행할 수 없습니다.
+        ValueError: 각 집단의 표본 크기가 2 미만인 경우 T-검정을 수행할 수 없습니다.
     """
-    
+
     n1, n2 = len(data1), len(data2)
     if n1 < 2 or n2 < 2:
         raise ValueError("T-검정을 수행하려면 각 집단의 표본 크기가 최소 2 이상이어야 합니다.")
@@ -186,7 +194,7 @@ def _run_two_sample_t_test(
 
     test_type = "Two-sample T-test (Equal Variance)" if profile.equal_var else "Welch's T-test (Unequal Variance)"
 
-    return TwoSampleTestResult(
+    return TwoSampleTestOutputDTO(
         test_type=test_type,
         statistic=float(res.statistic),
         p_value=float(res.pvalue),
@@ -199,6 +207,35 @@ def _run_two_sample_t_test(
         n1=n1,
         n2=n2
     )
+
+
+def run_two_sample_test(data1, data2, profile: TwoSampleTestProfile) -> TwoSampleTestOutputDTO:
+    """독립 두 표본 평균 검정을 검증 후 실행합니다.
+
+    Args:
+        data1: 첫 번째 유한한 1차원 표본 (최소 2개).
+        data2: 두 번째 유한한 1차원 표본 (최소 2개).
+        profile: 귀무 평균 차이, 모표준편차, 등분산 여부 및 대립가설.
+    Returns:
+        TwoSampleTestOutputDTO: Z/Student/Welch 검정과 표본 통계.
+    Raises:
+        ValueError: 잘못된 입력·조건 또는 두 집단 모두 0 표본분산인 T 검정.
+
+    Notes:
+        대응 표본은 src.stats.analysis의 paired_t 검정을 사용합니다.
+    """
+    validate_test_profile(profile)
+    a, b = numeric_sample(data1), numeric_sample(data2)
+    if not np.isfinite(profile.diff_0):
+        raise ValueError("귀무 평균 차이는 유한해야 합니다.")
+    m1, m2, s1, s2 = float(a.mean()), float(b.mean()), float(a.std(ddof=1)), float(b.std(ddof=1))
+    if profile.known_var:
+        if any(s is None or not np.isfinite(s) or s <= 0 for s in (profile.sigma1, profile.sigma2)):
+            raise ValueError("두 모표준편차는 유한한 양수여야 합니다.")
+        return _run_two_sample_z_test(a, b, profile, m1, m2, s1, s2)
+    if s1 == s2 == 0:
+        raise ValueError("T 검정에는 양의 표준오차가 필요합니다.")
+    return _run_two_sample_t_test(a, b, profile, m1, m2, s1, s2)
 
 
 if __name__ == "__main__":
@@ -215,12 +252,12 @@ if __name__ == "__main__":
     mean1 = np.mean(sample1)
     mean2 = np.mean(sample2)
     std1 = np.std(sample1, ddof=1)
-    std2 = np.std(sample2, ddof=1) 
+    std2 = np.std(sample2, ddof=1)
 
     if profile.known_var:
         result = _run_two_sample_z_test(sample1, sample2, profile, mean1, mean2, std1, std2)
     else:
-        result = _run_two_sample_t_test(sample1, sample2, profile, mean1, mean2, std1, std2)    
+        result = _run_two_sample_t_test(sample1, sample2, profile, mean1, mean2, std1, std2)
 
     print(f"Test Type: {result.test_type}")
     print(f"Statistic: {result.statistic:.4f}")
@@ -229,4 +266,3 @@ if __name__ == "__main__":
     print(f"Mean Difference: {result.diff_mean:.4f}")
     print(f"Sample Mean 1: {result.sample_mean1:.4f}, Sample Std 1: {result.sample_std1:.4f}, n1: {result.n1}")
     print(f"Sample Mean 2: {result.sample_mean2:.4f}, Sample Std 2: {result.sample_std2:.4f}, n2: {result.n2}")
-    

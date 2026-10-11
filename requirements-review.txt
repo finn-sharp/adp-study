@@ -1,0 +1,15 @@
+# Python 3.12: 시험 환경과 분리된 개발 검증 환경
+numpy==2.3.5
+pandas==2.2.3
+scipy==1.17.0
+scikit-learn==1.8.0
+statsmodels==0.14.6
+mlxtend==0.23.4
+matplotlib==3.10.8
+seaborn==0.13.2
+patsy==1.0.2
+typing_extensions==4.15.0
+
+# 전체 범주형 SMOTEN 포함 선택적 리샘플링
+imbalanced-learn==0.14.2
+sklearn-compat==0.1.6

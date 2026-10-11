@@ -16,20 +16,24 @@ OneWay.py - 세 집단 이상의 평균 검정(One-way ANOVA) 기능 구현
     ----------------------------------------------------------------------------
     2026-09-10  김재현(Finn)       v1.0.0    최초 작성
     2026-09-10  김재현(Finn)       v1.1.0    ANOVA 분산분석표(anova_table) 출력 기능 추가
+    2026-10-10  김재현(Finn)       v1.2.0    유의수준·유한 표본·퇴화 분산 검증 추가
 ================================================================================
+Output DTO 갱신: 2026-10-11 v1.3.0 명시적 DTO·사전/JSON 변환 및 Result 호환 별칭 추가
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.1.0"
+__version__ = "1.3.0"
 __status__ = "Development"
 
+from src.output import OutputDTO
 from dataclasses import dataclass
 from typing import List, Optional, Sequence, Union
 import numpy as np
 import pandas as pd
 from scipy import stats
 from typing_extensions import Literal  # pip install typing_extensions
+from src.stats.analysis import numeric_sample, validate_test_profile
 
 
 # 1. Data Models (Profile & Result)
@@ -46,7 +50,7 @@ class OneWayANOVAProfile:
 
 
 @dataclass
-class OneWayANOVAResult:
+class OneWayANOVAOutputDTO(OutputDTO):
     """세 집단 이상의 평균 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
     
     Attributes:
@@ -75,13 +79,17 @@ class OneWayANOVAResult:
     anova_table: pd.DataFrame
 
 
+# 기존 Result 이름을 동일 클래스의 호환 별칭으로 유지합니다.
+OneWayANOVAResult = OneWayANOVAOutputDTO
+
+
 # 2. Individual Test Runners (개별 검정 수행 전담 함수)
 def _run_classic_anova(
         groups: List[np.ndarray],
         profile: OneWayANOVAProfile,
         means: List[float],
         stds: List[float],
-        ns: List[int]) -> OneWayANOVAResult:
+        ns: List[int]) -> OneWayANOVAOutputDTO:
     """ 고전적 일원배치 분산분석 및 요약 테이블을 생성합니다 (등분산 가정: Classic Fisher ANOVA).
     
     Args:
@@ -92,7 +100,7 @@ def _run_classic_anova(
         ns: 각 집단의 표본 크기 리스트
     
     Returns:
-        OneWayANOVAResult: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체
+        OneWayANOVAOutputDTO: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체
     
     Raises:
         ValueError: 집단 수가 2개 미만이거나, 특정 집단의 표본 크기가 2 미만인 경우. 
@@ -124,6 +132,8 @@ def _run_classic_anova(
     # 평균제곱(MS) 및 F 통계량 산출
     ms_between = ss_between / df1
     ms_within = ss_within / df2
+    if ms_within <= 0:
+        raise ValueError("집단 내 분산은 0보다 커야 합니다.")
     stat = ms_between / ms_within
     p_val = float(stats.f.sf(stat, df1, df2))
 
@@ -136,7 +146,7 @@ def _run_classic_anova(
         'PR(>F)': [p_val, np.nan, np.nan]
     }, index=['Between Groups', 'Within Groups', 'Total'])
 
-    return OneWayANOVAResult(
+    return OneWayANOVAOutputDTO(
         test_type="One-way ANOVA (Equal Variance)",
         statistic=float(stat),
         p_value=p_val,
@@ -156,7 +166,7 @@ def _run_welch_anova(
         profile: OneWayANOVAProfile,
         means: List[float],
         stds: List[float],
-        ns: List[int]) -> OneWayANOVAResult:
+        ns: List[int]) -> OneWayANOVAOutputDTO:
     """Welch의 일원배치 분산분석 및 요약 테이블을 생성합니다 (이분산 허용: Welch's ANOVA).
     
     Args:
@@ -167,7 +177,7 @@ def _run_welch_anova(
         ns: 각 집단의 표본 크기 리스트
     
     Returns:
-        OneWayANOVAResult: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체
+        OneWayANOVAOutputDTO: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체
     
     Raises:
         ValueError: 집단 수가 2개 미만이거나, 특정 집단의 표본 크기가 2 미만인 경우.
@@ -212,7 +222,7 @@ def _run_welch_anova(
         'PR(>F)': [p_val]
     }, index=['Between Groups (Welch)'])
 
-    return OneWayANOVAResult(
+    return OneWayANOVAOutputDTO(
         test_type="Welch's One-way ANOVA (Unequal Variance)",
         statistic=stat,
         p_value=p_val,
@@ -230,7 +240,7 @@ def _run_welch_anova(
 # 3. Main Dispatcher (유효성 검증 및 분기 담당 메인 함수)
 def run_oneway_anova(
         groups: Sequence[Union[List[float], np.ndarray]], 
-        profile: OneWayANOVAProfile) -> OneWayANOVAResult:
+        profile: OneWayANOVAProfile) -> OneWayANOVAOutputDTO:
     """세 집단 이상의 평균 차이 검정(One-way ANOVA)을 유효성 검증 후 적절한 알고리즘으로 수행합니다.
     
     Args:
@@ -238,12 +248,13 @@ def run_oneway_anova(
         profile: 검정 조건을 정의한 OneWayANOVAProfile 객체.
     
     Returns:
-        OneWayANOVAResult: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체.
+        OneWayANOVAOutputDTO: 검정 결과 및 ANOVA 테이블을 통일된 규격으로 담은 객체.
     
     Raises:
         ValueError: 집단 수가 2개 미만이거나, 특정 집단의 표본 크기가 2 미만인 경우.
-        ValueError: profile이 None이거나, profile의 alpha가 0보다 작거나 1보다 큰 경우.
+        ValueError: profile이 None이거나, alpha가 (0, 1) 범위 밖인 경우.
     """
+    validate_test_profile(profile)
     if len(groups) < 2:
         raise ValueError("ANOVA를 수행하려면 최소 2개 이상의 집단이 필요합니다.")
 
@@ -253,7 +264,7 @@ def run_oneway_anova(
     ns: List[int] = []
 
     for idx, g in enumerate(groups):
-        arr = np.asarray(g, dtype=float)
+        arr = numeric_sample(g)
         n = len(arr)
         if n < 2:
             raise ValueError(f"{idx + 1}번째 집단의 표본 크기가 최소 2 이상이어야 합니다. (현재 크기: {n})")

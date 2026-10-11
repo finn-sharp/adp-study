@@ -30,3 +30,4 @@ tqdm==4.35.0
 
 ipykernel==5.1.0
 jupyter
+typing_extensions==4.7.1

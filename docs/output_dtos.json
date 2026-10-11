@@ -1,0 +1,3026 @@
+{
+  "analysis_api_count": 55,
+  "output_dto_count": 53,
+  "apis": [
+    {
+      "module": "src/Association/apriori.py",
+      "function": "run_association",
+      "output_dto": "AssociationOutputDTO",
+      "fields": [
+        {
+          "name": "encoder",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "encoded",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "frequent_itemsets",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "rules",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Clustering/clustering.py",
+      "function": "run_clustering",
+      "output_dto": "ClusteringOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "labels",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "transformed",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "n_clusters",
+          "type": "<class 'int'>",
+          "runtime": false
+        },
+        {
+          "name": "n_noise",
+          "type": "<class 'int'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Clustering/clustering.py",
+      "function": "distance_matrix",
+      "output_dto": "DistanceMatrixOutputDTO",
+      "fields": [
+        {
+          "name": "matrix",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "metric",
+          "type": "<class 'str'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Clustering/clustering.py",
+      "function": "make_linkage_matrix",
+      "output_dto": "LinkageMatrixOutputDTO",
+      "fields": [
+        {
+          "name": "matrix",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "method",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "metric",
+          "type": "<class 'str'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Decomposition/manifold.py",
+      "function": "run_embedding",
+      "output_dto": "EmbeddingOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "coordinates",
+          "type": "typing.Any",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Decomposition/pca.py",
+      "function": "run_decomposition",
+      "output_dto": "DecompositionOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "transformed",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "components",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "explained_variance_ratio",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "cumulative_variance_ratio",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Decomposition/pca.py",
+      "function": "run_pca_classification",
+      "output_dto": "PCAClassificationOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Linear/lasso.py",
+      "function": "run_lasso",
+      "output_dto": "LassoOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Linear/least_squares.py",
+      "function": "run_least_squares",
+      "output_dto": "LeastSquaresOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Linear/logistic.py",
+      "function": "run_logistic",
+      "output_dto": "LogisticOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Linear/numerical.py",
+      "function": "run_numerical_regression",
+      "output_dto": "NumericalOutputDTO",
+      "fields": [
+        {
+          "name": "coefficients",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "intercept",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "singular_values",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "rank",
+          "type": "<class 'int'>",
+          "runtime": false
+        },
+        {
+          "name": "condition_number",
+          "type": "<class 'float'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Linear/ridge.py",
+      "function": "run_ridge",
+      "output_dto": "RidgeOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/NaiveBayes/naive_bayes.py",
+      "function": "run_naive_bayes",
+      "output_dto": "NaiveBayesOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Neighbors/knn.py",
+      "function": "run_knn",
+      "output_dto": "KNNOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/NeuralNetworks/mlp.py",
+      "function": "run_mlp",
+      "output_dto": "MLPOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Regression/regression.py",
+      "function": "run_multiple_regression",
+      "output_dto": "MultipleRegressionOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Regression/regression.py",
+      "function": "run_polynomial_regression",
+      "output_dto": "PolynomialRegressionOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Regression/regression.py",
+      "function": "run_nonlinear_regression",
+      "output_dto": "NonlinearRegressionOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/SVM/svm.py",
+      "function": "run_svm",
+      "output_dto": "SVMOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Trees/adaboost.py",
+      "function": "run_adaboost",
+      "output_dto": "AdaBoostOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Trees/decision_tree.py",
+      "function": "run_decision_tree",
+      "output_dto": "DecisionTreeOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Trees/gradient_boosting.py",
+      "function": "run_gradient_boosting",
+      "output_dto": "GradientBoostingOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Trees/lightgbm.py",
+      "function": "run_lightgbm",
+      "output_dto": "LightGBMOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Trees/random_forest.py",
+      "function": "run_random_forest",
+      "output_dto": "RandomForestOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/Trees/xgboost.py",
+      "function": "run_xgboost",
+      "output_dto": "XGBoostOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/common.py",
+      "function": "run_supervised",
+      "output_dto": "SupervisedOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/feature_selection.py",
+      "function": "run_feature_selection",
+      "output_dto": "FeatureSelectionOutputDTO",
+      "fields": [
+        {
+          "name": "selector",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "transformed",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "support",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "scores",
+          "type": "typing.Any",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/MachineLearning/feature_selection.py",
+      "function": "run_permutation_importance",
+      "output_dto": "PermutationImportanceOutputDTO",
+      "fields": [
+        {
+          "name": "importances_mean",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "importances_std",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "importances",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/Preprocessing/sampling.py",
+      "function": "resample_training_data",
+      "output_dto": "SamplingOutputDTO",
+      "fields": [
+        {
+          "name": "X",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "y",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "sampler",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "counts_before",
+          "type": "typing.Dict[typing.Any, int]",
+          "runtime": false
+        },
+        {
+          "name": "counts_after",
+          "type": "typing.Dict[typing.Any, int]",
+          "runtime": false
+        },
+        {
+          "name": "sample_indices",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TextMining/text.py",
+      "function": "run_vectorization",
+      "output_dto": "VectorizationOutputDTO",
+      "fields": [
+        {
+          "name": "vectorizer",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_matrix",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "test_matrix",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TextMining/text.py",
+      "function": "run_text_classification",
+      "output_dto": "TextClassificationOutputDTO",
+      "fields": [
+        {
+          "name": "model_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "task",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "test_metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "y_test",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "train_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "test_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "classes",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "confusion",
+          "type": "typing.Optional[numpy.ndarray]",
+          "runtime": false
+        },
+        {
+          "name": "best_params",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "best_cv_score",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "cv_results",
+          "type": "typing.Optional[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TextMining/text.py",
+      "function": "run_topic_model",
+      "output_dto": "TopicOutputDTO",
+      "fields": [
+        {
+          "name": "vectorizer",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "document_topics",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "top_words",
+          "type": "typing.List[typing.List[str]]",
+          "runtime": false
+        },
+        {
+          "name": "feature_names",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TextMining/text.py",
+      "function": "analyze_english",
+      "output_dto": "EnglishAnalysisOutputDTO",
+      "fields": [
+        {
+          "name": "mode",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "items",
+          "type": "typing.List[typing.Any]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TextMining/text.py",
+      "function": "explain_text",
+      "output_dto": "TextExplanationOutputDTO",
+      "fields": [
+        {
+          "name": "explanation",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "classes",
+          "type": "typing.List[typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "probabilities",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "contributions",
+          "type": "typing.Dict[str, typing.List[typing.Tuple[str, float]]]",
+          "runtime": false
+        },
+        {
+          "name": "intercepts",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TimeSeries/arima.py",
+      "function": "run_arima",
+      "output_dto": "ForecastOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "test",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "intervals",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "best_order",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "best_seasonal_order",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "candidates",
+          "type": "typing.List[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TimeSeries/arima.py",
+      "function": "run_sarima",
+      "output_dto": "ForecastOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "test",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "intervals",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "best_order",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "best_seasonal_order",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "candidates",
+          "type": "typing.List[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TimeSeries/forecasting.py",
+      "function": "run_forecast",
+      "output_dto": "ForecastOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "test",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "intervals",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "metrics",
+          "type": "typing.Dict[str, float]",
+          "runtime": false
+        },
+        {
+          "name": "best_order",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "best_seasonal_order",
+          "type": "typing.Any",
+          "runtime": false
+        },
+        {
+          "name": "candidates",
+          "type": "typing.List[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TimeSeries/forecasting.py",
+      "function": "run_series_diagnostics",
+      "output_dto": "SeriesDiagnosticsOutputDTO",
+      "fields": [
+        {
+          "name": "transformed",
+          "type": "<class 'pandas.core.series.Series'>",
+          "runtime": false
+        },
+        {
+          "name": "boxcox_lambda",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "adf_statistic",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "adf_p_value",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_unit_root",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "acf",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "pacf",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "decomposition",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "decomposition_components",
+          "type": "typing.Dict[str, pandas.core.series.Series]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/TimeSeries/forecasting.py",
+      "function": "run_multivariate_forecast",
+      "output_dto": "MultivariateForecastOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "train",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "test",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "predictions",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "metrics",
+          "type": "typing.Dict[str, typing.Dict[str, float]]",
+          "runtime": false
+        },
+        {
+          "name": "converged",
+          "type": "<class 'bool'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/Visualization/plots.py",
+      "function": "run_plot",
+      "output_dto": "PlotOutputDTO",
+      "fields": [
+        {
+          "name": "figure",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "axes",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "kind",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "title",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "xlabel",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "ylabel",
+          "type": "<class 'str'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/Visualization/plots.py",
+      "function": "run_pairplot",
+      "output_dto": "PairPlotOutputDTO",
+      "fields": [
+        {
+          "name": "figure",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "axes",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "grid",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "feature_names",
+          "type": "<class 'list'>",
+          "runtime": false
+        },
+        {
+          "name": "hue",
+          "type": "typing.Optional[str]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/analysis.py",
+      "function": "run_descriptive",
+      "output_dto": "DescriptiveOutputDTO",
+      "fields": [
+        {
+          "name": "n",
+          "type": "<class 'int'>",
+          "runtime": false
+        },
+        {
+          "name": "mean",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "median",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "modes",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_variance",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_std",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "q1",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "q3",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "iqr",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "quartile_deviation",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "range",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "skewness",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "excess_kurtosis",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "outlier_indices",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/analysis.py",
+      "function": "run_statistical_test",
+      "output_dto": "StatisticalOutputDTO",
+      "fields": [
+        {
+          "name": "test_type",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "statistic",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_value",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "details",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/anova.py",
+      "function": "run_anova",
+      "output_dto": "ANOVAOutputDTO",
+      "fields": [
+        {
+          "name": "method",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "anova_table",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "analysis",
+          "type": "<class 'src.output.OutputDTO'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/manova.py",
+      "function": "run_manova",
+      "output_dto": "MANOVAOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "multivariate_test",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "tables",
+          "type": "typing.Dict[str, pandas.core.frame.DataFrame]",
+          "runtime": false
+        },
+        {
+          "name": "responses",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "factors",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "residual_df",
+          "type": "<class 'int'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/posthoc.py",
+      "function": "run_posthoc",
+      "output_dto": "PostHocOutputDTO",
+      "fields": [
+        {
+          "name": "method",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "table",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "groups",
+          "type": "typing.List[typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "alpha",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "correction",
+          "type": "<class 'str'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/regression.py",
+      "function": "run_regression_inference",
+      "output_dto": "RegressionOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "design",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "transformer",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "coefficient_table",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        },
+        {
+          "name": "diagnostics",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        },
+        {
+          "name": "residuals",
+          "type": "<class 'numpy.ndarray'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/regression.py",
+      "function": "run_variable_selection",
+      "output_dto": "SelectionOutputDTO",
+      "fields": [
+        {
+          "name": "selected_features",
+          "type": "typing.List[str]",
+          "runtime": false
+        },
+        {
+          "name": "model",
+          "type": "typing.Any",
+          "runtime": true
+        },
+        {
+          "name": "history",
+          "type": "typing.List[typing.Dict[str, typing.Any]]",
+          "runtime": false
+        },
+        {
+          "name": "converged",
+          "type": "<class 'bool'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/repeated_measures.py",
+      "function": "run_repeated_anova",
+      "output_dto": "RepeatedANOVAOutputDTO",
+      "fields": [
+        {
+          "name": "model",
+          "type": "<class 'object'>",
+          "runtime": true
+        },
+        {
+          "name": "anova_table",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/tests/nonParametric/onesample.py",
+      "function": "run_one_sample_rank_test",
+      "output_dto": "OneSampleRankOutputDTO",
+      "fields": [
+        {
+          "name": "test_type",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "statistic",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_value",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "details",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/tests/nonParametric/twosample.py",
+      "function": "run_two_sample_rank_test",
+      "output_dto": "TwoSampleRankOutputDTO",
+      "fields": [
+        {
+          "name": "test_type",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "statistic",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_value",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "details",
+          "type": "typing.Dict[str, typing.Any]",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/tests/parametric/Average/Bivariate.py",
+      "function": "run_two_sample_test",
+      "output_dto": "TwoSampleTestOutputDTO",
+      "fields": [
+        {
+          "name": "test_type",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "statistic",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_value",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "diff_mean",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_mean1",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_mean2",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_std1",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_std2",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "n1",
+          "type": "<class 'int'>",
+          "runtime": false
+        },
+        {
+          "name": "n2",
+          "type": "<class 'int'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/tests/parametric/Average/Multivariate/OneWay.py",
+      "function": "run_oneway_anova",
+      "output_dto": "OneWayANOVAOutputDTO",
+      "fields": [
+        {
+          "name": "test_type",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "statistic",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_value",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "num_groups",
+          "type": "<class 'int'>",
+          "runtime": false
+        },
+        {
+          "name": "group_means",
+          "type": "typing.List[float]",
+          "runtime": false
+        },
+        {
+          "name": "group_stds",
+          "type": "typing.List[float]",
+          "runtime": false
+        },
+        {
+          "name": "group_ns",
+          "type": "typing.List[int]",
+          "runtime": false
+        },
+        {
+          "name": "df_between",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "df_within",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "anova_table",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/tests/parametric/Average/Multivariate/TwoWay.py",
+      "function": "run_twoway_anova",
+      "output_dto": "TwoWayANOVAOutputDTO",
+      "fields": [
+        {
+          "name": "test_type",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "factor1_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "factor2_name",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "f_factor1",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_factor1",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0_factor1",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "f_factor2",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_factor2",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0_factor2",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "f_interaction",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "p_interaction",
+          "type": "typing.Optional[float]",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0_interaction",
+          "type": "typing.Optional[bool]",
+          "runtime": false
+        },
+        {
+          "name": "anova_table",
+          "type": "<class 'pandas.core.frame.DataFrame'>",
+          "runtime": false
+        }
+      ]
+    },
+    {
+      "module": "src/stats/tests/parametric/Average/Univariate.py",
+      "function": "run_one_sample_test",
+      "output_dto": "TestOutputDTO",
+      "fields": [
+        {
+          "name": "test_type",
+          "type": "<class 'str'>",
+          "runtime": false
+        },
+        {
+          "name": "statistic",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "p_value",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "reject_h0",
+          "type": "<class 'bool'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_mean",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "sample_std",
+          "type": "<class 'float'>",
+          "runtime": false
+        },
+        {
+          "name": "n",
+          "type": "<class 'int'>",
+          "runtime": false
+        }
+      ]
+    }
+  ]
+}

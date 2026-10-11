@@ -1,0 +1,15 @@
+{
+  "task": "classification",
+  "test_size": 0.3,
+  "random_state": 1234,
+  "scaling": "standard",
+  "stratify": true,
+  "param_grid": null,
+  "cv": 3,
+  "scoring": null,
+  "n_jobs": 1,
+  "n_neighbors": 5,
+  "weights": "uniform",
+  "metric": "minkowski",
+  "p": 2
+}

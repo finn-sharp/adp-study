@@ -1,0 +1,15 @@
+# Python 3.7: 기존 시험용 라이브러리 조합 유지
+# 전체 확장 모듈과 SMOTEN은 별도 requirements-py37.txt 환경 사용
+numpy==1.21.6
+pandas==1.1.2
+scipy==1.7.3
+scikit-learn==0.23.2
+statsmodels==0.13.2
+mlxtend==0.17.0
+matplotlib==3.0.3
+seaborn==0.9.0
+joblib==0.13.2
+typing_extensions==4.7.1
+# Python 3.7 호환 transitive 의존성의 해석 범위를 고정
+patsy==0.5.3
+packaging==23.2

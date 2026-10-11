@@ -1,0 +1,3 @@
+# 선택적 수치형/혼합형 리샘플링: 기존 Python 3.7 + sklearn 0.23.2 환경
+# SMOTEN은 0.7에 없으므로 전체 범주형 합성에는 requirements-py37.txt 별도 Python 3.7 환경 사용
+imbalanced-learn==0.7.0
