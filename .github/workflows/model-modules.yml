@@ -31,3 +31,7 @@ jobs:
           python -m src.MachineLearning.NeuralNetworks.perceptron
           python -m src.MachineLearning.LinearModels.linear_regression
           python -m src.MachineLearning.NeuralNetworks.adaline
+          python -m src.stats.tests.parametric.Average.Multivariate.OneWay
+          python -m src.stats.tests.parametric.Average.Multivariate.TwoWay
+          python -m src.stats.tests.parametric.Average.Multivariate.MANOVA
+          python -m src.stats.tests.parametric.Average.Multivariate.PostHoc

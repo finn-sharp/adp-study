@@ -8,3 +8,5 @@ matplotlib==3.5.3
 xgboost==0.90
 lightgbm==2.2.3
 catboost==1.2.5
+statsmodels==0.13.2
+patsy==0.5.6
