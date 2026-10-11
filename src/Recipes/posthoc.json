@@ -1,0 +1,5 @@
+{
+  "method": "tukey",
+  "equal_var": true,
+  "alpha": 0.05
+}

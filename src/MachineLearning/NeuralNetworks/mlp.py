@@ -5,6 +5,7 @@ mlp.py - MLP 다층 퍼셉트론 회귀·분류
 설명:
     - MLP 다층 퍼셉트론 회귀·분류의 학습·평가·학습 구간 교차검증을 제공합니다.
     - 분석 조건은 Profile, 분석 결과는 Output DTO로 정의합니다.
+    - Profile 생략 시 모델별 JSON 레시피를 읽어 학습에 적용합니다.
 
 분석 가정:
     - 독립·동일 분포 자료의 무작위 학습/테스트 분할을 사용합니다.
@@ -21,12 +22,13 @@ mlp.py - MLP 다층 퍼셉트론 회귀·분류
     DATE        AUTHOR          VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-10-11  김재현(Finn)     v1.0.0    동일 명세의 Profile·Output DTO·실행 함수 작성
+    2026-10-11  김재현(Finn)     v1.1.0    모델별 JSON 레시피 로딩과 공개 실행기 연결
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __status__ = "Development"
 
 
@@ -39,6 +41,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 
 from src.output import OutputDTO
+from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
     SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
 )
@@ -275,25 +278,33 @@ def run_mlp(
     X: Any,
     y: Any,
     profile: Optional[MLPProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    task: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
 ) -> MLPOutputDTO:
     """MLP 다층 퍼셉트론 회귀·분류를 검증·학습하고 전용 DTO로 반환합니다.
 
     Args:
         X: 유한한 수치형 (n_samples, n_features) 배열 또는 DataFrame.
         y: 길이 n_samples의 1차원 타깃. 회귀는 수치, 분류는 이산 라벨.
-        profile: MLPProfile. 기본 None이면 기본 조건을 사용.
+        profile: MLPProfile. 기본 None이면 모델별 JSON 레시피에서 구성.
+        recipe_path: 사용자 JSON 경로. None이면 src/Recipes의 모델별 기본 파일.
+        task: Profile이 없을 때 분류/회귀 레시피 선택. None이면 모델 기본 목적.
+        overrides: Profile이 없을 때 레시피 위에 적용할 명시적 설정 사전.
     Returns:
         MLPOutputDTO: 적합 Pipeline·평가·예측 및 모델별 결과.
     Raises:
         TypeError: 잘못된 Profile 타입.
         ValueError: 입력·조건·분할·CV·학습 오류.
         ImportError: 선택 모델 라이브러리 미설치.
+        FileNotFoundError/OSError: 레시피 파일 누락 또는 읽기 실패.
     Notes:
         학습 폴드에서만 스케일러를 적합합니다. 조기 종료는 학습 구간 내부 검증 자료만 사용합니다. n_jobs는 CV에만 적용됩니다. 수렴 경고를 숨기지 않으며 n_iter와 loss_curve로 확인합니다.
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = profile if profile is not None else MLPProfile()
+    profile = resolve_profile("mlp", profile, recipe_path=recipe_path, task=task, overrides=overrides)
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)
@@ -315,7 +326,7 @@ if __name__ == "__main__":
     from sklearn.datasets import load_iris
 
     X, y = load_iris(return_X_y=True)
-    profile = MLPProfile(solver="lbfgs", max_iter=2000)
+    profile = load_profile("mlp")
     result = run_mlp(X, y, profile)
 
     print("Test metrics:", result.test_metrics)

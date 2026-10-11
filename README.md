@@ -91,3 +91,8 @@ XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron, 선형회귀, 아달린�
 
 고전·Welch 일원배치, 이원배치(Type I·II·III), 일원 MANOVA와 Tukey HSD·Holm·Bonferroni 사후검정을 제공합니다.
 [통계 모듈 명세 및 실행 안내](docs/ANOVA_MODULES.md)를 참고하세요.
+
+## 모델별 레시피
+
+모델·목적별 JSON 17개를 `src/Recipes`에서 별도로 관리합니다. Profile을 생략한 실행과 모듈 예제는 해당 레시피를 읽습니다.
+[레시피 형식·설정 우선순위·사용 예제](docs/RECIPES.md)를 참고하세요.

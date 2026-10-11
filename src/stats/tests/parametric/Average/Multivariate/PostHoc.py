@@ -19,12 +19,13 @@ PostHoc.py - 독립 집단 평균 사후검정
     DATE        AUTHOR          VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-10-11  김재현(Finn)     v1.1.0    통계 명세·검증·Output DTO 통일 및 검정 구현
+    2026-10-11  김재현(Finn)     v1.2.0    모델별 JSON 레시피 로딩과 공개 실행기 연결
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __status__ = "Development"
 
 
@@ -40,6 +41,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
+from src.Recipes import load_profile, resolve_profile
 from ._common import validate_alpha, validate_groups, validate_labels
 from itertools import combinations
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
@@ -197,24 +199,31 @@ def _run_posthoc(groups: List[np.ndarray], names: List[str], profile: PostHocPro
 # ---------------------------------------------------------------------------
 
 def run_posthoc(groups: Any, profile: Optional[PostHocProfile] = None,
-                group_names: Optional[List[str]] = None) -> PostHocOutputDTO:
+                group_names: Optional[List[str]] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> PostHocOutputDTO:
     """한 반응변수의 모든 독립 집단 쌍을 비교합니다.
 
     Args:
         groups: 집단별 1차원 수치 배열 목록. 반복측정·대응 자료는 지원하지 않음.
-        profile: None이면 등분산 Tukey HSD, alpha=0.05.
+        profile: None이면 posthoc.json에서 구성.
         group_names: 입력 순서의 집단 표시 이름. None이면 자동 이름.
+        recipe_path: 사용자 JSON 경로. None이면 src/Recipes의 모델별 기본 파일.
+        overrides: Profile이 없을 때 레시피 위에 적용할 명시적 설정 사전.
     Returns:
         PostHocOutputDTO: 평균 차이·조정 p-value·선택적 CI·기각 판단 비교표.
     Raises:
         TypeError: 잘못된 Profile 타입.
         ValueError: 입력·조건·분산·이름 또는 수치 계산 오류.
+        FileNotFoundError/OSError: 레시피 파일 누락 또는 읽기 실패.
     Notes:
         전체 ANOVA의 유의성에 따라 자동으로 차단하지 않습니다. 전체 검정 결과와 함께 보고하세요.
         이원 ANOVA 교호작용의 단순효과/조정 주변평균 검정은 이 함수의 범위가 아닙니다.
         MANOVA 후 종속변수별 반복 비교는 이 함수의 쌍별 보정 외에 추가 보정이 필요합니다.
     """
-    profile = profile if profile is not None else PostHocProfile()
+    profile = resolve_profile("posthoc", profile, recipe_path=recipe_path, overrides=overrides)
     arrays,names = _validate_inputs(groups,profile,group_names)
     return _run_posthoc(arrays,names,profile)
 
@@ -226,6 +235,6 @@ def run_posthoc(groups: Any, profile: Optional[PostHocProfile] = None,
 if __name__ == "__main__":
     groups = [[1,2,3,4], [4,5,6,8], [8,9,10,12]]
     for method in ('tukey','holm','bonferroni'):
-        result = run_posthoc(groups,PostHocProfile(method=method),['A','B','C'])
+        result = run_posthoc(groups,load_profile("posthoc", overrides={"method": method}),['A','B','C'])
         print(result.comparisons)
         print(result.to_json()[:200])
