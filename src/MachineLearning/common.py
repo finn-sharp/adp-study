@@ -27,6 +27,7 @@ __version__ = "1.0.0"
 __status__ = "Development"
 
 
+from src.output import OutputDTO
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
