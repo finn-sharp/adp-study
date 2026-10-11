@@ -81,3 +81,13 @@ jupyter kernelspec list # 등록 커널 확인
 ```
 - 이후 환경 재시작하여 커널 지정하기 :
  > `command` + `shift` + `p` / `developer:reload window` 클릭하기
+
+## 동일 명세의 머신러닝 모델
+
+XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron, 선형회귀, 아달린의 Profile·Output DTO·실행 함수·예제를 제공합니다.
+[모듈 명세 및 실행 안내](docs/MODEL_MODULE_FORMAT.md)를 참고하세요.
+
+## ANOVA·MANOVA·사후검정
+
+고전·Welch 일원배치, 이원배치(Type I·II·III), 일원 MANOVA와 Tukey HSD·Holm·Bonferroni 사후검정을 제공합니다.
+[통계 모듈 명세 및 실행 안내](docs/ANOVA_MODULES.md)를 참고하세요.

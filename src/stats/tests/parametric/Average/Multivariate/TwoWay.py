@@ -1,75 +1,94 @@
 """
 ================================================================================
-TwoWay.py - 두 요인에 대한 평균 검정(Two-way ANOVA) 기능 구현
+TwoWay.py - 이원배치 ANOVA
 ================================================================================
 설명:
-    - 두 개의 범주형 독립변수(요인)에 따른 수치형 반응변수의 평균 차이를 검정합니다.
-    - 교호작용항(Interaction Effect) 포함 여부 및 제곱합 타입(Type I, II, III) 선택 기능을 제공합니다.
+    - 이원배치 ANOVA을 수행하고 Profile·Output DTO로 입력과 결과를 정의합니다.
+
+분석 가정:
+    - 독립 관측·잔차 정규성·등분산을 가정합니다. 교호작용 모델은 모든 요인 조합에 최소 두 관측이 필요합니다.
+    - 결측값·무한대는 사전에 처리하며 가정 검정은 자동 수행하지 않습니다.
 
 작성 정보:
-    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성자: 김재현(Finn)
+    - 이메일: penguin.klg@gmail.com
     - 작성일: 2026-09-10
     - 라이선스: Proprietary
 
-변경 이력:
-    DATE        AUTHOR           VERSION   DESCRIPTION
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
-    2026-09-10  김재현(Finn)       v1.0.0    최초 작성
+    2026-09-10  김재현(Finn)     v1.0.0    최초 작성
+    2026-10-11  김재현(Finn)     v1.1.0    통계 명세·검증·Output DTO 통일 및 검정 구현
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __status__ = "Development"
 
-import sys
+
+
+
+# ---------------------------------------------------------------------------
+# 1. Imports
+# ---------------------------------------------------------------------------
+
 from dataclasses import dataclass
-from typing import Any, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
+from scipy import stats
+from src.output import OutputDTO
+from ._common import validate_alpha, validate_groups, validate_labels
 from statsmodels.formula.api import ols
-from typing_extensions import Literal  # pip install typing_extensions
+from statsmodels.stats.anova import anova_lm
 
 
+# ---------------------------------------------------------------------------
+# 2. Input Profile
+# ---------------------------------------------------------------------------
 
-# 1. Data Models (Profile & Result)
 @dataclass
 class TwoWayANOVAProfile:
-    """ 이원배치 분산분석(Two-way ANOVA) 사전 정보 및 검정 조건을 정의하는 데이터 클래스.
-    
-    Attributes:
-        interaction: 교호작용항(Factor1 x Factor2) 포함 여부 (기본값 True)
-        ss_type: 제곱합(Sum of Squares) 계산 방식 (Type 1, 2, 3 / 기본값 2)
-        alpha: 유의수준 (기본값 0.05)
-    """
-    
-    interaction: bool = True               # 교호작용항 포함 여부 (True: 주효과+교호작용, False: 주효과 전용)
-    ss_type: Literal[1, 2, 3] = 2          # 제곱합 계산 방식 (Type II SS가 주효과 검정의 기본 표준)
-    alpha: float = 0.05                    # 유의수준
+    """이원배치 ANOVA 입력 조건.
 
+    Attributes:
+        interaction (bool): 교호작용 포함 여부. 기본 True. False는 가법 주효과 모델.
+        ss_type (int): 제곱합 타입 1/2/3. 기본 2. Type I는 요인 1→요인 2의 순차 검정. Sum 코딩 사용.
+        alpha (float): 유의수준. 기본 0.05, 유한한 0<값<1. 기각 기준은 p_value<alpha.
+    """
+
+    interaction: bool = True
+    ss_type: int = 2
+    alpha: float = 0.05
+
+
+# ---------------------------------------------------------------------------
+# 3. Output DTO
+# ---------------------------------------------------------------------------
 
 @dataclass
-class TwoWayANOVAResult:
-    """ Two-way ANOVA 검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
-    
+class TwoWayANOVAOutputDTO(OutputDTO):
+    """이원배치 ANOVA 검정 결과.
+
     Attributes:
-        test_type: 수행된 검정 유형 (예: "Two-way ANOVA (With Interaction)", "Two-way ANOVA (Main Effects Only)")
-        factor1_name: 요인 1 변수명
-        factor2_name: 요인 2 변수명
-        f_factor1: 요인 1 F 통계량
-        p_factor1: 요인 1 p-value
-        reject_h0_factor1: 요인 1 귀무가설 기각 여부
-        f_factor2: 요인 2 F 통계량
-        p_factor2: 요인 2 p-value
-        reject_h0_factor2: 요인 2 귀무가설 기각 여부
-        f_interaction: 교호작용항 F 통계량 (interaction=False 시 None)
-        p_interaction: 교호작용항 p-value (interaction=False 시 None)
-        reject_h0_interaction: 교호작용항 귀무가설 기각 여부 (interaction=False 시 None)
-        anova_table: 전체 ANOVA 분산분석표 (pandas DataFrame)
+        test_type (str): 교호작용·SS 타입을 포함한 이원배치 검정 이름.
+        factor1_name (str): 첫 번째 요인의 표시 이름.
+        factor2_name (str): 두 번째 요인의 표시 이름.
+        f_factor1 (float): 요인 1 F 통계량.
+        p_factor1 (float): 요인 1 p-value.
+        reject_h0_factor1 (bool): 요인 1 p<alpha 여부.
+        f_factor2 (float): 요인 2 F 통계량.
+        p_factor2 (float): 요인 2 p-value.
+        reject_h0_factor2 (bool): 요인 2 p<alpha 여부.
+        f_interaction (Optional[float]): 교호작용 F 통계량. interaction=False이면 None.
+        p_interaction (Optional[float]): 교호작용 p-value. interaction=False이면 None.
+        reject_h0_interaction (Optional[bool]): 교호작용 p<alpha 여부. interaction=False이면 None.
+        anova_table (pd.DataFrame): SS·df·F·p 표. 행은 요인·교호작용·잔차. Type III는 절편 검정 포함.
     """
-    
+
     test_type: str
     factor1_name: str
     factor2_name: str
@@ -84,222 +103,130 @@ class TwoWayANOVAResult:
     reject_h0_interaction: Optional[bool]
     anova_table: pd.DataFrame
 
+TwoWayANOVAResult = TwoWayANOVAOutputDTO
 
-# 2. Individual Test Runners (개별 검정 수행 전담 함수)
-def _run_twoway_with_interaction(
-        df: pd.DataFrame,
-        profile: TwoWayANOVAProfile,
-        f1_name: str,
-        f2_name: str,
-        response_name: str) -> TwoWayANOVAResult:
 
-    """ 교호작용항을 포함한 이원배치 분산분석(Full Factorial Model)을 수행합니다.
-    
+# ---------------------------------------------------------------------------
+# 4. Input Validation
+# ---------------------------------------------------------------------------
+
+def _validate_inputs(y: Any, factor1: Any, factor2: Any, profile: TwoWayANOVAProfile,
+                     names: List[str]) -> pd.DataFrame:
+    """이원배치 입력과 요인 조합을 검증합니다.
+
     Args:
-        df: pandas DataFrame 형태의 데이터 (반응변수와 두 요인 포함)
-        profile: 검정 조건을 정의한 TwoWayANOVAProfile 객체
-        f1_name: 요인 1 변수명
-        f2_name: 요인 2 변수명
-        response_name: 반응 변수의 변수명
-    
+        y: 유한한 수치형 1차원 반응변수.
+        factor1: 첫 번째 요인 라벨, 최소 두 수준.
+        factor2: 두 번째 요인 라벨, 최소 두 수준.
+        profile: TwoWayANOVAProfile.
+        names: 서로 다른 비어 있지 않은 요인1·요인2·반응 표시 이름.
     Returns:
-        TwoWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
-    
+        pd.DataFrame: 안전한 내부 열 이름으로 구성한 분석 데이터.
     Raises:
-        ValueError: 입력 데이터가 충분하지 않거나, 교호작용항이 포함되지 않은 경우.
+        TypeError: 잘못된 Profile 타입.
+        ValueError: 조건·입력·요인 조합·이름 오류.
     """
-
-    if profile is None:
-        raise ValueError("검정 조건을 정의한 TwoWayANOVAProfile 객체가 필요합니다.")
-
-    if not profile.interaction:
-        raise ValueError("교호작용항이 포함되지 않은 프로필에서는 이 함수를 사용할 수 없습니다. interaction=True로 설정하세요.")
-    
-    formula = f'Q("{response_name}") ~ C(Q("{f1_name}")) + C(Q("{f2_name}")) + C(Q("{f1_name}")):C(Q("{f2_name}"))'
-    model = ols(formula, data=df).fit()
-    anova_df = sm.stats.anova_lm(model, typ=profile.ss_type)
-
-    # ANOVA 표 결과 추출 (Factor1, Factor2, Interaction)
-    f1_f = float(anova_df.iloc[0]['F'])
-    f1_p = float(anova_df.iloc[0]['PR(>F)'])
-
-    f2_f = float(anova_df.iloc[1]['F'])
-    f2_p = float(anova_df.iloc[1]['PR(>F)'])
-
-    inter_f = float(anova_df.iloc[2]['F'])
-    inter_p = float(anova_df.iloc[2]['PR(>F)'])
-
-    return TwoWayANOVAResult(
-        test_type=f"Two-way ANOVA with Interaction (Type {profile.ss_type} SS)",
-        factor1_name=f1_name,
-        factor2_name=f2_name,
-        f_factor1=f1_f,
-        p_factor1=f1_p,
-        reject_h0_factor1=bool(f1_p < profile.alpha),
-        f_factor2=f2_f,
-        p_factor2=f2_p,
-        reject_h0_factor2=bool(f2_p < profile.alpha),
-        f_interaction=inter_f,
-        p_interaction=inter_p,
-        reject_h0_interaction=bool(inter_p < profile.alpha),
-        anova_table=anova_df
-    )
-
-
-def _run_twoway_without_interaction(
-        df: pd.DataFrame,
-        profile: TwoWayANOVAProfile,
-        f1_name: str,
-        f2_name: str,
-        response_name: str) -> TwoWayANOVAResult:
-    """ 교호작용항을 제외한 이원배치 분산분석(Main Effects Only Model)을 수행합니다.
-    
-    Args:
-        df: pandas DataFrame 형태의 데이터 (반응변수와 두 요인 포함)
-        profile: 검정 조건을 정의한 TwoWayANOVAProfile 객체
-        f1_name: 요인 1 변수명
-        f2_name: 요인 2 변수명
-        response_name: 반응 변수의 변수명
-    
-    Returns:
-        TwoWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
-    
-    Raises:
-        ValueError: 입력 데이터가 충분하지 않거나, 교호작용항이 포함된 경우.
-    """
-    if profile is None:
-        raise ValueError("검정 조건을 정의한 TwoWayANOVAProfile 객체가 필요합니다.")
-    
+    if not isinstance(profile, TwoWayANOVAProfile):
+        raise TypeError("TwoWayANOVAProfile이 필요합니다.")
+    validate_alpha(profile.alpha)
+    if not isinstance(profile.interaction, bool) or isinstance(profile.ss_type, bool) or not isinstance(profile.ss_type,int) or profile.ss_type not in (1,2,3):
+        raise ValueError("interaction은 bool, ss_type은 1/2/3 정수여야 합니다.")
+    if any(not isinstance(s,str) or not s.strip() for s in names) or len(set(names)) != 3:
+        raise ValueError("표시 이름은 서로 다른 비어 있지 않은 문자열이어야 합니다.")
+    response = np.asarray(y,dtype=float)
+    if response.ndim != 1 or len(response)<4 or not np.isfinite(response).all():
+        raise ValueError("y는 최소 4행의 유한한 1차원 수치 자료여야 합니다.")
+    f1, f2 = validate_labels(factor1,len(response)), validate_labels(factor2,len(response))
+    data = pd.DataFrame({'Response':response,'Factor1':f1,'Factor2':f2})
     if profile.interaction:
-        raise ValueError("교호작용항이 포함된 프로필에서는 이 함수를 사용할 수 없습니다. interaction=False로 설정하세요.")
-    
-    formula = f'Q("{response_name}") ~ C(Q("{f1_name}")) + C(Q("{f2_name}"))'
-    model = ols(formula, data=df).fit()
-    anova_df = sm.stats.anova_lm(model, typ=profile.ss_type)
-
-    # ANOVA 표 결과 추출 (Factor1, Factor2)
-    f1_f = float(anova_df.iloc[0]['F'])
-    f1_p = float(anova_df.iloc[0]['PR(>F)'])
-
-    f2_f = float(anova_df.iloc[1]['F'])
-    f2_p = float(anova_df.iloc[1]['PR(>F)'])
-
-    return TwoWayANOVAResult(
-        test_type=f"Two-way ANOVA Main Effects Only (Type {profile.ss_type} SS)",
-        factor1_name=f1_name,
-        factor2_name=f2_name,
-        f_factor1=f1_f,
-        p_factor1=f1_p,
-        reject_h0_factor1=bool(f1_p < profile.alpha),
-        f_factor2=f2_f,
-        p_factor2=f2_p,
-        reject_h0_factor2=bool(f2_p < profile.alpha),
-        f_interaction=None,
-        p_interaction=None,
-        reject_h0_interaction=None,
-        anova_table=anova_df
-    )
+        counts = data.groupby(['Factor1','Factor2']).size()
+        if len(counts)!=len(np.unique(f1))*len(np.unique(f2)) or counts.min()<2:
+            raise ValueError("교호작용 모델은 모든 요인 조합에 최소 두 관측이 필요합니다.")
+    return data
 
 
-# 3. Main Dispatcher (유효성 검증 및 분기 담당 메인 함수)
-def run_twoway_anova(
-        y: Sequence[Union[float, int]],
-        factor1: Sequence[Any],
-        factor2: Sequence[Any],
-        profile: TwoWayANOVAProfile,
-        factor1_name: str = "Factor1",
-        factor2_name: str = "Factor2",
-        response_name: str = "Response") -> TwoWayANOVAResult:
-    """ 두 요인에 대한 평균 차이 및 교호작용 검정(Two-way ANOVA)을 유효성 검증 후 적절한 알고리즘으로 수행합니다.
-    
+# ---------------------------------------------------------------------------
+# 5. Individual Model Runners
+# ---------------------------------------------------------------------------
+
+def _run_twoway(data: pd.DataFrame, profile: TwoWayANOVAProfile,
+                factor1_name: str, factor2_name: str) -> TwoWayANOVAOutputDTO:
+    """Sum 코딩 OLS를 적합하고 이름으로 효과를 추출합니다.
+
     Args:
-        y: 반응 변수 데이터 (수치형 데이터 시퀀스).
-        factor1: 첫 번째 독립변수 요인 데이터 (범주형 데이터 시퀀스).
-        factor2: 두 번째 독립변수 요인 데이터 (범주형 데이터 시퀀스).
-        profile: 검정 조건을 정의한 TwoWayANOVAProfile 객체.
-        factor1_name: 첫 번째 요인의 변수명 (기본값 "Factor1").
-        factor2_name: 두 번째 요인의 변수명 (기본값 "Factor2").
-        response_name: 반응 변수의 변수명 (기본값 "Response").
-    
+        data: 검증된 내부 열 데이터.
+        profile: 검정 조건.
+        factor1_name: 요인 1 표시 이름.
+        factor2_name: 요인 2 표시 이름.
     Returns:
-        TwoWayANOVAResult: 검정 결과를 통일된 규격으로 담은 객체.
-    
+        TwoWayANOVAOutputDTO: 두 주효과와 선택적 교호작용 검정.
     Raises:
-        ValueError: 입력 데이터 간 길이가 다르거나, 표본 크기가 부족한 경우.
+        ValueError: 설계 rank 부족·잔차 자유도/분산 부족·비유한 검정 결과.
+    Notes:
+        Type III는 Sum 대비를 사용하며 행 위치로 효과를 추출하지 않습니다.
     """
-    y_arr = np.asarray(y, dtype=float)
-    f1_arr = np.asarray(factor1)
-    f2_arr = np.asarray(factor2)
-
-    if not (len(y_arr) == len(f1_arr) == len(f2_arr)):
-        raise ValueError("반응변수(y)와 두 요인(factor1, factor2)의 데이터 길이가 일치해야 합니다.")
-
-    if len(y_arr) < 4:
-        raise ValueError("Two-way ANOVA를 수행하려면 최소 4개 이상의 표본 데이터가 필요합니다.")
-
-    df = pd.DataFrame({
-        response_name: y_arr,
-        factor1_name: f1_arr,
-        factor2_name: f2_arr
-    })
-
-    # 책임 분기: 프로필의 interaction 설정에 따라 개별 실행기로 위임
-    if profile.interaction:
-        return _run_twoway_with_interaction(df, profile, factor1_name, factor2_name, response_name)
-    else:
-        return _run_twoway_without_interaction(df, profile, factor1_name, factor2_name, response_name)
+    t1,t2 = 'C(Factor1, Sum)','C(Factor2, Sum)'
+    formula = 'Response ~ '+t1+(' * ' if profile.interaction else ' + ')+t2
+    model = ols(formula,data=data).fit()
+    if np.linalg.matrix_rank(model.model.exog)<model.model.exog.shape[1] or model.df_resid<=0 or model.ssr<=0:
+        raise ValueError("추정 가능한 설계와 양의 잔차 자유도·분산이 필요합니다.")
+    table = anova_lm(model,typ=profile.ss_type)
+    values = {}
+    for suffix,term in [('factor1',t1),('factor2',t2),('interaction',t1+':'+t2)]:
+        if suffix=='interaction' and not profile.interaction:
+            values.update(f_interaction=None,p_interaction=None,reject_h0_interaction=None)
+            continue
+        f,p = float(table.loc[term,'F']),float(table.loc[term,'PR(>F)'])
+        if not np.isfinite([f,p]).all():
+            raise ValueError("효과의 F 또는 p-value가 유한하지 않습니다.")
+        values['f_'+suffix],values['p_'+suffix],values['reject_h0_'+suffix] = f,p,bool(p<profile.alpha)
+    table = table.rename(index={t1:'C('+factor1_name+', Sum)',t2:'C('+factor2_name+', Sum)',
+                               t1+':'+t2:'C('+factor1_name+', Sum):C('+factor2_name+', Sum)'})
+    return TwoWayANOVAOutputDTO(test_type='Two-way ANOVA (Type {} SS, interaction={})'.format(profile.ss_type,profile.interaction),
+                                factor1_name=factor1_name,factor2_name=factor2_name,anova_table=table,**values)
 
 
+# ---------------------------------------------------------------------------
+# 6. Public Runner
+# ---------------------------------------------------------------------------
+
+def run_twoway_anova(y: Any, factor1: Any, factor2: Any,
+                     profile: Optional[TwoWayANOVAProfile] = None,
+                     factor1_name: str = "Factor1", factor2_name: str = "Factor2",
+                     response_name: str = "Response") -> TwoWayANOVAOutputDTO:
+    """두 요인의 평균 차이 및 선택적 교호작용을 검정합니다.
+
+    Args:
+        y: 수치형 1차원 반응변수.
+        factor1: y와 같은 길이의 첫 번째 요인.
+        factor2: y와 같은 길이의 두 번째 요인.
+        profile: None이면 교호작용 포함 Type II, alpha=0.05.
+        factor1_name: 요인 1 표시 이름. 수식에 삽입하지 않음.
+        factor2_name: 요인 2 표시 이름. 수식에 삽입하지 않음.
+        response_name: 반응변수 표시 이름. 수식에 삽입하지 않음.
+    Returns:
+        TwoWayANOVAOutputDTO: 효과별 검정 및 분산분석표.
+    Raises:
+        TypeError: 잘못된 Profile 타입.
+        ValueError: 입력·조건·설계·잔차 또는 수치 계산 오류.
+    Notes:
+        기존 함수 인자와 TwoWayANOVAResult 이름은 호환됩니다.
+        유의한 교호작용은 주효과만으로 해석하지 말고 단순효과를 확인해야 합니다.
+    """
+    profile = profile if profile is not None else TwoWayANOVAProfile()
+    data = _validate_inputs(y,factor1,factor2,profile,[factor1_name,factor2_name,response_name])
+    return _run_twoway(data,profile,factor1_name,factor2_name)
+
+
+# ---------------------------------------------------------------------------
+# 7. Example Execution
+# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    # 예시 데이터: 비료 종류(Fertilizer: A, B)와 급수 방법(Watering: Low, High)에 따른 식물 성장량(Yield)
-    yield_data = [
-        12.5, 13.1, 11.8, 14.0,  # Fertilizer A, Low Water
-        16.2, 15.8, 17.1, 16.5,  # Fertilizer A, High Water
-        10.1, 11.0, 10.5, 9.8,   # Fertilizer B, Low Water
-        12.0, 12.8, 13.2, 12.1   # Fertilizer B, High Water
-    ]
-
-    fertilizer = ['A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B']
-    watering = ['Low', 'Low', 'Low', 'Low', 'High', 'High', 'High', 'High', 'Low', 'Low', 'Low', 'Low', 'High', 'High', 'High', 'High']
-
-    # 1. 교호작용항을 포함하는 이원배치 분산분석 (With Interaction)
-    profile_interaction = TwoWayANOVAProfile(interaction=True, ss_type=2, alpha=0.05)
-    res_interaction = run_twoway_anova(
-        y=yield_data,
-        factor1=fertilizer,
-        factor2=watering,
-        profile=profile_interaction,
-        factor1_name="Fertilizer",
-        factor2_name="Watering",
-        response_name="Yield"
-    )
-
-    print("=== 1. Two-way ANOVA (With Interaction) ===")
-    print(f"Test Type   : {res_interaction.test_type}")
-    print(f"[{res_interaction.factor1_name}] F: {res_interaction.f_factor1:.4f}, p: {res_interaction.p_factor1:.4e}, Reject H0: {res_interaction.reject_h0_factor1}")
-    print(f"[{res_interaction.factor2_name}] F: {res_interaction.f_factor2:.4f}, p: {res_interaction.p_factor2:.4e}, Reject H0: {res_interaction.reject_h0_factor2}")
-    if res_interaction.f_interaction is not None and res_interaction.p_interaction is not None:
-        print(f"[Interaction] F: {res_interaction.f_interaction:.4f}, p: {res_interaction.p_interaction:.4e}, Reject H0: {res_interaction.reject_h0_interaction}")
-    print("\n[ANOVA Table]")
-    print(res_interaction.anova_table)
-    print("\n" + "=" * 80 + "\n")
-
-    # 2. 주효과만 고려하는 이원배치 분산분석 (Main Effects Only)
-    profile_additive = TwoWayANOVAProfile(interaction=False, ss_type=2, alpha=0.05)
-    res_additive = run_twoway_anova(
-        y=yield_data,
-        factor1=fertilizer,
-        factor2=watering,
-        profile=profile_additive,
-        factor1_name="Fertilizer",
-        factor2_name="Watering",
-        response_name="Yield"
-    )
-
-    print("=== 2. Two-way ANOVA (Main Effects Only) ===")
-    print(f"Test Type   : {res_additive.test_type}")
-    print(f"[{res_additive.factor1_name}] F: {res_additive.f_factor1:.4f}, p: {res_additive.p_factor1:.4e}, Reject H0: {res_additive.reject_h0_factor1}")
-    print(f"[{res_additive.factor2_name}] F: {res_additive.f_factor2:.4f}, p: {res_additive.p_factor2:.4e}, Reject H0: {res_additive.reject_h0_factor2}")
-    print("\n[ANOVA Table]")
-    print(res_additive.anova_table)
+    y = [1,2,3,4, 3,4,5,7, 5,6,7,9, 10,11,12,14]
+    factor1 = ['A']*8+['B']*8
+    factor2 = (['Low']*4+['High']*4)*2
+    for ss_type in (1,2,3):
+        result = run_twoway_anova(y,factor1,factor2,TwoWayANOVAProfile(ss_type=ss_type))
+        print(result.anova_table)
+        print(result.to_json()[:200])
