@@ -1,4 +1,4 @@
-# Python 3.12.14에서 검증한 여덟 모델의 CPU 의존성
+# Python 3.12.14에서 검증한 모델·분석 모듈의 CPU 의존성
 numpy==2.3.5
 pandas==2.2.3
 scipy==1.17.0
@@ -9,3 +9,13 @@ lightgbm==4.6.0
 catboost==1.2.8
 statsmodels==0.14.6
 patsy==1.0.2
+
+# 비선형 차원 축소·계층 밀도 군집·연결망 분석
+umap-learn==0.5.9.post2
+numba==0.68.0
+llvmlite==0.50.0
+pynndescent==0.6.0
+hdbscan==0.8.41
+networkx==3.4.2
+tqdm==4.70.1
+typing-extensions==4.15.0

@@ -1,0 +1,7 @@
+{
+  "directed": false,
+  "nodes": null,
+  "pagerank_alpha": 0.85,
+  "pagerank_max_iter": 1000,
+  "pagerank_tol": 1e-06
+}

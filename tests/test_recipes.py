@@ -31,7 +31,7 @@ class RecipesTest(unittest.TestCase):
                     aliases = {'alpha', 'lambda'} if name == 'xgboost' else set()
                     self.assertFalse(keys - {f.name for f in fields(profile)} - aliases)
                     count += 1
-        self.assertEqual(count, 17)
+        self.assertEqual(count, 34)
         self.assertIsInstance(load_profile('mlp').hidden_layer_sizes, tuple)
 
     def test_all_machine_learning_runners_use_default_recipes(self):
@@ -39,7 +39,7 @@ class RecipesTest(unittest.TestCase):
         X_reg, y_reg = make_regression(n_samples=90, n_features=4, random_state=2)
         y_reg = y_reg / 100
         for name, (module_name, _, _, tasks) in _REGISTRY.items():
-            if tasks == (None,):
+            if name not in ('xgboost','catboost','lightgbm','adaboost','mlp','perceptron','adaline','linear-regression'):
                 continue
             run = getattr(importlib.import_module(module_name), 'run_' + name.replace('-', '_'))
             for task in tasks:

@@ -1,0 +1,9 @@
+{
+  "scaling": "standard",
+  "random_state": 1234,
+  "n_components": 2,
+  "n_neighbors": 15,
+  "min_dist": 0.1,
+  "spread": 1.0,
+  "n_epochs": 200
+}

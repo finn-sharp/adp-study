@@ -21,8 +21,8 @@
 | `manova` | 해당 없음 | `manova.json` |
 | `posthoc` | 해당 없음 | `posthoc.json` |
 
-총 17개 파일입니다. 기본 목적은 선형회귀를 제외한 머신러닝 모델에서 `classification`,
-선형회귀에서 `regression`입니다. 통계 검정에는 task 인자를 지정하지 않습니다.
+기존 모델·검정 레시피는 위 17개 파일입니다. 전체 추가 기법까지 총 34개 파일입니다. 지도 학습·변수 선택의 기본 목적은 선형회귀를 제외하면 `classification`,
+선형회귀에서는 `regression`입니다. 군집·차원 축소·통계·Apriori·SNA에는 task 인자를 지정하지 않습니다.
 
 ## 설정 순서와 형식
 
@@ -94,5 +94,28 @@ GridSearchCV에서도 각 학습 폴드 내부에서 분리하며, 보류 테스
 키와 형식은 로더가, 수치 범위와 데이터 조건은 공개 실행기가 검증합니다.
 JSON은 설정과 CV 후보만 저장하며 적합 모델이나 결과 자료를 저장하지 않습니다.
 
-`tests/test_recipes.py`는 17개 파일, 설정 우선순위, 파일 변경 반영, 작업 디렉터리 독립성,
+`tests/test_recipes.py`는 34개 파일, 설정 우선순위, 파일 변경 반영, 작업 디렉터리 독립성,
 잘못된 설정 거부, 조기 종료 분리 및 CV, 통계 설정 연결을 검증합니다.
+
+## 추가 분석 기법 레시피
+
+| 기법 | 레시피 |
+| --- | --- |
+| `kmeans` | `kmeans.json` |
+| `dbscan` | `dbscan.json` |
+| `hdbscan` | `hdbscan.json` |
+| `k-distance` | `k-distance.json` |
+| `pca` | `pca.json` |
+| `lda` | `lda.json` |
+| `umap` | `umap.json` |
+| `tsne` | `tsne.json` |
+| `mds` | `mds.json` |
+| `som` | `som.json` |
+| `naive-bayes` | `naive-bayes-classification.json` |
+| `wrapper-selection` | `wrapper-selection-classification.json`, `wrapper-selection-regression.json` |
+| `regularized-selection` | `regularized-selection-classification.json`, `regularized-selection-regression.json` |
+| `apriori` | `apriori.json` |
+| `sna` | `sna.json` |
+
+Wrapper의 method와 규제 선택의 penalty도 각 레시피에서 관리합니다. 분류·회귀별 파일은 별도로 유지합니다.
+전체 Profile·Output DTO 필드와 알고리즘 경계는 [전체 명세](ANALYSIS_CATALOG.md)를 참고하세요.

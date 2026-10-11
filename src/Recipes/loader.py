@@ -49,6 +49,21 @@ _REGISTRY = {
     "twoway-anova": ("src.stats.tests.parametric.Average.Multivariate.TwoWay", "TwoWayANOVAProfile", None, (None,)),
     "manova": ("src.stats.tests.parametric.Average.Multivariate.MANOVA", "MANOVAProfile", None, (None,)),
     "posthoc": ("src.stats.tests.parametric.Average.Multivariate.PostHoc", "PostHocProfile", None, (None,)),
+    'kmeans': ('src.MachineLearning.Clustering.kmeans', 'KMeansProfile', None, (None,)),
+    'dbscan': ('src.MachineLearning.Clustering.dbscan', 'DBSCANProfile', None, (None,)),
+    'hdbscan': ('src.MachineLearning.Clustering.hdbscan', 'HDBSCANProfile', None, (None,)),
+    'k-distance': ('src.MachineLearning.Clustering.k_distance', 'KDistanceProfile', None, (None,)),
+    'pca': ('src.MachineLearning.Decomposition.pca', 'PCAProfile', None, (None,)),
+    'lda': ('src.MachineLearning.Decomposition.lda', 'LDAProfile', None, (None,)),
+    'umap': ('src.MachineLearning.Decomposition.umap', 'UMAPProfile', None, (None,)),
+    'tsne': ('src.MachineLearning.Decomposition.tsne', 'TSNEProfile', None, (None,)),
+    'mds': ('src.MachineLearning.Decomposition.mds', 'MDSProfile', None, (None,)),
+    'som': ('src.MachineLearning.Decomposition.som', 'SOMProfile', None, (None,)),
+    'naive-bayes': ('src.MachineLearning.NaiveBayes.naive_bayes', 'NaiveBayesProfile', 'classification', ('classification',)),
+    'wrapper-selection': ('src.MachineLearning.FeatureSelection.wrapper', 'WrapperSelectionProfile', 'classification', ('classification', 'regression')),
+    'regularized-selection': ('src.MachineLearning.FeatureSelection.regularized', 'RegularizedSelectionProfile', 'classification', ('classification', 'regression')),
+    'apriori': ('src.Association.apriori', 'AprioriProfile', None, (None,)),
+    'sna': ('src.Networks.sna', 'SNAProfile', None, (None,)),
 }
 
 
