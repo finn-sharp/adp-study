@@ -136,8 +136,9 @@ Profile 기본값은 입력 계약의 기본값입니다. 실제 기본 실행�
 
 분류·회귀; 조기 종료와 학습 구간 CV.
 
-파일: [`src/MachineLearning/Trees/xgboost.py`](../src/MachineLearning/Trees/xgboost.py)  
-Profile: `XGBoostProfile` · DTO: `XGBoostOutputDTO`  
+파일: [`src/MachineLearning/Trees/xgboost.py`](../src/MachineLearning/Trees/xgboost.py)
+
+Profile: `XGBoostProfile` · DTO: `XGBoostOutputDTO`
 레시피: `xgboost-classification.json`, `xgboost-regression.json`
 
 ```python
@@ -200,8 +201,9 @@ run_xgboost(X: Any, y: Any, profile: Optional[src.MachineLearning.Trees.xgboost.
 
 분류·회귀; 현재 수치 입력만 지원.
 
-파일: [`src/MachineLearning/Trees/catboost.py`](../src/MachineLearning/Trees/catboost.py)  
-Profile: `CatBoostProfile` · DTO: `CatBoostOutputDTO`  
+파일: [`src/MachineLearning/Trees/catboost.py`](../src/MachineLearning/Trees/catboost.py)
+
+Profile: `CatBoostProfile` · DTO: `CatBoostOutputDTO`
 레시피: `catboost-classification.json`, `catboost-regression.json`
 
 ```python
@@ -252,8 +254,9 @@ run_catboost(X: Any, y: Any, profile: Optional[src.MachineLearning.Trees.catboos
 
 분류·회귀.
 
-파일: [`src/MachineLearning/Trees/lightgbm.py`](../src/MachineLearning/Trees/lightgbm.py)  
-Profile: `LightGBMProfile` · DTO: `LightGBMOutputDTO`  
+파일: [`src/MachineLearning/Trees/lightgbm.py`](../src/MachineLearning/Trees/lightgbm.py)
+
+Profile: `LightGBMProfile` · DTO: `LightGBMOutputDTO`
 레시피: `lightgbm-classification.json`, `lightgbm-regression.json`
 
 ```python
@@ -308,8 +311,9 @@ run_lightgbm(X: Any, y: Any, profile: Optional[src.MachineLearning.Trees.lightgb
 
 분류·회귀; 의사결정나무 기반.
 
-파일: [`src/MachineLearning/Trees/adaboost.py`](../src/MachineLearning/Trees/adaboost.py)  
-Profile: `AdaBoostProfile` · DTO: `AdaBoostOutputDTO`  
+파일: [`src/MachineLearning/Trees/adaboost.py`](../src/MachineLearning/Trees/adaboost.py)
+
+Profile: `AdaBoostProfile` · DTO: `AdaBoostOutputDTO`
 레시피: `adaboost-classification.json`, `adaboost-regression.json`
 
 ```python
@@ -360,8 +364,9 @@ run_adaboost(X: Any, y: Any, profile: Optional[src.MachineLearning.Trees.adaboos
 
 분류·회귀; 다층 퍼셉트론.
 
-파일: [`src/MachineLearning/NeuralNetworks/mlp.py`](../src/MachineLearning/NeuralNetworks/mlp.py)  
-Profile: `MLPProfile` · DTO: `MLPOutputDTO`  
+파일: [`src/MachineLearning/NeuralNetworks/mlp.py`](../src/MachineLearning/NeuralNetworks/mlp.py)
+
+Profile: `MLPProfile` · DTO: `MLPOutputDTO`
 레시피: `mlp-classification.json`, `mlp-regression.json`
 
 ```python
@@ -420,8 +425,9 @@ run_mlp(X: Any, y: Any, profile: Optional[src.MachineLearning.NeuralNetworks.mlp
 
 분류; 단층 선형 모델, 확률 없음.
 
-파일: [`src/MachineLearning/NeuralNetworks/perceptron.py`](../src/MachineLearning/NeuralNetworks/perceptron.py)  
-Profile: `PerceptronProfile` · DTO: `PerceptronOutputDTO`  
+파일: [`src/MachineLearning/NeuralNetworks/perceptron.py`](../src/MachineLearning/NeuralNetworks/perceptron.py)
+
+Profile: `PerceptronProfile` · DTO: `PerceptronOutputDTO`
 레시피: `perceptron-classification.json`
 
 ```python
@@ -477,8 +483,9 @@ run_perceptron(X: Any, y: Any, profile: Optional[src.MachineLearning.NeuralNetwo
 
 이진 분류; 선형 활성화의 배치 평균제곱 손실.
 
-파일: [`src/MachineLearning/NeuralNetworks/adaline.py`](../src/MachineLearning/NeuralNetworks/adaline.py)  
-Profile: `AdalineProfile` · DTO: `AdalineOutputDTO`  
+파일: [`src/MachineLearning/NeuralNetworks/adaline.py`](../src/MachineLearning/NeuralNetworks/adaline.py)
+
+Profile: `AdalineProfile` · DTO: `AdalineOutputDTO`
 레시피: `adaline-classification.json`
 
 ```python
@@ -534,8 +541,9 @@ run_adaline(X: Any, y: Any, profile: Optional[src.MachineLearning.NeuralNetworks
 
 단순·다중 OLS / positive=True일 때 NNLS.
 
-파일: [`src/MachineLearning/LinearModels/linear_regression.py`](../src/MachineLearning/LinearModels/linear_regression.py)  
-Profile: `LinearRegressionProfile` · DTO: `LinearRegressionOutputDTO`  
+파일: [`src/MachineLearning/LinearModels/linear_regression.py`](../src/MachineLearning/LinearModels/linear_regression.py)
+
+Profile: `LinearRegressionProfile` · DTO: `LinearRegressionOutputDTO`
 레시피: `linear-regression-regression.json`
 
 ```python
@@ -589,8 +597,9 @@ run_linear_regression(X: Any, y: Any, profile: Optional[src.MachineLearning.Line
 
 Gaussian / Multinomial / Bernoulli / Complement 분류.
 
-파일: [`src/MachineLearning/NaiveBayes/naive_bayes.py`](../src/MachineLearning/NaiveBayes/naive_bayes.py)  
-Profile: `NaiveBayesProfile` · DTO: `NaiveBayesOutputDTO`  
+파일: [`src/MachineLearning/NaiveBayes/naive_bayes.py`](../src/MachineLearning/NaiveBayes/naive_bayes.py)
+
+Profile: `NaiveBayesProfile` · DTO: `NaiveBayesOutputDTO`
 레시피: `naive-bayes-classification.json`
 
 ```python
@@ -641,8 +650,9 @@ run_naive_bayes(X: Any, y: Any, profile: Optional[src.MachineLearning.NaiveBayes
 
 고정 k 군집; 중심·inertia·silhouette.
 
-파일: [`src/MachineLearning/Clustering/kmeans.py`](../src/MachineLearning/Clustering/kmeans.py)  
-Profile: `KMeansProfile` · DTO: `KMeansOutputDTO`  
+파일: [`src/MachineLearning/Clustering/kmeans.py`](../src/MachineLearning/Clustering/kmeans.py)
+
+Profile: `KMeansProfile` · DTO: `KMeansOutputDTO`
 레시피: `kmeans.json`
 
 ```python
@@ -677,8 +687,9 @@ run_kmeans(X: Any, profile: Optional[src.MachineLearning.Clustering.kmeans.KMean
 
 eps 밀도 군집; 핵심점·잡음(-1).
 
-파일: [`src/MachineLearning/Clustering/dbscan.py`](../src/MachineLearning/Clustering/dbscan.py)  
-Profile: `DBSCANProfile` · DTO: `DBSCANOutputDTO`  
+파일: [`src/MachineLearning/Clustering/dbscan.py`](../src/MachineLearning/Clustering/dbscan.py)
+
+Profile: `DBSCANProfile` · DTO: `DBSCANOutputDTO`
 레시피: `dbscan.json`
 
 ```python
@@ -709,8 +720,9 @@ run_dbscan(X: Any, profile: Optional[src.MachineLearning.Clustering.dbscan.DBSCA
 
 계층 밀도 군집; 소속 강도·GLOSH 이상 점수.
 
-파일: [`src/MachineLearning/Clustering/hdbscan.py`](../src/MachineLearning/Clustering/hdbscan.py)  
-Profile: `HDBSCANProfile` · DTO: `HDBSCANOutputDTO`  
+파일: [`src/MachineLearning/Clustering/hdbscan.py`](../src/MachineLearning/Clustering/hdbscan.py)
+
+Profile: `HDBSCANProfile` · DTO: `HDBSCANOutputDTO`
 레시피: `hdbscan.json`
 
 ```python
@@ -743,8 +755,9 @@ run_hdbscan(X: Any, profile: Optional[src.MachineLearning.Clustering.hdbscan.HDB
 
 자기 자신 포함 k번째 이웃 거리와 정렬 곡선; eps 후보 진단.
 
-파일: [`src/MachineLearning/Clustering/k_distance.py`](../src/MachineLearning/Clustering/k_distance.py)  
-Profile: `KDistanceProfile` · DTO: `KDistanceOutputDTO`  
+파일: [`src/MachineLearning/Clustering/k_distance.py`](../src/MachineLearning/Clustering/k_distance.py)
+
+Profile: `KDistanceProfile` · DTO: `KDistanceOutputDTO`
 레시피: `k-distance.json`
 
 ```python
@@ -772,8 +785,9 @@ run_k_distance(X: Any, profile: Optional[src.MachineLearning.Clustering.k_distan
 
 선형 비지도 축소; 주성분·분산 설명·재구성 오차.
 
-파일: [`src/MachineLearning/Decomposition/pca.py`](../src/MachineLearning/Decomposition/pca.py)  
-Profile: `PCAProfile` · DTO: `PCAOutputDTO`  
+파일: [`src/MachineLearning/Decomposition/pca.py`](../src/MachineLearning/Decomposition/pca.py)
+
+Profile: `PCAProfile` · DTO: `PCAOutputDTO`
 레시피: `pca.json`
 
 ```python
@@ -805,8 +819,9 @@ run_pca(X: Any, profile: Optional[src.MachineLearning.Decomposition.pca.PCAProfi
 
 지도 판별 축소; y 필요; 최대 min(p, 클래스 수-1)축.
 
-파일: [`src/MachineLearning/Decomposition/lda.py`](../src/MachineLearning/Decomposition/lda.py)  
-Profile: `LDAProfile` · DTO: `LDAOutputDTO`  
+파일: [`src/MachineLearning/Decomposition/lda.py`](../src/MachineLearning/Decomposition/lda.py)
+
+Profile: `LDAProfile` · DTO: `LDAOutputDTO`
 레시피: `lda.json`
 
 ```python
@@ -837,8 +852,9 @@ run_lda(X: Any, y: Any, profile: Optional[src.MachineLearning.Decomposition.lda.
 
 비선형 비지도 축소; 새 입력 transform.
 
-파일: [`src/MachineLearning/Decomposition/umap.py`](../src/MachineLearning/Decomposition/umap.py)  
-Profile: `UMAPProfile` · DTO: `UMAPOutputDTO`  
+파일: [`src/MachineLearning/Decomposition/umap.py`](../src/MachineLearning/Decomposition/umap.py)
+
+Profile: `UMAPProfile` · DTO: `UMAPOutputDTO`
 레시피: `umap.json`
 
 ```python
@@ -870,8 +886,9 @@ run_umap(X: Any, profile: Optional[src.MachineLearning.Decomposition.umap.UMAPPr
 
 t-SNE; 시각화용 전 자료 적합; 새 입력 transform 없음.
 
-파일: [`src/MachineLearning/Decomposition/tsne.py`](../src/MachineLearning/Decomposition/tsne.py)  
-Profile: `TSNEProfile` · DTO: `TSNEOutputDTO`  
+파일: [`src/MachineLearning/Decomposition/tsne.py`](../src/MachineLearning/Decomposition/tsne.py)
+
+Profile: `TSNEProfile` · DTO: `TSNEOutputDTO`
 레시피: `tsne.json`
 
 ```python
@@ -903,8 +920,9 @@ run_tsne(X: Any, profile: Optional[src.MachineLearning.Decomposition.tsne.TSNEPr
 
 온라인 Kohonen SOM; 2차원 BMU 격자·코드북·양자화/위상 오차.
 
-파일: [`src/MachineLearning/Decomposition/som.py`](../src/MachineLearning/Decomposition/som.py)  
-Profile: `SOMProfile` · DTO: `SOMOutputDTO`  
+파일: [`src/MachineLearning/Decomposition/som.py`](../src/MachineLearning/Decomposition/som.py)
+
+Profile: `SOMProfile` · DTO: `SOMOutputDTO`
 레시피: `som.json`
 
 ```python
@@ -939,8 +957,9 @@ run_som(X: Any, profile: Optional[src.MachineLearning.Decomposition.som.SOMProfi
 
 metric/nonmetric SMACOF; 유클리드 입력; 새 입력 transform 없음.
 
-파일: [`src/MachineLearning/Decomposition/mds.py`](../src/MachineLearning/Decomposition/mds.py)  
-Profile: `MDSProfile` · DTO: `MDSOutputDTO`  
+파일: [`src/MachineLearning/Decomposition/mds.py`](../src/MachineLearning/Decomposition/mds.py)
+
+Profile: `MDSProfile` · DTO: `MDSOutputDTO`
 레시피: `mds.json`
 
 ```python
@@ -975,8 +994,9 @@ run_mds(X: Any, profile: Optional[src.MachineLearning.Decomposition.mds.MDSProfi
 
 Forward / Backward / CV 점수 기반 양방향 Stepwise; 분류·회귀.
 
-파일: [`src/MachineLearning/FeatureSelection/wrapper.py`](../src/MachineLearning/FeatureSelection/wrapper.py)  
-Profile: `WrapperSelectionProfile` · DTO: `WrapperSelectionOutputDTO`  
+파일: [`src/MachineLearning/FeatureSelection/wrapper.py`](../src/MachineLearning/FeatureSelection/wrapper.py)
+
+Profile: `WrapperSelectionProfile` · DTO: `WrapperSelectionOutputDTO`
 레시피: `wrapper-selection-classification.json`, `wrapper-selection-regression.json`
 
 ```python
@@ -1037,8 +1057,9 @@ run_wrapper_selection(X: Any, y: Any, profile: Optional[src.MachineLearning.Feat
 
 L1·L2; 분류 Logistic / 회귀 Lasso·Ridge 계수 기반 선택.
 
-파일: [`src/MachineLearning/FeatureSelection/regularized.py`](../src/MachineLearning/FeatureSelection/regularized.py)  
-Profile: `RegularizedSelectionProfile` · DTO: `RegularizedSelectionOutputDTO`  
+파일: [`src/MachineLearning/FeatureSelection/regularized.py`](../src/MachineLearning/FeatureSelection/regularized.py)
+
+Profile: `RegularizedSelectionProfile` · DTO: `RegularizedSelectionOutputDTO`
 레시피: `regularized-selection-classification.json`, `regularized-selection-regression.json`
 
 ```python
@@ -1098,8 +1119,9 @@ run_regularized_selection(X: Any, y: Any, profile: Optional[src.MachineLearning.
 
 빈발 항목집합; support·confidence·lift·leverage·conviction.
 
-파일: [`src/Association/apriori.py`](../src/Association/apriori.py)  
-Profile: `AprioriProfile` · DTO: `AprioriOutputDTO`  
+파일: [`src/Association/apriori.py`](../src/Association/apriori.py)
+
+Profile: `AprioriProfile` · DTO: `AprioriOutputDTO`
 레시피: `apriori.json`
 
 ```python
@@ -1129,8 +1151,9 @@ run_apriori(transactions: Any, profile: Optional[src.Association.apriori.Apriori
 
 유향·무향 연결망; 중심성·PageRank·커뮤니티·모듈성.
 
-파일: [`src/Networks/sna.py`](../src/Networks/sna.py)  
-Profile: `SNAProfile` · DTO: `SNAOutputDTO`  
+파일: [`src/Networks/sna.py`](../src/Networks/sna.py)
+
+Profile: `SNAProfile` · DTO: `SNAOutputDTO`
 레시피: `sna.json`
 
 ```python
@@ -1163,8 +1186,9 @@ run_sna(edges: Any, profile: Optional[src.Networks.sna.SNAProfile] = None, *, re
 
 고전·Welch 일원 ANOVA.
 
-파일: [`src/stats/tests/parametric/Average/Multivariate/OneWay.py`](../src/stats/tests/parametric/Average/Multivariate/OneWay.py)  
-Profile: `OneWayANOVAProfile` · DTO: `OneWayANOVAOutputDTO`  
+파일: [`src/stats/tests/parametric/Average/Multivariate/OneWay.py`](../src/stats/tests/parametric/Average/Multivariate/OneWay.py)
+
+Profile: `OneWayANOVAProfile` · DTO: `OneWayANOVAOutputDTO`
 레시피: `oneway-anova.json`
 
 ```python
@@ -1198,8 +1222,9 @@ run_oneway_anova(groups: Any, profile: Optional[src.stats.tests.parametric.Avera
 
 Type I·II·III; 교호작용 포함/제외.
 
-파일: [`src/stats/tests/parametric/Average/Multivariate/TwoWay.py`](../src/stats/tests/parametric/Average/Multivariate/TwoWay.py)  
-Profile: `TwoWayANOVAProfile` · DTO: `TwoWayANOVAOutputDTO`  
+파일: [`src/stats/tests/parametric/Average/Multivariate/TwoWay.py`](../src/stats/tests/parametric/Average/Multivariate/TwoWay.py)
+
+Profile: `TwoWayANOVAProfile` · DTO: `TwoWayANOVAOutputDTO`
 레시피: `twoway-anova.json`
 
 ```python
@@ -1236,8 +1261,9 @@ run_twoway_anova(y: Any, factor1: Any, factor2: Any, profile: Optional[src.stats
 
 일원 요인 MANOVA; Pillai·Wilks·Hotelling-Lawley·Roy.
 
-파일: [`src/stats/tests/parametric/Average/Multivariate/MANOVA.py`](../src/stats/tests/parametric/Average/Multivariate/MANOVA.py)  
-Profile: `MANOVAProfile` · DTO: `MANOVAOutputDTO`  
+파일: [`src/stats/tests/parametric/Average/Multivariate/MANOVA.py`](../src/stats/tests/parametric/Average/Multivariate/MANOVA.py)
+
+Profile: `MANOVAProfile` · DTO: `MANOVAOutputDTO`
 레시피: `manova.json`
 
 ```python
@@ -1274,8 +1300,9 @@ run_manova(Y: Any, groups: Any, profile: Optional[src.stats.tests.parametric.Ave
 
 Tukey HSD / Student·Welch 쌍별 t + Holm·Bonferroni.
 
-파일: [`src/stats/tests/parametric/Average/Multivariate/PostHoc.py`](../src/stats/tests/parametric/Average/Multivariate/PostHoc.py)  
-Profile: `PostHocProfile` · DTO: `PostHocOutputDTO`  
+파일: [`src/stats/tests/parametric/Average/Multivariate/PostHoc.py`](../src/stats/tests/parametric/Average/Multivariate/PostHoc.py)
+
+Profile: `PostHocProfile` · DTO: `PostHocOutputDTO`
 레시피: `posthoc.json`
 
 ```python
