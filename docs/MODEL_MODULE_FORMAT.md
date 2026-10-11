@@ -1,6 +1,6 @@
 # 모델 모듈 명세와 실행
 
-여섯 모듈은 기존 통계 검정 파일의 작성 정보, 변경 이력, 메타데이터와
+여덟 모듈은 기존 통계 검정 파일의 작성 정보, 변경 이력, 메타데이터와
 Attributes·Args·Returns·Raises 문서 형식을 따릅니다.
 모델 파일 자체에 공통 입력과 출력 필드를 모두 명시합니다.
 
@@ -26,6 +26,8 @@ Attributes·Args·Returns·Raises 문서 형식을 따릅니다.
 | `src/MachineLearning/Trees/adaboost.py` | `AdaBoostProfile` / `AdaBoostOutputDTO` | `run_adaboost` | 분류·회귀 |
 | `src/MachineLearning/NeuralNetworks/mlp.py` | `MLPProfile` / `MLPOutputDTO` | `run_mlp` | 분류·회귀 |
 | `src/MachineLearning/NeuralNetworks/perceptron.py` | `PerceptronProfile` / `PerceptronOutputDTO` | `run_perceptron` | 분류 |
+| `src/MachineLearning/LinearModels/linear_regression.py` | `LinearRegressionProfile` / `LinearRegressionOutputDTO` | `run_linear_regression` | 단순·다중 선형회귀 |
+| `src/MachineLearning/NeuralNetworks/adaline.py` | `AdalineProfile` / `AdalineOutputDTO` | `run_adaline` | 이진 분류 |
 
 MCP 요청은 확인한 의미에 따라 MLP(다층 퍼셉트론)로 구현했습니다.
 
@@ -66,6 +68,35 @@ LightGBM 4.6.0과 scikit-learn 1.8.0 조합에서는 배열 입력에도 특성 
 이 조합에서 예측·CV·결과 검증은 통과했으며 경고를 숨기지 않습니다.
 AdaBoost 분류는 두 환경 모두 SAMME로 구성합니다.
 
+선형회귀는 특성 한 열이면 단순회귀, 여러 열이면 다중회귀를 수행합니다.
+기본값은 OLS이며 `positive=True`이면 비음수 계수 제약을 적용합니다.
+DTO에 계수·절편·보류 잔차·설계 행렬 rank·특이값을 제공합니다.
+`positive=True`인 모델의 rank·특이값은 `None`입니다.
+계수와 절편은 스케일러 변환 좌표계 기준이며 p-value·신뢰구간은 제공하지 않습니다.
+
+아달린은 정확히 두 클래스를 지원하는 배치 경사하강법 모델입니다.
+원래 두 라벨을 `classes[0]→-1`, `classes[1]→+1`로 매핑하고 영벡터에서 학습합니다.
+손실은 `J=0.5*mean((Xw+b-t)²)`이며 가중치 갱신은 `w += eta0*X.T@(t-z)/n`,
+절편 갱신은 `b += eta0*mean(t-z)`입니다.
+연속 출력 `z>=0`이면 두 번째 클래스를 예측합니다. 연속 출력은 확률이 아니므로
+`probabilities=None`이며 DTO에 `activation_scores`, `loss_curve`, `n_iter`, `converged`를 제공합니다.
+`tol=None`이면 최대 epoch까지 수행합니다. 허용오차를 지정한 경우 연속 epoch의 손실 감소가
+0 이상 tol 이하이면 수렴으로 표시하며, 반복 한도까지 미수렴이면 경고합니다.
+기본 `standard` 스케일링을 사용하고 발산 시 학습률을 낮춥니다.
+
+```python
+from src.MachineLearning.LinearModels.linear_regression import LinearRegressionProfile, run_linear_regression
+from src.MachineLearning.NeuralNetworks.adaline import AdalineProfile, run_adaline
+
+# X_numeric: 유한한 수치형 2차원 특성, y_continuous: 1차원 회귀 타깃
+regression = run_linear_regression(X_numeric, y_continuous, LinearRegressionProfile())
+print(regression.coefficients, regression.intercept, regression.test_metrics)
+
+# X_binary: 수치형 특성, y_binary: 정확히 두 클래스의 1차원 타깃
+classification = run_adaline(X_binary, y_binary, AdalineProfile(eta0=0.01))
+print(classification.loss_curve, classification.converged, classification.test_metrics)
+```
+
 ## 검증 환경
 
 | Python | 의존성 파일 | XGBoost | CatBoost | LightGBM | scikit-learn |
@@ -83,8 +114,12 @@ python -m src.MachineLearning.Trees.lightgbm
 python -m src.MachineLearning.Trees.adaboost
 python -m src.MachineLearning.NeuralNetworks.mlp
 python -m src.MachineLearning.NeuralNetworks.perceptron
+python -m src.MachineLearning.LinearModels.linear_regression
+python -m src.MachineLearning.NeuralNetworks.adaline
 ```
 
 테스트는 11개 분류·회귀 조합, 여섯 모델의 CV, CatBoost 문자열 라벨 및 회귀 CV,
 학습 구간만 사용하는 스케일링, 입력 오류, DTO 직렬화와 명세 형식을 검증합니다.
+추가로 선형회귀의 단순·다중 계수 복원과 비음수 제약·CV, 아달린의 손계산 배치 갱신,
+문자열 라벨·CV·손실 감소·수렴·발산·결과 계약을 검증합니다. 총 10개 테스트와 여덟 실행 예제를 사용합니다.
 Python 3.7.4 및 실제 시험 서버에서는 직접 실행하지 않았습니다.

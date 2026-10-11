@@ -29,3 +29,5 @@ jobs:
           python -m src.MachineLearning.Trees.adaboost
           python -m src.MachineLearning.NeuralNetworks.mlp
           python -m src.MachineLearning.NeuralNetworks.perceptron
+          python -m src.MachineLearning.LinearModels.linear_regression
+          python -m src.MachineLearning.NeuralNetworks.adaline

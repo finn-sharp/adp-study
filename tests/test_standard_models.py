@@ -111,7 +111,9 @@ class StandardModelsTest(unittest.TestCase):
     def test_complete_uniform_specification(self):
         section_names = ["1. Imports", "2. Input Profile", "3. Output DTO", "4. Input Validation",
                          "5. Individual Model Runners", "6. Public Runner", "7. Example Execution"]
-        for case in CASES:
+        extra_cases = [("LinearModels.linear_regression", "LinearRegression", "linear_regression"),
+                       ("NeuralNetworks.adaline", "Adaline", "adaline")]
+        for case in CASES + extra_cases:
             module, Profile, _ = self.load_case(case)
             with self.subTest(model=case[1]):
                 source = Path(module.__file__).read_text(encoding="utf-8")

@@ -1,4 +1,4 @@
-# Python 3.7.17에서 검증한 여섯 모델의 CPU 의존성
+# Python 3.7.17에서 검증한 여덟 모델의 CPU 의존성
 numpy==1.21.6
 pandas==1.3.5
 scipy==1.7.3
