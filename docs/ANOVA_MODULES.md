@@ -20,31 +20,33 @@ Profile·Output DTO의 모든 필드, 입력 검증 및 함수의 Args·Returns�
 저장소 루트에서 import합니다.
 
 ```python
-from src.stats.tests.parametric.Average.Multivariate.OneWay import OneWayANOVAProfile, run_oneway_anova
-from src.stats.tests.parametric.Average.Multivariate.PostHoc import PostHocProfile, run_posthoc
+from src.Recipes import load_profile
+from src.stats.tests.parametric.Average.Multivariate.OneWay import run_oneway_anova
+from src.stats.tests.parametric.Average.Multivariate.PostHoc import run_posthoc
 
 groups = [[1, 2, 3, 4], [4, 5, 6, 8], [8, 9, 10, 12]]
-anova = run_oneway_anova(groups, OneWayANOVAProfile(equal_var=True))
+anova = run_oneway_anova(groups)
 print(anova.statistic, anova.p_value, anova.reject_h0)
 print(anova.anova_table)
 
-posthoc = run_posthoc(groups, PostHocProfile(method="tukey"), ["A", "B", "C"])
+posthoc = run_posthoc(groups, load_profile("posthoc"), ["A", "B", "C"])
 print(posthoc.comparisons)
 print(posthoc.to_json(indent=2))
 
 # 이분산: Welch ANOVA와 쌍별 Welch t + Holm 보정
-welch = run_oneway_anova(groups, OneWayANOVAProfile(equal_var=False))
-holm = run_posthoc(groups, PostHocProfile(method="holm", equal_var=False))
+welch = run_oneway_anova(groups, load_profile("oneway-anova", overrides={"equal_var": False}))
+holm = run_posthoc(groups, load_profile("posthoc", overrides={"method": "holm", "equal_var": False}))
 ```
 
 ```python
 import numpy as np
-from src.stats.tests.parametric.Average.Multivariate.MANOVA import MANOVAProfile, run_manova
+from src.Recipes import load_profile
+from src.stats.tests.parametric.Average.Multivariate.MANOVA import run_manova
 
 rng = np.random.RandomState(1234)
 Y = np.vstack([rng.normal(size=(20, 2)) + shift for shift in (0, 1, 2)])
 labels = ["A"] * 20 + ["B"] * 20 + ["C"] * 20
-result = run_manova(Y, labels, MANOVAProfile(criterion="pillai"), ["Response1", "Response2"])
+result = run_manova(Y, labels, load_profile("manova"), ["Response1", "Response2"])
 print(result.test_table)
 print(result.p_value, result.reject_h0)
 ```
@@ -89,3 +91,8 @@ python -m src.stats.tests.parametric.Average.Multivariate.PostHoc
 통계 테스트는 SciPy·statsmodels 참조값과 고전/Welch F·p·자유도, 이원배치 6개 조건,
 MANOVA 네 지표, Tukey 및 Student/Welch t의 Holm·Bonferroni 보정, 구간·비교 방향,
 퇴화 설계·잘못된 입력·결과 직렬화·전체 명세를 검증합니다.
+
+## 검정별 설정 관리
+
+검정별 JSON의 기본값과 일회성 overrides는 [레시피 안내](RECIPES.md)를 따릅니다.
+모든 실행 예제는 해당 JSON에서 Profile을 구성하며, `.py`의 전체 명세 형식은 유지합니다.

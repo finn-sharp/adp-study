@@ -37,15 +37,14 @@ MCP 요청은 확인한 의미에 따라 MLP(다층 퍼셉트론)로 구현했�
 
 ```python
 from sklearn.datasets import load_iris
-from src.MachineLearning.Trees.xgboost import XGBoostProfile, run_xgboost
+from src.Recipes import load_profile
+from src.MachineLearning.Trees.xgboost import run_xgboost
 
 X, y = load_iris(return_X_y=True)
-profile = XGBoostProfile(
-    task="classification",
-    n_estimators=100,
-    cv=3,
-    param_grid={"max_depth": [2, 3]},
-)
+profile = load_profile("xgboost", overrides={
+    "cv": 3,
+    "param_grid": {"max_depth": [2, 3]},
+})
 result = run_xgboost(X, y, profile)
 print(result.test_metrics)
 print(result.best_params)
@@ -85,15 +84,15 @@ DTO에 계수·절편·보류 잔차·설계 행렬 rank·특이값을 제공합
 기본 `standard` 스케일링을 사용하고 발산 시 학습률을 낮춥니다.
 
 ```python
-from src.MachineLearning.LinearModels.linear_regression import LinearRegressionProfile, run_linear_regression
-from src.MachineLearning.NeuralNetworks.adaline import AdalineProfile, run_adaline
+from src.MachineLearning.LinearModels.linear_regression import run_linear_regression
+from src.MachineLearning.NeuralNetworks.adaline import run_adaline
 
 # X_numeric: 유한한 수치형 2차원 특성, y_continuous: 1차원 회귀 타깃
-regression = run_linear_regression(X_numeric, y_continuous, LinearRegressionProfile())
+regression = run_linear_regression(X_numeric, y_continuous)
 print(regression.coefficients, regression.intercept, regression.test_metrics)
 
 # X_binary: 수치형 특성, y_binary: 정확히 두 클래스의 1차원 타깃
-classification = run_adaline(X_binary, y_binary, AdalineProfile(eta0=0.01))
+classification = run_adaline(X_binary, y_binary)
 print(classification.loss_curve, classification.converged, classification.test_metrics)
 ```
 
@@ -123,3 +122,8 @@ python -m src.MachineLearning.NeuralNetworks.adaline
 추가로 선형회귀의 단순·다중 계수 복원과 비음수 제약·CV, 아달린의 손계산 배치 갱신,
 문자열 라벨·CV·손실 감소·수렴·발산·결과 계약을 검증합니다. 총 10개 테스트와 여덟 실행 예제를 사용합니다.
 Python 3.7.4 및 실제 시험 서버에서는 직접 실행하지 않았습니다.
+
+## 모델별 설정 관리
+
+실행 설정은 [별도 JSON 레시피](RECIPES.md)에서 관리합니다. Profile 생략 시 기본 레시피를 사용하고,
+명시적 Profile 전달 시에는 전달한 설정을 사용합니다. `.py`의 7개 섹션과 전체 Profile·DTO 명세는 유지합니다.

@@ -19,12 +19,13 @@ MANOVA.py - 일원배치 MANOVA
     DATE        AUTHOR          VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-10-11  김재현(Finn)     v1.1.0    통계 명세·검증·Output DTO 통일 및 검정 구현
+    2026-10-11  김재현(Finn)     v1.2.0    모델별 JSON 레시피 로딩과 공개 실행기 연결
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __status__ = "Development"
 
 
@@ -40,6 +41,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
+from src.Recipes import load_profile, resolve_profile
 from ._common import validate_alpha, validate_groups, validate_labels
 from statsmodels.multivariate.manova import MANOVA
 
@@ -192,25 +194,32 @@ def _run_manova(Y: np.ndarray, labels: np.ndarray, names: List[str],
 # ---------------------------------------------------------------------------
 
 def run_manova(Y: Any, groups: Any, profile: Optional[MANOVAProfile] = None,
-               response_names: Optional[List[str]] = None, group_name: str = "Group") -> MANOVAOutputDTO:
+               response_names: Optional[List[str]] = None, group_name: str = "Group",
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> MANOVAOutputDTO:
     """여러 반응변수의 공동 평균을 한 요인으로 검정합니다.
 
     Args:
         Y: 행은 관측, 열은 서로 다른 수치형 반응인 2차원 자료. 최소 두 열.
         groups: Y와 같은 행 순서의 일원 요인 집단 라벨.
-        profile: None이면 Pillai 지표, alpha=0.05.
+        profile: None이면 manova.json에서 구성.
         response_names: 반응 열 표시 이름. None이면 입력 열 이름을 사용.
         group_name: 요인 표시 이름. 기본 Group.
+        recipe_path: 사용자 JSON 경로. None이면 src/Recipes의 모델별 기본 파일.
+        overrides: Profile이 없을 때 레시피 위에 적용할 명시적 설정 사전.
     Returns:
         MANOVAOutputDTO: 공동 검정 지표·집단 요약·JSON 변환 계약.
     Raises:
         TypeError: 잘못된 Profile 타입.
         ValueError: 입력·조건·표본·잔차 공분산 또는 수치 계산 오류.
+        FileNotFoundError/OSError: 레시피 파일 누락 또는 읽기 실패.
     Notes:
         네 지표를 개별 보고하지만 기본 기각 판단은 사전에 정한 한 지표(Pillai)를 사용합니다.
         종속변수별 사후검정을 여러 번 수행하면 추가 다중검정 보정이 필요합니다.
     """
-    profile = profile if profile is not None else MANOVAProfile()
+    profile = resolve_profile("manova", profile, recipe_path=recipe_path, overrides=overrides)
     response,labels,names = _validate_inputs(Y,groups,profile,response_names,group_name)
     return _run_manova(response,labels,names,group_name,profile)
 
@@ -223,6 +232,6 @@ if __name__ == "__main__":
     rng = np.random.RandomState(1234)
     Y = np.vstack([rng.normal(size=(20,2))+shift for shift in (0,1,2)])
     groups = ['A']*20+['B']*20+['C']*20
-    result = run_manova(Y,groups)
+    result = run_manova(Y,groups,load_profile("manova"))
     print(result.test_table)
     print(result.to_json()[:200])

@@ -20,12 +20,13 @@ TwoWay.py - 이원배치 ANOVA
     ----------------------------------------------------------------------------
     2026-09-10  김재현(Finn)     v1.0.0    최초 작성
     2026-10-11  김재현(Finn)     v1.1.0    통계 명세·검증·Output DTO 통일 및 검정 구현
+    2026-10-11  김재현(Finn)     v1.2.0    모델별 JSON 레시피 로딩과 공개 실행기 연결
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __status__ = "Development"
 
 
@@ -41,6 +42,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
+from src.Recipes import load_profile, resolve_profile
 from ._common import validate_alpha, validate_groups, validate_labels
 from statsmodels.formula.api import ols
 from statsmodels.stats.anova import anova_lm
@@ -193,27 +195,34 @@ def _run_twoway(data: pd.DataFrame, profile: TwoWayANOVAProfile,
 def run_twoway_anova(y: Any, factor1: Any, factor2: Any,
                      profile: Optional[TwoWayANOVAProfile] = None,
                      factor1_name: str = "Factor1", factor2_name: str = "Factor2",
-                     response_name: str = "Response") -> TwoWayANOVAOutputDTO:
+                     response_name: str = "Response",
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> TwoWayANOVAOutputDTO:
     """두 요인의 평균 차이 및 선택적 교호작용을 검정합니다.
 
     Args:
         y: 수치형 1차원 반응변수.
         factor1: y와 같은 길이의 첫 번째 요인.
         factor2: y와 같은 길이의 두 번째 요인.
-        profile: None이면 교호작용 포함 Type II, alpha=0.05.
+        profile: None이면 twoway-anova.json에서 구성.
         factor1_name: 요인 1 표시 이름. 수식에 삽입하지 않음.
         factor2_name: 요인 2 표시 이름. 수식에 삽입하지 않음.
         response_name: 반응변수 표시 이름. 수식에 삽입하지 않음.
+        recipe_path: 사용자 JSON 경로. None이면 src/Recipes의 모델별 기본 파일.
+        overrides: Profile이 없을 때 레시피 위에 적용할 명시적 설정 사전.
     Returns:
         TwoWayANOVAOutputDTO: 효과별 검정 및 분산분석표.
     Raises:
         TypeError: 잘못된 Profile 타입.
         ValueError: 입력·조건·설계·잔차 또는 수치 계산 오류.
+        FileNotFoundError/OSError: 레시피 파일 누락 또는 읽기 실패.
     Notes:
         기존 함수 인자와 TwoWayANOVAResult 이름은 호환됩니다.
         유의한 교호작용은 주효과만으로 해석하지 말고 단순효과를 확인해야 합니다.
     """
-    profile = profile if profile is not None else TwoWayANOVAProfile()
+    profile = resolve_profile("twoway-anova", profile, recipe_path=recipe_path, overrides=overrides)
     data = _validate_inputs(y,factor1,factor2,profile,[factor1_name,factor2_name,response_name])
     return _run_twoway(data,profile,factor1_name,factor2_name)
 
@@ -227,6 +236,6 @@ if __name__ == "__main__":
     factor1 = ['A']*8+['B']*8
     factor2 = (['Low']*4+['High']*4)*2
     for ss_type in (1,2,3):
-        result = run_twoway_anova(y,factor1,factor2,TwoWayANOVAProfile(ss_type=ss_type))
+        result = run_twoway_anova(y,factor1,factor2,load_profile("twoway-anova", overrides={"ss_type": ss_type}))
         print(result.anova_table)
         print(result.to_json()[:200])
