@@ -1,0 +1,7 @@
+{
+  "scaling": "standard",
+  "random_state": 1234,
+  "n_clusters": 3,
+  "n_init": 10,
+  "max_iter": 300
+}

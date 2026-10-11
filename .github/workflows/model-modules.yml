@@ -19,7 +19,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: python -m pip install -r ${{ matrix.requirements }}
+      - name: Prepare legacy HDBSCAN build dependencies
+        if: matrix.python == '3.7'
+        run: python -m pip install numpy==1.21.6 Cython==0.29.37 wheel==0.38.4
+      - name: Install legacy dependencies
+        if: matrix.python == '3.7'
+        run: python -m pip install --no-build-isolation -r ${{ matrix.requirements }}
+      - name: Install modern dependencies
+        if: matrix.python != '3.7'
+        run: python -m pip install -r ${{ matrix.requirements }}
       - run: python -m unittest discover -s tests -v
       - name: Execute module examples
         run: |
@@ -35,3 +43,18 @@ jobs:
           python -m src.stats.tests.parametric.Average.Multivariate.TwoWay
           python -m src.stats.tests.parametric.Average.Multivariate.MANOVA
           python -m src.stats.tests.parametric.Average.Multivariate.PostHoc
+          python -m src.MachineLearning.Clustering.kmeans
+          python -m src.MachineLearning.Clustering.dbscan
+          python -m src.MachineLearning.Clustering.hdbscan
+          python -m src.MachineLearning.Clustering.k_distance
+          python -m src.MachineLearning.Decomposition.pca
+          python -m src.MachineLearning.Decomposition.lda
+          python -m src.MachineLearning.Decomposition.umap
+          python -m src.MachineLearning.Decomposition.tsne
+          python -m src.MachineLearning.Decomposition.mds
+          python -m src.MachineLearning.Decomposition.som
+          python -m src.MachineLearning.NaiveBayes.naive_bayes
+          python -m src.MachineLearning.FeatureSelection.wrapper
+          python -m src.MachineLearning.FeatureSelection.regularized
+          python -m src.Association.apriori
+          python -m src.Networks.sna

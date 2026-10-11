@@ -94,5 +94,11 @@ XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron, 선형회귀, 아달린�
 
 ## 모델별 레시피
 
-모델·목적별 JSON 17개를 `src/Recipes`에서 별도로 관리합니다. Profile을 생략한 실행과 모듈 예제는 해당 레시피를 읽습니다.
+모델·목적별 JSON 34개를 `src/Recipes`에서 별도로 관리합니다. Profile을 생략한 실행과 모듈 예제는 해당 레시피를 읽습니다.
 [레시피 형식·설정 우선순위·사용 예제](docs/RECIPES.md)를 참고하세요.
+
+## 전체 분석 기법 명세
+
+나이브 베이즈, K-means·k-distance·DBSCAN·HDBSCAN, PCA·LDA·UMAP·t-SNE·SOM·MDS,
+Forward·Backward·Stepwise 및 L1·L2 변수 선택, Apriori와 SNA를 제공합니다.
+[전체 27개 표준 모듈과 기존 Z·t 검정의 입력·출력·레시피 명세](docs/ANALYSIS_CATALOG.md)를 참고하세요.

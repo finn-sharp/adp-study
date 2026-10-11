@@ -1,0 +1,6 @@
+{
+  "scaling": "standard",
+  "random_state": 1234,
+  "n_components": 2,
+  "tol": 0.0001
+}

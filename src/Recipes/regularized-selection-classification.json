@@ -1,0 +1,16 @@
+{
+  "task": "classification",
+  "test_size": 0.3,
+  "random_state": 1234,
+  "scaling": "standard",
+  "stratify": true,
+  "param_grid": null,
+  "cv": 3,
+  "scoring": null,
+  "n_jobs": 1,
+  "penalty": "l1",
+  "alpha": 0.01,
+  "C": 1.0,
+  "threshold": null,
+  "max_iter": 5000
+}
