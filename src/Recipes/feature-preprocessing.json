@@ -1,0 +1,6 @@
+{
+  "remainder": "drop",
+  "sparse_threshold": 0.3,
+  "allow_overlap": false,
+  "target_columns": null
+}

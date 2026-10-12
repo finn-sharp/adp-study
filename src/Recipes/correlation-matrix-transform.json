@@ -1,0 +1,10 @@
+{
+  "mode": "tidy",
+  "distance_kind": "signed",
+  "min_abs_coefficient": 0.0,
+  "max_p_value": null,
+  "include_diagonal": false,
+  "allow_missing": false,
+  "tolerance": 1e-8,
+  "max_pairs": 10000
+}

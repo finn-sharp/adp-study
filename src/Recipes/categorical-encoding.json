@@ -1,0 +1,9 @@
+{
+  "method": "onehot",
+  "handle_unknown": "ignore",
+  "drop_first": false,
+  "sparse_output": false,
+  "unknown_value": -1,
+  "category_orders": null,
+  "unknown_frequency": 0
+}

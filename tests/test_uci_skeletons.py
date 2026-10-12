@@ -12,6 +12,7 @@ from zipfile import ZipFile
 import numpy as np
 import pandas as pd
 from src.datasets import uci as _datasets
+from src.datasets import adult as _adult
 from src.MachineLearning.skeleton._common import fit_evaluate
 from src.MachineLearning.skeleton import linear_regression, pca, mds
 from src.MachineLearning.base.feature import FeatureSpec
@@ -31,12 +32,12 @@ class UCISkeletonTest(unittest.TestCase):
         with self.assertRaises(ValueError):processor.get_preprocessor()
 
     def test_all_modules_import_without_network_or_training_and_follow_contract(self):
-        domains = {'MachineLearning':21, 'DeepLearning':8, 'Association':3, 'Networks':1}
-        with patch.object(_datasets, 'urlopen', side_effect=AssertionError('Import must be offline')):
+        domains = {'MachineLearning':21, 'DeepLearning':8, 'Association':3, 'Networks':1, 'Preprocessing':7, 'stats':6}
+        with patch.object(_datasets, 'urlopen', side_effect=AssertionError('Import must be offline')), patch.object(_adult, 'urlopen', side_effect=AssertionError('Import must be offline')):
             for domain,count in domains.items():
                 package=importlib.import_module('src.'+domain+'.skeleton')
                 root=Path(package.__file__).parent
-                paths=[p for p in root.glob('*.py') if not p.name.startswith('_')]
+                paths=[p for p in root.glob('*.py') if not p.name.startswith('_') and p.stem != 'distributions']
                 self.assertEqual(len(paths),count)
                 for path in paths:
                     module = importlib.import_module('src.'+domain+'.skeleton.' + path.stem)
@@ -110,6 +111,27 @@ class UCISkeletonTest(unittest.TestCase):
         pipeline.pipeline.fit(X)
         with self.assertRaises(ValueError):pipeline.pipeline.transform(X.iloc[:2])
         with self.assertRaises(ValueError):pca.build_pipeline(X.columns,profile=pca.load_recipe(),overrides={})
+
+    def test_adult_official_split_missing_and_target_normalization(self):
+        row='39, ?, 77516, Bachelors, 13, Never-married, Adm-clerical, Not-in-family, White, Male, 2174, 0, 40, United-States, '
+        with tempfile.TemporaryDirectory() as directory:
+            with ZipFile(Path(directory)/'adult.zip','w') as archive:
+                archive.writestr('adult.data',row+'<=50K\n')
+                archive.writestr('adult.test','| official test file\n'+row+'>50K.\n')
+            with patch.object(_adult,'urlopen',side_effect=AssertionError('Cache must be reused')):
+                train,test=_adult.load_adult(directory)
+            self.assertEqual(train.income.tolist(),['<=50K'])
+            self.assertEqual(test.income.tolist(),['>50K'])
+            self.assertTrue(pd.isna(train.workclass.iloc[0]))
+            self.assertEqual(train.columns.tolist(),_adult.ADULT_COLUMNS)
+            from src.Preprocessing.skeleton.feature_pipeline import load_data,build_pipeline
+            X,new,y,new_y=load_data(directory)
+            self.assertNotIn('income',X.columns)
+            self.assertEqual(y.tolist(),['<=50K'])
+            features,transformer=build_pipeline()
+            self.assertFalse(hasattr(transformer,'transformers_'))
+            self.assertEqual([name for name,_ in features[0].transformer.steps],['impute','scale'])
+        with self.assertRaises(ValueError):_adult.load_adult(max_rows=0)
 
 
 if __name__=='__main__':unittest.main()

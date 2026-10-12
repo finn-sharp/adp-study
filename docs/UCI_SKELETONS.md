@@ -30,7 +30,7 @@ Wine Quality를 읽고 `quality`를 타깃으로 분리한 다음, `FeatureSpec`
 
 ## 파일과 모델 범위
 
-33개 UCI 실행 파일을 실제 구현의 분야별 skeleton 폴더에 둡니다.
+46개 UCI 실행 파일을 실제 구현의 분야별 skeleton 폴더에 둡니다.
 각 파일에는 작성 정보·변경 이력·메타데이터와 함수별 Args/Returns/Raises가 있습니다.
 MachineLearning 파이프라인 연결은 그 분야의 `_common.py`, 공유 UCI 로딩은 `src/datasets/uci.py`와 `optdigits.py`에 있습니다.
 import만 해서는 데이터 다운로드나 학습이 시작되지 않습니다.
@@ -62,8 +62,9 @@ import만 해서는 데이터 다운로드나 학습이 시작되지 않습니�
 | `src/DeepLearning/skeleton/` | 8 | Dense·일반 RNN·시계열·전용 CNN/SimpleRNN/LSTM/GRU |
 | `src/Association/skeleton/` | 3 | Apriori·FP-Growth·Eclat |
 | `src/Networks/skeleton/` | 1 | SNA |
-| `src/stats/skeleton/` | 1 | 기존 확률분포 16종×2 예제, UCI 33개와 별도 |
-| `src/datasets/` | 공유 로더 2개 | 다섯 UCI 자료와 Optdigits 공식 train/test |
+| `src/Preprocessing/skeleton/` | 7 | 수치/범주 Feature·통합 Pipeline·RoPE |
+| `src/stats/skeleton/` | 7 | UCI 상관/행렬 6개 + 기존 확률분포 16종×2 예제 |
+| `src/datasets/` | 공유 로더 3개 | 다섯 UCI 자료와 Optdigits 및 Adult 공식 train/test |
 
 MachineLearning에는 다른 분야의 호환 wrapper를 남기지 않습니다. 변경된 정식 import/CLI 경로를 사용합니다.
 기존 통계 CLI `examples.statistics_pdf_examples`만 정식 통계 스켈레톤의 호환 export로 유지합니다.
@@ -170,3 +171,8 @@ Linux용 기존 파일은 `tensorflow-cpu==2.16.2`를 지정합니다. 일반 �
 
 CNN 1D/2D·전용 SimpleRNN/LSTM/GRU·FP-Growth/Eclat을 각각 별도 구현/레시피/스켈레톤 파일로 추가했습니다.
 [전체 필드·아키텍처·UCI 입력·검증 명세](DEEP_ASSOCIATION_MODULES.md)를 참고하세요.
+
+## Feature 전처리·상관 skeleton 추가
+
+Preprocessing에 7개, stats에 상관/행렬 6개를 추가하여 UCI skeleton은 총 46개입니다.
+기존 stats 분포 예제는 별도 1개입니다. [Feature 중심 설계·UCI 데이터·전체 명세](PREPROCESSING_CORRELATION_MODULES.md)를 참고하세요.

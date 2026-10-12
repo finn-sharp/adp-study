@@ -91,3 +91,15 @@ TensorFlow 미설치 일반 환경에서는 모듈 import/Profile/입력 검증�
 GitHub Actions는 Python 3.7/3.12 일반 분석과 두 버전 TensorFlow의 네 작업을 따로 실행합니다.
 
 Python 3.7.4 자체, 실제 ADP 시험 서버, GPU/Apple Silicon 네이티브 환경은 직접 검증하지 않았습니다.
+
+## Feature 전처리·상관분석 확장 (2026-10-12)
+
+Python 3.12.14 일반 분석 환경에서 신규 UCI skeleton 13개를 실제 캐시 원본으로 실행하고
+DTO JSON 직렬화를 확인했습니다. Wine 수치 전처리, Adult 공식 train/test 범주·통합 Feature,
+Libras 위치 임베딩, Iris 수치 상관과 Adult 범주 상관을 사용했습니다. import 시 다운로드/학습이
+없고 생성한 파일에 시각화가 없음을 계약 검사로 확인합니다.
+
+전체 단위 검사는 103개(선택 TensorFlow 환경 검사 7개 제외)를 대상으로 합니다.
+신규 검사는 참조 수치·미지 범주·nullable 결측·타깃 제외·실제 CV 폴드별 적합 상태,
+RoPE 수식/역회전/부분 차원/노름/상대 위치, 다중검정 보정·signed Phi 방향·행렬 정의역을 확인합니다.
+13개 신규 모듈 CLI 예제 및 Python 3.7 구문을 확인합니다. 실제 Python 3.7 동작은 CI에서 별도로 검증합니다.
