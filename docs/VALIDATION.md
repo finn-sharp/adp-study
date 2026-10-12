@@ -1,5 +1,23 @@
 # 검증 기록
 
+## 2026-10-12: 통계 PDF 전체 모듈 복구·확장
+
+Apple Silicon macOS의 Python 3.12.14에서 저장소의 일반 분석용 고정 버전을 사용했습니다.
+XGBoost는 같은 3.0.5 버전의 macOS 패키지를 사용했습니다.
+
+- 전체 unittest 72개 중 68개 통과, TensorFlow 실제 학습 4개는 별도 환경이 필요해 skip.
+- 신규 통계 검사 14개: SciPy/statsmodels 참조값, Fisher RxC 미시상태 열거와 Monte Carlo,
+  대응 결측·동률·0차이, 공분산 변환 불변성, 반복측정 ANOVA의 큰 공통 위치 이동,
+  기존 import 및 결과 계약 검증.
+- 분포 검사 7개: 16종의 확률·모수화·모멘트·난수, 꼬리와 구간의 수치 안정성,
+  PDF 예제 32개에서 교정한 계산과 명시한 보충 가정 검증.
+- 기법별 Profile·DTO·7개 섹션·독립 JSON 레시피 42개와 전체 레시피 87개 검증.
+- 실행 예제 85개 통과. 이전 `python -m` 경로 9개를 포함하며 PDF 분포 예제 32개도 실행했습니다.
+- Python 3.7 구문과 문서 링크를 검사하며, 복구 후 실제 3.7 실행과 별도 TensorFlow 학습은
+  GitHub Actions의 기존 네 환경에서 확인합니다. 로컬 결과로 해당 실행을 대체하지 않습니다.
+
+일반 모델 검사는 TensorFlow의 NumPy 핀과 분리했습니다.
+
 ## 2026-10-12: 추가 통계 검정·TensorFlow·README
 
 일반 분석 환경과 TensorFlow 환경은 NumPy 핀 차이 때문에 따로 설치합니다.

@@ -1,0 +1,10 @@
+{
+  "alpha": 0.05,
+  "sample_design": "one_sample",
+  "location_0": 0.0,
+  "method": "auto",
+  "zero_method": "wilcox",
+  "correction": false,
+  "alternative": "two-sided",
+  "nan_policy": "raise"
+}

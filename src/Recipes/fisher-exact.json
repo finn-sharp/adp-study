@@ -1,0 +1,8 @@
+{
+  "alpha": 0.05,
+  "method": "auto",
+  "max_tables": 100000,
+  "n_resamples": 10000,
+  "random_state": 1234,
+  "alternative": "two-sided"
+}

@@ -1,0 +1,6 @@
+{
+  "r": 4,
+  "p": 0.5,
+  "counting": "failures",
+  "random_state": 1234
+}

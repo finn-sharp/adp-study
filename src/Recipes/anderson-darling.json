@@ -1,0 +1,5 @@
+{
+  "alpha": 0.05,
+  "distribution": "norm",
+  "nan_policy": "raise"
+}

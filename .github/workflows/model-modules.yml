@@ -39,10 +39,10 @@ jobs:
           python -m src.MachineLearning.NeuralNetworks.perceptron
           python -m src.MachineLearning.LinearModels.linear_regression
           python -m src.MachineLearning.NeuralNetworks.adaline
-          python -m src.stats.tests.parametric.Average.Multivariate.OneWay
-          python -m src.stats.tests.parametric.Average.Multivariate.TwoWay
-          python -m src.stats.tests.parametric.Average.Multivariate.MANOVA
-          python -m src.stats.tests.parametric.Average.Multivariate.PostHoc
+          python -m src.stats.tests.parametric.Average.anova.one_way
+          python -m src.stats.tests.parametric.Average.anova.two_way
+          python -m src.stats.tests.parametric.Multivariate.manova
+          python -m src.stats.tests.parametric.Average.anova.posthoc
           python -m src.MachineLearning.Clustering.kmeans
           python -m src.MachineLearning.Clustering.dbscan
           python -m src.MachineLearning.Clustering.hdbscan
@@ -58,12 +58,66 @@ jobs:
           python -m src.MachineLearning.FeatureSelection.regularized
           python -m src.Association.apriori
           python -m src.Networks.sna
-          python -m src.stats.tests.nonParametric.chi_square
-          python -m src.stats.tests.nonParametric.independence
-          python -m src.stats.tests.nonParametric.mcnemar
+          python -m src.stats.tests.nonParametric.Categorical.chi_square
+          python -m src.stats.tests.nonParametric.Categorical.independence
+          python -m src.stats.tests.nonParametric.Categorical.mcnemar
           python -m src.stats.tests.parametric.Variance.f_test
           python -m src.stats.tests.diagnostics.normality
           python -m src.stats.tests.diagnostics.homogeneity
+          python -m src.stats.tests.parametric.Average.one_sample
+          python -m src.stats.tests.parametric.Average.two_sample
+          python -m src.stats.tests.parametric.Average.paired
+          python -m src.stats.tests.parametric.Variance.one_sample
+          python -m src.stats.tests.parametric.Proportion.one_sample
+          python -m src.stats.tests.parametric.Proportion.two_sample
+          python -m src.stats.tests.nonParametric.Location.sign
+          python -m src.stats.tests.nonParametric.Location.wilcoxon
+          python -m src.stats.tests.nonParametric.Sequence.runs
+          python -m src.stats.tests.nonParametric.Location.mann_whitney
+          python -m src.stats.tests.nonParametric.Location.kruskal_wallis
+          python -m src.stats.tests.nonParametric.Location.mood_median
+          python -m src.stats.tests.nonParametric.Location.friedman
+          python -m src.stats.tests.parametric.Average.anova.repeated_measures
+          python -m src.stats.tests.diagnostics.anderson_darling
+          python -m src.stats.tests.diagnostics.kolmogorov_smirnov
+          python -m src.stats.tests.parametric.Multivariate.hotelling
+          python -m src.stats.tests.diagnostics.box_m
+          python -m src.stats.tests.Association.odds_ratio
+          python -m src.stats.tests.Association.risk_ratio
+          python -m src.stats.tests.nonParametric.Categorical.fisher_exact
+          python -m src.stats.tests.Association.cmh
+          python -m src.stats.tests.nonParametric.Categorical.bowker
+          python -m src.stats.tests.nonParametric.Categorical.cochran_q
+          python -m src.stats.tests.TimeSeries.adf
+          python -m src.stats.tests.nonParametric.Categorical.homogeneity
+          python -m src.stats.distributions.bernoulli
+          python -m src.stats.distributions.binomial
+          python -m src.stats.distributions.normal
+          python -m src.stats.distributions.hypergeometric
+          python -m src.stats.distributions.geometric
+          python -m src.stats.distributions.negative_binomial
+          python -m src.stats.distributions.poisson
+          python -m src.stats.distributions.exponential
+          python -m src.stats.distributions.weibull
+          python -m src.stats.distributions.chi_square
+          python -m src.stats.distributions.gamma
+          python -m src.stats.distributions.beta
+          python -m src.stats.distributions.student_t
+          python -m src.stats.distributions.cauchy
+          python -m src.stats.distributions.lognormal
+          python -m src.stats.distributions.f
+          python -m examples.statistics_pdf_examples
+      - name: Verify legacy CLI compatibility
+        run: |
+          python -m src.stats.tests.parametric.Average.Univariate
+          python -m src.stats.tests.parametric.Average.Bivariate
+          python -m src.stats.tests.parametric.Average.Multivariate.OneWay
+          python -m src.stats.tests.parametric.Average.Multivariate.TwoWay
+          python -m src.stats.tests.parametric.Average.Multivariate.PostHoc
+          python -m src.stats.tests.parametric.Average.Multivariate.MANOVA
+          python -m src.stats.tests.nonParametric.chi_square
+          python -m src.stats.tests.nonParametric.independence
+          python -m src.stats.tests.nonParametric.mcnemar
   tensorflow:
     runs-on: ubuntu-22.04
     strategy:

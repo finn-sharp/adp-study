@@ -1,0 +1,8 @@
+{
+  "alpha": 0.05,
+  "distribution": "norm",
+  "parameters": null,
+  "estimated_parameters": false,
+  "alternative": "two-sided",
+  "nan_policy": "raise"
+}

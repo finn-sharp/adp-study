@@ -1,0 +1,6 @@
+{
+  "alpha": 0.05,
+  "diff_0": 0.0,
+  "alternative": "two-sided",
+  "nan_policy": "raise"
+}
