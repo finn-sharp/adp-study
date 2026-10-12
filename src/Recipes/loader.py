@@ -37,6 +37,20 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    'feature-preprocessing': ('src.Preprocessing.feature_pipeline', 'FeaturePreprocessingProfile', None, (None,)),
+    'numeric-scaling': ('src.Preprocessing.numeric.scaling', 'NumericScalingProfile', None, (None,)),
+    'numeric-imputation': ('src.Preprocessing.numeric.imputation', 'NumericImputationProfile', None, (None,)),
+    'numeric-power': ('src.Preprocessing.numeric.power', 'NumericPowerProfile', None, (None,)),
+    'categorical-imputation': ('src.Preprocessing.categorical.imputation', 'CategoricalImputationProfile', None, (None,)),
+    'categorical-encoding': ('src.Preprocessing.categorical.encoding', 'CategoricalEncodingProfile', None, (None,)),
+    'correlation-pearson': ('src.stats.correlation.numeric.pearson', 'PearsonProfile', None, (None,)),
+    'correlation-spearman': ('src.stats.correlation.numeric.spearman', 'SpearmanProfile', None, (None,)),
+    'correlation-kendall': ('src.stats.correlation.numeric.kendall', 'KendallProfile', None, (None,)),
+    'correlation-cramers-v': ('src.stats.correlation.categorical.cramers_v', 'CramersVProfile', None, (None,)),
+    'correlation-phi': ('src.stats.correlation.categorical.phi', 'PhiProfile', None, (None,)),
+    'rope': ('src.Preprocessing.positional.rope', 'RoPEProfile', None, (None,)),
+    'correlation-matrix-transform': ('src.stats.correlation.matrix_transform', 'CorrelationMatrixTransformProfile', None, (None,)),
+
     'tf-cnn': ('src.DeepLearning.TensorFlow.cnn', 'TFCNNProfile', 'classification', ('classification', 'regression')),
     'tf-simple-rnn': ('src.DeepLearning.TensorFlow.simple_rnn', 'TFSimpleRNNProfile', 'classification', ('classification', 'regression')),
     'tf-lstm': ('src.DeepLearning.TensorFlow.lstm', 'TFLSTMProfile', 'classification', ('classification', 'regression')),
@@ -210,6 +224,8 @@ def _normalize(model_name: str, values: Dict[str, Any]) -> Dict[str, Any]:
                     raise ValueError("레시피 키 충돌: " + alias + " / " + canonical)
                 result[canonical] = result.pop(alias)
     for key in ("hidden_layer_sizes", "target_columns", "conv_filters"):
+        if model_name == "feature-preprocessing" and key == "target_columns":
+            continue  # FeaturePreprocessingProfile declares List[str]; sequence models use tuple.
         if key in result and isinstance(result[key], list):
             result[key] = tuple(result[key])
     return result

@@ -1,0 +1,5 @@
+{
+  "strategy": "median",
+  "fill_value": 0,
+  "add_indicator": false
+}

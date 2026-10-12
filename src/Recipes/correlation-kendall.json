@@ -1,0 +1,9 @@
+{
+  "alpha": 0.05,
+  "alternative": "two-sided",
+  "nan_policy": "raise",
+  "min_samples": 3,
+  "max_pairs": 10000,
+  "p_adjust": "holm",
+  "method": "auto"
+}

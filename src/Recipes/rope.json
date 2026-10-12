@@ -1,0 +1,8 @@
+{
+  "rotary_dim": null,
+  "base": 10000.0,
+  "layout": "interleaved",
+  "offset": 0,
+  "position_scale": 1.0,
+  "inverse": false
+}

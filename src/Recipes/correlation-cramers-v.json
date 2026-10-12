@@ -1,0 +1,5 @@
+{
+  "alpha": 0.05,
+  "nan_policy": "raise",
+  "bias_correction": true
+}

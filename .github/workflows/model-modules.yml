@@ -109,6 +109,19 @@ jobs:
           python -m src.stats.distributions.lognormal
           python -m src.stats.distributions.f
           python -m src.stats.skeleton.distributions
+          python -m src.Preprocessing.numeric.scaling
+          python -m src.Preprocessing.numeric.imputation
+          python -m src.Preprocessing.numeric.power
+          python -m src.Preprocessing.categorical.imputation
+          python -m src.Preprocessing.categorical.encoding
+          python -m src.Preprocessing.positional.rope
+          python -m src.Preprocessing.feature_pipeline
+          python -m src.stats.correlation.numeric.pearson
+          python -m src.stats.correlation.numeric.spearman
+          python -m src.stats.correlation.numeric.kendall
+          python -m src.stats.correlation.categorical.cramers_v
+          python -m src.stats.correlation.categorical.phi
+          python -m src.stats.correlation.matrix_transform
       - name: Verify legacy CLI compatibility
         run: |
           python -m src.stats.tests.parametric.Average.Univariate

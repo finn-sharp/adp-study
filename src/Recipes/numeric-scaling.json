@@ -1,0 +1,7 @@
+{
+  "method": "standard",
+  "center": true,
+  "scale": true,
+  "clip": false,
+  "norm": "l2"
+}

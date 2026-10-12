@@ -2,13 +2,15 @@
 
 ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다. 구현된 코드는
 **Profile → 모델별 JSON 레시피 → 실행 함수 → 전용 Output DTO**를 사용합니다.
-현재 표준 분석 모듈은 **85개**, 모델·목적별 레시피는 **97개**입니다.
+현재 표준 분석 모듈은 **98개**, 모델·목적별 레시피는 **110개**입니다.
 기존 단일·독립 두 표본 Z/t도 표준 공개 모듈로 정비하고 이전 호출을 호환 경로로 유지합니다.
 
 ## 구현 범위
 
 | 영역 | 구현 내용 |
 | --- | --- |
+| Feature 전처리 | 수치형 결측·스케일·power, 범주형 결측·onehot/ordinal/frequency, FeatureSpec 순서 조합, 별도 RoPE |
+| 상관분석 | Pearson/Spearman/Kendall, Cramér V·signed Phi, 행렬 정리·삼각·거리 변환 |
 | 지도 학습 | XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron, Adaline, 단순·다중 선형회귀, Gaussian/Multinomial/Bernoulli/Complement Naive Bayes |
 | 군집·거리 | K-means, DBSCAN, HDBSCAN, 자기 포함 k-distance 진단 |
 | 차원 축소 | PCA, 지도 LDA, UMAP, t-SNE, SOM, metric/nonmetric MDS |
@@ -166,8 +168,13 @@ PDF의 신규 검정/효과크기23개·분포16종, 범주동질성 API와 기�
 
 ## UCI 모델 스켈레톤
 
-UCI 스켈레톤 33개는 구현 분야별 폴더에 둡니다: MachineLearning 21개, DeepLearning 8개, Association 3개, Networks 1개.
+UCI 스켈레톤 46개는 구현 분야별 폴더에 둡니다: MachineLearning 21개, DeepLearning 8개, Association 3개, Networks 1개, Preprocessing 7개, stats 상관/행렬 6개.
 확률분포 예제는 `src/stats/skeleton/`, 공유 UCI 로더는 `src/datasets/`에 있습니다.
 참고 XGBoost의 데이터 로딩 → 레시피 → FeatureSpec 전처리 → 모델 → 수치 평가 흐름을 유지합니다.
 군집·차원 축소·변수 선택·TensorFlow·연관규칙·네트워크도 목적에 맞는 파이프라인을 제공합니다.
 [참고 코드 분석·데이터 출처·실행 방법](docs/UCI_SKELETONS.md)을 확인하세요. 시각화는 포함하지 않습니다.
+
+## Feature 전처리·상관분석 확장
+
+수치/범주형 Feature의 순서가 있는 전처리, 별도 RoPE 임베딩 회전, 수치/범주 상관분석과
+상관행렬 변환을 추가했습니다. [전체 명세](docs/PREPROCESSING_CORRELATION_MODULES.md)를 참고하세요.
