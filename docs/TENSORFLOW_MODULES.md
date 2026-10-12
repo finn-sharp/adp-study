@@ -128,3 +128,8 @@ single-shot 방식이며 예측을 다시 입력하는 autoregressive 방식은 
 - [Keras RNN](https://www.tensorflow.org/guide/keras/working_with_rnns)
 - [시계열](https://www.tensorflow.org/tutorials/structured_data/time_series)
 - [버전별 Python 지원](https://www.tensorflow.org/install/source#tested_build_configurations)
+
+## 별도 딥러닝·연관규칙 확장
+
+CNN 1D/2D·전용 SimpleRNN/LSTM/GRU·FP-Growth/Eclat을 각각 별도 구현/레시피/스켈레톤 파일로 추가했습니다.
+[전체 필드·아키텍처·UCI 입력·검증 명세](DEEP_ASSOCIATION_MODULES.md)를 참고하세요.

@@ -33,7 +33,7 @@ class UCISkeletonTest(unittest.TestCase):
     def test_all_modules_import_without_network_or_training_and_follow_contract(self):
         root = Path(_datasets.__file__).parent
         paths = [p for p in root.glob('*.py') if not p.name.startswith('_')]
-        self.assertEqual(len(paths), 27)
+        self.assertEqual(len(paths), 33)
         with patch.object(_datasets, 'urlopen', side_effect=AssertionError('Import must be offline')):
             for path in paths:
                 module = importlib.import_module('src.MachineLearning.skeleton.' + path.stem)

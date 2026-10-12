@@ -1,0 +1,17 @@
+{
+  "random_state": 1234,
+  "epochs": 30,
+  "batch_size": 32,
+  "learning_rate": 0.001,
+  "patience": 5,
+  "test_size": 0.2,
+  "validation_size": 0.2,
+  "scaling": "standard",
+  "verbose": 0,
+  "task": "classification",
+  "units": 16,
+  "num_layers": 1,
+  "bidirectional": false,
+  "dropout": 0.0,
+  "recurrent_dropout": 0.0
+}

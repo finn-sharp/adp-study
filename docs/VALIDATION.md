@@ -1,5 +1,23 @@
 # 검증 기록
 
+## 2026-10-12: 별도 딥러닝·연관규칙 알고리즘
+
+CNN·SimpleRNN·LSTM·GRU·FP-Growth·Eclat을 각각 별도 구현/스켈레톤 파일로 추가했습니다.
+기존 RNN·TensorFlow common·Apriori 계산 파일은 변경하지 않았습니다.
+
+- 일반 분석 환경: 전체 검사 87개 중 80개 통과; TensorFlow 학습 7개는 별도 환경에서 실행.
+- 별도 TF 환경: 기존 학습/계약 검사 6개 및 새 CNN/순환 모델 검사 5개 모두 통과.
+- 새 CNN 1D/2D·SimpleRNN/LSTM/GRU UCI 실행 5개를 2 epoch로 확인했습니다.
+  CNN 2D는 Optdigits의 공식 train 3,823개/test 1,797개 구분을 유지합니다.
+- FP-Growth/Eclat은 50개 무작위 거래 전수 oracle·Apriori와 일치합니다.
+  실제 정제 Retail의 빈발 항목집합 167개·규칙 80개도 일치합니다.
+- 전용 Profile/DTO 전체 필드, 함수 문서, 7개 섹션, 레시피 97개, Python 3.7 구문,
+  문서 링크 및 새 스켈레톤의 비시각화 계약을 검사했습니다.
+
+이번 로컬 실행은 Apple Silicon Python 3.12.14 및 TF 2.16.2입니다.
+2 epoch 검사는 실행/출력 계약을 확인한 기록이며 예측 품질의 주장이나 시험 서버 검증은 아닙니다.
+전체 입력·출력과 제약은 [별도 알고리즘 명세](DEEP_ASSOCIATION_MODULES.md)를 참고하세요.
+
 ## 2026-10-12: UCI 모델 스켈레톤
 
 GitHub 최신 main을 기준으로 기반 클래스 3개와 학습/분석 스켈레톤 27개를 추가했습니다.

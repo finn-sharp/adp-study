@@ -1,0 +1,10 @@
+{
+  "min_support": 0.2,
+  "min_confidence": 0.5,
+  "min_lift": 1.0,
+  "max_length": 3,
+  "max_itemsets": 100000,
+  "max_rules": 100000,
+  "max_rule_candidates": 100000,
+  "max_intersections": 100000
+}

@@ -30,7 +30,7 @@ Wine Quality를 읽고 `quality`를 타깃으로 분리한 다음, `FeatureSpec`
 
 ## 파일과 모델 범위
 
-27개 실행 파일을 참고 코드와 같은 `src/MachineLearning/skeleton/`에 둡니다.
+33개 실행 파일을 참고 코드와 같은 `src/MachineLearning/skeleton/`에 둡니다.
 각 파일에는 작성 정보·변경 이력·메타데이터와 함수별 Args/Returns/Raises가 있습니다.
 공통 연결·UCI 로딩만 `_common.py`, `_datasets.py`로 분리했습니다.
 import만 해서는 데이터 다운로드나 학습이 시작되지 않습니다.
@@ -49,6 +49,8 @@ import만 해서는 데이터 다운로드나 학습이 시작되지 않습니�
 | TensorFlow RNN | tf_rnn | Libras의 독립 손동작 시퀀스 분류 |
 | TensorFlow 예측 | tf_time_series | Bike Sharing 일별 대여 수 예측 |
 | 연관규칙·네트워크 | apriori, sna | Retail 영수증 장바구니 / 상품 공동구매 edge |
+| 전용 딥러닝 | tf_cnn, tf_simple_rnn, tf_lstm, tf_gru | Optdigits 공식 분할 / Libras 독립 시퀀스 |
+| 추가 연관규칙 | fp_growth, eclat | Retail 영수증 장바구니 |
 
 이 스켈레톤 범위는 구현된 학습·분석 모델입니다. 통계 가설검정·확률분포는
 학습 모델의 파이프라인을 사용하지 않으므로 기존 전용 예제를 유지합니다.
@@ -143,10 +145,15 @@ Linux용 기존 파일은 `tensorflow-cpu==2.16.2`를 지정합니다. 일반 �
 - 분류/회귀의 추가 목적 7개와 Naive Bayes 추가 variant 3개도 실제 자료에서 실행했습니다.
 - TensorFlow 4개는 별도 환경에서 실제 자료로 2 epoch 학습·보류 예측·DTO 직렬화를 확인했습니다.
   이 검사는 짧은 실행 검증이며 모델 품질이나 기본 30 epoch의 성능을 주장하지 않습니다.
-- 오프라인 계약 검사: import 시 학습/다운로드 없음, 27개 함수 흐름·메타데이터·docstring,
+- 오프라인 계약 검사: import 시 학습/다운로드 없음, 33개 함수 흐름·메타데이터·docstring,
   전처리의 학습 행 평균·CV, 날짜/시퀀스 순서, 완전한 영수증 그룹·취소 제거, 미지원 transform 거부.
 - 생성한 스켈레톤에는 시각화 import·그래프 생성·그림 파일 저장이 없습니다.
 - Python 3.7 구문도 검사합니다. 이번 실행 환경은 Apple Silicon Python 3.12.14이며,
   이번 스켈레톤을 실제 Python 3.7 또는 ADP 시험 서버에서 실행하지는 않았습니다.
 
 모든 모델과 Profile의 상세 명세는 기존 모델별 문서와 구현 파일을 따릅니다.
+
+## 별도 딥러닝·연관규칙 확장
+
+CNN 1D/2D·전용 SimpleRNN/LSTM/GRU·FP-Growth/Eclat을 각각 별도 구현/레시피/스켈레톤 파일로 추가했습니다.
+[전체 필드·아키텍처·UCI 입력·검증 명세](DEEP_ASSOCIATION_MODULES.md)를 참고하세요.
