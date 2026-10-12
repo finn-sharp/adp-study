@@ -1,5 +1,17 @@
 # 검증 기록
 
+## 2026-10-12: 스켈레톤 분야별 폴더 이관
+
+MachineLearning 21개·DeepLearning 8개·Association 3개·Networks 1개로 UCI 스켈레톤을 배치했습니다.
+기존 32개 확률분포 예제의 정식 위치는 `src/stats/skeleton/distributions.py`입니다.
+UCI 공용 로더는 `src/datasets/`로 분리하고 기본 캐시 위치·환경 변수 계약을 유지했습니다.
+기존 비ML 스켈레톤 파일은 MachineLearning 폴더에서 제거했습니다.
+
+도메인별 파일 수·함수/docstring·import 시 네트워크/학습 없음·금지된 교차 배치·통계 예제의
+이전 import 호환성을 검사했습니다. 일반 환경 전체 검사 88개 중 81개 통과(TF 학습 7개는 별도 환경).
+새 경로에서 UCI 딥러닝 8개·연관규칙 3개·네트워크 1개 실행을 모두 확인했습니다.
+통계 예제의 새/이전 CLI JSON 출력도 동일합니다.
+
 ## 2026-10-12: 별도 딥러닝·연관규칙 알고리즘
 
 CNN·SimpleRNN·LSTM·GRU·FP-Growth·Eclat을 각각 별도 구현/스켈레톤 파일로 추가했습니다.

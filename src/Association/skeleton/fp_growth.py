@@ -1,6 +1,6 @@
 """
 ================================================================================
-apriori.py - apriori UCI 스켈레톤
+fp_growth.py - fp_growth UCI 스켈레톤
 ================================================================================
 설명:
     - 데이터 로딩 → JSON/Profile → 전처리/모델 연결 → 학습/분석 → 수치 평가.
@@ -24,8 +24,8 @@ __status__ = "Development"
 from collections import Counter
 from itertools import combinations
 from src.Recipes import load_profile
-from src.Association.apriori import run_apriori
-from ._datasets import load_baskets
+from src.Association.fp_growth import run_fp_growth
+from src.datasets.uci import load_baskets
 
 UCI_DEFAULT_OVERRIDES = {'min_support': 0.05}
 
@@ -46,7 +46,7 @@ def load_data(cache_dir=None, max_transactions=1000, max_items=30):
 
 
 def load_recipe(overrides=None):
-    """기존 apriori JSON을 전용 Profile로 읽습니다.
+    """기존 fp_growth JSON을 전용 Profile로 읽습니다.
 
     Args:
         overrides: 명시적 레시피 재정의.
@@ -57,7 +57,7 @@ def load_recipe(overrides=None):
     """
     settings = dict(UCI_DEFAULT_OVERRIDES)
     settings.update(overrides or {})
-    return load_profile('apriori', overrides=settings)
+    return load_profile('fp-growth', overrides=settings)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -74,7 +74,7 @@ def build_pipeline(profile=None, overrides=None):
     if profile is not None and overrides is not None:
         raise ValueError('profile과 overrides를 동시에 지정하지 않습니다.')
     profile = load_recipe(overrides) if profile is None else profile
-    return lambda baskets: run_apriori(baskets, profile=profile)
+    return lambda baskets: run_fp_growth(baskets, profile=profile)
 
 
 def main(cache_dir=None, overrides=None, max_transactions=1000, max_items=30):
@@ -94,7 +94,7 @@ def main(cache_dir=None, overrides=None, max_transactions=1000, max_items=30):
     profile = load_recipe(overrides)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
-    print('=== Example : UCI Online Retail apriori ===')
+    print('=== Example : UCI Online Retail fp_growth ===')
     print('transactions:', result.n_transactions)
     print('itemsets:', len(result.itemsets), 'rules:', len(result.rules))
     print(result.rules.head(10).to_string(index=False))

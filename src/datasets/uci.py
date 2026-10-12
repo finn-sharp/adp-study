@@ -1,6 +1,6 @@
 """
 ================================================================================
-_datasets.py - UCI 스켈레톤 공식 자료 로딩·정제
+uci.py - UCI 스켈레톤 공식 자료 로딩·정제
 ================================================================================
 설명:
     - 데이터 로딩 → JSON/Profile → 전처리/모델 연결 → 학습/분석 → 수치 평가.
@@ -51,7 +51,7 @@ def dataset_bytes(name, cache_dir=None):
         OSError/ValueError: 네트워크·캐시·ZIP 파일 오류.
     """
     relative, member = DATASETS[name]
-    root = Path(cache_dir or os.environ.get('UCI_SKELETON_CACHE', Path(__file__).parents[3] / '.uci-cache'))
+    root = Path(cache_dir or os.environ.get('UCI_SKELETON_CACHE', Path(__file__).parents[2] / '.uci-cache'))
     root.mkdir(parents=True, exist_ok=True)
     path = root / (name + '.zip')
     if not path.exists():

@@ -30,9 +30,9 @@ Wine Quality를 읽고 `quality`를 타깃으로 분리한 다음, `FeatureSpec`
 
 ## 파일과 모델 범위
 
-33개 실행 파일을 참고 코드와 같은 `src/MachineLearning/skeleton/`에 둡니다.
+33개 UCI 실행 파일을 실제 구현의 분야별 skeleton 폴더에 둡니다.
 각 파일에는 작성 정보·변경 이력·메타데이터와 함수별 Args/Returns/Raises가 있습니다.
-공통 연결·UCI 로딩만 `_common.py`, `_datasets.py`로 분리했습니다.
+MachineLearning 파이프라인 연결은 그 분야의 `_common.py`, 공유 UCI 로딩은 `src/datasets/uci.py`와 `optdigits.py`에 있습니다.
 import만 해서는 데이터 다운로드나 학습이 시작되지 않습니다.
 
 | 계열 | 실행 파일 | 목적 / 데이터 |
@@ -54,6 +54,19 @@ import만 해서는 데이터 다운로드나 학습이 시작되지 않습니�
 
 이 스켈레톤 범위는 구현된 학습·분석 모델입니다. 통계 가설검정·확률분포는
 학습 모델의 파이프라인을 사용하지 않으므로 기존 전용 예제를 유지합니다.
+
+
+| 정식 폴더 | 실행 파일 수 | 범위 |
+| --- | --- | --- |
+| `src/MachineLearning/skeleton/` | 21 | 지도 학습·군집·축소·변수 선택 |
+| `src/DeepLearning/skeleton/` | 8 | Dense·일반 RNN·시계열·전용 CNN/SimpleRNN/LSTM/GRU |
+| `src/Association/skeleton/` | 3 | Apriori·FP-Growth·Eclat |
+| `src/Networks/skeleton/` | 1 | SNA |
+| `src/stats/skeleton/` | 1 | 기존 확률분포 16종×2 예제, UCI 33개와 별도 |
+| `src/datasets/` | 공유 로더 2개 | 다섯 UCI 자료와 Optdigits 공식 train/test |
+
+MachineLearning에는 다른 분야의 호환 wrapper를 남기지 않습니다. 변경된 정식 import/CLI 경로를 사용합니다.
+기존 통계 CLI `examples.statistics_pdf_examples`만 정식 통계 스켈레톤의 호환 export로 유지합니다.
 
 ## UCI 원본과 자료 변환
 
@@ -110,7 +123,7 @@ PCA/LDA/UMAP/SOM만 기존 구현이 지원하는 transform을 재사용합니�
 python -m pip install -r requirements-uci-skeletons.txt
 python -m src.MachineLearning.skeleton.xgboost
 python -m src.MachineLearning.skeleton.pca
-python -m src.MachineLearning.skeleton.apriori
+python -m src.Association.skeleton.apriori
 ```
 
 목적이나 레시피를 바꾸는 예:
@@ -128,10 +141,10 @@ print(result.to_json(indent=2))
 from src.MachineLearning.skeleton.naive_bayes import main
 result = main(overrides={"variant": "multinomial"})
 
-from src.MachineLearning.skeleton.tf_rnn import main
+from src.DeepLearning.skeleton.tf_rnn import main
 result = main(overrides={"cell": "gru", "epochs": 5})
 
-from src.MachineLearning.skeleton.tf_time_series import main
+from src.DeepLearning.skeleton.tf_time_series import main
 result = main(overrides={"input_width": 14, "horizon": 3, "epochs": 5})
 ```
 

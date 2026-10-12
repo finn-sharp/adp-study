@@ -26,7 +26,7 @@ from sklearn.pipeline import Pipeline
 from src.MachineLearning.common import make_scaler
 from src.MachineLearning.FeatureSelection.wrapper import _base_estimator
 from src.MachineLearning.FeatureSelection.wrapper import WrapperSelector
-from ._datasets import load_tabular
+from src.datasets.uci import load_tabular
 from ._common import connect_pipeline, fit_evaluate, report
 
 

@@ -1,6 +1,6 @@
 """
 ================================================================================
-tf_cnn.py - tf-cnn UCI 스켈레톤
+tf_lstm.py - tf-lstm UCI 스켈레톤
 ================================================================================
 설명:
     - 데이터 로딩 → JSON/Profile → 전처리/모델 연결 → 학습/분석 → 수치 평가.
@@ -22,25 +22,21 @@ __version__ = "1.0.0"
 __status__ = "Development"
 
 from src.Recipes import load_profile
-from src.DeepLearning.TensorFlow.cnn import run_tf_cnn
-from ._deep_datasets import load_optdigits
-from ._datasets import load_libras
+from src.DeepLearning.TensorFlow.lstm import run_tf_lstm
+from src.datasets.uci import load_tabular, load_libras, load_bike
 
 
-def load_data(cache_dir=None, dimension=2):
-    """UCI Optdigits/Libras 원본을 모델의 표본/시퀀스 계약으로 변환합니다.
+def load_data(cache_dir=None):
+    """UCI libras 원본을 모델의 표본/시퀀스 계약으로 변환합니다.
 
     Args:
         cache_dir: 선택 UCI 캐시.
-        dimension: 2는 공식 Optdigits, 1은 Libras 독립 시퀀스.
     Returns:
         object: Dense 표, 독립 시퀀스 또는 날짜 순 시계열.
     Raises:
         ValueError/OSError: 자료·다운로드 오류.
     """
-    if dimension==1:return load_libras(cache_dir)
-    if dimension!=2:raise ValueError('dimension은 1/2입니다.')
-    return load_optdigits(cache_dir)
+    return load_libras(cache_dir)
 
 
 def load_recipe(overrides=None):
@@ -53,7 +49,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    return load_profile('tf-cnn', task='classification', overrides=overrides)
+    return load_profile('tf-lstm', task='classification', overrides=overrides)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -80,7 +76,7 @@ def build_pipeline(profile=None, overrides=None):
         Raises:
             ValueError/ImportError: 자료 조건 또는 TensorFlow 미설치.
         """
-        return run_tf_cnn(*data, profile=profile) if profile.dimension==1 else run_tf_cnn(data[0],data[1],profile=profile,test_data=(data[2],data[3]))
+        return run_tf_lstm(*data, profile=profile)
     return execute
 
 
@@ -89,18 +85,17 @@ def main(cache_dir=None, overrides=None):
 
     Args:
         cache_dir: 선택 UCI 캐시.
-        dimension: 2는 공식 Optdigits, 1은 Libras 독립 시퀀스.
         overrides: 명시적 레시피 재정의.
     Returns:
         OutputDTO: 기존 TensorFlow 전용 결과.
     Raises:
         ValueError/OSError/ImportError: 자료·레시피·라이브러리 오류.
     """
+    data = load_data(cache_dir)
     profile = load_recipe(overrides)
-    data = load_data(cache_dir, dimension=profile.dimension)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
-    print('=== Example : UCI Optdigits/Libras tf_cnn ===')
+    print('=== Example : UCI libras tf_lstm ===')
     print('input_shape:', result.input_shape)
     print('metrics:', result.test_metrics)
     print('epochs_trained:', result.epochs_trained)

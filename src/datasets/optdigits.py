@@ -1,6 +1,6 @@
 """
 ================================================================================
-_deep_datasets.py - 새 딥러닝 스켈레톤용 UCI Optdigits 공식 train/test 로딩.
+optdigits.py - 새 딥러닝 스켈레톤용 UCI Optdigits 공식 train/test 로딩.
 ================================================================================
 설명:
     - 새 알고리즘 파일의 공통 검증·학습·자료 로딩 계약을 제공합니다.
@@ -39,7 +39,7 @@ def load_optdigits(cache_dir=None):
     Raises:
         ValueError/OSError: UCI 스키마·픽셀 범위·ZIP·네트워크 오류.
     """
-    root=Path(cache_dir or os.environ.get('UCI_SKELETON_CACHE',Path(__file__).parents[3]/'.uci-cache'))
+    root=Path(cache_dir or os.environ.get('UCI_SKELETON_CACHE',Path(__file__).parents[2]/'.uci-cache'))
     root.mkdir(parents=True,exist_ok=True);path=root/'optdigits.zip'
     if not path.exists():
         with urlopen('https://archive.ics.uci.edu/static/public/80/optical+recognition+of+handwritten+digits.zip',timeout=60) as response:payload=response.read()

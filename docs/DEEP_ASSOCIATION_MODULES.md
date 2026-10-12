@@ -8,14 +8,14 @@ CNN 아키텍처, SimpleRNN/LSTM/GRU 층 구성, FP-tree 탐색, TID 교집합 �
 
 ## 공개 API와 경로
 
-| 알고리즘 | 구현 (`src/` 기준) | 공개 실행기 | 스켈레톤 (`src/MachineLearning/skeleton/`) |
+| 알고리즘 | 구현 (`src/` 기준) | 공개 실행기 | 스켈레톤 (`src/` 기준) |
 | --- | --- | --- | --- |
-| CNN 1D·2D | DeepLearning/TensorFlow/cnn.py | run_tf_cnn | tf_cnn.py |
-| SimpleRNN | DeepLearning/TensorFlow/simple_rnn.py | run_tf_simple_rnn | tf_simple_rnn.py |
-| LSTM | DeepLearning/TensorFlow/lstm.py | run_tf_lstm | tf_lstm.py |
-| GRU | DeepLearning/TensorFlow/gru.py | run_tf_gru | tf_gru.py |
-| FP-Growth | Association/fp_growth.py | run_fp_growth | fp_growth.py |
-| Eclat | Association/eclat.py | run_eclat | eclat.py |
+| CNN 1D·2D | DeepLearning/TensorFlow/cnn.py | run_tf_cnn | DeepLearning/skeleton/tf_cnn.py |
+| SimpleRNN | DeepLearning/TensorFlow/simple_rnn.py | run_tf_simple_rnn | DeepLearning/skeleton/tf_simple_rnn.py |
+| LSTM | DeepLearning/TensorFlow/lstm.py | run_tf_lstm | DeepLearning/skeleton/tf_lstm.py |
+| GRU | DeepLearning/TensorFlow/gru.py | run_tf_gru | DeepLearning/skeleton/tf_gru.py |
+| FP-Growth | Association/fp_growth.py | run_fp_growth | Association/skeleton/fp_growth.py |
+| Eclat | Association/eclat.py | run_eclat | Association/skeleton/eclat.py |
 
 기존 Apriori와 함께 연관규칙 알고리즘은 3종입니다. 여섯 모델을 registry에 추가하며
 딥러닝 분류/회귀 8개와 연관규칙 2개를 합쳐 JSON 10개를 추가합니다.
@@ -76,14 +76,14 @@ UCI 부분 자료의 min_support=0.05는 스켈레톤에 명시되며 원 모델
 상세 정제·캐시·라이선스는 [UCI 스켈레톤](UCI_SKELETONS.md)을 따릅니다.
 
 ```python
-from src.MachineLearning.skeleton.tf_cnn import main
+from src.DeepLearning.skeleton.tf_cnn import main
 result = main(overrides={"epochs": 5, "conv_filters": [16, 32]})
 print(result.split_mode, result.test_metrics)
 
-from src.MachineLearning.skeleton.tf_lstm import main
+from src.DeepLearning.skeleton.tf_lstm import main
 result = main(overrides={"num_layers": 2, "bidirectional": True, "epochs": 5})
 
-from src.MachineLearning.skeleton.fp_growth import main
+from src.Association.skeleton.fp_growth import main
 result = main(overrides={"min_support": 0.05, "max_length": 3})
 print(result.itemsets, result.rules)
 ```
@@ -345,3 +345,11 @@ print(result.itemsets, result.rules)
 [TensorFlow Conv2D](https://www.tensorflow.org/api_docs/python/tf/keras/layers/Conv2D),
 [SimpleRNN](https://www.tensorflow.org/api_docs/python/tf/keras/layers/SimpleRNN),
 [LSTM](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM).
+
+## 분야별 스켈레톤 이관
+
+이번 PR에서 기존 12개 타 분야 스켈레톤도 각 구현 분야로 이관했습니다.
+MachineLearning에는 실제 해당 분야 모델의 21개만 남겼습니다.
+DeepLearning 8개·Association 3개·Networks 1개는 각각 자신의 skeleton 패키지에 있습니다.
+공유 데이터 로더는 src/datasets, 기존 확률분포 예제는 src/stats/skeleton/distributions.py에 있습니다.
+도메인별 파일 수·금지된 교차 배치·통계 호환 export·새 import/CLI를 검사합니다.

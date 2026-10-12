@@ -23,7 +23,7 @@ __status__ = "Development"
 
 from src.Recipes import load_profile
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB, ComplementNB
-from ._datasets import load_tabular
+from src.datasets.uci import load_tabular
 from ._common import connect_pipeline, fit_evaluate, report
 
 

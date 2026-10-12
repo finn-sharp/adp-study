@@ -11,7 +11,7 @@ from unittest.mock import patch
 from zipfile import ZipFile
 import numpy as np
 import pandas as pd
-from src.MachineLearning.skeleton import _datasets
+from src.datasets import uci as _datasets
 from src.MachineLearning.skeleton._common import fit_evaluate
 from src.MachineLearning.skeleton import linear_regression, pca, mds
 from src.MachineLearning.base.feature import FeatureSpec
@@ -31,25 +31,37 @@ class UCISkeletonTest(unittest.TestCase):
         with self.assertRaises(ValueError):processor.get_preprocessor()
 
     def test_all_modules_import_without_network_or_training_and_follow_contract(self):
-        root = Path(_datasets.__file__).parent
-        paths = [p for p in root.glob('*.py') if not p.name.startswith('_')]
-        self.assertEqual(len(paths), 33)
+        domains = {'MachineLearning':21, 'DeepLearning':8, 'Association':3, 'Networks':1}
         with patch.object(_datasets, 'urlopen', side_effect=AssertionError('Import must be offline')):
-            for path in paths:
-                module = importlib.import_module('src.MachineLearning.skeleton.' + path.stem)
-                for name in ('load_data', 'load_recipe', 'build_pipeline', 'main'):
-                    self.assertTrue(callable(getattr(module, name)))
-                tree = ast.parse(path.read_text())
-                for name in ('__author__', '__email__', '__version__', '__status__'):
-                    self.assertIsInstance(getattr(module, name), str)
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.FunctionDef):
-                        for label in ('Args:', 'Returns:', 'Raises:'):
-                            self.assertIn(label, ast.get_docstring(node))
-        for path in root.glob('*.py'):
-            source = path.read_text()
-            for forbidden in ('matplotlib', 'seaborn', 'plotly', 'plt.', '.plot(', 'savefig('):
-                self.assertNotIn(forbidden, source)
+            for domain,count in domains.items():
+                package=importlib.import_module('src.'+domain+'.skeleton')
+                root=Path(package.__file__).parent
+                paths=[p for p in root.glob('*.py') if not p.name.startswith('_')]
+                self.assertEqual(len(paths),count)
+                for path in paths:
+                    module = importlib.import_module('src.'+domain+'.skeleton.' + path.stem)
+                    for name in ('load_data', 'load_recipe', 'build_pipeline', 'main'):
+                        self.assertTrue(callable(getattr(module, name)))
+                    tree = ast.parse(path.read_text())
+                    for name in ('__author__', '__email__', '__version__', '__status__'):
+                        self.assertIsInstance(getattr(module, name), str)
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.FunctionDef):
+                            for label in ('Args:', 'Returns:', 'Raises:'):
+                                self.assertIn(label, ast.get_docstring(node))
+                for path in root.glob('*.py'):
+                    source=path.read_text()
+                    for forbidden in ('matplotlib', 'seaborn', 'plotly', 'plt.', '.plot(', 'savefig('):
+                        self.assertNotIn(forbidden, source)
+
+    def test_domain_separation_and_statistics_compatibility(self):
+        root=Path(linear_regression.__file__).parent
+        self.assertFalse(any(p.stem.startswith('tf_') for p in root.glob('*.py')))
+        self.assertFalse(any((root/(name+'.py')).exists() for name in ('apriori','fp_growth','eclat','sna')))
+        from src.stats.skeleton.distributions import run_pdf_examples
+        from examples.statistics_pdf_examples import run_pdf_examples as old
+        self.assertIs(old,run_pdf_examples)
+        self.assertEqual(len(run_pdf_examples()),32)
 
     def test_preprocessing_and_grid_search_use_training_rows_only(self):
         rng = np.random.RandomState(5)

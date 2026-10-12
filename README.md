@@ -166,7 +166,8 @@ PDF의 신규 검정/효과크기23개·분포16종, 범주동질성 API와 기�
 
 ## UCI 모델 스켈레톤
 
-`src/MachineLearning/skeleton/`의 33개 예제는 UCI 원본 자료와 기존 모델별 레시피를 연결합니다.
+UCI 스켈레톤 33개는 구현 분야별 폴더에 둡니다: MachineLearning 21개, DeepLearning 8개, Association 3개, Networks 1개.
+확률분포 예제는 `src/stats/skeleton/`, 공유 UCI 로더는 `src/datasets/`에 있습니다.
 참고 XGBoost의 데이터 로딩 → 레시피 → FeatureSpec 전처리 → 모델 → 수치 평가 흐름을 유지합니다.
 군집·차원 축소·변수 선택·TensorFlow·연관규칙·네트워크도 목적에 맞는 파이프라인을 제공합니다.
 [참고 코드 분석·데이터 출처·실행 방법](docs/UCI_SKELETONS.md)을 확인하세요. 시각화는 포함하지 않습니다.

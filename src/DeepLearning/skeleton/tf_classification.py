@@ -23,7 +23,7 @@ __status__ = "Development"
 
 from src.Recipes import load_profile
 from src.DeepLearning.TensorFlow.classification import run_tf_classification
-from ._datasets import load_tabular, load_libras, load_bike
+from src.datasets.uci import load_tabular, load_libras, load_bike
 
 
 def load_data(cache_dir=None):
