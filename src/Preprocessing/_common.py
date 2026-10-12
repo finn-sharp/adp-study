@@ -126,6 +126,10 @@ class ProfileTransformer(TransformerMixin,BaseEstimator):
         if len(names)!=self.n_features_in_:raise ValueError('입력 열 수 불일치')
         if hasattr(self.estimator_,'get_feature_names_out'):return self.estimator_.get_feature_names_out(names)
         if hasattr(self.estimator_,'get_feature_names'):return self.estimator_.get_feature_names(names)
+        indicator=getattr(self.estimator_,'indicator_',None)
+        if indicator is not None:
+            extra=['missingindicator_'+str(names[index]) for index in indicator.features_]
+            return np.concatenate([names,np.asarray(extra,dtype=object)])
         return names.copy()
 
     def inverse_transform(self,X):

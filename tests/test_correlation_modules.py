@@ -26,8 +26,15 @@ class CorrelationModulesTest(unittest.TestCase):
             result=runner(self.x,self.y);r,p=reference(self.x,self.y)
             self.assertAlmostEqual(result.coefficient,r);self.assertAlmostEqual(result.p_value,p)
             for alternative in ('less','greater'):
-                result=runner(self.x,self.y,overrides={'alternative':alternative})
-                expected=reference(self.x,self.y,alternative=alternative)[1] if 'alternative' in inspect.signature(reference).parameters else p/2 if (r>0)==(alternative=='greater') else 1-p/2
+                native='alternative' in inspect.signature(reference).parameters
+                settings={'alternative':alternative}
+                if runner is run_kendall and not native:
+                    # Exact discrete tails cannot use the complement of two-sided p.
+                    with self.assertRaises(ValueError):runner(self.x,self.y,overrides=settings)
+                    settings['method']='asymptotic'
+                    r,p=reference(self.x,self.y,method='asymptotic')
+                result=runner(self.x,self.y,overrides=settings)
+                expected=reference(self.x,self.y,alternative=alternative)[1] if native else p/2 if (r>0)==(alternative=='greater') else 1-p/2
                 self.assertAlmostEqual(result.p_value,expected)
             json.loads(result.to_json())
             with self.assertRaises(ValueError):runner(np.ones(8),self.y)
