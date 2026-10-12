@@ -1,0 +1,8 @@
+# 독립 TensorFlow 환경. requirements-models-py312.txt의 NumPy 2 핀과 섞지 않습니다.
+tensorflow-cpu==2.16.2
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.13.1
+scikit-learn==1.5.2
+# TF의 Keras 하한만으로 새 버전이 자동 설치되지 않도록 검증 버전 고정
+keras==3.15.1

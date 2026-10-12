@@ -1,6 +1,6 @@
 # 전체 분석 모듈 명세
 
-현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 27개, 모델·목적별 JSON 레시피는 34개입니다.
+현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 37개, 모델·목적별 JSON 레시피는 45개입니다.
 기존 단일·독립 두 표본 Z·t 검정 파일 2개도 아래에 별도로 명세합니다.
 비모수 검정의 빈 파일은 구현 완료로 집계하지 않습니다.
 
@@ -73,6 +73,26 @@
 | `twoway-anova` | Type I·II·III; 교호작용 포함/제외 | `run_twoway_anova` | 기존 구현 |
 | `manova` | 일원 요인 MANOVA; Pillai·Wilks·Hotelling-Lawley·Roy | `run_manova` | 기존 구현 |
 | `posthoc` | Tukey HSD / Student·Welch 쌍별 t + Holm·Bonferroni | `run_posthoc` | 기존 구현 |
+
+### 추가 검정·가정 진단
+
+| 기법 | 지원 범위 | 실행기 |
+| --- | --- | --- |
+| chi-square | Pearson 적합도, 지정 기대도수와 ddof | run_chi_square |
+| independence | 교차표 Pearson 독립성, Yates, Cramér’s V | run_independence |
+| mcnemar | 대응 이진 정확/근사 검정 | run_mcnemar |
+| f-test | 정규 독립 두 표본 분산비, 세 방향 | run_f_test |
+| normality | Shapiro/D’Agostino–Pearson/Jarque–Bera | run_normality |
+| homogeneity | Levene/Bartlett/Fligner–Killeen | run_homogeneity |
+
+### TensorFlow
+
+| 기법 | 지원 범위 | 실행기 |
+| --- | --- | --- |
+| tf-classification | Dense 이진/다중 클래스 softmax | run_tf_classification |
+| tf-regression | Dense 단일/다중 타깃 수치 회귀 | run_tf_regression |
+| tf-rnn | SimpleRNN/LSTM/GRU sequence-to-one 분류·회귀 | run_tf_rnn |
+| tf-time-series | 시간 순 윈도·single-shot 미래 단일/다중 스텝 | run_tf_time_series |
 
 ## 용어와 알고리즘 경계
 
@@ -1405,7 +1425,7 @@ Z 검정은 알려진 양의 모표준편차를 지정하고, t 검정은 미지
 - 3.7 환경의 HDBSCAN 0.8.33은 Cython 0.29.37·wheel·NumPy를 먼저 설치하고 `--no-build-isolation`로 빌드합니다. C/C++ 컴파일러가 필요합니다.
 - 3.12 환경은 HDBSCAN 0.8.41, UMAP 0.5.9.post2를 사용합니다. 3.7 환경은 UMAP 0.5.3과 해당 버전의 numba/llvmlite를 사용합니다.
 - 새 모듈은 기존 소스의 Python 3.7 호환 문법을 유지합니다. 실제 시험 서버 및 Python 3.7.4에서 직접 검증하지는 않았습니다.
-- 전체 unittest 39개, 표준 모듈 실행 예제 27개를 두 환경에서 실행합니다. UMAP은 첫 실행에 Numba 컴파일 시간이 필요할 수 있습니다.
+- 일반 분석 환경은 unittest 51개 중 TensorFlow 실제 학습 4개를 선택 의존성으로 건너뛰고 47개를 실행합니다. 일반 예제 33개를 실행하며, 별도 TensorFlow 환경에서는 6개 테스트와 4개 예제를 실행합니다. UMAP은 첫 실행에 Numba 컴파일 시간이 필요할 수 있습니다.
 - t-SNE·MDS는 거리/최적화 계산량이 크고 Wrapper는 후보별 CV를 반복합니다. 대규모 자료에서는 표본 수·특성 수·반복 한도를 조절하세요.
 
 ```bash
@@ -1429,3 +1449,355 @@ python -m src.Networks.sna
 [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/api.html),
 [UMAP](https://umap-learn.readthedocs.io/en/latest/api.html),
 [NetworkX](https://networkx.org/documentation/stable/reference/index.html).
+
+
+## 2026-10-12 추가 통계 검정·TensorFlow
+
+검정 선택과 가정은 [통계 검정 안내](STATISTICAL_TESTS.md), TensorFlow 학습/타깃 정렬 규약은 [TensorFlow 안내](TENSORFLOW_MODULES.md)를 참고하세요.
+
+### chi-square
+
+- 모듈: `src.stats.tests.nonParametric.chi_square`
+- 실행기: `run_chi_square`
+- 레시피: `chi-square.json`
+
+#### ChiSquareProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `alpha` | `<class 'float'>` | `0.05` | 유의수준, 기본 0.05. |
+| `ddof` | `<class 'int'>` | `0` | 추정 모수 수에 따른 자유도 감소, 기본 0. |
+
+#### ChiSquareOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `statistic` | `<class 'float'>` | `반환 필드` | 검정 통계량. |
+| `p_value` | `<class 'float'>` | `반환 필드` | 귀무가설 하의 p 값. |
+| `reject_h0` | `<class 'bool'>` | `반환 필드` | p_value < alpha. |
+| `alpha` | `<class 'float'>` | `반환 필드` | 사용한 유의수준. |
+| `null_hypothesis` | `<class 'str'>` | `반환 필드` | 검정한 귀무가설. |
+| `details` | `Dict[str, Any]` | `반환 필드` | 자유도·기대도수·표본수 등 검정별 진단. |
+| `warnings` | `List[str]` | `반환 필드` | 근사 조건과 해석 제약. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### independence
+
+- 모듈: `src.stats.tests.nonParametric.independence`
+- 실행기: `run_independence`
+- 레시피: `independence.json`
+
+#### IndependenceProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `alpha` | `<class 'float'>` | `0.05` | 유의수준, 기본 0.05. |
+| `correction` | `<class 'bool'>` | `True` | 자유도 1일 때 Yates 보정, 기본 True. |
+
+#### IndependenceOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `statistic` | `<class 'float'>` | `반환 필드` | 검정 통계량. |
+| `p_value` | `<class 'float'>` | `반환 필드` | 귀무가설 하의 p 값. |
+| `reject_h0` | `<class 'bool'>` | `반환 필드` | p_value < alpha. |
+| `alpha` | `<class 'float'>` | `반환 필드` | 사용한 유의수준. |
+| `null_hypothesis` | `<class 'str'>` | `반환 필드` | 검정한 귀무가설. |
+| `details` | `Dict[str, Any]` | `반환 필드` | 자유도·기대도수·표본수 등 검정별 진단. |
+| `warnings` | `List[str]` | `반환 필드` | 근사 조건과 해석 제약. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### mcnemar
+
+- 모듈: `src.stats.tests.nonParametric.mcnemar`
+- 실행기: `run_mcnemar`
+- 레시피: `mcnemar.json`
+
+#### McNemarProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `alpha` | `<class 'float'>` | `0.05` | 유의수준, 기본 0.05. |
+| `exact` | `<class 'bool'>` | `True` | 이항 정확 검정, 기본 True. |
+| `correction` | `<class 'bool'>` | `True` | 근사 검정의 연속성 보정, exact에서는 무시. 기본 True. |
+
+#### McNemarOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `statistic` | `<class 'float'>` | `반환 필드` | 검정 통계량. |
+| `p_value` | `<class 'float'>` | `반환 필드` | 귀무가설 하의 p 값. |
+| `reject_h0` | `<class 'bool'>` | `반환 필드` | p_value < alpha. |
+| `alpha` | `<class 'float'>` | `반환 필드` | 사용한 유의수준. |
+| `null_hypothesis` | `<class 'str'>` | `반환 필드` | 검정한 귀무가설. |
+| `details` | `Dict[str, Any]` | `반환 필드` | 자유도·기대도수·표본수 등 검정별 진단. |
+| `warnings` | `List[str]` | `반환 필드` | 근사 조건과 해석 제약. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### f-test
+
+- 모듈: `src.stats.tests.parametric.Variance.f_test`
+- 실행기: `run_f_test`
+- 레시피: `f-test.json`
+
+#### FTestProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `alpha` | `<class 'float'>` | `0.05` | 유의수준, 기본 0.05. |
+| `alternative` | `<class 'str'>` | `'two-sided'` | two-sided/less/greater: var(x)/var(y) 방향. 기본 two-sided. |
+| `ratio_0` | `<class 'float'>` | `1.0` | 귀무 분산비, 양수. 기본 1. |
+
+#### FTestOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `statistic` | `<class 'float'>` | `반환 필드` | 검정 통계량. |
+| `p_value` | `<class 'float'>` | `반환 필드` | 귀무가설 하의 p 값. |
+| `reject_h0` | `<class 'bool'>` | `반환 필드` | p_value < alpha. |
+| `alpha` | `<class 'float'>` | `반환 필드` | 사용한 유의수준. |
+| `null_hypothesis` | `<class 'str'>` | `반환 필드` | 검정한 귀무가설. |
+| `details` | `Dict[str, Any]` | `반환 필드` | 자유도·기대도수·표본수 등 검정별 진단. |
+| `warnings` | `List[str]` | `반환 필드` | 근사 조건과 해석 제약. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### normality
+
+- 모듈: `src.stats.tests.diagnostics.normality`
+- 실행기: `run_normality`
+- 레시피: `normality.json`
+
+#### NormalityProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `alpha` | `<class 'float'>` | `0.05` | 유의수준, 기본 0.05. |
+| `method` | `<class 'str'>` | `'shapiro'` | shapiro/dagostino/jarque_bera. 기본 shapiro. |
+
+#### NormalityOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `statistic` | `<class 'float'>` | `반환 필드` | 검정 통계량. |
+| `p_value` | `<class 'float'>` | `반환 필드` | 귀무가설 하의 p 값. |
+| `reject_h0` | `<class 'bool'>` | `반환 필드` | p_value < alpha. |
+| `alpha` | `<class 'float'>` | `반환 필드` | 사용한 유의수준. |
+| `null_hypothesis` | `<class 'str'>` | `반환 필드` | 검정한 귀무가설. |
+| `details` | `Dict[str, Any]` | `반환 필드` | 자유도·기대도수·표본수 등 검정별 진단. |
+| `warnings` | `List[str]` | `반환 필드` | 근사 조건과 해석 제약. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### homogeneity
+
+- 모듈: `src.stats.tests.diagnostics.homogeneity`
+- 실행기: `run_homogeneity`
+- 레시피: `homogeneity.json`
+
+#### HomogeneityProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `alpha` | `<class 'float'>` | `0.05` | 유의수준, 기본 0.05. |
+| `method` | `<class 'str'>` | `'levene'` | levene/bartlett/fligner. 기본 levene. |
+| `center` | `<class 'str'>` | `'median'` | Levene/Fligner 중심 mean/median/trimmed. 기본 median. |
+
+#### HomogeneityOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `statistic` | `<class 'float'>` | `반환 필드` | 검정 통계량. |
+| `p_value` | `<class 'float'>` | `반환 필드` | 귀무가설 하의 p 값. |
+| `reject_h0` | `<class 'bool'>` | `반환 필드` | p_value < alpha. |
+| `alpha` | `<class 'float'>` | `반환 필드` | 사용한 유의수준. |
+| `null_hypothesis` | `<class 'str'>` | `반환 필드` | 검정한 귀무가설. |
+| `details` | `Dict[str, Any]` | `반환 필드` | 자유도·기대도수·표본수 등 검정별 진단. |
+| `warnings` | `List[str]` | `반환 필드` | 근사 조건과 해석 제약. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### tf-classification
+
+- 모듈: `src.DeepLearning.TensorFlow.classification`
+- 실행기: `run_tf_classification`
+- 레시피: `tf-classification.json`
+
+#### TFClassificationProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `random_state` | `<class 'int'>` | `1234` | 0 이상 정수 시드. CPU에서도 완전 결정성을 보장하지 않음. 기본 1234. |
+| `epochs` | `<class 'int'>` | `30` | 최대 학습 epoch, 양수. 기본 30. |
+| `batch_size` | `<class 'int'>` | `32` | 학습 batch 크기, 양수. 기본 32. |
+| `learning_rate` | `<class 'float'>` | `0.001` | Adam 학습률, 양수. 기본 0.001. |
+| `patience` | `<class 'int'>` | `5` | validation loss 조기 종료 대기, 0 이상. 기본 5. |
+| `test_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 test 비율. 기본 0.2. |
+| `validation_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 validation 비율, 두 비율 합 <1. 기본 0.2. |
+| `scaling` | `<class 'str'>` | `'standard'` | none/standard; 학습 입력만 적합. 기본 standard. |
+| `verbose` | `<class 'int'>` | `0` | Keras 출력 0/1/2. 기본 0. |
+| `hidden_layer_sizes` | `Tuple[int, ...]` | `(32, 16)` | 은닉 Dense 폭, 양수 정수 tuple. 빈 tuple은 선형 출력. 기본 (32,16). |
+
+#### TFClassificationOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `task` | `<class 'str'>` | `반환 필드` | classification/regression. 시계열은 regression. |
+| `parameters` | `Dict[str, Any]` | `반환 필드` | 실제 적용한 Profile 설정. 레시피 및 overrides 반영. |
+| `model` | `Any` | `반환 필드` | 학습 scaler·class encoder를 포함한 predict adapter; keras_model로 원 Keras 모델 접근. JSON 제외. |
+| `history` | `Dict[str, List[float]]` | `반환 필드` | epoch별 loss와 val_loss; Keras History 객체가 아닌 수치 목록. |
+| `test_metrics` | `Dict[str, float]` | `반환 필드` | 분류 accuracy/log_loss 또는 회귀 mse/rmse/mae. 원 타깃 단위. |
+| `predictions` | `<class 'numpy.ndarray'>` | `반환 필드` | test 순서 예측. 분류는 원 라벨, 시계열은 (창,horizon,target). |
+| `probabilities` | `Optional[numpy.ndarray]` | `반환 필드` | 분류 (n,classes) 확률; 회귀 None. |
+| `classes` | `Optional[numpy.ndarray]` | `반환 필드` | 확률 열 순서의 학습 클래스; 회귀 None. |
+| `train_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 학습 표본 번호; 시계열은 원 시점 번호. |
+| `validation_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 조기 종료 전용 검증 표본/시점 번호. |
+| `test_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 보류 평가 표본/시점 번호. |
+| `target_indices` | `Optional[numpy.ndarray]` | `반환 필드` | 시계열 test 각 창의 실제 타깃 시점 (창,horizon), 다른 모델 None. |
+| `y_test` | `<class 'numpy.ndarray'>` | `반환 필드` | predictions와 같은 shape/순서의 실제 test 타깃. |
+| `input_shape` | `Tuple[int, ...]` | `반환 필드` | Keras 입력 shape(batch 제외). |
+| `epochs_trained` | `<class 'int'>` | `반환 필드` | 실제 실행한 epoch 수. |
+| `best_epoch` | `<class 'int'>` | `반환 필드` | 최저 val_loss epoch, 1부터 시작. 최적 weights 복원. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### tf-regression
+
+- 모듈: `src.DeepLearning.TensorFlow.regression`
+- 실행기: `run_tf_regression`
+- 레시피: `tf-regression.json`
+
+#### TFRegressionProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `random_state` | `<class 'int'>` | `1234` | 0 이상 정수 시드. CPU에서도 완전 결정성을 보장하지 않음. 기본 1234. |
+| `epochs` | `<class 'int'>` | `30` | 최대 학습 epoch, 양수. 기본 30. |
+| `batch_size` | `<class 'int'>` | `32` | 학습 batch 크기, 양수. 기본 32. |
+| `learning_rate` | `<class 'float'>` | `0.001` | Adam 학습률, 양수. 기본 0.001. |
+| `patience` | `<class 'int'>` | `5` | validation loss 조기 종료 대기, 0 이상. 기본 5. |
+| `test_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 test 비율. 기본 0.2. |
+| `validation_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 validation 비율, 두 비율 합 <1. 기본 0.2. |
+| `scaling` | `<class 'str'>` | `'standard'` | none/standard; 학습 입력만 적합. 기본 standard. |
+| `verbose` | `<class 'int'>` | `0` | Keras 출력 0/1/2. 기본 0. |
+| `hidden_layer_sizes` | `Tuple[int, ...]` | `(32, 16)` | 은닉 Dense 폭, 양수 정수 tuple. 빈 tuple은 선형 출력. 기본 (32,16). |
+
+#### TFRegressionOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `task` | `<class 'str'>` | `반환 필드` | classification/regression. 시계열은 regression. |
+| `parameters` | `Dict[str, Any]` | `반환 필드` | 실제 적용한 Profile 설정. 레시피 및 overrides 반영. |
+| `model` | `Any` | `반환 필드` | 학습 scaler·class encoder를 포함한 predict adapter; keras_model로 원 Keras 모델 접근. JSON 제외. |
+| `history` | `Dict[str, List[float]]` | `반환 필드` | epoch별 loss와 val_loss; Keras History 객체가 아닌 수치 목록. |
+| `test_metrics` | `Dict[str, float]` | `반환 필드` | 분류 accuracy/log_loss 또는 회귀 mse/rmse/mae. 원 타깃 단위. |
+| `predictions` | `<class 'numpy.ndarray'>` | `반환 필드` | test 순서 예측. 분류는 원 라벨, 시계열은 (창,horizon,target). |
+| `probabilities` | `Optional[numpy.ndarray]` | `반환 필드` | 분류 (n,classes) 확률; 회귀 None. |
+| `classes` | `Optional[numpy.ndarray]` | `반환 필드` | 확률 열 순서의 학습 클래스; 회귀 None. |
+| `train_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 학습 표본 번호; 시계열은 원 시점 번호. |
+| `validation_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 조기 종료 전용 검증 표본/시점 번호. |
+| `test_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 보류 평가 표본/시점 번호. |
+| `target_indices` | `Optional[numpy.ndarray]` | `반환 필드` | 시계열 test 각 창의 실제 타깃 시점 (창,horizon), 다른 모델 None. |
+| `y_test` | `<class 'numpy.ndarray'>` | `반환 필드` | predictions와 같은 shape/순서의 실제 test 타깃. |
+| `input_shape` | `Tuple[int, ...]` | `반환 필드` | Keras 입력 shape(batch 제외). |
+| `epochs_trained` | `<class 'int'>` | `반환 필드` | 실제 실행한 epoch 수. |
+| `best_epoch` | `<class 'int'>` | `반환 필드` | 최저 val_loss epoch, 1부터 시작. 최적 weights 복원. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### tf-rnn
+
+- 모듈: `src.DeepLearning.TensorFlow.rnn`
+- 실행기: `run_tf_rnn`
+- 레시피: `tf-rnn-classification.json`, `tf-rnn-regression.json`
+
+#### TFRNNProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `random_state` | `<class 'int'>` | `1234` | 0 이상 정수 시드. CPU에서도 완전 결정성을 보장하지 않음. 기본 1234. |
+| `epochs` | `<class 'int'>` | `30` | 최대 학습 epoch, 양수. 기본 30. |
+| `batch_size` | `<class 'int'>` | `32` | 학습 batch 크기, 양수. 기본 32. |
+| `learning_rate` | `<class 'float'>` | `0.001` | Adam 학습률, 양수. 기본 0.001. |
+| `patience` | `<class 'int'>` | `5` | validation loss 조기 종료 대기, 0 이상. 기본 5. |
+| `test_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 test 비율. 기본 0.2. |
+| `validation_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 validation 비율, 두 비율 합 <1. 기본 0.2. |
+| `scaling` | `<class 'str'>` | `'standard'` | none/standard; 학습 입력만 적합. 기본 standard. |
+| `verbose` | `<class 'int'>` | `0` | Keras 출력 0/1/2. 기본 0. |
+| `task` | `<class 'str'>` | `'regression'` | classification/regression. 기본 regression. |
+| `cell` | `<class 'str'>` | `'lstm'` | simple_rnn/lstm/gru 셀 선택. 기본 lstm. |
+| `units` | `<class 'int'>` | `16` | 순환 층 폭, 양수. 기본 16. |
+
+#### TFRNNOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `task` | `<class 'str'>` | `반환 필드` | classification/regression. 시계열은 regression. |
+| `parameters` | `Dict[str, Any]` | `반환 필드` | 실제 적용한 Profile 설정. 레시피 및 overrides 반영. |
+| `model` | `Any` | `반환 필드` | 학습 scaler·class encoder를 포함한 predict adapter; keras_model로 원 Keras 모델 접근. JSON 제외. |
+| `history` | `Dict[str, List[float]]` | `반환 필드` | epoch별 loss와 val_loss; Keras History 객체가 아닌 수치 목록. |
+| `test_metrics` | `Dict[str, float]` | `반환 필드` | 분류 accuracy/log_loss 또는 회귀 mse/rmse/mae. 원 타깃 단위. |
+| `predictions` | `<class 'numpy.ndarray'>` | `반환 필드` | test 순서 예측. 분류는 원 라벨, 시계열은 (창,horizon,target). |
+| `probabilities` | `Optional[numpy.ndarray]` | `반환 필드` | 분류 (n,classes) 확률; 회귀 None. |
+| `classes` | `Optional[numpy.ndarray]` | `반환 필드` | 확률 열 순서의 학습 클래스; 회귀 None. |
+| `train_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 학습 표본 번호; 시계열은 원 시점 번호. |
+| `validation_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 조기 종료 전용 검증 표본/시점 번호. |
+| `test_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 보류 평가 표본/시점 번호. |
+| `target_indices` | `Optional[numpy.ndarray]` | `반환 필드` | 시계열 test 각 창의 실제 타깃 시점 (창,horizon), 다른 모델 None. |
+| `y_test` | `<class 'numpy.ndarray'>` | `반환 필드` | predictions와 같은 shape/순서의 실제 test 타깃. |
+| `input_shape` | `Tuple[int, ...]` | `반환 필드` | Keras 입력 shape(batch 제외). |
+| `epochs_trained` | `<class 'int'>` | `반환 필드` | 실제 실행한 epoch 수. |
+| `best_epoch` | `<class 'int'>` | `반환 필드` | 최저 val_loss epoch, 1부터 시작. 최적 weights 복원. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+### tf-time-series
+
+- 모듈: `src.DeepLearning.TensorFlow.time_series`
+- 실행기: `run_tf_time_series`
+- 레시피: `tf-time-series.json`
+
+#### TFTimeSeriesProfile
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `random_state` | `<class 'int'>` | `1234` | 0 이상 정수 시드. CPU에서도 완전 결정성을 보장하지 않음. 기본 1234. |
+| `epochs` | `<class 'int'>` | `30` | 최대 학습 epoch, 양수. 기본 30. |
+| `batch_size` | `<class 'int'>` | `32` | 학습 batch 크기, 양수. 기본 32. |
+| `learning_rate` | `<class 'float'>` | `0.001` | Adam 학습률, 양수. 기본 0.001. |
+| `patience` | `<class 'int'>` | `5` | validation loss 조기 종료 대기, 0 이상. 기본 5. |
+| `test_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 test 비율. 기본 0.2. |
+| `validation_size` | `<class 'float'>` | `0.2` | 전체 표본/시점 중 validation 비율, 두 비율 합 <1. 기본 0.2. |
+| `scaling` | `<class 'str'>` | `'standard'` | none/standard; 학습 입력만 적합. 기본 standard. |
+| `verbose` | `<class 'int'>` | `0` | Keras 출력 0/1/2. 기본 0. |
+| `cell` | `<class 'str'>` | `'lstm'` | simple_rnn/lstm/gru 셀 선택. 기본 lstm. |
+| `units` | `<class 'int'>` | `16` | 순환 층 폭, 양수. 기본 16. |
+| `input_width` | `<class 'int'>` | `12` | 관측 입력 창 길이. 기본 12. |
+| `horizon` | `<class 'int'>` | `1` | 미래 예측 타임스텝 수. 기본 1. |
+| `target_columns` | `Optional[Tuple[int, ...]]` | `None` | 예측할 열 위치; None은 모든 입력 열. 기본 None. |
+
+#### TFTimeSeriesOutputDTO
+
+| 필드 | 타입 | 기본값 | 의미 |
+| --- | --- | --- | --- |
+| `task` | `<class 'str'>` | `반환 필드` | classification/regression. 시계열은 regression. |
+| `parameters` | `Dict[str, Any]` | `반환 필드` | 실제 적용한 Profile 설정. 레시피 및 overrides 반영. |
+| `model` | `Any` | `반환 필드` | 학습 scaler·class encoder를 포함한 predict adapter; keras_model로 원 Keras 모델 접근. JSON 제외. |
+| `history` | `Dict[str, List[float]]` | `반환 필드` | epoch별 loss와 val_loss; Keras History 객체가 아닌 수치 목록. |
+| `test_metrics` | `Dict[str, float]` | `반환 필드` | 분류 accuracy/log_loss 또는 회귀 mse/rmse/mae. 원 타깃 단위. |
+| `predictions` | `<class 'numpy.ndarray'>` | `반환 필드` | test 순서 예측. 분류는 원 라벨, 시계열은 (창,horizon,target). |
+| `probabilities` | `Optional[numpy.ndarray]` | `반환 필드` | 분류 (n,classes) 확률; 회귀 None. |
+| `classes` | `Optional[numpy.ndarray]` | `반환 필드` | 확률 열 순서의 학습 클래스; 회귀 None. |
+| `train_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 학습 표본 번호; 시계열은 원 시점 번호. |
+| `validation_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 조기 종료 전용 검증 표본/시점 번호. |
+| `test_indices` | `<class 'numpy.ndarray'>` | `반환 필드` | 보류 평가 표본/시점 번호. |
+| `target_indices` | `Optional[numpy.ndarray]` | `반환 필드` | 시계열 test 각 창의 실제 타깃 시점 (창,horizon), 다른 모델 None. |
+| `y_test` | `<class 'numpy.ndarray'>` | `반환 필드` | predictions와 같은 shape/순서의 실제 test 타깃. |
+| `input_shape` | `Tuple[int, ...]` | `반환 필드` | Keras 입력 shape(batch 제외). |
+| `epochs_trained` | `<class 'int'>` | `반환 필드` | 실제 실행한 epoch 수. |
+| `best_epoch` | `<class 'int'>` | `반환 필드` | 최저 val_loss epoch, 1부터 시작. 최적 weights 복원. |
+
+공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.

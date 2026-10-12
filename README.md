@@ -1,19 +1,93 @@
-# ADP 필기 및 실기 학습 가이드
+# ADP 분석 모듈과 학습 자료
 
----
+ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다. 구현된 코드는
+**Profile → 모델별 JSON 레시피 → 실행 함수 → 전용 Output DTO**를 사용합니다.
+현재 표준 분석 모듈은 **37개**, 모델·목적별 레시피는 **45개**입니다.
+기존 단일·독립 두 표본 Z/t 검정 2개는 별도 계약으로 유지합니다.
 
-## 시험 환경 안내
+## 구현 범위
 
-> K-Data 공식 안내 기준 시험 환경입니다.
+| 영역 | 구현 내용 |
+| --- | --- |
+| 지도 학습 | XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron, Adaline, 단순·다중 선형회귀, Gaussian/Multinomial/Bernoulli/Complement Naive Bayes |
+| 군집·거리 | K-means, DBSCAN, HDBSCAN, 자기 포함 k-distance 진단 |
+| 차원 축소 | PCA, 지도 LDA, UMAP, t-SNE, SOM, metric/nonmetric MDS |
+| 변수 선택 | Forward/Backward/CV Stepwise, L1/L2 계수 기반 선택 |
+| 연관·연결망 | Apriori와 support/confidence/lift 등 규칙 지표, SNA 중심성·PageRank·커뮤니티 |
+| 평균·다변량 검정 | 기존 Z/t, 고전/Welch 일원 ANOVA, 이원 ANOVA Type I·II·III, 일원 MANOVA, Tukey 및 Student/Welch 쌍별 t+Holm/Bonferroni |
+| 추가 검정·진단 | 카이제곱 적합도, 독립성, 정확/근사 McNemar, 두 표본 분산비 F, Shapiro/D’Agostino/Jarque–Bera, Levene/Bartlett/Fligner |
+| TensorFlow | Dense 분류·회귀, SimpleRNN/LSTM/GRU sequence-to-one, 시간 순 분할과 다중 스텝 시계열 예측 |
 
-* **방식**: 클라우드 기반 CBT (Computer Based Test), 크롬(Chrome) 브라우저 사용
-* **서버 사양**: Ubuntu (64-bit) OS, 2 CPU, 4GB 메모리 (컨테이너별 제공)
-* **분석 도구 및 버전**
-* **R**: 버전 4.1.3, RStudio 제공
-* **Python**: 버전 3.7.4, Jupyter Notebook 제공
+빈 비모수 onesample/twosample 파일은 구현에 포함하지 않습니다. ARIMA/SARIMA,
+비선형 회귀 및 imbalanced-learn 실행 모듈은 현재 main에 포함되지 않았습니다.
+SNA는 사회연결망 분석이며 신경망이 아닙니다. L2 자체는 희소화를 보장하지 않습니다.
 
+## 빠른 실행
 
----
+저장소 루트에서 실행하세요. Python 3.7/3.12별 의존성을 분리합니다.
+
+```bash
+# 일반 분석 환경 (Python 3.12)
+python -m pip install -r requirements-models-py312.txt
+python -m unittest discover -s tests -v
+python -m src.stats.tests.nonParametric.independence
+
+# 별도 TensorFlow 환경 (Python 3.12; NumPy 핀이 달라 위 환경과 혼합하지 않음)
+python -m pip install -r requirements-tensorflow-py312.txt
+python -m unittest discover -s tests -p 'test_tensorflow_modules.py' -v
+python -m src.DeepLearning.TensorFlow.time_series
+```
+
+Python 3.7 일반 환경은 `requirements-models-py37.txt`를 사용합니다. HDBSCAN 빌드 전
+`numpy==1.21.6 Cython==0.29.37 wheel==0.38.4`를 설치하고
+`python -m pip install --no-build-isolation -r requirements-models-py37.txt`로 설치합니다.
+TensorFlow 3.7 환경은 `requirements-tensorflow-py37.txt`로 별도 설치합니다.
+`requirements.txt`는 기존 학습용 설정이며 새 표준 모듈 전체의 설치 명세가 아닙니다.
+
+```python
+from src.MachineLearning.Clustering.dbscan import run_dbscan
+from src.stats.tests.nonParametric.independence import run_independence
+
+result = run_independence([[30, 20], [10, 40]], overrides={"correction": False})
+print(result.p_value, result.reject_h0)
+print(result.to_json(indent=2))
+# 군집: run_dbscan(X, overrides={"eps": 0.5, "min_samples": 5})
+```
+
+Profile 생략 시 `src/Recipes`의 모델별 JSON을 매번 읽습니다. 설정 우선순위는
+JSON → overrides이며 명시적 Profile과 레시피 옵션을 동시에 지정하면 오류입니다.
+모델 객체는 DTO 속성으로 접근하며 기본 사전/JSON에서는 제외합니다.
+
+## 문서와 저장소 구조
+
+| 경로·문서 | 내용 |
+| --- | --- |
+| `src/MachineLearning` | 지도 학습·군집·차원 축소·변수 선택 |
+| `src/stats/tests` | 실제 통계 검정·가정 진단 코드 |
+| `src/DeepLearning/TensorFlow` | 선택 의존성 TensorFlow 실행기 |
+| `src/Association`, `src/Networks` | 연관규칙·사회연결망 |
+| `src/Recipes` | 모델·목적별 JSON과 공통 loader |
+| `tests` | 참조값·자료 분리·DTO·레시피·실제 학습 검증 |
+| [전체 명세](docs/ANALYSIS_CATALOG.md) | 모든 구현 목록과 Profile/DTO 필드 |
+| [모듈 컨벤션](docs/MODEL_MODULE_FORMAT.md) | 파일 메타데이터·7개 섹션·공통 실행 계약 |
+| [레시피 사용법](docs/RECIPES.md) | 기본·사용자 JSON과 overrides |
+| [ANOVA 계열](docs/ANOVA_MODULES.md) | 가정과 지원 범위 |
+| [추가 통계 검정](docs/STATISTICAL_TESTS.md) | 검정 선택·귀무가설·근사 조건 |
+| [TensorFlow 정리](docs/TENSORFLOW_MODULES.md) | 첨부 4개 자료의 핵심·입력 shape·학습/평가·윈도 |
+| [검증 기록](docs/VALIDATION.md) | 환경과 실제 실행 범위 |
+
+## 실행·해석 범위
+
+지도 학습과 변수 선택은 IID 분할이며 전처리는 학습 자료에 적합합니다.
+군집·차원 축소는 전체 입력의 탐색 분석입니다. t-SNE/MDS와 현재 밀도 군집 실행기는
+새 관측 predict/transform을 제공하지 않습니다. TensorFlow RNN 표본은 독립 시퀀스이며,
+연속 시계열은 시간 순 윈도 실행기를 사용합니다. 상세 범위는 각 문서에 있습니다.
+Python 3.7.4 시험 서버와 동일한 환경·패키지 제공을 보장하지 않습니다.
+
+## 기존 로컬 학습 환경 설정
+
+아래는 기존 Python 3.7 학습 환경 참고입니다. 시험 환경 정보는 현재 공식 안내를
+별도로 확인하고, 새 분석 모듈은 위의 전용 의존성 파일을 사용하세요.
 
 ## Mac (Apple Silicon) 환경 설정: Python 3.7 활성화
 
@@ -81,24 +155,3 @@ jupyter kernelspec list # 등록 커널 확인
 ```
 - 이후 환경 재시작하여 커널 지정하기 :
  > `command` + `shift` + `p` / `developer:reload window` 클릭하기
-
-## 동일 명세의 머신러닝 모델
-
-XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron, 선형회귀, 아달린의 Profile·Output DTO·실행 함수·예제를 제공합니다.
-[모듈 명세 및 실행 안내](docs/MODEL_MODULE_FORMAT.md)를 참고하세요.
-
-## ANOVA·MANOVA·사후검정
-
-고전·Welch 일원배치, 이원배치(Type I·II·III), 일원 MANOVA와 Tukey HSD·Holm·Bonferroni 사후검정을 제공합니다.
-[통계 모듈 명세 및 실행 안내](docs/ANOVA_MODULES.md)를 참고하세요.
-
-## 모델별 레시피
-
-모델·목적별 JSON 34개를 `src/Recipes`에서 별도로 관리합니다. Profile을 생략한 실행과 모듈 예제는 해당 레시피를 읽습니다.
-[레시피 형식·설정 우선순위·사용 예제](docs/RECIPES.md)를 참고하세요.
-
-## 전체 분석 기법 명세
-
-나이브 베이즈, K-means·k-distance·DBSCAN·HDBSCAN, PCA·LDA·UMAP·t-SNE·SOM·MDS,
-Forward·Backward·Stepwise 및 L1·L2 변수 선택, Apriori와 SNA를 제공합니다.
-[전체 27개 표준 모듈과 기존 Z·t 검정의 입력·출력·레시피 명세](docs/ANALYSIS_CATALOG.md)를 참고하세요.

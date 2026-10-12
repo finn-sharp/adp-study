@@ -37,6 +37,18 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    'tf-classification': ('src.DeepLearning.TensorFlow.classification', 'TFClassificationProfile', None, (None,)),
+    'tf-regression': ('src.DeepLearning.TensorFlow.regression', 'TFRegressionProfile', None, (None,)),
+    'tf-rnn': ('src.DeepLearning.TensorFlow.rnn', 'TFRNNProfile', 'regression', ('classification', 'regression')),
+    'tf-time-series': ('src.DeepLearning.TensorFlow.time_series', 'TFTimeSeriesProfile', None, (None,)),
+
+    'chi-square': ('src.stats.tests.nonParametric.chi_square', 'ChiSquareProfile', None, (None,)),
+    'independence': ('src.stats.tests.nonParametric.independence', 'IndependenceProfile', None, (None,)),
+    'mcnemar': ('src.stats.tests.nonParametric.mcnemar', 'McNemarProfile', None, (None,)),
+    'f-test': ('src.stats.tests.parametric.Variance.f_test', 'FTestProfile', None, (None,)),
+    'normality': ('src.stats.tests.diagnostics.normality', 'NormalityProfile', None, (None,)),
+    'homogeneity': ('src.stats.tests.diagnostics.homogeneity', 'HomogeneityProfile', None, (None,)),
+
     "xgboost": ("src.MachineLearning.Trees.xgboost", "XGBoostProfile", "classification", ("classification", "regression")),
     "catboost": ("src.MachineLearning.Trees.catboost", "CatBoostProfile", "classification", ("classification", "regression")),
     "lightgbm": ("src.MachineLearning.Trees.lightgbm", "LightGBMProfile", "classification", ("classification", "regression")),
@@ -146,8 +158,9 @@ def _normalize(model_name: str, values: Dict[str, Any]) -> Dict[str, Any]:
                 if canonical in result:
                     raise ValueError("레시피 키 충돌: " + alias + " / " + canonical)
                 result[canonical] = result.pop(alias)
-    if "hidden_layer_sizes" in result and isinstance(result["hidden_layer_sizes"], list):
-        result["hidden_layer_sizes"] = tuple(result["hidden_layer_sizes"])
+    for key in ("hidden_layer_sizes", "target_columns"):
+        if key in result and isinstance(result[key], list):
+            result[key] = tuple(result[key])
     return result
 
 
