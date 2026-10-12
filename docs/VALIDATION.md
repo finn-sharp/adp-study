@@ -103,3 +103,13 @@ Libras 위치 임베딩, Iris 수치 상관과 Adult 범주 상관을 사용했�
 신규 검사는 참조 수치·미지 범주·nullable 결측·타깃 제외·실제 CV 폴드별 적합 상태,
 RoPE 수식/역회전/부분 차원/노름/상대 위치, 다중검정 보정·signed Phi 방향·행렬 정의역을 확인합니다.
 13개 신규 모듈 CLI 예제 및 Python 3.7 구문을 확인합니다. 실제 Python 3.7 동작은 CI에서 별도로 검증합니다.
+
+## Axes EDA 시각화 (2026-10-12)
+
+새 plot 모듈 35개·JSON 35개·UCI subplot skeleton 11개를 추가했습니다.
+Python 3.12 로컬 전체 단위 검사 113개 중 106개 통과, 선택 TensorFlow 학습 7개는 별도 CI 환경에서 검증합니다.
+새 오프라인 실행 예제 35개와 실제 UCI 조합 11개(총35 pane)의 렌더링/DTO 직렬화가 통과했습니다.
+범주·군집·분류 화면의 실제 PNG를 확인하고 heatmap 문자 대비를 조정했습니다.
+Axes 동일 객체/추가 figure·show 없음/명시적 cax/다른 pane 불변/입력 불변,
+ECDF·분모·Wilson·linkage·silhouette·AUC/AP·모든 임계값 비용·PACF·후행 평균을 검증합니다.
+명세와 공개 함수 계약 및 Python 3.7 구문 검사도 통과했습니다.

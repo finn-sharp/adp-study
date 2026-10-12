@@ -176,3 +176,9 @@ CNN 1D/2D·전용 SimpleRNN/LSTM/GRU·FP-Growth/Eclat을 각각 별도 구현/�
 
 Preprocessing에 7개, stats에 상관/행렬 6개를 추가하여 UCI skeleton은 총 46개입니다.
 기존 stats 분포 예제는 별도 1개입니다. [Feature 중심 설계·UCI 데이터·전체 명세](PREPROCESSING_CORRELATION_MODULES.md)를 참고하세요.
+
+## 시각화 조합 예제
+
+이번 확장은 `src/Visualization/skeleton`에 별도 UCI subplot 예제 11개를 추가합니다.
+기존 모델 skeleton 46개의 수치 실행은 유지하며 새 모듈은 단일 ax를 받아 조합합니다.
+[의사결정별 시각화·전체 명세](EDA_VISUALIZATION_MODULES.md)를 참고하세요.

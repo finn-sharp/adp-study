@@ -1,0 +1,8 @@
+{
+  "title": "",
+  "color": "C0",
+  "alpha": 0.8,
+  "nlags": 20,
+  "kind": "acf",
+  "confidence": 0.95
+}

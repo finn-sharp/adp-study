@@ -1,0 +1,8 @@
+{
+  "title": "",
+  "color": "C0",
+  "alpha": 0.8,
+  "k": 5,
+  "metric": "euclidean",
+  "eps": null
+}

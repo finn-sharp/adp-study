@@ -122,6 +122,8 @@ jobs:
           python -m src.stats.correlation.categorical.cramers_v
           python -m src.stats.correlation.categorical.phi
           python -m src.stats.correlation.matrix_transform
+      - name: Execute Axes visualization examples
+        run: python -m examples.eda_visualization_examples
       - name: Verify legacy CLI compatibility
         run: |
           python -m src.stats.tests.parametric.Average.Univariate
