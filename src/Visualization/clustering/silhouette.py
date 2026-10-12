@@ -109,9 +109,10 @@ def _draw(values, labels, ax, profile, before):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from sklearn.metrics import silhouette_samples
+    if isinstance(values,pd.DataFrame) and isinstance(labels,pd.Series) and not values.index.equals(labels.index):raise ValueError('관측과 군집 라벨 인덱스가 다릅니다.')
     raw=frame(values);lab=np.asarray(labels)
     if lab.ndim!=1 or len(lab)!=len(raw) or pd.isna(lab).any():raise ValueError('대응 라벨 오류')
-    keep=np.ones(len(lab),dtype=bool) if profile.noise_label is None else lab!=profile.noise_label
+    keep=np.ones(len(lab),dtype=bool) if profile.noise_label is None else pd.Series(lab).ne(profile.noise_label).to_numpy(dtype=bool)
     if profile.metric=='precomputed':
         if raw.shape!=(len(raw),len(raw)) or (raw.values<0).any() or not np.allclose(raw.values,raw.values.T) or not np.allclose(np.diag(raw),0):raise ValueError('precomputed 거리 행렬 오류')
         X=raw.values[np.ix_(keep,keep)]
