@@ -1,0 +1,103 @@
+"""네트워크 없는 스켈레톤 계약·누수·CV·시계열/장바구니 변환 검증."""
+import ast
+import contextlib
+from dataclasses import fields
+import importlib
+from io import BytesIO, StringIO
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+from zipfile import ZipFile
+import numpy as np
+import pandas as pd
+from src.MachineLearning.skeleton import _datasets
+from src.MachineLearning.skeleton._common import fit_evaluate
+from src.MachineLearning.skeleton import linear_regression, pca, mds
+from src.MachineLearning.base.feature import FeatureSpec
+from src.MachineLearning.base.preprocessor import BasePreprocessor
+
+
+class UCISkeletonTest(unittest.TestCase):
+    def test_feature_schema_and_preprocessor_configuration(self):
+        with self.assertRaises(ValueError):FeatureSpec('numeric','age','passthrough')
+        with self.assertRaises(ValueError):FeatureSpec('numeric',['a','a'],'passthrough')
+        feature=FeatureSpec('numeric',['a'],'passthrough')
+        processor=BasePreprocessor([feature])
+        with self.assertRaises(ValueError):processor.add_feature(feature)
+        self.assertEqual(processor.describe()[0]['transformer'],'passthrough')
+        self.assertIs(processor.fit(pd.DataFrame({'a':[1.,2.]})),processor)
+        processor.remove_feature('numeric')
+        with self.assertRaises(ValueError):processor.get_preprocessor()
+
+    def test_all_modules_import_without_network_or_training_and_follow_contract(self):
+        root = Path(_datasets.__file__).parent
+        paths = [p for p in root.glob('*.py') if not p.name.startswith('_')]
+        self.assertEqual(len(paths), 27)
+        with patch.object(_datasets, 'urlopen', side_effect=AssertionError('Import must be offline')):
+            for path in paths:
+                module = importlib.import_module('src.MachineLearning.skeleton.' + path.stem)
+                for name in ('load_data', 'load_recipe', 'build_pipeline', 'main'):
+                    self.assertTrue(callable(getattr(module, name)))
+                tree = ast.parse(path.read_text())
+                for name in ('__author__', '__email__', '__version__', '__status__'):
+                    self.assertIsInstance(getattr(module, name), str)
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.FunctionDef):
+                        for label in ('Args:', 'Returns:', 'Raises:'):
+                            self.assertIn(label, ast.get_docstring(node))
+        for path in root.glob('*.py'):
+            source = path.read_text()
+            for forbidden in ('matplotlib', 'seaborn', 'plotly', 'plt.', '.plot(', 'savefig('):
+                self.assertNotIn(forbidden, source)
+
+    def test_preprocessing_and_grid_search_use_training_rows_only(self):
+        rng = np.random.RandomState(5)
+        frame = pd.DataFrame(rng.normal(size=(60, 3)), columns=['a','b','c'])
+        frame['target'] = frame.a * 2 + frame.b - frame.c
+        pipeline = linear_regression.build_pipeline(['a','b','c'], overrides={'scaling':'standard', 'param_grid':{'fit_intercept':[True,False]}})
+        result = fit_evaluate(frame, pipeline, 'OLS')
+        scaler = result.model.pipeline.named_steps['preprocessor'].named_transformers_['numeric']
+        np.testing.assert_allclose(scaler.mean_, frame.iloc[result.train_indices][['a','b','c']].mean())
+        self.assertFalse(set(result.train_indices) & set(result.test_indices))
+        self.assertLess(result.metrics['rmse'], 1e-10)
+        self.assertTrue(result.details['best_params'])
+        np.testing.assert_allclose(result.predict(frame.iloc[result.test_indices].drop(columns='target')), result.predictions)
+        self.assertNotIn('model', result.to_dict())
+
+    def test_libras_frame_order_and_time_series_dates(self):
+        frame = pd.DataFrame([list(range(90))+[1], list(range(90,180))+[2]])
+        with patch.object(_datasets, 'dataset_bytes', return_value=frame.to_csv(index=False,header=False).encode()):
+            X,y = _datasets.load_libras()
+        self.assertEqual(X.shape,(2,45,2))
+        np.testing.assert_array_equal(X[0,1],[2,3])
+        bike = b'dteday,cnt\n2011-01-02,2\n2011-01-01,1\n'
+        with patch.object(_datasets, 'dataset_bytes', return_value=bike):
+            data = _datasets.load_bike()
+        np.testing.assert_array_equal(data.cnt,[1,2])
+        with patch.object(_datasets, 'dataset_bytes', return_value=b'dteday,cnt\n2011-01-01,1\n2011-01-03,2\n'):
+            with self.assertRaises(ValueError):_datasets.load_bike()
+
+    def test_retail_cancellation_product_codes_and_complete_invoice_groups(self):
+        data = pd.DataFrame([
+            ('1','12345',1,2,'2011-01-01'),('2','34567',1,2,'2011-01-02'),
+            ('1','23456',1,2,'2011-01-03'),('2','23456',1,2,'2011-01-04'),
+            ('C1','99999',1,2,'2011-01-01'),('1','POST',1,2,'2011-01-01'),
+            ('1','88888',-1,2,'2011-01-01'),('3','45678',1,2,'2011-01-05')],
+            columns=['InvoiceNo','StockCode','Quantity','UnitPrice','InvoiceDate'])
+        with patch.object(_datasets,'dataset_bytes',return_value=b'x'),patch.object(pd,'read_excel',return_value=data):
+            baskets=_datasets.load_baskets(max_transactions=2,max_items=10)
+        self.assertEqual(baskets,[{'12345','23456'},{'34567','23456'}])
+
+    def test_transform_support_and_profile_conflicts(self):
+        X=pd.DataFrame(np.random.RandomState(2).normal(size=(20,4)),columns=list('abcd'))
+        pipeline=pca.build_pipeline(X.columns)
+        pipeline.pipeline.fit(X)
+        self.assertEqual(pipeline.pipeline.transform(X.iloc[:2]).shape,(2,2))
+        pipeline=mds.build_pipeline(X.columns,overrides={'max_iter':20,'n_init':1})
+        pipeline.pipeline.fit(X)
+        with self.assertRaises(ValueError):pipeline.pipeline.transform(X.iloc[:2])
+        with self.assertRaises(ValueError):pca.build_pipeline(X.columns,profile=pca.load_recipe(),overrides={})
+
+
+if __name__=='__main__':unittest.main()

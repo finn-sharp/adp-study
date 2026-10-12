@@ -31,3 +31,6 @@ build/
 
 # data
 data/*
+
+# UCI skeleton raw-data cache
+.uci-cache/

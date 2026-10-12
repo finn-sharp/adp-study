@@ -163,3 +163,10 @@ jupyter kernelspec list # 등록 커널 확인
 
 PDF의 신규 검정/효과크기23개·분포16종, 범주동질성 API와 기존평균 표준화를 제공합니다. 폴더는 검정계열·목적, 입력은 표본설계를 구분합니다. 기존 import와 python -m 경로는 유지합니다.
 [통계 전체 명세](docs/STATISTICS_COMPLETE.md)를 참고하세요.
+
+## UCI 모델 스켈레톤
+
+`src/MachineLearning/skeleton/`의 27개 예제는 UCI 원본 자료와 기존 모델별 레시피를 연결합니다.
+참고 XGBoost의 데이터 로딩 → 레시피 → FeatureSpec 전처리 → 모델 → 수치 평가 흐름을 유지합니다.
+군집·차원 축소·변수 선택·TensorFlow·연관규칙·네트워크도 목적에 맞는 파이프라인을 제공합니다.
+[참고 코드 분석·데이터 출처·실행 방법](docs/UCI_SKELETONS.md)을 확인하세요. 시각화는 포함하지 않습니다.
