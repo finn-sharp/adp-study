@@ -1,0 +1,8 @@
+{
+  "alpha": 0.05,
+  "mu_0": 0.0,
+  "known_var": false,
+  "sigma": null,
+  "alternative": "two-sided",
+  "nan_policy": "raise"
+}

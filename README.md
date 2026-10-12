@@ -2,8 +2,8 @@
 
 ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다. 구현된 코드는
 **Profile → 모델별 JSON 레시피 → 실행 함수 → 전용 Output DTO**를 사용합니다.
-현재 표준 분석 모듈은 **37개**, 모델·목적별 레시피는 **45개**입니다.
-기존 단일·독립 두 표본 Z/t 검정 2개는 별도 계약으로 유지합니다.
+현재 표준 분석 모듈은 **79개**, 모델·목적별 레시피는 **87개**입니다.
+기존 단일·독립 두 표본 Z/t도 표준 공개 모듈로 정비하고 이전 호출을 호환 경로로 유지합니다.
 
 ## 구현 범위
 
@@ -15,6 +15,7 @@ ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다.
 | 변수 선택 | Forward/Backward/CV Stepwise, L1/L2 계수 기반 선택 |
 | 연관·연결망 | Apriori와 support/confidence/lift 등 규칙 지표, SNA 중심성·PageRank·커뮤니티 |
 | 평균·다변량 검정 | 기존 Z/t, 고전/Welch 일원 ANOVA, 이원 ANOVA Type I·II·III, 일원 MANOVA, Tukey 및 Student/Welch 쌍별 t+Holm/Bonferroni |
+| 통계 PDF 확장 | 분포16종, 모비율·대응t·단일분산χ², 순위·반복측정, OR/RR·RxC Fisher·CMH·Bowker·Cochran Q, AD·KS/Lilliefors·Hotelling·Box M·ADF |
 | 추가 검정·진단 | 카이제곱 적합도, 독립성, 정확/근사 McNemar, 두 표본 분산비 F, Shapiro/D’Agostino/Jarque–Bera, Levene/Bartlett/Fligner |
 | TensorFlow | Dense 분류·회귀, SimpleRNN/LSTM/GRU sequence-to-one, 시간 순 분할과 다중 스텝 시계열 예측 |
 
@@ -74,6 +75,8 @@ JSON → overrides이며 명시적 Profile과 레시피 옵션을 동시에 지�
 | [ANOVA 계열](docs/ANOVA_MODULES.md) | 가정과 지원 범위 |
 | [추가 통계 검정](docs/STATISTICAL_TESTS.md) | 검정 선택·귀무가설·근사 조건 |
 | [TensorFlow 정리](docs/TENSORFLOW_MODULES.md) | 첨부 4개 자료의 핵심·입력 shape·학습/평가·윈도 |
+| [통계 전체 구현](docs/STATISTICS_COMPLETE.md) | PDF 대응·전체 입력/출력·분포·정확/근사 경계 |
+| [PDF 사전분석](docs/STATISTICS_PDF_AUDIT.md) | 구현 전 전수 조사·이관 전략 |
 | [검증 기록](docs/VALIDATION.md) | 환경과 실제 실행 범위 |
 
 ## 실행·해석 범위
@@ -155,3 +158,8 @@ jupyter kernelspec list # 등록 커널 확인
 ```
 - 이후 환경 재시작하여 커널 지정하기 :
  > `command` + `shift` + `p` / `developer:reload window` 클릭하기
+
+## 통계 전체 범위와 경로 이관
+
+PDF의 신규 검정/효과크기23개·분포16종, 범주동질성 API와 기존평균 표준화를 제공합니다. 폴더는 검정계열·목적, 입력은 표본설계를 구분합니다. 기존 import와 python -m 경로는 유지합니다.
+[통계 전체 명세](docs/STATISTICS_COMPLETE.md)를 참고하세요.

@@ -1,0 +1,6 @@
+{
+  "alpha": 0.05,
+  "variance_0": 1.0,
+  "alternative": "two-sided",
+  "nan_policy": "raise"
+}

@@ -1,0 +1,10 @@
+{
+  "alpha": 0.05,
+  "diff_0": 0.0,
+  "known_var": false,
+  "sigma1": null,
+  "sigma2": null,
+  "equal_var": true,
+  "alternative": "two-sided",
+  "nan_policy": "raise"
+}

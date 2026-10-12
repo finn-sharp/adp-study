@@ -1,6 +1,6 @@
 # 전체 분석 모듈 명세
 
-현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 37개, 모델·목적별 JSON 레시피는 45개입니다.
+현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 79개, 모델·목적별 JSON 레시피는 87개입니다.
 기존 단일·독립 두 표본 Z·t 검정 파일 2개도 아래에 별도로 명세합니다.
 비모수 검정의 빈 파일은 구현 완료로 집계하지 않습니다.
 
@@ -1801,3 +1801,8 @@ python -m src.Networks.sna
 | `best_epoch` | `<class 'int'>` | `반환 필드` | 최저 val_loss epoch, 1부터 시작. 최적 weights 복원. |
 
 공개 실행기의 `profile`, `recipe_path`, `overrides`는 기존 레시피 우선순위를 따릅니다.
+
+## 통계 PDF 전체 확장과 정식 경로
+
+추가42개 공개모듈의 전체 API·필드·레시피·설계·계산경계는 [통계 전체 명세](STATISTICS_COMPLETE.md)에 있습니다.
+ANOVA/사후검정은 parametric/Average/anova, MANOVA는 parametric/Multivariate, 카이제곱/McNemar는 nonParametric/Categorical이 정식위치입니다. 이전위치 링크는 호환export로 유효합니다. 기존 Z/t 설명은 이전 호환API이며 새표준실행기는 전체명세를 참고하세요.

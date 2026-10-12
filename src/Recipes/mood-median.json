@@ -1,0 +1,6 @@
+{
+  "alpha": 0.05,
+  "nan_policy": "raise",
+  "ties": "below",
+  "correction": true
+}

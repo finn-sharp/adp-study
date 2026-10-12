@@ -1,0 +1,5 @@
+{
+  "alpha": 0.05,
+  "zero_correction": "none",
+  "alternative": "two-sided"
+}

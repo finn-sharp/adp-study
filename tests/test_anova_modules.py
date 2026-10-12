@@ -145,7 +145,8 @@ class ANOVAModulesTest(unittest.TestCase):
         modules=[('OneWay','OneWayANOVA'),('TwoWay','TwoWayANOVA'),('MANOVA','MANOVA'),('PostHoc','PostHoc')]
         for filename,prefix in modules:
             with self.subTest(filename=filename):
-                module=importlib.import_module('src.stats.tests.parametric.Average.Multivariate.'+filename)
+                canonical={'OneWay':'src.stats.tests.parametric.Average.anova.one_way','TwoWay':'src.stats.tests.parametric.Average.anova.two_way','PostHoc':'src.stats.tests.parametric.Average.anova.posthoc','MANOVA':'src.stats.tests.parametric.Multivariate.manova'}
+                module=importlib.import_module(canonical[filename])
                 source=Path(module.__file__).read_text(encoding='utf-8')
                 sections=['1. Imports','2. Input Profile','3. Output DTO','4. Input Validation',
                           '5. Individual Model Runners','6. Public Runner','7. Example Execution']

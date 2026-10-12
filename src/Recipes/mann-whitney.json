@@ -1,0 +1,7 @@
+{
+  "alpha": 0.05,
+  "method": "auto",
+  "correction": true,
+  "alternative": "two-sided",
+  "nan_policy": "raise"
+}

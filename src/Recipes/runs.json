@@ -1,0 +1,6 @@
+{
+  "alpha": 0.05,
+  "cutoff": null,
+  "correction": true,
+  "nan_policy": "raise"
+}

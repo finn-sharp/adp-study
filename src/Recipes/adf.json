@@ -1,0 +1,7 @@
+{
+  "alpha": 0.05,
+  "regression": "c",
+  "max_lag": null,
+  "autolag": "AIC",
+  "nan_policy": "raise"
+}

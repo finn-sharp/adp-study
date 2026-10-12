@@ -1,0 +1,6 @@
+{
+  "alpha": 0.05,
+  "p_0": 0.5,
+  "method": "exact",
+  "alternative": "two-sided"
+}
