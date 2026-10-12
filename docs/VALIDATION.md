@@ -1,5 +1,20 @@
 # 검증 기록
 
+## 2026-10-12: UCI 모델 스켈레톤
+
+GitHub 최신 main을 기준으로 기반 클래스 3개와 학습/분석 스켈레톤 27개를 추가했습니다.
+기존 모델 구현과 JSON 레시피는 그대로 사용합니다.
+
+- 공식 UCI 원본 Wine Quality·Iris·Bike Sharing·Libras Movement·Online Retail을 사용했습니다.
+- 일반 스켈레톤 23개 기본 실행과 분류/회귀 추가 목적 7개·Naive Bayes 추가 variant 3개 통과.
+- TensorFlow 4개는 별도 Python 3.12/TF 2.16.2 환경에서 원본 자료로 2 epoch 실제 학습·예측 검증.
+- 오프라인 검사 6개: 전처리 스키마, 27개 import/함수/docstring 계약, 학습 구간 전처리·CV,
+  시퀀스/날짜 순서, 취소 제외·완전한 영수증 그룹, transform 지원 범위.
+- 새 스켈레톤의 시각화 import·그림 생성·저장 없음과 Python 3.7 구문을 검사합니다.
+
+실행 검증은 Apple Silicon Python 3.12.14입니다. 짧은 TensorFlow 검증은 예측 성능 주장이 아닙니다.
+실제 Python 3.7 및 ADP 시험 서버 검증은 이 기록과 구분합니다.
+
 ## 2026-10-12: 통계 PDF 전체 모듈 복구·확장
 
 Apple Silicon macOS의 Python 3.12.14에서 저장소의 일반 분석용 고정 버전을 사용했습니다.
