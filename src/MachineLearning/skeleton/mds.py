@@ -23,7 +23,7 @@ __status__ = "Development"
 
 import numpy as np
 from src.Recipes import load_profile
-from ._datasets import load_tabular
+from src.datasets.uci import load_tabular
 from ._common import AnalysisEstimator, SkeletonOutputDTO, connect_pipeline, report
 
 

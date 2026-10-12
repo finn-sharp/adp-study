@@ -37,6 +37,13 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    'tf-cnn': ('src.DeepLearning.TensorFlow.cnn', 'TFCNNProfile', 'classification', ('classification', 'regression')),
+    'tf-simple-rnn': ('src.DeepLearning.TensorFlow.simple_rnn', 'TFSimpleRNNProfile', 'classification', ('classification', 'regression')),
+    'tf-lstm': ('src.DeepLearning.TensorFlow.lstm', 'TFLSTMProfile', 'classification', ('classification', 'regression')),
+    'tf-gru': ('src.DeepLearning.TensorFlow.gru', 'TFGRUProfile', 'classification', ('classification', 'regression')),
+    'fp-growth': ('src.Association.fp_growth', 'FPGrowthProfile', None, (None,)),
+    'eclat': ('src.Association.eclat', 'EclatProfile', None, (None,)),
+
     'distribution-bernoulli': ('src.stats.distributions.bernoulli', 'BernoulliProfile', None, (None,)),
     'distribution-binomial': ('src.stats.distributions.binomial', 'BinomialProfile', None, (None,)),
     'distribution-normal': ('src.stats.distributions.normal', 'NormalProfile', None, (None,)),
@@ -202,7 +209,7 @@ def _normalize(model_name: str, values: Dict[str, Any]) -> Dict[str, Any]:
                 if canonical in result:
                     raise ValueError("레시피 키 충돌: " + alias + " / " + canonical)
                 result[canonical] = result.pop(alias)
-    for key in ("hidden_layer_sizes", "target_columns"):
+    for key in ("hidden_layer_sizes", "target_columns", "conv_filters"):
         if key in result and isinstance(result[key], list):
             result[key] = tuple(result[key])
     return result

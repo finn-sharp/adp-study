@@ -1,6 +1,6 @@
 """
 ================================================================================
-apriori.py - apriori UCI 스켈레톤
+sna.py - sna UCI 스켈레톤
 ================================================================================
 설명:
     - 데이터 로딩 → JSON/Profile → 전처리/모델 연결 → 학습/분석 → 수치 평가.
@@ -24,10 +24,8 @@ __status__ = "Development"
 from collections import Counter
 from itertools import combinations
 from src.Recipes import load_profile
-from src.Association.apriori import run_apriori
-from ._datasets import load_baskets
-
-UCI_DEFAULT_OVERRIDES = {'min_support': 0.05}
+from src.Networks.sna import run_sna
+from src.datasets.uci import load_baskets
 
 
 def load_data(cache_dir=None, max_transactions=1000, max_items=30):
@@ -46,7 +44,7 @@ def load_data(cache_dir=None, max_transactions=1000, max_items=30):
 
 
 def load_recipe(overrides=None):
-    """기존 apriori JSON을 전용 Profile로 읽습니다.
+    """기존 sna JSON을 전용 Profile로 읽습니다.
 
     Args:
         overrides: 명시적 레시피 재정의.
@@ -55,9 +53,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    settings = dict(UCI_DEFAULT_OVERRIDES)
-    settings.update(overrides or {})
-    return load_profile('apriori', overrides=settings)
+    return load_profile('sna', overrides=overrides)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -74,7 +70,20 @@ def build_pipeline(profile=None, overrides=None):
     if profile is not None and overrides is not None:
         raise ValueError('profile과 overrides를 동시에 지정하지 않습니다.')
     profile = load_recipe(overrides) if profile is None else profile
-    return lambda baskets: run_apriori(baskets, profile=profile)
+    def execute(baskets):
+        """영수증의 상품 쌍을 가중 공동구매 edge로 변환합니다.
+
+        Args:
+            baskets: 정제한 영수증별 고유 상품 집합.
+        Returns:
+            SNAOutputDTO: 공동구매 그래프 수치.
+        Raises:
+            ValueError/ImportError: edge 조건·networkx 오류.
+        """
+        counts = Counter(pair for basket in baskets for pair in combinations(sorted(basket), 2))
+        edges = [(a, b, float(weight)) for (a, b), weight in sorted(counts.items())]
+        return run_sna(edges, profile=profile)
+    return execute
 
 
 def main(cache_dir=None, overrides=None, max_transactions=1000, max_items=30):
@@ -94,10 +103,10 @@ def main(cache_dir=None, overrides=None, max_transactions=1000, max_items=30):
     profile = load_recipe(overrides)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
-    print('=== Example : UCI Online Retail apriori ===')
-    print('transactions:', result.n_transactions)
-    print('itemsets:', len(result.itemsets), 'rules:', len(result.rules))
-    print(result.rules.head(10).to_string(index=False))
+    print('=== Example : UCI Online Retail sna ===')
+    print('nodes:', len(result.nodes), 'components:', result.n_components)
+    print('density:', result.density, 'modularity:', result.modularity)
+    print(result.node_metrics.head(10).to_string(index=False))
     return result
 
 

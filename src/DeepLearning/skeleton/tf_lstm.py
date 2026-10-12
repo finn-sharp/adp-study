@@ -1,6 +1,6 @@
 """
 ================================================================================
-tf_time_series.py - tf-time-series UCI 스켈레톤
+tf_lstm.py - tf-lstm UCI 스켈레톤
 ================================================================================
 설명:
     - 데이터 로딩 → JSON/Profile → 전처리/모델 연결 → 학습/분석 → 수치 평가.
@@ -22,12 +22,12 @@ __version__ = "1.0.0"
 __status__ = "Development"
 
 from src.Recipes import load_profile
-from src.DeepLearning.TensorFlow.time_series import run_tf_time_series
-from ._datasets import load_tabular, load_libras, load_bike
+from src.DeepLearning.TensorFlow.lstm import run_tf_lstm
+from src.datasets.uci import load_tabular, load_libras, load_bike
 
 
 def load_data(cache_dir=None):
-    """UCI bike 원본을 모델의 표본/시퀀스 계약으로 변환합니다.
+    """UCI libras 원본을 모델의 표본/시퀀스 계약으로 변환합니다.
 
     Args:
         cache_dir: 선택 UCI 캐시.
@@ -36,7 +36,7 @@ def load_data(cache_dir=None):
     Raises:
         ValueError/OSError: 자료·다운로드 오류.
     """
-    return load_bike(cache_dir)
+    return load_libras(cache_dir)
 
 
 def load_recipe(overrides=None):
@@ -49,7 +49,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    return load_profile('tf-time-series', task=None, overrides=overrides)
+    return load_profile('tf-lstm', task='classification', overrides=overrides)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -76,7 +76,7 @@ def build_pipeline(profile=None, overrides=None):
         Raises:
             ValueError/ImportError: 자료 조건 또는 TensorFlow 미설치.
         """
-        return run_tf_time_series(data.to_numpy(dtype=float), profile=profile)
+        return run_tf_lstm(*data, profile=profile)
     return execute
 
 
@@ -95,7 +95,7 @@ def main(cache_dir=None, overrides=None):
     profile = load_recipe(overrides)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
-    print('=== Example : UCI bike tf_time_series ===')
+    print('=== Example : UCI libras tf_lstm ===')
     print('input_shape:', result.input_shape)
     print('metrics:', result.test_metrics)
     print('epochs_trained:', result.epochs_trained)

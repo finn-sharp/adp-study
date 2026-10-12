@@ -23,7 +23,7 @@ __status__ = "Development"
 
 from src.Recipes import load_profile
 from src.MachineLearning.Trees.lightgbm import _create_model
-from ._datasets import load_tabular
+from src.datasets.uci import load_tabular
 from ._common import connect_pipeline, fit_evaluate, report
 
 
