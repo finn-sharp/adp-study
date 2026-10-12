@@ -107,6 +107,9 @@ def _draw(times, values, ax, profile, before):
     raw,removed=paired(time=times,value=values);raw['value']=vector(raw.value,allow_missing=False)[0];raw['time']=pd.to_datetime(raw.time,errors='raise')
     if raw.time.isna().any() or raw.time.duplicated().any() or not raw.time.is_monotonic_increasing or profile.rolling_window<0:raise ValueError('시간은 고유하고 오름차순이어야 합니다.')
     data=raw;ax.plot(data.time,data.value,color=profile.color,alpha=profile.alpha,label='Observed')
+    from matplotlib.dates import AutoDateLocator,ConciseDateFormatter
+    locator=AutoDateLocator(minticks=3,maxticks=5)
+    ax.xaxis.set_major_locator(locator);ax.xaxis.set_major_formatter(ConciseDateFormatter(locator))
     if profile.rolling_window:
         data['trailing_mean']=data.value.rolling(profile.rolling_window,min_periods=profile.rolling_window).mean();ax.plot(data.time,data.trailing_mean,color='C3',label='Trailing mean')
     ax.set_xlabel('Time');ax.set_ylabel('Value');ax.legend(fontsize=8);diagnostics={'n':len(data),'missing_removed':removed,'rolling_window_in_rows':profile.rolling_window};notes=['이동평균은 후행 관측 요약이며 예측값이 아닙니다. 행 간격이 일정한지 별도로 확인하세요.']
