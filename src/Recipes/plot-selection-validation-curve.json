@@ -1,0 +1,8 @@
+{
+  "title": "",
+  "color": "C0",
+  "alpha": 0.8,
+  "x_label": "Training samples / model setting",
+  "score_label": "Classification score (higher is better)",
+  "error_multiplier": 1.0
+}

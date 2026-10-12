@@ -1,0 +1,9 @@
+{
+  "title": "",
+  "color": "C0",
+  "alpha": 0.8,
+  "min_support": 0.0,
+  "min_confidence": 0.0,
+  "min_lift": 0.0,
+  "max_rules": 200
+}

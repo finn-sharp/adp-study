@@ -1,0 +1,8 @@
+{
+  "title": "",
+  "color": "C0",
+  "alpha": 0.8,
+  "max_nodes": 100,
+  "random_state": 1234,
+  "show_labels": true
+}

@@ -1,0 +1,9 @@
+{
+  "title": "",
+  "color": "C0",
+  "alpha": 0.8,
+  "kind": "box",
+  "max_categories": 20,
+  "whisker": 1.5,
+  "random_state": 1234
+}
