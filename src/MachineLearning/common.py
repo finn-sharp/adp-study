@@ -148,14 +148,8 @@ def make_scaler(scaling: str) -> Any:
 
 
 def _metrics(y: np.ndarray, prediction: np.ndarray, task: str) -> Dict[str, float]:
-    if task == "regression":
-        mse = float(mean_squared_error(y, prediction))
-        return {"mae": float(mean_absolute_error(y, prediction)), "mse": mse,
-                "rmse": float(np.sqrt(mse)), "r2": float(r2_score(y, prediction))}
-    return {"accuracy": float(accuracy_score(y, prediction)),
-            "precision_weighted": float(precision_score(y, prediction, average="weighted", zero_division=0)),
-            "recall_weighted": float(recall_score(y, prediction, average="weighted", zero_division=0)),
-            "f1_weighted": float(f1_score(y, prediction, average="weighted", zero_division=0))}
+    from src.Evaluation.adapters import evaluate_predictions
+    return evaluate_predictions(y, prediction, task)
 
 
 def validate_supervised_inputs(X: Any, y: Any, profile: SupervisedProfile) -> Tuple[np.ndarray, np.ndarray]:
@@ -256,11 +250,11 @@ def run_supervised(X: Any, y: Any, estimator: Any, profile: SupervisedProfile,
     # sklearn 0.23의 일부 회귀 추정기도 classes_ 속성을 노출하므로 task로 먼저 구분합니다.
     classes = getattr(pipeline.named_steps["model"], "classes_", None) if profile.task == "classification" else None
     probabilities = None
-    test_metrics = _metrics(y_test, prediction, profile.task)
     if profile.task == "classification" and hasattr(pipeline, "predict_proba"):
         probabilities = pipeline.predict_proba(X_test)
-        if len(classes) == 2 and len(np.unique(y_test)) == 2:
-            test_metrics["roc_auc"] = float(roc_auc_score(y_test == classes[1], probabilities[:, 1]))
+
+    from src.Evaluation.adapters import evaluate_predictions
+    test_metrics = evaluate_predictions(y_test, prediction, profile.task, probabilities, classes)
     feature_names = [str(c) for c in X.columns] if hasattr(X, "columns") else ["feature_{}".format(i) for i in range(arr.shape[1])]
     return SupervisedOutputDTO(
         model_name=type(pipeline.named_steps["model"]).__name__, task=profile.task, model=pipeline,

@@ -1,0 +1,5 @@
+{
+  "exclude_noise": true,
+  "noise_label": -1,
+  "distance": "euclidean"
+}

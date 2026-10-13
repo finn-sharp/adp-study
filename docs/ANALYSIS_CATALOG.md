@@ -1,6 +1,6 @@
 # 전체 분석 모듈 명세
 
-현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 133개, 모델·목적별 JSON 레시피는 145개입니다.
+현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 189개, 모델·목적별 JSON 레시피는 201개입니다.
 기존 단일·독립 두 표본 Z·t 검정 파일 2개도 아래에 별도로 명세합니다.
 비모수 검정의 빈 파일은 구현 완료로 집계하지 않습니다.
 
@@ -1817,3 +1817,7 @@ ANOVA/사후검정은 parametric/Average/anova, MANOVA는 parametric/Multivariat
 `src/Visualization`의 35개 모듈은 단일 ax에 그려 subplot으로 조합합니다. 회귀 시각화는 제외하고
 분포·결측·범주·군집·차원 축소·분류 결정·연관/연결망·시간 패턴을 포함합니다.
 [전체 Profile/DTO·의사결정 근거·UCI 조합 예제](EDA_VISUALIZATION_MODULES.md)를 참고하세요.
+
+## 독립 평가 메트릭
+
+추가 평가 모듈 56개의 전체 Profile·Output DTO·레시피·수식·skeleton 경로는 [평가 전체 명세](EVALUATION_METRICS.md)에 있습니다.

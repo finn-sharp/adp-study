@@ -260,8 +260,8 @@ def _fit(X, y, train, val, test, p, kind, classification, target_indices=None):
     predictions = adapter.predict(X[test])
     if not np.isfinite(model(scaled[test],training=False).numpy()).all(): raise ValueError('비유한 예측')
     proba = adapter.predict_proba(X[test]) if classification else None
-    metrics = {'accuracy':float(accuracy_score(y[test],predictions)), 'log_loss':float(log_loss(y[test],proba,labels=encoder.classes_))} if classification else {'mse':float(mean_squared_error(y[test].reshape(len(test),-1),predictions.reshape(len(test),-1))), 'mae':float(mean_absolute_error(y[test].reshape(len(test),-1),predictions.reshape(len(test),-1)))}
-    if not classification: metrics['rmse'] = float(np.sqrt(metrics['mse']))
+    from src.Evaluation.adapters import evaluate_predictions
+    metrics = evaluate_predictions(y[test], predictions, 'classification', proba, encoder.classes_) if classification else evaluate_predictions(y[test].reshape(len(test),-1), predictions.reshape(len(test),-1), 'regression')
     return dict(task='classification' if classification else 'regression', parameters=asdict(p), model=adapter, history={k:[float(v) for v in vs] for k,vs in history.items()}, test_metrics=metrics,
                 predictions=predictions, probabilities=proba, classes=None if encoder is None else encoder.classes_,
                 train_indices=train,validation_indices=val,test_indices=test,target_indices=target_indices,
