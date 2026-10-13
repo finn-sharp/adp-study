@@ -4,6 +4,7 @@ jobs:
   models:
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - python: '3.7'
@@ -122,6 +123,8 @@ jobs:
           python -m src.stats.correlation.categorical.cramers_v
           python -m src.stats.correlation.categorical.phi
           python -m src.stats.correlation.matrix_transform
+      - name: Execute all evaluation metric examples
+        run: python -m examples.evaluation_metric_examples
       - name: Execute Axes visualization examples
         run: python -m examples.eda_visualization_examples
       - name: Verify legacy CLI compatibility
@@ -138,6 +141,7 @@ jobs:
   tensorflow:
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - python: '3.7'

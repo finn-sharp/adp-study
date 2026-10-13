@@ -29,6 +29,7 @@ from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, mean_a
 from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold, train_test_split
 from sklearn.preprocessing import LabelEncoder
 from src.output import OutputDTO
+from src.Evaluation.adapters import evaluate_predictions
 from src.MachineLearning.base.feature import FeatureSpec
 from src.MachineLearning.base.preprocessor import BasePreprocessor
 from src.MachineLearning.base.pipeline import Basepipeline
@@ -151,9 +152,10 @@ def fit_evaluate(data, pipeline, model_name):
     prediction = pipeline.pipeline.predict(X.iloc[test])
     if classification:
         prediction = encoder.inverse_transform(np.asarray(prediction, dtype=int))
-        metrics = {'accuracy': float(accuracy_score(y.iloc[test], prediction)), 'f1_weighted': float(f1_score(y.iloc[test], prediction, average='weighted'))}
+        probabilities = pipeline.pipeline.predict_proba(X.iloc[test]) if hasattr(pipeline.pipeline, 'predict_proba') else None
+        metrics = evaluate_predictions(y.iloc[test], prediction, 'classification', probabilities, encoder.classes_)
     else:
-        metrics = {'rmse': float(np.sqrt(mean_squared_error(y.iloc[test], prediction))), 'mae': float(mean_absolute_error(y.iloc[test], prediction)), 'r2': float(r2_score(y.iloc[test], prediction))}
+        metrics = evaluate_predictions(y.iloc[test], prediction, 'regression')
     dataset = 'UCI Iris' if classification else 'UCI Wine Quality (red)'
     details = {'feature_names': X.columns.tolist(), 'preprocessor': pipeline.feature_specification.describe(), 'best_params': best_params, 'recipe': asdict(p)}
     final = pipeline.get_model()

@@ -1,0 +1,6 @@
+{
+  "multioutput": "uniform_average",
+  "zero_policy": "raise",
+  "n_features": 0,
+  "quantile": 0.5
+}

@@ -95,6 +95,12 @@ def main(cache_dir=None, overrides=None):
     profile = load_recipe(overrides)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
+    from src.Evaluation.time_series.metrics import run_time_series_metrics
+    columns = list(profile.target_columns) if profile.target_columns is not None else list(range(data.shape[1]))
+    training = data.to_numpy(dtype=float)[result.train_indices][:, columns]
+    evaluation = run_time_series_metrics(result.y_test, result.predictions, y_train=training)
+    result.test_metrics.update({k: float(v) for k, v in evaluation.value.items() if k != 'horizon_errors'})
+    print('horizon_metrics:', evaluation.details['metrics']['horizon_errors']['table'])
     print('=== Example : UCI bike tf_time_series ===')
     print('input_shape:', result.input_shape)
     print('metrics:', result.test_metrics)

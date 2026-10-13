@@ -100,6 +100,12 @@ def main(cache_dir=None, overrides=None):
     data = load_data(cache_dir, dimension=profile.dimension)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
+    from src.Evaluation.adapters import evaluate_predictions
+    actual, predicted = result.y_test, result.predictions
+    if result.task == 'regression':
+        actual = actual.reshape(len(actual), -1)
+        predicted = predicted.reshape(len(predicted), -1)
+    result.test_metrics.update(evaluate_predictions(actual, predicted, result.task, result.probabilities, result.classes))
     print('=== Example : UCI Optdigits/Libras tf_cnn ===')
     print('input_shape:', result.input_shape)
     print('metrics:', result.test_metrics)

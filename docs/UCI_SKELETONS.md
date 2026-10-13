@@ -182,3 +182,7 @@ Preprocessing에 7개, stats에 상관/행렬 6개를 추가하여 UCI skeleton�
 이번 확장은 `src/Visualization/skeleton`에 별도 UCI subplot 예제 11개를 추가합니다.
 기존 모델 skeleton 46개의 수치 실행은 유지하며 새 모듈은 단일 ax를 받아 조합합니다.
 [의사결정별 시각화·전체 명세](EDA_VISUALIZATION_MODULES.md)를 참고하세요.
+
+## 독립 평가 skeleton 56개
+
+src/Evaluation/skeleton의 분야별 개별 지표·묶음 54개와 모델 비교/CV 요약 2개가 추가됩니다. 기존 46개 분야별 UCI skeleton과 별도이며, 모두 공식 UCI 로더와 독립 평가 API를 사용합니다. [자료·예측·평가 흐름과 전체 경계](EVALUATION_METRICS.md)를 참고하세요.
