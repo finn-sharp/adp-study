@@ -111,8 +111,17 @@ def class_inputs(y_true, y_pred, y_score, p):
         if score.ndim == 2:
             if p.labels is None or score.shape[1] != len(order):
                 raise ValueError('확률 행렬에는 열 순서 labels를 명시해야 합니다.')
-            if np.any((score < 0) | (score > 1)) or not np.allclose(score.sum(axis=1), 1, atol=1e-7, rtol=0):
+            # Validate in the precision of the supplied softmax output, before
+            # numeric() promotes float32 to float64. Four ULPs permit rounding,
+            # while the cap prevents low-precision inputs accepting bad totals.
+            source_dtype = np.asarray(y_score).dtype
+            source_epsilon = np.finfo(source_dtype).eps if source_dtype.kind == 'f' else 0.0
+            tolerance = max(1e-7, min(1e-6, 4 * source_epsilon))
+            row_sums = score.sum(axis=1, keepdims=True)
+            if np.any((score < 0) | (score > 1)) or not np.allclose(row_sums, 1, atol=tolerance, rtol=0):
                 raise ValueError('확률은 [0,1]이며 각 행의 합이 1이어야 합니다.')
+            # Work on a new array; only accepted rounding is normalized.
+            score = score / row_sums
         elif len(order) > 2:
             raise ValueError('다중 클래스에는 확률 행렬을 전달하세요.')
     encoded = np.array([np.flatnonzero(order == v)[0] for v in y], dtype=int)

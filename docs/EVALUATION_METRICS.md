@@ -26,7 +26,7 @@
 ### 확률·순위·군집 경계
 
 - 1D score는 positive_label의 점수입니다. ROC/AP/KS/Lift는 유한 decision score도 허용합니다. Log Loss/Brier/calibration은 [0,1] 확률만 허용합니다.
-- 2D 확률은 [0,1]·행 합 1(절대 오차 1e-7)·명시 클래스 순서가 필요합니다. sklearn 내부 정렬과 달라도 정답을 그 순서로 인코딩합니다.
+- 2D 확률은 [0,1]·행 합 1(허용 오차 max(1e-7, min(1e-6, 4×입력 dtype epsilon)))·명시 클래스 순서가 필요합니다. sklearn 내부 정렬과 달라도 정답을 그 순서로 인코딩합니다. 검증을 통과한 반올림 오차만 새 배열에서 행 합 1로 정규화하며 원 입력을 변경하지 않습니다.
 - ROC/AP/Lift/Gain 등 이진 순위 평가에는 실제 양성·음성이 모두 있어야 합니다. 다중 클래스 ROC/AP는 모든 클래스가 평가 자료에 있어야 합니다.
 - top-k는 ceil(n*f), score 동률은 원 입력 행 순서를 유지합니다. tie가 많은 경우 입력 순서에 결과가 의존하므로 details.tie_policy를 보존합니다.
 - Lift/Gain curves의 details.curve는 origin을 포함하고 value는 origin을 제외합니다. Gain origin은 0, Lift origin은 정의 불가 null입니다. Lift는 연관규칙의 confidence/support와 별도입니다.

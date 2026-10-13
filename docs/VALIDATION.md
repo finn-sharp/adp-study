@@ -130,3 +130,12 @@ ECDF·분모·Wilson·linkage·silhouette·AUC/AP·모든 임계값 비용·PACF
 
 다중 타깃 RMSE는 독립 회귀 모듈과 동일하게 타깃별 sqrt(MSE)의 평균으로 통일했습니다.
 모든 경계와 전체 입력/출력은 [평가 전체 명세](EVALUATION_METRICS.md)에 있습니다.
+
+### PR #12 확률 정밀도 CI 수정
+
+TensorFlow 3.12의 float32 softmax 행 합이 1에서 약 1.19e-7 벗어나 기존 절대 오차 1e-7 검증에 실패했습니다. 원 dtype epsilon의 4배를 반영하되 허용 오차를 [1e-7, 1e-6] 범위로 제한하고, 통과한 반올림 오차만 새 배열에서 정규화합니다. [0,1] 범위 밖·비유한 값·실제 합 오류는 계속 거부합니다.
+
+- float32 반올림 허용·같은 값의 float64 엄격 검증·잘못된 확률 합/음수 거부·입력 불변/지표 참조값의 회귀 검사 추가.
+- Python 3.12.14 일반 분석 전체 130개 검사: 123개 통과, 선택 TensorFlow 실제 학습 7개 skip.
+- 별도 requirements-tensorflow-py312.txt 환경에서 기존 TensorFlow 검사 6개 및 CNN/전용 순환 모델 검사 5개 모두 실제 학습 포함 통과.
+- CI matrix fail-fast를 꺼 한 환경의 실패가 다른 Python 환경의 검증을 취소하지 않도록 변경.

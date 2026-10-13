@@ -83,6 +83,27 @@ class EvaluationMetricsTest(unittest.TestCase):
             with self.assertRaises(ValueError):run_classification_metrics([0,1],[0,1],y_score=score,overrides={'labels':[0,1]})
         with self.assertRaises(ValueError):run('classification','log_loss',y_true=[0,1],y_score=[-1,2])
 
+    def test_float32_softmax_rounding_and_invalid_totals(self):
+        probabilities = np.array([[.25, .75000012], [.75, .25000012]], dtype=np.float32)
+        original = probabilities.copy()
+        result = run_classification_metrics([1, 0], [1, 0], y_score=probabilities,
+                                            overrides={'labels': [0, 1]})
+        normalized = probabilities.astype(float)
+        normalized /= normalized.sum(axis=1, keepdims=True)
+        self.assertAlmostEqual(result.value['log_loss'], -np.log(normalized[[0, 1], [1, 0]]).mean())
+        self.assertAlmostEqual(result.value['brier_score'], np.mean((normalized[:, 1] - [1, 0])**2))
+        np.testing.assert_array_equal(probabilities, original)
+        # Identical float64 values exceed their tighter rounding tolerance.
+        with self.assertRaises(ValueError):
+            run_classification_metrics([1, 0], [1, 0], y_score=original.astype(float),
+                                       overrides={'labels': [0, 1]})
+        for invalid in (np.array([[.25, .75001], [.75, .25]], dtype=np.float32),
+                        np.array([[-1e-8, 1.0], [.75, .25]], dtype=np.float32),
+                        np.array([[.25, .76], [.75, .25]], dtype=np.float16)):
+            with self.assertRaises(ValueError):
+                run_classification_metrics([1, 0], [1, 0], y_score=invalid,
+                                           overrides={'labels': [0, 1]})
+
     def test_calibration_and_ks(self):
         r=run('classification','calibration',y_true=[0,1,0,1],y_score=[0,1,.2,.8],overrides={'n_bins':2})
         self.assertAlmostEqual(r.value,.1);self.assertEqual(r.details['bins']['count'].sum(),4)

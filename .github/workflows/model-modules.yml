@@ -4,6 +4,7 @@ jobs:
   models:
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - python: '3.7'
@@ -140,6 +141,7 @@ jobs:
   tensorflow:
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         include:
           - python: '3.7'
