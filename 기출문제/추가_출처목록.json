@@ -1,0 +1,86 @@
+[
+  {
+    "filename": "28회.pdf",
+    "sha256": "4c496c0146d28fecf5a4b7887ba99c6304b86ff6d6be9214d2247321db65fd7c",
+    "role": "reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "ADP) ADP 실기 기출문제 모음 (17, 18, 19, 20, 21, 22, 23, 24, 25, 26회).pdf",
+    "sha256": "cf73f91378dbd4f91b4acfd1006cea21a995984e0ff3b50c904e57ae3b9b654e",
+    "role": "reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "[ML] - (외부자료)Template Code.html",
+    "sha256": "2c60bb9ef21f5679db4192384f44794febce302af173bffceb9d43bec1f1fe29",
+    "role": "optimization_reference",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "모의고사 1.ipynb",
+    "sha256": "af19777f5f7587f428fda5a0434b268e86208efbfce3130581b58255e1a97761",
+    "role": "reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "모의고사 2.ipynb",
+    "sha256": "2f47a51aeb1ab1e82eead105df8c70cb8aff4bb08382adcb78b9b9c2bc2dbd9a",
+    "role": "reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "모의고사 3.ipynb",
+    "sha256": "4c73e1f7828780469a4bb1d0ec2de3f40e183fbb009d44719f044f22d43e7c7c",
+    "role": "reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "모의고사 4.ipynb",
+    "sha256": "4495a964b25ea91c8f206e81e429fd099cbe7d9f7000af9db7310c448bfda7ca",
+    "role": "reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "adp_17_summary.pdf",
+    "sha256": "f82e58336c47602639a5f7d58d1dd4f0b3c8b8bed86a651871b91bfd041387b1",
+    "role": "detailed_reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "adp_18_summary.pdf",
+    "sha256": "4c6c46429d77056f96ecbb873ee19497d4b889420000f791072446f13d41d326",
+    "role": "detailed_reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "adp_19_summary.pdf",
+    "sha256": "a2994e06eb615ed0b16fb67396759d9a56a6e3b76e0f939d491c733b5e10b630",
+    "role": "detailed_reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "adp_20_summary.pdf",
+    "sha256": "7e5a49d634eaa2f4b12c33c521da68be88dae07e77978a1a3d45a6896e25e07d",
+    "role": "detailed_reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "adp_21_summary.pdf",
+    "sha256": "68458074f70dacd61153e467cd16feb6b41bdf5e862fd95db85566cd610ecf36",
+    "role": "detailed_reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "adp_22_summary.pdf",
+    "sha256": "bac7afdfef27ca217af7d5a43e2726031a2b3f138909aa37f3356ac4747d2055",
+    "role": "detailed_reconstruction_source",
+    "included_original_bytes": false
+  },
+  {
+    "filename": "adp_23_kaggle.ipynb",
+    "sha256": "c27191fab9040f4dcee1c619826b5c3055a3af91e0adc5d4e40ae86275c23c7e",
+    "role": "detailed_reconstruction_source",
+    "included_original_bytes": false
+  }
+]

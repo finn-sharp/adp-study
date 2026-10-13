@@ -1,0 +1,32 @@
+{
+  "task": "regression",
+  "scoring": "neg_mean_absolute_error",
+  "cv": 3,
+  "split": "iid",
+  "shuffle": true,
+  "random_state": 1234,
+  "search_space": {
+    "model__max_depth": {
+      "type": "int",
+      "low": 2,
+      "high": 5
+    },
+    "model__n_estimators": {
+      "type": "int",
+      "low": 30,
+      "high": 60,
+      "step": 10
+    },
+    "model__learning_rate": {
+      "type": "float",
+      "low": 0.03,
+      "high": 0.15,
+      "log": true
+    }
+  },
+  "n_iter": 10,
+  "n_jobs": 1,
+  "refit": true,
+  "timeout": null,
+  "pruning": false
+}

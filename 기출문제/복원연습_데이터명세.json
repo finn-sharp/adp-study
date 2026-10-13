@@ -1,0 +1,366 @@
+[
+  {
+    "path": "모의고사/1회/data/lotto.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 400,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/1회/data/FIFA.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 320,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/1회/data/reviews.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 60,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/1회/data/lexicon.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 14,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/2회/data/Admission.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 240,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/2회/data/titanic.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 420,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/2회/data/speech.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 60,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/2회/data/lexicon.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 14,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/3회/data/Carseats.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 300,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/3회/data/BlackFriday.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 600,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/3회/data/comments.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 60,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/3회/data/lexicon.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 14,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/4회/data/weatherAUS.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 10520,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/4회/data/bike_marketing.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 172,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/4회/data/instagram.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 60,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "모의고사/4회/data/lexicon.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 14,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "18회/data/segments.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 180,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "18회/data/documents.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 60,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "18회/data/lexicon.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 14,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "18회/data/series.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 144,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "19회/data/credit.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 450,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "19회/data/traffic.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 240,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "21회/data/student.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 395,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "21회/data/regression.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 120,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "21회/data/polynomial.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 100,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "21회/data/anova.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 100,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "24회/data/student_absence.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 395,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "24회/data/advertising.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 10,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "24회/data/sample.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 9,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "25회/data/retail.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 750,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "25회/data/series.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 144,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "25회/data/paired_bp.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 20,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "25회/data/production.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 30,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "25회/data/npv.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 3,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "26회/data/retail.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 750,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "26회/data/regional_support.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 3,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "26회/data/blood_pressure.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 25,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "26회/data/silver.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 9,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "26회/data/body.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 140,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "28회/data/student.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 420,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "28회/data/survival.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 36,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "28회/data/school_scores.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 36,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "28회/data/tasting.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 60,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "28회/data/partial.csv",
+    "kind": "synthetic",
+    "seed": 20261014,
+    "rows": 100,
+    "note": "사용자 자료의 컬럼/주제에 맞춰 만든 연습 자료. 원 시험 수치/정답이 아님."
+  },
+  {
+    "path": "18회/보충/data/customers.csv",
+    "kind": "synthetic",
+    "seed": 20261015,
+    "rows": 500,
+    "note": "회차별 후기의 컬럼과 조건을 보완한 합성 자료. 원 시험 수치가 아님."
+  },
+  {
+    "path": "19회/보충/data/traffic_quarterly.csv",
+    "kind": "synthetic",
+    "seed": 20261015,
+    "rows": 80,
+    "note": "회차별 후기의 컬럼과 조건을 보완한 합성 자료. 원 시험 수치가 아님."
+  },
+  {
+    "path": "20회/보충/data/temps.csv",
+    "kind": "synthetic",
+    "seed": 20261015,
+    "rows": 348,
+    "note": "회차별 후기의 컬럼과 조건을 보완한 합성 자료. 원 시험 수치가 아님."
+  },
+  {
+    "path": "18회/data/customers.csv",
+    "kind": "synthetic",
+    "seed": 20261015,
+    "rows": 500,
+    "note": "회차별 후기의 컬럼과 조건을 보완한 합성 자료. 원 시험 수치가 아님."
+  },
+  {
+    "path": "18회/data/english_documents.csv",
+    "kind": "synthetic",
+    "seed": 20261015,
+    "rows": 4,
+    "note": "회차별 후기의 컬럼과 조건을 보완한 합성 자료. 원 시험 수치가 아님."
+  },
+  {
+    "path": "18회/data/english_lexicon.csv",
+    "kind": "synthetic",
+    "seed": 20261015,
+    "rows": 12,
+    "note": "회차별 후기의 컬럼과 조건을 보완한 합성 자료. 원 시험 수치가 아님."
+  },
+  {
+    "path": "19회/data/traffic_quarterly.csv",
+    "kind": "synthetic",
+    "seed": 20261015,
+    "rows": 80,
+    "note": "회차별 후기의 컬럼과 조건을 보완한 합성 자료. 원 시험 수치가 아님."
+  },
+  {
+    "path": "21회/보충/data/travel_example.csv",
+    "kind": "source_example",
+    "seed": null,
+    "rows": 30,
+    "note": "adp_21_summary.pdf pp.7~8의 30명 여행태도 학습 예제 값 그대로. 원 시험 데이터로 주장하지 않음."
+  }
+]

@@ -1,0 +1,645 @@
+{
+  "all_passed": true,
+  "notebooks": [
+    {
+      "folder": "15회",
+      "questions": 9,
+      "code_cells": 10,
+      "pdf_pages": 3,
+      "figures": 7,
+      "status": "passed",
+      "notebook_sha256": "891246ecb857c5716dab5d7c4a4eaa5f7ac40e3c83b25a633b81538c63d62d52",
+      "pdf_sha256": "8443ce13e67a01efdf9681fe087b507788dff3687001588298f10273eab57569"
+    },
+    {
+      "folder": "17회",
+      "questions": 10,
+      "code_cells": 11,
+      "pdf_pages": 3,
+      "figures": 6,
+      "status": "passed",
+      "notebook_sha256": "5e7c6f34d9d3216ed429cfd527a102ea47013b2fe15de8d26be87bb710512bbc",
+      "pdf_sha256": "b9b729e3eb02cd5a50daac0250046a43571c4ed7ebf2933f7b18e9193d7aa20f"
+    },
+    {
+      "folder": "18회",
+      "questions": 8,
+      "code_cells": 9,
+      "pdf_pages": 2,
+      "figures": 10,
+      "status": "passed",
+      "notebook_sha256": "741c973d143d556b08a992f66accc3ef8d23df564f36375ac3e43b05a26d08cc",
+      "pdf_sha256": "0f423615748c302260d6e74fb805cb4e161bdacbd43d32426536e3b8aceff2aa"
+    },
+    {
+      "folder": "18회/보충",
+      "questions": 3,
+      "code_cells": 4,
+      "pdf_pages": 1,
+      "figures": 6,
+      "status": "passed",
+      "notebook_sha256": "3e16c9126053a53dd264a178fcaaee528ef987638f96fb97a690460bbf48e95f",
+      "pdf_sha256": "fc172bf7c646be7ebd0aec28c6f6ca70bdfb304f2f381286481e1d53805ff295"
+    },
+    {
+      "folder": "19회",
+      "questions": 7,
+      "code_cells": 8,
+      "pdf_pages": 2,
+      "figures": 6,
+      "status": "passed",
+      "notebook_sha256": "d26340a821c3cd2f0a5ae9e891d12655350d4bf3e76eafabf4d036a37f87aff1",
+      "pdf_sha256": "b710850e4bd510cd5ab3f59d98d5e877886da41986f0d660129472bfbbcffe14"
+    },
+    {
+      "folder": "19회/보충",
+      "questions": 2,
+      "code_cells": 3,
+      "pdf_pages": 1,
+      "figures": 4,
+      "status": "passed",
+      "notebook_sha256": "c2f62f0a3898e2bfc1b3574308129353bee870e816a4d5a0fd4ae10a22ee0716",
+      "pdf_sha256": "78467dc8c220b28b9dbb126e52055385a0a7c4ba7bd543f5c63c2da2da04d3b0"
+    },
+    {
+      "folder": "20회",
+      "questions": 7,
+      "code_cells": 8,
+      "pdf_pages": 4,
+      "figures": 5,
+      "status": "passed",
+      "notebook_sha256": "e5bdb93f92f8847404cdb5afe096d426ff256f90c4215b5fb116bfd27de64a54",
+      "pdf_sha256": "831747ec56ba25a521245c04a8ef42179b04af66c93c55d467dc473a65c5cb08"
+    },
+    {
+      "folder": "20회/보충",
+      "questions": 3,
+      "code_cells": 4,
+      "pdf_pages": 1,
+      "figures": 2,
+      "status": "passed",
+      "notebook_sha256": "64f6c57fb140a68ba4f8b39ea88c4a4c0eedacf440c0a2346c72c473999163be",
+      "pdf_sha256": "1b89b406f58e0007650ca7cf53b7c7e3f597f146228ae528b66ed8a660687288"
+    },
+    {
+      "folder": "21회",
+      "questions": 7,
+      "code_cells": 8,
+      "pdf_pages": 2,
+      "figures": 3,
+      "status": "passed",
+      "notebook_sha256": "877ff0b5ec7f9afed5631f4bf659321210f9455e4fbe48f64eedcf7b2db0f70f",
+      "pdf_sha256": "83c9b65271e0e8af5a64dfbd049d41e6e6009daf240c5bfa9d0d308ef7408d12"
+    },
+    {
+      "folder": "21회/보충",
+      "questions": 1,
+      "code_cells": 2,
+      "pdf_pages": 1,
+      "figures": 1,
+      "status": "passed",
+      "notebook_sha256": "67822eba8d40490b9991d72632e570586b89049547d25bd2a75bf0780282e0f0",
+      "pdf_sha256": "924e7bbb0a4dc6840fa60dacbf427972af41e752ac459b0b3d826b8d8aed7b74"
+    },
+    {
+      "folder": "22회",
+      "questions": 14,
+      "code_cells": 15,
+      "pdf_pages": 3,
+      "figures": 4,
+      "status": "passed",
+      "notebook_sha256": "cb0252bc6711c1bbef155f638cd772d93495ea4d34c6c053e6533a6e41ec0696",
+      "pdf_sha256": "6c7e4886a9bfd1e6f1ba8025b2785303661deff5dbf37f532687c4d00345abcb"
+    },
+    {
+      "folder": "22회/보충",
+      "questions": 2,
+      "code_cells": 3,
+      "pdf_pages": 1,
+      "figures": 0,
+      "status": "passed",
+      "notebook_sha256": "ded36afde311d64801b45f7d57ca6b22fa05d25627924f836948e11bf4356c68",
+      "pdf_sha256": "f34c6cc35c3da89fdac6cdd66c267238ffdb72e0402c85186b049044249e1274"
+    },
+    {
+      "folder": "22회/후기보충",
+      "questions": 1,
+      "code_cells": 2,
+      "pdf_pages": 1,
+      "figures": 0,
+      "status": "passed",
+      "notebook_sha256": "0e4e64a5f9bc83dcca2b28236a82d14799e2e61313b85904da82fc91a8b91fad",
+      "pdf_sha256": "5c83957ccb0788f70fb71956a5ee8f884278034c625ee5ef49e75142f7460afa"
+    },
+    {
+      "folder": "23회",
+      "questions": 17,
+      "code_cells": 18,
+      "pdf_pages": 5,
+      "figures": 4,
+      "status": "passed",
+      "notebook_sha256": "0625f1c2dad7e711d8bcf8e8fd6fbd4c60dffcfb94552a3d70183f07827dca98",
+      "pdf_sha256": "c84ae70f5130f867c05b64d9fa95f3d9c7f191cd2b4fbc563797d008b0ba17bd"
+    },
+    {
+      "folder": "24회",
+      "questions": 7,
+      "code_cells": 8,
+      "pdf_pages": 2,
+      "figures": 1,
+      "status": "passed",
+      "notebook_sha256": "b5a0bc9d84cff727e7e959911341b160bfa8b6df5a9b8bb2beeedb72517a40f9",
+      "pdf_sha256": "b93aae741c627604bf9656487e7cc3df9459c19634ff3cabd07be4419d888869"
+    },
+    {
+      "folder": "25회",
+      "questions": 13,
+      "code_cells": 14,
+      "pdf_pages": 3,
+      "figures": 4,
+      "status": "passed",
+      "notebook_sha256": "a6a5b0fc1665d83a75c59eaade6ba38f01962827173d2a9d968affe5919de380",
+      "pdf_sha256": "c3803d2fb23d47094974bc96d4161c33846a05be169eb7f96fd9578ae7e96f6d"
+    },
+    {
+      "folder": "26회",
+      "questions": 9,
+      "code_cells": 10,
+      "pdf_pages": 3,
+      "figures": 2,
+      "status": "passed",
+      "notebook_sha256": "d1b884ca17ec82777d19716031d709fef4d6ce68fc6da82227f468b98d01bb1b",
+      "pdf_sha256": "3b476fcf9af5c7c01b772aee65ebe7c35257e25d899ae1b0340a5582b8388e60"
+    },
+    {
+      "folder": "28회",
+      "questions": 9,
+      "code_cells": 10,
+      "pdf_pages": 2,
+      "figures": 2,
+      "status": "passed",
+      "notebook_sha256": "1e6ca19333f287b61181a7ea5bf742d644f05c72e7d71aea5d01378f8988ff47",
+      "pdf_sha256": "d7fb711255ddeac5d5cb8c4f91a8f46038df7bb98dd3667066cfc79424081a31"
+    },
+    {
+      "folder": "모의고사/1회",
+      "questions": 9,
+      "code_cells": 10,
+      "pdf_pages": 2,
+      "figures": 2,
+      "status": "passed",
+      "notebook_sha256": "db43625ba23f00029ced2a181b2490b1e312bd2e4387b7d27c7146c9b349b41c",
+      "pdf_sha256": "1bcc374612b8ae8e46c8798b5d5d91f131d99fc4e076381fbd8a95a509fa367f"
+    },
+    {
+      "folder": "모의고사/2회",
+      "questions": 7,
+      "code_cells": 8,
+      "pdf_pages": 2,
+      "figures": 4,
+      "status": "passed",
+      "notebook_sha256": "b6f33efa8a9b1a5c0c8cc33cf93d8e4b5c7db0e96cc780f6006878324121b984",
+      "pdf_sha256": "5f051d1557c461bd72b96e7a746604ba7f0db4315ddf9835193ee93a28a0c1ae"
+    },
+    {
+      "folder": "모의고사/3회",
+      "questions": 9,
+      "code_cells": 10,
+      "pdf_pages": 2,
+      "figures": 4,
+      "status": "passed",
+      "notebook_sha256": "8e631814f4b9031a1daa840119922e5d8e440f0eedc1dced2c60051674cd2e11",
+      "pdf_sha256": "f2d35770b16f51f1ecc9750a7fb426419c404d694f19cf6a211547da4e5c1b3e"
+    },
+    {
+      "folder": "모의고사/4회",
+      "questions": 8,
+      "code_cells": 9,
+      "pdf_pages": 2,
+      "figures": 3,
+      "status": "passed",
+      "notebook_sha256": "7e192c4454f5ce2029e92c284ff9531798c7a2ba32f988eba58960b6b80e68dd",
+      "pdf_sha256": "65ba6ad49f6c55a4fbf2a06a811a251762588e6af19a8590203ff3b92ec4c7d2"
+    }
+  ],
+  "dataset_files": [
+    {
+      "path": "15회/data/problem1.csv",
+      "bytes": 282039,
+      "sha256": "7df2287c520164d037193adc0844465053af20e614bf63db07bb8beb6e0e115f",
+      "uncompressed_sha256": "7df2287c520164d037193adc0844465053af20e614bf63db07bb8beb6e0e115f"
+    },
+    {
+      "path": "15회/data/problem2_avg_tem.csv",
+      "bytes": 10804,
+      "sha256": "d30a8c0430f68d88cdfc29fa83d125be9f3535498137a2e3295db1470988cc28",
+      "uncompressed_sha256": "d30a8c0430f68d88cdfc29fa83d125be9f3535498137a2e3295db1470988cc28"
+    },
+    {
+      "path": "15회/data/problem2_usage.csv",
+      "bytes": 29870,
+      "sha256": "afb4382b1e515a174e6ab3dd958f9e2f9f9893a4b22e38cb59fd1cd74ed6597a",
+      "uncompressed_sha256": "afb4382b1e515a174e6ab3dd958f9e2f9f9893a4b22e38cb59fd1cd74ed6597a"
+    },
+    {
+      "path": "15회/data/problem2_usage_history.csv.gz",
+      "bytes": 11514026,
+      "sha256": "e78ec99849048963cb670ccf19b328a65b7b24ba22e7c07bcfc9aaf0b4992fe7",
+      "uncompressed_sha256": "4cf46ab03d8456028a850acec3f0c71fdbe9f025103fb8dcafd110f6f21796dd"
+    },
+    {
+      "path": "17회/data/problem1.csv",
+      "bytes": 91187,
+      "sha256": "cf6e95303e1be889715d9072003ce1bd7d8186612f44d9b0d51b7af8b5a51cf9",
+      "uncompressed_sha256": "cf6e95303e1be889715d9072003ce1bd7d8186612f44d9b0d51b7af8b5a51cf9"
+    },
+    {
+      "path": "17회/data/problem2.csv.gz",
+      "bytes": 1285596,
+      "sha256": "318c5607d96e24cdb2ebefb3a576a80f9bc4d57bc37f74f1ff5d3e3b969d62c4",
+      "uncompressed_sha256": "dfcaa6f95ee46e27269eee9e9656586b169a6033ae3f731f86271fdde78c431f"
+    },
+    {
+      "path": "17회/data/problem3.csv",
+      "bytes": 46003,
+      "sha256": "14d124afebf0f8edd12fa741cb1ed02cf412d578ae49fe9b6a1073ee55449a5a",
+      "uncompressed_sha256": "14d124afebf0f8edd12fa741cb1ed02cf412d578ae49fe9b6a1073ee55449a5a"
+    },
+    {
+      "path": "18회/data/customers.csv",
+      "bytes": 16965,
+      "sha256": "076a99a4e04b238e283f1b444dcd5b2d582b5768b22d752da37db84b1ff7606a",
+      "uncompressed_sha256": "076a99a4e04b238e283f1b444dcd5b2d582b5768b22d752da37db84b1ff7606a"
+    },
+    {
+      "path": "18회/data/documents.csv",
+      "bytes": 4087,
+      "sha256": "99ce34f585d998c3f061b087e378983488b83be30f6de4196aa43c58a7ea6100",
+      "uncompressed_sha256": "99ce34f585d998c3f061b087e378983488b83be30f6de4196aa43c58a7ea6100"
+    },
+    {
+      "path": "18회/data/english_documents.csv",
+      "bytes": 192,
+      "sha256": "dc397cc03cd6bba755562cc984e350103afbe43d748101aa653f69a477aabe7f",
+      "uncompressed_sha256": "dc397cc03cd6bba755562cc984e350103afbe43d748101aa653f69a477aabe7f"
+    },
+    {
+      "path": "18회/data/english_lexicon.csv",
+      "bytes": 166,
+      "sha256": "4d54007b7f9dccb407d61ffdb9171982f2124e040a37b40ef7043c6b864fa904",
+      "uncompressed_sha256": "4d54007b7f9dccb407d61ffdb9171982f2124e040a37b40ef7043c6b864fa904"
+    },
+    {
+      "path": "18회/data/lexicon.csv",
+      "bytes": 203,
+      "sha256": "826fed77c14c81eae973080643318e8c6a06fa1df07fda2a537d54e144bb2e14",
+      "uncompressed_sha256": "826fed77c14c81eae973080643318e8c6a06fa1df07fda2a537d54e144bb2e14"
+    },
+    {
+      "path": "18회/data/segments.csv",
+      "bytes": 9944,
+      "sha256": "1f74058833c2a22a4146ba1fcb12841469701bdc9b68485c7f984800266912ed",
+      "uncompressed_sha256": "1f74058833c2a22a4146ba1fcb12841469701bdc9b68485c7f984800266912ed"
+    },
+    {
+      "path": "18회/data/series.csv",
+      "bytes": 4178,
+      "sha256": "704b1d21b6a04329516ca1892216d76486a6d0ccaa1d2e0c6bc3946d7f8707aa",
+      "uncompressed_sha256": "704b1d21b6a04329516ca1892216d76486a6d0ccaa1d2e0c6bc3946d7f8707aa"
+    },
+    {
+      "path": "18회/보충/data/customers.csv",
+      "bytes": 16965,
+      "sha256": "076a99a4e04b238e283f1b444dcd5b2d582b5768b22d752da37db84b1ff7606a",
+      "uncompressed_sha256": "076a99a4e04b238e283f1b444dcd5b2d582b5768b22d752da37db84b1ff7606a"
+    },
+    {
+      "path": "19회/data/credit.csv",
+      "bytes": 12256,
+      "sha256": "28b6fb6f688e22bab9a51e70dd3184990f8c6a2b0cdfa168e93f81c365c91dea",
+      "uncompressed_sha256": "28b6fb6f688e22bab9a51e70dd3184990f8c6a2b0cdfa168e93f81c365c91dea"
+    },
+    {
+      "path": "19회/data/traffic.csv",
+      "bytes": 7028,
+      "sha256": "76b5fec1f44912cdd574efa622370e67a693b79740b1071fee565fc5a82efb59",
+      "uncompressed_sha256": "76b5fec1f44912cdd574efa622370e67a693b79740b1071fee565fc5a82efb59"
+    },
+    {
+      "path": "19회/data/traffic_quarterly.csv",
+      "bytes": 2385,
+      "sha256": "14ad4d156f29cd9456888589877eb627433a9884aef913db1669211661da8474",
+      "uncompressed_sha256": "14ad4d156f29cd9456888589877eb627433a9884aef913db1669211661da8474"
+    },
+    {
+      "path": "19회/보충/data/traffic_quarterly.csv",
+      "bytes": 2387,
+      "sha256": "69cf4d30195421162c3d4a775379be9f787f4e8786bd06d6df5a249fe08dc4c6",
+      "uncompressed_sha256": "69cf4d30195421162c3d4a775379be9f787f4e8786bd06d6df5a249fe08dc4c6"
+    },
+    {
+      "path": "20회/data/problem1.csv",
+      "bytes": 14155,
+      "sha256": "db213690e29090412112c2a930fc8fd1e257f5146c974f8f30e527ff37c6a23e",
+      "uncompressed_sha256": "db213690e29090412112c2a930fc8fd1e257f5146c974f8f30e527ff37c6a23e"
+    },
+    {
+      "path": "20회/data/problem2.csv.gz",
+      "bytes": 6030120,
+      "sha256": "5d796f396fec29dc00e4dc19c521a8b07fa1d8b0a893796c7c1e46e60edeac88",
+      "uncompressed_sha256": "7e3adc96d890f5e4b9345c72edbb4df61e6633b864e48d89d08c5d6e34d5c8d8"
+    },
+    {
+      "path": "20회/data/problem3.csv.gz",
+      "bytes": 649347,
+      "sha256": "41f5aff079a2effa87e0812bba361540f24f1c06018ef6d00823ae3ab3a192d6",
+      "uncompressed_sha256": "30dca886a778a8a26cfb22b53133aec4b040ff866fa9386731e9249619ba4996"
+    },
+    {
+      "path": "20회/보충/data/temps.csv",
+      "bytes": 39114,
+      "sha256": "bc3c6f31ad84f8c1feb961bec8802c7980a87600a494ef49b658fd5f24b02baf",
+      "uncompressed_sha256": "bc3c6f31ad84f8c1feb961bec8802c7980a87600a494ef49b658fd5f24b02baf"
+    },
+    {
+      "path": "21회/data/anova.csv",
+      "bytes": 4093,
+      "sha256": "9c3934427c234b11ec4396e3cef3abc0ef14297ac84c9b00ae89d79a316402e4",
+      "uncompressed_sha256": "9c3934427c234b11ec4396e3cef3abc0ef14297ac84c9b00ae89d79a316402e4"
+    },
+    {
+      "path": "21회/data/polynomial.csv",
+      "bytes": 3732,
+      "sha256": "27e1cfedf79e525a9f064ce1f01065b952c1437ef676a60791bab11341814ddf",
+      "uncompressed_sha256": "27e1cfedf79e525a9f064ce1f01065b952c1437ef676a60791bab11341814ddf"
+    },
+    {
+      "path": "21회/data/regression.csv",
+      "bytes": 25872,
+      "sha256": "b25c2e9dc2e1ada53f4918168be8749b2cc24ee7f613ce8b9204234322d76db2",
+      "uncompressed_sha256": "b25c2e9dc2e1ada53f4918168be8749b2cc24ee7f613ce8b9204234322d76db2"
+    },
+    {
+      "path": "21회/data/student.csv",
+      "bytes": 17724,
+      "sha256": "e489061df4db65918189ec8183a66ab0fe8f20a3d8d860b19c0e9762a9a53346",
+      "uncompressed_sha256": "e489061df4db65918189ec8183a66ab0fe8f20a3d8d860b19c0e9762a9a53346"
+    },
+    {
+      "path": "21회/보충/data/travel_example.csv",
+      "bytes": 198,
+      "sha256": "52a8f3e76eb13f403f3ef6ddd4620d1571d4fc4846a05d3a5299b23a1c2eefee",
+      "uncompressed_sha256": "52a8f3e76eb13f403f3ef6ddd4620d1571d4fc4846a05d3a5299b23a1c2eefee"
+    },
+    {
+      "path": "22회/data/content.csv",
+      "bytes": 3690,
+      "sha256": "22cb1a2ee30c7fe37941016341afc2663d22ed7158dc08e761a58d7a0e8a3349",
+      "uncompressed_sha256": "22cb1a2ee30c7fe37941016341afc2663d22ed7158dc08e761a58d7a0e8a3349"
+    },
+    {
+      "path": "22회/data/data1.csv",
+      "bytes": 23294,
+      "sha256": "1a69ae928244085f42162377259f9a026237c85b516953bc802717bf9555be7e",
+      "uncompressed_sha256": "1a69ae928244085f42162377259f9a026237c85b516953bc802717bf9555be7e"
+    },
+    {
+      "path": "22회/data/error.csv",
+      "bytes": 801,
+      "sha256": "3a0f3c7a35bf4f62b3f9a38ae1a03277439ab60e899b87a2ec8cc057920e3b59",
+      "uncompressed_sha256": "3a0f3c7a35bf4f62b3f9a38ae1a03277439ab60e899b87a2ec8cc057920e3b59"
+    },
+    {
+      "path": "23회/data/problem1.csv.gz",
+      "bytes": 221347,
+      "sha256": "ab45e60af99d1cd15e592cbfbd0c7a793957ad8cf589466f28397e2a5ff569c9",
+      "uncompressed_sha256": "a55a984ae46cea79ad03f158bbc9acb06962ca212de18373045a4beca5e2e4c2"
+    },
+    {
+      "path": "23회/data/problem2.csv",
+      "bytes": 181,
+      "sha256": "f1ec2900cad7b0c5a3481c4f0a28903ee9ca4f1f25a1d0e88bd1552fb10ddee3",
+      "uncompressed_sha256": "f1ec2900cad7b0c5a3481c4f0a28903ee9ca4f1f25a1d0e88bd1552fb10ddee3"
+    },
+    {
+      "path": "23회/data/problem3_covid2.csv",
+      "bytes": 309944,
+      "sha256": "e3ef587e22f0f03acf7639ac222b2effb208e2d13fd52574a12da29acd3c79c0",
+      "uncompressed_sha256": "e3ef587e22f0f03acf7639ac222b2effb208e2d13fd52574a12da29acd3c79c0"
+    },
+    {
+      "path": "24회/data/advertising.csv",
+      "bytes": 568,
+      "sha256": "09e114fdf4f07c8cfe98b7a1c9ec9c5ece4f224af3284dfc76f8479b2c500183",
+      "uncompressed_sha256": "09e114fdf4f07c8cfe98b7a1c9ec9c5ece4f224af3284dfc76f8479b2c500183"
+    },
+    {
+      "path": "24회/data/sample.csv",
+      "bytes": 48,
+      "sha256": "82e163f589f77f2ee089309b8a1fc92793b01d966eed1dc59a8f30baf0087638",
+      "uncompressed_sha256": "82e163f589f77f2ee089309b8a1fc92793b01d966eed1dc59a8f30baf0087638"
+    },
+    {
+      "path": "24회/data/student_absence.csv",
+      "bytes": 20455,
+      "sha256": "d1a60993505feb8c76cca669fe135f13f1f5f6b29d8f510d00de1f0f94fb6534",
+      "uncompressed_sha256": "d1a60993505feb8c76cca669fe135f13f1f5f6b29d8f510d00de1f0f94fb6534"
+    },
+    {
+      "path": "25회/data/npv.csv",
+      "bytes": 86,
+      "sha256": "16cc623d535bdc9e77e248556ddc4178a88353e57213c9f6841b98b437a8eb94",
+      "uncompressed_sha256": "16cc623d535bdc9e77e248556ddc4178a88353e57213c9f6841b98b437a8eb94"
+    },
+    {
+      "path": "25회/data/paired_bp.csv",
+      "bytes": 761,
+      "sha256": "23306124b44e77466a30397b3eb680dbec496c062f1b1eff92a8d273e7792028",
+      "uncompressed_sha256": "23306124b44e77466a30397b3eb680dbec496c062f1b1eff92a8d273e7792028"
+    },
+    {
+      "path": "25회/data/production.csv",
+      "bytes": 646,
+      "sha256": "e6979e3be0686586f8c57228a1145ab25b3625ac04cf1067ad07cf4ca0667d82",
+      "uncompressed_sha256": "e6979e3be0686586f8c57228a1145ab25b3625ac04cf1067ad07cf4ca0667d82"
+    },
+    {
+      "path": "25회/data/retail.csv",
+      "bytes": 33578,
+      "sha256": "46f3c4f1285cb0a1fcff84c5c3fdbfde7c0f9afd4bc8ea039ac29a605754fe1a",
+      "uncompressed_sha256": "46f3c4f1285cb0a1fcff84c5c3fdbfde7c0f9afd4bc8ea039ac29a605754fe1a"
+    },
+    {
+      "path": "25회/data/series.csv",
+      "bytes": 4173,
+      "sha256": "e1bd54b9e9982e29063cb213d8546f5b0fb0b69109065ccd934ae552e3b9cd1e",
+      "uncompressed_sha256": "e1bd54b9e9982e29063cb213d8546f5b0fb0b69109065ccd934ae552e3b9cd1e"
+    },
+    {
+      "path": "26회/data/blood_pressure.csv",
+      "bytes": 525,
+      "sha256": "10e303f8bc76a3ed465c5d7462d75139eddcc424570f3518f56c9d1749f226d5",
+      "uncompressed_sha256": "10e303f8bc76a3ed465c5d7462d75139eddcc424570f3518f56c9d1749f226d5"
+    },
+    {
+      "path": "26회/data/body.csv",
+      "bytes": 7662,
+      "sha256": "c536a5a54fb1b2b412ce2cce151fe972f275c1a9f96c9809210b51dc122f049d",
+      "uncompressed_sha256": "c536a5a54fb1b2b412ce2cce151fe972f275c1a9f96c9809210b51dc122f049d"
+    },
+    {
+      "path": "26회/data/regional_support.csv",
+      "bytes": 44,
+      "sha256": "cf4a8fef0a77b6d10a8e2baf65af0bf1de0c43f20099c05759c8aa50e5b56f1d",
+      "uncompressed_sha256": "cf4a8fef0a77b6d10a8e2baf65af0bf1de0c43f20099c05759c8aa50e5b56f1d"
+    },
+    {
+      "path": "26회/data/retail.csv",
+      "bytes": 35091,
+      "sha256": "4265968d3f4a903cb885652619b82662730603581d4c70f6fa0c54192111ddd6",
+      "uncompressed_sha256": "4265968d3f4a903cb885652619b82662730603581d4c70f6fa0c54192111ddd6"
+    },
+    {
+      "path": "26회/data/silver.csv",
+      "bytes": 255,
+      "sha256": "f08a67970dfcf96013d1c316c0b2a4702f1787d223e4d31c1c012d2d2a59f6a8",
+      "uncompressed_sha256": "f08a67970dfcf96013d1c316c0b2a4702f1787d223e4d31c1c012d2d2a59f6a8"
+    },
+    {
+      "path": "28회/data/partial.csv",
+      "bytes": 5879,
+      "sha256": "8556e763643df1bb3dd2999a6d694467c8e762d877a783341b8c877f1e5826f5",
+      "uncompressed_sha256": "8556e763643df1bb3dd2999a6d694467c8e762d877a783341b8c877f1e5826f5"
+    },
+    {
+      "path": "28회/data/school_scores.csv",
+      "bytes": 736,
+      "sha256": "e2a6038c55f8240321690f91030c464c4e91a01075eb641afb696e927d3b0a0c",
+      "uncompressed_sha256": "e2a6038c55f8240321690f91030c464c4e91a01075eb641afb696e927d3b0a0c"
+    },
+    {
+      "path": "28회/data/student.csv",
+      "bytes": 14524,
+      "sha256": "df996898355c5131dad1f659f8dc8ee6c97a052e2068d6a61bb18b0fa912a2ee",
+      "uncompressed_sha256": "df996898355c5131dad1f659f8dc8ee6c97a052e2068d6a61bb18b0fa912a2ee"
+    },
+    {
+      "path": "28회/data/survival.csv",
+      "bytes": 178,
+      "sha256": "31154f58dd24d05a4d550bec728a88eee082ed66480a26f091a78de348734482",
+      "uncompressed_sha256": "31154f58dd24d05a4d550bec728a88eee082ed66480a26f091a78de348734482"
+    },
+    {
+      "path": "28회/data/tasting.csv",
+      "bytes": 253,
+      "sha256": "cbfa805a6bc4224a820cb071e38ff1d8890d75db16d1788fa82203373d5f0bd2",
+      "uncompressed_sha256": "cbfa805a6bc4224a820cb071e38ff1d8890d75db16d1788fa82203373d5f0bd2"
+    },
+    {
+      "path": "모의고사/1회/data/FIFA.csv",
+      "bytes": 23770,
+      "sha256": "60cb4216bc38115928bff836d7434ffbd909840b6fa0bf65b136591b19b3e6f2",
+      "uncompressed_sha256": "60cb4216bc38115928bff836d7434ffbd909840b6fa0bf65b136591b19b3e6f2"
+    },
+    {
+      "path": "모의고사/1회/data/lexicon.csv",
+      "bytes": 206,
+      "sha256": "a40426f16a383859ac8a932971221ac179cad1e193633ef12b6e613f8a759fd6",
+      "uncompressed_sha256": "a40426f16a383859ac8a932971221ac179cad1e193633ef12b6e613f8a759fd6"
+    },
+    {
+      "path": "모의고사/1회/data/lotto.csv",
+      "bytes": 5397,
+      "sha256": "b8ae93da5a7c992cec51c3b270505cd5adac101bac484c06a4395b06a7228824",
+      "uncompressed_sha256": "b8ae93da5a7c992cec51c3b270505cd5adac101bac484c06a4395b06a7228824"
+    },
+    {
+      "path": "모의고사/1회/data/reviews.csv",
+      "bytes": 4156,
+      "sha256": "a92723a79ba40ed0cd4971356f0ad38e986cae2882f280ec901f88f0a6d31f93",
+      "uncompressed_sha256": "a92723a79ba40ed0cd4971356f0ad38e986cae2882f280ec901f88f0a6d31f93"
+    },
+    {
+      "path": "모의고사/2회/data/Admission.csv",
+      "bytes": 19661,
+      "sha256": "becd294457b7f01563dc5be0e94a17dba09547f2d87409f9aa3b6cb8f2f0aebe",
+      "uncompressed_sha256": "becd294457b7f01563dc5be0e94a17dba09547f2d87409f9aa3b6cb8f2f0aebe"
+    },
+    {
+      "path": "모의고사/2회/data/lexicon.csv",
+      "bytes": 209,
+      "sha256": "12a7d876503f44979a4bbd534f40e28400beb8f84e572416785bab212247f60e",
+      "uncompressed_sha256": "12a7d876503f44979a4bbd534f40e28400beb8f84e572416785bab212247f60e"
+    },
+    {
+      "path": "모의고사/2회/data/speech.csv",
+      "bytes": 4288,
+      "sha256": "1775ed2fc0589ae11177510b4dc4f7f41840d98e3037ae0b21e8b89feb62e8c6",
+      "uncompressed_sha256": "1775ed2fc0589ae11177510b4dc4f7f41840d98e3037ae0b21e8b89feb62e8c6"
+    },
+    {
+      "path": "모의고사/2회/data/titanic.csv",
+      "bytes": 22653,
+      "sha256": "7dcdeee9e00a8c349767016dcc43a8676cf47c16e42ea3562136961ec065ef27",
+      "uncompressed_sha256": "7dcdeee9e00a8c349767016dcc43a8676cf47c16e42ea3562136961ec065ef27"
+    },
+    {
+      "path": "모의고사/3회/data/BlackFriday.csv",
+      "bytes": 29548,
+      "sha256": "7adf02908e24ae82c96ebcc30355ddf573968c3e2f9ed52eac82b1424bcb0ec5",
+      "uncompressed_sha256": "7adf02908e24ae82c96ebcc30355ddf573968c3e2f9ed52eac82b1424bcb0ec5"
+    },
+    {
+      "path": "모의고사/3회/data/Carseats.csv",
+      "bytes": 40518,
+      "sha256": "067e6f7170c3e61082cdc451041819c5ea78f3fb9a371a9061bb253548b3cfc4",
+      "uncompressed_sha256": "067e6f7170c3e61082cdc451041819c5ea78f3fb9a371a9061bb253548b3cfc4"
+    },
+    {
+      "path": "모의고사/3회/data/comments.csv",
+      "bytes": 4069,
+      "sha256": "d16c5779b69a02411bc1245a7671d22922e8ebd7cd87e8070d2a750fcd0e4fdc",
+      "uncompressed_sha256": "d16c5779b69a02411bc1245a7671d22922e8ebd7cd87e8070d2a750fcd0e4fdc"
+    },
+    {
+      "path": "모의고사/3회/data/lexicon.csv",
+      "bytes": 203,
+      "sha256": "8347583d209b66912b4b3121f6d029b578af23d3d17deebd12ec3ebfe0c4ae0c",
+      "uncompressed_sha256": "8347583d209b66912b4b3121f6d029b578af23d3d17deebd12ec3ebfe0c4ae0c"
+    },
+    {
+      "path": "모의고사/4회/data/bike_marketing.csv",
+      "bytes": 17196,
+      "sha256": "090121f2acbf9efe0970d89d8d76e5be474afe36dfb8d8cb8ff945b7ef6ed05e",
+      "uncompressed_sha256": "090121f2acbf9efe0970d89d8d76e5be474afe36dfb8d8cb8ff945b7ef6ed05e"
+    },
+    {
+      "path": "모의고사/4회/data/instagram.csv",
+      "bytes": 4273,
+      "sha256": "98954833a7164372ed205928b12fd0131066fb9e35f54d1660c96d083e5eb527",
+      "uncompressed_sha256": "98954833a7164372ed205928b12fd0131066fb9e35f54d1660c96d083e5eb527"
+    },
+    {
+      "path": "모의고사/4회/data/lexicon.csv",
+      "bytes": 209,
+      "sha256": "b569b0cd74810cd2382a4b9ea615873b18154859afa1a76e5b9d144964e0cd38",
+      "uncompressed_sha256": "b569b0cd74810cd2382a4b9ea615873b18154859afa1a76e5b9d144964e0cd38"
+    },
+    {
+      "path": "모의고사/4회/data/weatherAUS.csv",
+      "bytes": 579603,
+      "sha256": "7e779a01dc310e4e5094b6b3f6c05da31ce2c0ada1e53aebde4ef12c995c5cca",
+      "uncompressed_sha256": "7e779a01dc310e4e5094b6b3f6c05da31ce2c0ada1e53aebde4ef12c995c5cca"
+    }
+  ],
+  "total_notebooks": 22,
+  "total_questions": 162,
+  "total_code_cells": 184,
+  "total_pdf_pages": 48,
+  "total_figures": 80,
+  "notes": [
+    "Actual sequential isolated Python-process execution outputs retained.",
+    "Python 3.7 grammar checked; Python 3.7 runtime uses GitHub CI for modules.",
+    "PDF coordinates checked; visual review performed separately."
+  ]
+}

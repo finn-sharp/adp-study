@@ -1,0 +1,2 @@
+# Optuna 3.0.6 지원 Python >=3.7. 기본 sklearn은 requirements-models-py37.txt 사용.
+optuna==3.0.6

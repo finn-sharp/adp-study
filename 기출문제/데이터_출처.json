@@ -1,0 +1,276 @@
+[
+  {
+    "exam": 15,
+    "file": "problem2_usage.csv",
+    "rows": 1460,
+    "columns": [
+      "timestamp",
+      "usage"
+    ],
+    "sha256": "afb4382b1e515a174e6ab3dd958f9e2f9f9893a4b22e38cb59fd1cd74ed6597a",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p4"
+  },
+  {
+    "exam": 15,
+    "file": "problem2_usage_history.csv",
+    "rows": 525600,
+    "columns": [
+      "hh:mm",
+      "6hour_index",
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "sha256": "4cf46ab03d8456028a850acec3f0c71fdbe9f025103fb8dcafd110f6f21796dd",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p4"
+  },
+  {
+    "exam": 15,
+    "file": "problem1.csv",
+    "rows": 1941,
+    "columns": [
+      "X_Minimum",
+      "X_Maximum",
+      "Y_Minimum",
+      "Y_Maximum",
+      "Pixels_Areas",
+      "X_Perimeter",
+      "Y_Perimeter",
+      "Sum_of_Luminosity",
+      "Minimum_of_Luminosity",
+      "Maximum_of_Luminosity",
+      "Length_of_Conveyer",
+      "TypeOfSteel_A300",
+      "TypeOfSteel_A400",
+      "Steel_Plate_Thickness",
+      "Edges_Index",
+      "Empty_Index",
+      "Square_Index",
+      "Outside_X_Index",
+      "Edges_X_Index",
+      "Edges_Y_Index",
+      "Outside_Global_Index",
+      "LogOfAreas",
+      "Log_X_Index",
+      "Log_Y_Index",
+      "Orientation_Index",
+      "Luminosity_Index",
+      "SigmoidOfAreas",
+      "target"
+    ],
+    "sha256": "7df2287c520164d037193adc0844465053af20e614bf63db07bb8beb6e0e115f",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p4"
+  },
+  {
+    "exam": 15,
+    "file": "problem2_avg_tem.csv",
+    "rows": 365,
+    "columns": [
+      "date",
+      "temperature"
+    ],
+    "sha256": "d30a8c0430f68d88cdfc29fa83d125be9f3535498137a2e3295db1470988cc28",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p4"
+  },
+  {
+    "exam": 17,
+    "file": "problem2.csv",
+    "rows": 136931,
+    "columns": [
+      "location",
+      "date",
+      "total_cases",
+      "total_deaths",
+      "new_tests",
+      "population",
+      "new_vaccinations"
+    ],
+    "sha256": "dfcaa6f95ee46e27269eee9e9656586b169a6033ae3f731f86271fdde78c431f",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p3"
+  },
+  {
+    "exam": 17,
+    "file": "problem3.csv",
+    "rows": 1000,
+    "columns": [
+      "userid",
+      "group",
+      "Q1-1",
+      "Q1-2",
+      "Q1-3",
+      "Q1-4",
+      "Q2-1",
+      "Q2-2",
+      "Q2-3",
+      "Q2-4",
+      "Q3-1",
+      "Q3-2",
+      "Q3-3",
+      "Q3-4",
+      "Q4-1",
+      "Q4-2",
+      "Q4-3",
+      "Q4-4",
+      "Q5-1",
+      "Q5-2",
+      "Q5-3",
+      "Q5-4"
+    ],
+    "sha256": "14d124afebf0f8edd12fa741cb1ed02cf412d578ae49fe9b6a1073ee55449a5a",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p3"
+  },
+  {
+    "exam": 17,
+    "file": "problem1.csv",
+    "rows": 1460,
+    "columns": [
+      "Id",
+      "LotArea",
+      "LotFrontage",
+      "YearBuilt",
+      "1stFlrSF",
+      "2ndFlrSF",
+      "YearRemodAdd",
+      "TotRmsAbvGrd",
+      "KitchenAbvGr",
+      "BedroomAbvGr",
+      "GarageCars",
+      "GarageArea",
+      "price"
+    ],
+    "sha256": "cf6e95303e1be889715d9072003ce1bd7d8186612f44d9b0d51b7af8b5a51cf9",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p3"
+  },
+  {
+    "exam": 20,
+    "file": "problem2.csv",
+    "rows": 401760,
+    "columns": [
+      "houseCode",
+      "date",
+      "power consumption"
+    ],
+    "sha256": "7e3adc96d890f5e4b9345c72edbb4df61e6633b864e48d89d08c5d6e34d5c8d8",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p2"
+  },
+  {
+    "exam": 20,
+    "file": "problem3.csv",
+    "rows": 44904,
+    "columns": [
+      "TIMESTAMP",
+      "BIOGAS",
+      "BIOMASS",
+      "GEOTHERMAL",
+      "Hour",
+      "SMALL HYDRO",
+      "SOLAR",
+      "SOLAR PV",
+      "SOLAR THERMAL",
+      "WIND TOTAL"
+    ],
+    "sha256": "30dca886a778a8a26cfb22b53133aec4b040ff866fa9386731e9249619ba4996",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p2"
+  },
+  {
+    "exam": 20,
+    "file": "problem1.csv",
+    "rows": 348,
+    "columns": [
+      "year",
+      "month",
+      "day",
+      "week",
+      "temp_2",
+      "temp_1",
+      "average",
+      "actual",
+      "forecast_noaa",
+      "forecast_acc",
+      "forecast_under",
+      "friend"
+    ],
+    "sha256": "db213690e29090412112c2a930fc8fd1e257f5146c974f8f30e527ff37c6a23e",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p2"
+  },
+  {
+    "exam": 22,
+    "file": "error.csv",
+    "rows": 100,
+    "columns": [
+      "iot_number",
+      "error_case_number"
+    ],
+    "sha256": "3a0f3c7a35bf4f62b3f9a38ae1a03277439ab60e899b87a2ec8cc057920e3b59",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adpkrp5"
+  },
+  {
+    "exam": 22,
+    "file": "content.csv",
+    "rows": 200,
+    "columns": [
+      "content"
+    ],
+    "sha256": "22cb1a2ee30c7fe37941016341afc2663d22ed7158dc08e761a58d7a0e8a3349",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adpkrp5"
+  },
+  {
+    "exam": 22,
+    "file": "data1.csv",
+    "rows": 768,
+    "columns": [
+      "Pregnancies",
+      "Glucose",
+      "BloodPressure",
+      "SkinThickness",
+      "Insulin",
+      "BMI",
+      "DiabetesPedigreeFunction",
+      "Age",
+      "Outcome"
+    ],
+    "sha256": "1a69ae928244085f42162377259f9a026237c85b516953bc802717bf9555be7e",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adpkrp5"
+  },
+  {
+    "exam": 23,
+    "file": "problem3_covid2.csv",
+    "rows": 11895,
+    "columns": [
+      "location",
+      "date",
+      "new_cases"
+    ],
+    "sha256": "e3ef587e22f0f03acf7639ac222b2effb208e2d13fd52574a12da29acd3c79c0",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p1"
+  },
+  {
+    "exam": 23,
+    "file": "problem2.csv",
+    "rows": 12,
+    "columns": [
+      "name",
+      "life span"
+    ],
+    "sha256": "f1ec2900cad7b0c5a3481c4f0a28903ee9ca4f1f25a1d0e88bd1552fb10ddee3",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p1"
+  },
+  {
+    "exam": 23,
+    "file": "problem1.csv",
+    "rows": 17910,
+    "columns": [
+      "date",
+      "Temperature",
+      "Humidity",
+      "Light",
+      "CO2",
+      "HumidityRatio",
+      "Occupancy"
+    ],
+    "sha256": "a55a984ae46cea79ad03f158bbc9acb06962ca212de18373045a4beca5e2e4c2",
+    "source": "https://www.kaggle.com/api/v1/datasets/download/kukuroo3/adp-kr-p1"
+  }
+]

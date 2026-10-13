@@ -1821,3 +1821,14 @@ ANOVA/사후검정은 parametric/Average/anova, MANOVA는 parametric/Multivariat
 ## 독립 평가 메트릭
 
 추가 평가 모듈 56개의 전체 Profile·Output DTO·레시피·수식·skeleton 경로는 [평가 전체 명세](EVALUATION_METRICS.md)에 있습니다.
+
+
+## 교차검증 파라미터 최적화 (추가 3종)
+
+| 모듈 | Profile | Output DTO | 실행 함수 |
+| --- | --- | --- | --- |
+| MachineLearning/Optimization/grid_search | GridSearchProfile | GridSearchOutputDTO | run_grid_search |
+| MachineLearning/Optimization/random_search | RandomSearchProfile | RandomSearchOutputDTO | run_random_search |
+| MachineLearning/Optimization/optuna_search | OptunaSearchProfile | OptunaSearchOutputDTO | run_optuna_search |
+
+공통 설정은 task/scoring/cv/split/shuffle/random_state/search_space/n_iter/n_jobs/refit/timeout/pruning입니다. 공통 결과는 method/task/scoring/best_params/best_score/cv_results/folds/n_candidates/elapsed_seconds/model/study입니다. 모델·study 객체는 기본 JSON에서 제외합니다. 18개 기본·RF·LightGBM 분류/회귀 레시피 및 방법별 skeleton과 연결합니다. 상세 입력 조건·음수 손실 scorer·그룹/시간 분할은 [최적화 명세](PARAMETER_OPTIMIZATION.md)를 참고하세요.
