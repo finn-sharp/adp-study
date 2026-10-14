@@ -37,6 +37,10 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    'optimization-grid-search': ('src.MachineLearning.Optimization.grid_search', 'GridSearchProfile', 'classification', ('classification', 'regression')),
+    'optimization-random-search': ('src.MachineLearning.Optimization.random_search', 'RandomSearchProfile', 'classification', ('classification', 'regression')),
+    'optimization-optuna-search': ('src.MachineLearning.Optimization.optuna_search', 'OptunaSearchProfile', 'classification', ('classification', 'regression')),
+
     'metric-comparison': ('src.Evaluation.comparison', 'ComparisonProfile', None, (None,)),
     'metric-cv-summary': ('src.Evaluation.cv_summary', 'CVSummaryProfile', None, (None,)),
     'metric-classification-accuracy': ('src.Evaluation.classification.accuracy', 'ClassificationAccuracyProfile', None, (None,)),

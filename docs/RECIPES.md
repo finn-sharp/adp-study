@@ -144,3 +144,7 @@ TensorFlow는 `tf-classification.json`, `tf-regression.json`, `tf-rnn-classifica
 `src/Visualization`의 35개 모듈은 단일 ax에 그려 subplot으로 조합합니다. 회귀 시각화는 제외하고
 분포·결측·범주·군집·차원 축소·분류 결정·연관/연결망·시간 패턴을 포함합니다.
 [전체 Profile/DTO·의사결정 근거·UCI 조합 예제](EDA_VISUALIZATION_MODULES.md)를 참고하세요.
+
+## 파라미터 최적화 레시피 (2026-10-14)
+
+optimization-grid-search, optimization-random-search, optimization-optuna-search를 추가했습니다. 각 분류/회귀 기본 6개 및 RF/LightGBM 전용 12개 JSON으로 검색 공간을 관리합니다. 전체 JSON 219개이며 기본 registry 로드 조합은 207개입니다. 모델별 후보는 skeleton이 명시 recipe_path로 로드합니다. [최적화 명세](PARAMETER_OPTIMIZATION.md)를 참고하세요.
