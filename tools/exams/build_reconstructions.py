@@ -3,11 +3,7 @@ from pathlib import Path
 import json, re, textwrap, html
 import nbformat
 import pandas as pd
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.colors import HexColor
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+from render_question_papers import render_paper, all_exams
 
 ROOT=Path(__file__).resolve().parents[2]/'기출문제'
 EXAMS={}
@@ -401,18 +397,6 @@ from summary_supplements import register
 register(book, section, q, EXAMS)
 
 # Write source-grounded manifests, notebook cells and exam-only PDFs.
-pdfmetrics.registerFont(TTFont('Nanum',str(ROOT/'공통/NanumGothic-Regular.ttf')))
-ST={
- 'title':ParagraphStyle('title',fontName='Nanum',fontSize=21,leading=29,textColor=HexColor('#172D46'),spaceAfter=12,wordWrap='CJK'),
- 'body':ParagraphStyle('body',fontName='Nanum',fontSize=9.5,leading=15,wordWrap='CJK',spaceAfter=8),
- 'section':ParagraphStyle('section',fontName='Nanum',fontSize=13,leading=20,textColor=HexColor('#216080'),spaceAfter=10,keepWithNext=True,wordWrap='CJK'),
- 'small':ParagraphStyle('small',fontName='Nanum',fontSize=8,leading=12,textColor=HexColor('#637282'),spaceAfter=6,wordWrap='CJK')}
-ST['intro']=ParagraphStyle('intro',parent=ST['body'],keepWithNext=True)
-ST['intro_small']=ParagraphStyle('intro_small',parent=ST['small'],keepWithNext=True)
-def para(text,style='body'):return Paragraph(html.escape(str(text)).replace('\n','<br/>'),ST[style])
-def footer(canvas,doc):
- canvas.saveState();canvas.setFont('Nanum',8);canvas.setFillColor(HexColor('#637282'));canvas.drawString(46,27,'ADP 복원 연습 | 원 시험·공식 정답과 구분');canvas.drawRightString(549,27,str(doc.page));canvas.restoreState()
-
 for folder,exam in EXAMS.items():
  dest=ROOT/folder;dest.mkdir(exist_ok=True,parents=True);stem=('ADP_'+folder.replace('/','_')) if '모의고사' not in folder else folder.replace('/','_')
  cells=[nbformat.v4.new_markdown_cell('# '+exam['title']+'\n\n출처: '+exam['source']+'\n\n**복원 연습 자료·예시 풀이이며 공식 정답이 아닙니다.** '+exam['note']+'\n\n동봉 data를 사용하며 원 질문·보완 조건·풀이를 분리합니다. 입력 파일은 UTF-8. 저장소 루트 또는 현재 회차 폴더에서 실행할 수 있습니다.')]
@@ -442,22 +426,10 @@ def load(name):return pd.read_csv(DATA/name)
 print('데이터 종류: 합성 복원 연습 자료, 원 시험 데이터가 아님')
 '''.replace('FOLDER',folder)
  cells.append(nbformat.v4.new_code_cell(setup))
- story=[para(exam['title'],'title'),para('성명 _____________________    작성일 _____________________','small'),para('출처: '+exam['source'],'small'),para('복원 연습 문제. 원 시험 지문·수치의 완전 복제가 아니며, 출제 주제에 맞춰 미제공 조건과 데이터를 보완했습니다. '+exam['note'],'small'),Spacer(1,10)]
- for i,s in enumerate(exam['sections']):
-  if i:
-   story.append(PageBreak() if folder=='19회' and i==1 else Spacer(1,16))
-  section_start=len(story)
-  story.extend([para(s['title'],'section'),para('자료: '+s['data'],'intro'),para(s['condition'],'intro_small')])
+ for s in exam['sections']:
   cells.append(nbformat.v4.new_markdown_cell('## '+s['title']+'\n\n자료: '+s['data']+'\n\n'+s['condition']))
   for item in s['questions']:
    cells.extend([nbformat.v4.new_markdown_cell('### '+item['id']+'\n\n'+item['text']+'\n\n**출처/보완:** '+item['origin']+'\n\n**풀이 근거:** '+item['reason']),nbformat.v4.new_code_cell(item['code'])])
-   block=Table([[para(item['id'],'small'),para(item['text'])]],colWidths=[64,437]);block.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(0,0),HexColor('#EFF4F7')),('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8),('LINEBELOW',(1,0),(1,0),.3,HexColor('#DCE5EB'))]));story.extend([block,Spacer(1,12)])
-  # include explicit givens preview table when dataset available, no fitted answers.
-  mainfile=s['data'].split(' + ')[0]
-  if (dest/'data'/mainfile).exists():
-   data=pd.read_csv(dest/'data'/mainfile).head(3).iloc[:,:6]
-   rows=[[para(x,'small') for x in data.columns]]+[[para(format(x,'.6g') if isinstance(x,float) else str(x)[:45],'small') for x in row] for row in data.itertuples(index=False,name=None)]
-   preview=Table(rows,colWidths=[501/len(data.columns)]*len(data.columns));preview.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(-1,0),HexColor('#EFF4F7')),('GRID',(0,0),(-1,-1),.25,HexColor('#DCE5EB'))]));story[-2:]=[KeepTogether(story[-2:]+[para('제공 자료 예시 (첫 3행, 최대 6열; 수치는 표시용 반올림)','small'),preview])]
 
  nb=nbformat.v4.new_notebook(cells=cells,metadata={'kernelspec':{'name':'python3','display_name':'Python 3','language':'python'},'language_info':{'name':'python','version':'3.7'},'adp':{'type':'reconstructed_practice','source':exam['source'],'subquestions':[x['id'] for s in exam['sections'] for x in s['questions']]}})
  path=dest/(stem+'_풀이.ipynb')
@@ -470,6 +442,10 @@ print('데이터 종류: 합성 복원 연습 자료, 원 시험 데이터가 �
      prev=next(old_code);c.outputs=prev.outputs;c.execution_count=prev.execution_count
    if 'execution_validation' in old.metadata:nb.metadata['execution_validation']=old.metadata.execution_validation
  nbformat.write(nb,path)
- SimpleDocTemplate(str(dest/(stem+'_문제지.pdf')),pagesize=(595,842),leftMargin=46,rightMargin=46,topMargin=45,bottomMargin=50,title=exam['title']).build(story,onFirstPage=footer,onLaterPages=footer)
+
  print(folder,len(nb.metadata.adp.subquestions))
 (ROOT/'추가_문항명세.json').write_text(json.dumps(EXAMS,ensure_ascii=False,indent=2)+'\n')
+
+# Apply the same layout to the five original DataManim rounds as well.
+for folder, exam in all_exams():
+ render_paper(folder, exam)

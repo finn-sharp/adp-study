@@ -60,3 +60,6 @@ Python3.7 호환 안내는 requirements-py37.txt에 있습니다. 실제 이번 
 ## 추가 ML 최적화
 
 [Grid/Random/Optuna 모듈 명세](../docs/PARAMETER_OPTIMIZATION.md). 기존 skeleton 흐름과 모델별 JSON에 연결했으며 전처리·선택·리샘플링은 CV Pipeline 내부에서 적합합니다.
+# 문제지 서식
+
+전체 문제지는 흑백 중심의 A4 공통 서식을 사용합니다. [서식 명세 및 PDF 재생성](../docs/QUESTION_PAPER_STYLE.md)을 참고하세요.
