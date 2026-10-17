@@ -11,3 +11,6 @@ ipykernel==7.4.0
 
 xgboost-cpu==3.0.5
 lightgbm==4.6.0
+# 상황형 PDF 텍스트·레이아웃 대응 검사
+PyMuPDF==1.26.6
+reportlab==4.4.9

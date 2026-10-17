@@ -446,6 +446,6 @@ print('데이터 종류: 합성 복원 연습 자료, 원 시험 데이터가 �
  print(folder,len(nb.metadata.adp.subquestions))
 (ROOT/'추가_문항명세.json').write_text(json.dumps(EXAMS,ensure_ascii=False,indent=2)+'\n')
 
-# Apply the same layout to the five original DataManim rounds as well.
-for folder, exam in all_exams():
- render_paper(folder, exam)
+# Apply the situation-based contract to every round, including legacy notebooks.
+from apply_scenario_style import apply
+apply()

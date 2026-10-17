@@ -8,8 +8,8 @@
       "pdf_pages": 2,
       "figures": 7,
       "status": "passed",
-      "notebook_sha256": "891246ecb857c5716dab5d7c4a4eaa5f7ac40e3c83b25a633b81538c63d62d52",
-      "pdf_sha256": "fcc9678549c6657579078a1ac22ca8c2fa0144959015ff307b980419f9240cbf"
+      "notebook_sha256": "83da657f7d2fd1a20531b6eca3315c784602f7e8cf80c3b95bc2f71c4866fb36",
+      "pdf_sha256": "8c065adfbd818486c2332cc04776e6bbea29d2aaff979828964190ada34b45b9"
     },
     {
       "folder": "17회",
@@ -18,8 +18,8 @@
       "pdf_pages": 2,
       "figures": 6,
       "status": "passed",
-      "notebook_sha256": "5e7c6f34d9d3216ed429cfd527a102ea47013b2fe15de8d26be87bb710512bbc",
-      "pdf_sha256": "63106f7b5388decf849fa3a1b654469424e20a63ef504394604fdb551ff265f7"
+      "notebook_sha256": "06fcd1657e5e6dacd982f81dfa3f3ddc56e430adbdd91e1d4d691c9374fbbcb1",
+      "pdf_sha256": "dbb5d02cc6b326b986cf52e53607fcfaf82e8083160a67b5115009e79a9cb5ce"
     },
     {
       "folder": "18회",
@@ -28,8 +28,8 @@
       "pdf_pages": 2,
       "figures": 10,
       "status": "passed",
-      "notebook_sha256": "741c973d143d556b08a992f66accc3ef8d23df564f36375ac3e43b05a26d08cc",
-      "pdf_sha256": "61a53024c651e161896eab42f74618e9d51e8ec80289a9d756857f29926f2287"
+      "notebook_sha256": "b49ba760abd04e079123729f1c2c7d6f6797592df90a2c3cc42d3e98d8b6bddb",
+      "pdf_sha256": "9302c7dbb357a1426665f0e17c3ce76c9f0991e4994b10dd9c2acf98ff60a6e5"
     },
     {
       "folder": "18회/보충",
@@ -38,8 +38,8 @@
       "pdf_pages": 1,
       "figures": 6,
       "status": "passed",
-      "notebook_sha256": "3e16c9126053a53dd264a178fcaaee528ef987638f96fb97a690460bbf48e95f",
-      "pdf_sha256": "f2a33df524561a98bcce50053174ff3c6b30610847bbccf4402d03337fcafaba"
+      "notebook_sha256": "9406d8c69a3f3ede924a55e184378c087b87312daeb274761f5ced5628399c91",
+      "pdf_sha256": "496478130a8d8aad1ed949beb4d730b2819bae3c5e80a82fd5c69b09b8bd5827"
     },
     {
       "folder": "19회",
@@ -48,8 +48,8 @@
       "pdf_pages": 2,
       "figures": 6,
       "status": "passed",
-      "notebook_sha256": "d26340a821c3cd2f0a5ae9e891d12655350d4bf3e76eafabf4d036a37f87aff1",
-      "pdf_sha256": "95a9eb836160cb6c8787dc749af7eb5bba9ec988070030aededc310ac6b95523"
+      "notebook_sha256": "4501a5c6ced196312e6632f6cb335ce3aca39dc3860ca7cee3517c60f8c3db84",
+      "pdf_sha256": "e251138fb479640f883c5c58cb6044103f1bbb2410aa0b909836900de297865f"
     },
     {
       "folder": "19회/보충",
@@ -58,8 +58,8 @@
       "pdf_pages": 1,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "c2f62f0a3898e2bfc1b3574308129353bee870e816a4d5a0fd4ae10a22ee0716",
-      "pdf_sha256": "47efc780c025a8738504e8ced7d8c6a39241cbc4826d18df4eede82ea26b647e"
+      "notebook_sha256": "21a443f30b5eb169dff07e8ba59d381fef2df92473e548ddc8e431d35939047a",
+      "pdf_sha256": "7eb11073ae4c6128112811f00bcf74060e404d2d19debd9b2154a1478f579a93"
     },
     {
       "folder": "20회",
@@ -68,8 +68,8 @@
       "pdf_pages": 3,
       "figures": 5,
       "status": "passed",
-      "notebook_sha256": "e5bdb93f92f8847404cdb5afe096d426ff256f90c4215b5fb116bfd27de64a54",
-      "pdf_sha256": "aa5e766520f5d58258e70a6c1720641f424737924190fdf289a234e0991149e3"
+      "notebook_sha256": "c8eb3ed356b52990e989e7bae4f6eb458f80b3b143df9ac93c8089f9597841bf",
+      "pdf_sha256": "d077c628cd6a037ca8616fbf36879bc904ef8ce1b53af3f8a188e07f121eb842"
     },
     {
       "folder": "20회/보충",
@@ -78,8 +78,8 @@
       "pdf_pages": 1,
       "figures": 2,
       "status": "passed",
-      "notebook_sha256": "64f6c57fb140a68ba4f8b39ea88c4a4c0eedacf440c0a2346c72c473999163be",
-      "pdf_sha256": "fd2f724b99f99efe027c4dfdb9f2dd0c687ce39b1574843c705f350c6d8a4155"
+      "notebook_sha256": "525e9c4f38e19254b6cae23ebd64918388590c508c57b76161a54049684d1e85",
+      "pdf_sha256": "ecebc34c462ee5e43b2a027a31fa389dc64c19afc3a44a8e3ed659c30f200d95"
     },
     {
       "folder": "21회",
@@ -88,8 +88,8 @@
       "pdf_pages": 3,
       "figures": 3,
       "status": "passed",
-      "notebook_sha256": "877ff0b5ec7f9afed5631f4bf659321210f9455e4fbe48f64eedcf7b2db0f70f",
-      "pdf_sha256": "9f664eeae8b91d8d6478f6f6bcf4c7e695690e4050b8b87bc1a7a40af0a039db"
+      "notebook_sha256": "55f5c2cf8a0b0b52a6ca2ea50b94067d0cf2355c01aec918bbd6e7d2965eadd1",
+      "pdf_sha256": "019bf93431fe6d4186c447266dec0281216bd9959c29217a59cbaaeaa1cc8f0c"
     },
     {
       "folder": "21회/보충",
@@ -98,18 +98,18 @@
       "pdf_pages": 1,
       "figures": 1,
       "status": "passed",
-      "notebook_sha256": "67822eba8d40490b9991d72632e570586b89049547d25bd2a75bf0780282e0f0",
-      "pdf_sha256": "918a7bf01c634b15073e8e9ef23e08d238657fc498e508d9d99bad3d212a4169"
+      "notebook_sha256": "b56c348639f9a39bf2664cf36503c07980722e94bdbd43b34c10e4f525fac415",
+      "pdf_sha256": "e2e4cff066559333da30d09a23ec5424442cbf837cb41773f06b647d63f81cf9"
     },
     {
       "folder": "22회",
       "questions": 14,
       "code_cells": 15,
-      "pdf_pages": 2,
+      "pdf_pages": 4,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "cb0252bc6711c1bbef155f638cd772d93495ea4d34c6c053e6533a6e41ec0696",
-      "pdf_sha256": "9ea7070fa09b305e15be84670a0365f4ced859c33e9a4c20a031225464a55fdd"
+      "notebook_sha256": "c4da9e8aa0e8e9f0f9748ec6460a6ad477710ac97d4f8c6f757eb0dc62d89e08",
+      "pdf_sha256": "7922d69d4084cb32fff1328c9f1ef351c7923f15063dcf8f1088680855f27dec"
     },
     {
       "folder": "22회/보충",
@@ -118,8 +118,8 @@
       "pdf_pages": 1,
       "figures": 0,
       "status": "passed",
-      "notebook_sha256": "ded36afde311d64801b45f7d57ca6b22fa05d25627924f836948e11bf4356c68",
-      "pdf_sha256": "b0729b03886d5c1833507819fe731447a4cb2fb6139c48ec9c13d66d11a14a63"
+      "notebook_sha256": "720b4197e47943dfe1978692b67e754a1d09d2a529612652dd9c4f174f226103",
+      "pdf_sha256": "a8cefa07c441f81fae9504577a97c773a22a472358efd707d259de2e893dceff"
     },
     {
       "folder": "22회/후기보충",
@@ -128,18 +128,18 @@
       "pdf_pages": 1,
       "figures": 0,
       "status": "passed",
-      "notebook_sha256": "0e4e64a5f9bc83dcca2b28236a82d14799e2e61313b85904da82fc91a8b91fad",
-      "pdf_sha256": "0ac3c490fb06c391855f21f92c81b0fdaec23aee35a9326fde56ac1e8dead9c5"
+      "notebook_sha256": "cf7525ae2effb7f70c8e18f6d47128ee8b280067d617043622dcd4188b2e2e43",
+      "pdf_sha256": "c6154ce0b5669fd0f0c3871baea03a215129ef9afbf317582c0efc8c2d9f8d0a"
     },
     {
       "folder": "23회",
       "questions": 17,
       "code_cells": 18,
-      "pdf_pages": 3,
+      "pdf_pages": 4,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "0625f1c2dad7e711d8bcf8e8fd6fbd4c60dffcfb94552a3d70183f07827dca98",
-      "pdf_sha256": "035ed3f20209a40c164a42cb1d3a607b505d5d02e4a773913846ee608263edea"
+      "notebook_sha256": "144389c78a3115c30212e388ce80b703ab0a47915e97c08a5bf8dddae9c195bb",
+      "pdf_sha256": "6f0c4f7222ce2839db8f284b9b94e0ddecbd806646223a8ff3f7dcd2fc2f55a6"
     },
     {
       "folder": "24회",
@@ -148,8 +148,8 @@
       "pdf_pages": 3,
       "figures": 1,
       "status": "passed",
-      "notebook_sha256": "b5a0bc9d84cff727e7e959911341b160bfa8b6df5a9b8bb2beeedb72517a40f9",
-      "pdf_sha256": "f9e0be9e60809a67561a92413ba2c328e4c62fb40748dab440b1ee86b9ea4dd5"
+      "notebook_sha256": "ce23d8f55d58b906d12c94aab43a355bf6a748462e27e0797c07246f5ab28af6",
+      "pdf_sha256": "4bef70ef965e370505b1c838787ec4e9eac11f9a6e6bcf69fd77237326214934"
     },
     {
       "folder": "25회",
@@ -158,18 +158,18 @@
       "pdf_pages": 4,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "a6a5b0fc1665d83a75c59eaade6ba38f01962827173d2a9d968affe5919de380",
-      "pdf_sha256": "d453941a74befde37d138ef2796764a6294d330aeb7eecefc9f75e1fb3645ca5"
+      "notebook_sha256": "e4c7e08780b1aad48b9c685aa805b4fe0d9c57aeddddf200a04e8f464d046055",
+      "pdf_sha256": "024774cfa2b6a4caeb382289647b48736882115ec077eb267637090a2a3ffd4f"
     },
     {
       "folder": "26회",
       "questions": 9,
       "code_cells": 10,
-      "pdf_pages": 3,
+      "pdf_pages": 4,
       "figures": 2,
       "status": "passed",
-      "notebook_sha256": "d1b884ca17ec82777d19716031d709fef4d6ce68fc6da82227f468b98d01bb1b",
-      "pdf_sha256": "dae1df112a6b62dc3c939990ccc7dab34e7fdb3648a0f72d9419696ae37f6cb9"
+      "notebook_sha256": "a6add67e4e5e92c45a827472c8999293cc4b2f2bc90d92d78aaa43d6392d8de9",
+      "pdf_sha256": "d8000462234c28574bf56884582421084ae2321ab28da2689af17f4408231c18"
     },
     {
       "folder": "28회",
@@ -178,8 +178,8 @@
       "pdf_pages": 3,
       "figures": 2,
       "status": "passed",
-      "notebook_sha256": "1e6ca19333f287b61181a7ea5bf742d644f05c72e7d71aea5d01378f8988ff47",
-      "pdf_sha256": "67cc28d0ac49273f8488577bb3cba441d6d43f556e2aa27f3d4774e6df0f6081"
+      "notebook_sha256": "7f57996449793e3440ce4304fce4059529315a5406be021f1acb7f8932e75f11",
+      "pdf_sha256": "a4da9b925dfd170d577f767be1479e67b75a2fdc835e7dfcf96e4342e40699d4"
     },
     {
       "folder": "모의고사/1회",
@@ -188,18 +188,18 @@
       "pdf_pages": 3,
       "figures": 2,
       "status": "passed",
-      "notebook_sha256": "db43625ba23f00029ced2a181b2490b1e312bd2e4387b7d27c7146c9b349b41c",
-      "pdf_sha256": "1335eae64099a9a0d9b7e77742b387e783815db6ab5acb60e6f49817f89b18d9"
+      "notebook_sha256": "a6593b99bd973654fb6d25c77560fc5a8dfbabba23058567868b9da4bb64c08f",
+      "pdf_sha256": "427eb0ebadfe81316bd276f4df56b95faead134e8d4d78e87e2f419a03096017"
     },
     {
       "folder": "모의고사/2회",
       "questions": 7,
       "code_cells": 8,
-      "pdf_pages": 3,
+      "pdf_pages": 2,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "b6f33efa8a9b1a5c0c8cc33cf93d8e4b5c7db0e96cc780f6006878324121b984",
-      "pdf_sha256": "a830b580ce26ebe6e21ef8c52dba918083ce084943844a1dd2dbd91c1ab09ee9"
+      "notebook_sha256": "73de5b9f7004a31db6e83237299b2be46cd901ca85d644da2f333e62d11a8d59",
+      "pdf_sha256": "0c658576759098ca7063a2adb71e2590f03aba30369940c42b3b61495b04d40b"
     },
     {
       "folder": "모의고사/3회",
@@ -208,18 +208,18 @@
       "pdf_pages": 3,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "8e631814f4b9031a1daa840119922e5d8e440f0eedc1dced2c60051674cd2e11",
-      "pdf_sha256": "7a17771b7b630b7254b4fbdc5cb9c608c37861d12fe5fb864c4ad21a593430ab"
+      "notebook_sha256": "52f90580460af6c3596eae12e94698ffde2822c55f71c03b191864446aa2b088",
+      "pdf_sha256": "be31d2c04ff50b9638a74d6de7f7df7b7eb4b782afe2d9ae819b54b47c476739"
     },
     {
       "folder": "모의고사/4회",
       "questions": 8,
       "code_cells": 9,
-      "pdf_pages": 3,
+      "pdf_pages": 2,
       "figures": 3,
       "status": "passed",
-      "notebook_sha256": "7e192c4454f5ce2029e92c284ff9531798c7a2ba32f988eba58960b6b80e68dd",
-      "pdf_sha256": "396ae07fc5ee7e1cb5eb0947075c870077ee7fe384376d55c28e064227aa6939"
+      "notebook_sha256": "d2388b0fd49bb1fb81b263f1fc7bc6ef14c08b87bab8118ebfee87833307cb86",
+      "pdf_sha256": "57d1c866bffdae66d941275a6d29bdfdb491b1c9dc17b12ef5d992e835c27aaa"
     }
   ],
   "dataset_files": [
@@ -635,12 +635,11 @@
   "total_notebooks": 22,
   "total_questions": 162,
   "total_code_cells": 184,
-  "total_pdf_pages": 50,
+  "total_pdf_pages": 52,
   "total_figures": 80,
   "notes": [
     "Actual sequential isolated Python-process execution outputs retained.",
     "Python 3.7 grammar checked; Python 3.7 runtime uses GitHub CI for modules.",
-    "PDF coordinates checked; visual review performed separately.",
-    "Question PDFs restyled in Korean administrative layout; all 162 question texts, original givens/tables/images, A4 size and text bounds verified; notebooks/data unchanged."
+    "PDF coordinates checked; visual review performed separately."
   ]
 }
