@@ -1,0 +1,176 @@
+[
+  {
+    "date": "2024-01-01",
+    "meta": {
+      "source": "simulated"
+    },
+    "records": [
+      {
+        "entity": "E1",
+        "sensors": {
+          "temp": 18.343494974402024,
+          "load": 4
+        }
+      },
+      {
+        "entity": "E2",
+        "sensors": {
+          "temp": 22.29843369278368,
+          "load": 1
+        }
+      },
+      {
+        "entity": "E3",
+        "sensors": {
+          "temp": 23.326205063604373,
+          "load": 1
+        }
+      }
+    ]
+  },
+  {
+    "date": "2024-01-02",
+    "meta": {
+      "source": "simulated"
+    },
+    "records": [
+      {
+        "entity": "E1",
+        "sensors": {
+          "temp": 22.488417847742273,
+          "load": 7
+        }
+      },
+      {
+        "entity": "E2",
+        "sensors": {
+          "temp": 21.83541022415154,
+          "load": 7
+        }
+      },
+      {
+        "entity": "E3",
+        "sensors": {
+          "temp": 18.972565235073937,
+          "load": 9
+        }
+      }
+    ]
+  },
+  {
+    "date": "2024-01-03",
+    "meta": {
+      "source": "simulated"
+    },
+    "records": [
+      {
+        "entity": "E1",
+        "sensors": {
+          "temp": 20.16027139805464,
+          "load": 3
+        }
+      },
+      {
+        "entity": "E2",
+        "sensors": {
+          "temp": 23.705008772314677,
+          "load": 8
+        }
+      },
+      {
+        "entity": "E3",
+        "sensors": {
+          "temp": 20.428212934725178,
+          "load": 5
+        }
+      }
+    ]
+  },
+  {
+    "date": "2024-01-04",
+    "meta": {
+      "source": "simulated"
+    },
+    "records": [
+      {
+        "entity": "E1",
+        "sensors": {
+          "temp": 18.822415052986983,
+          "load": 6
+        }
+      },
+      {
+        "entity": "E2",
+        "sensors": {
+          "temp": 19.00163652826376,
+          "load": 2
+        }
+      },
+      {
+        "entity": "E3",
+        "sensors": {
+          "temp": 17.503052801290693,
+          "load": 7
+        }
+      }
+    ]
+  },
+  {
+    "date": "2024-01-05",
+    "meta": {
+      "source": "simulated"
+    },
+    "records": [
+      {
+        "entity": "E1",
+        "sensors": {
+          "temp": 21.222236562332434,
+          "load": 6
+        }
+      },
+      {
+        "entity": "E2",
+        "sensors": {
+          "temp": 19.1282559682361,
+          "load": 9
+        }
+      },
+      {
+        "entity": "E3",
+        "sensors": {
+          "temp": 24.63919545582166,
+          "load": 5
+        }
+      }
+    ]
+  },
+  {
+    "date": "2024-01-06",
+    "meta": {
+      "source": "simulated"
+    },
+    "records": [
+      {
+        "entity": "E1",
+        "sensors": {
+          "temp": 19.736106904440515,
+          "load": 7
+        }
+      },
+      {
+        "entity": "E2",
+        "sensors": {
+          "temp": 21.8625244077071,
+          "load": 7
+        }
+      },
+      {
+        "entity": "E3",
+        "sensors": {
+          "temp": 20.840026243741598,
+          "load": 6
+        }
+      }
+    ]
+  }
+]

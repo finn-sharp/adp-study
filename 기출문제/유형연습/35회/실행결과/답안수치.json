@@ -1,0 +1,120 @@
+[
+  {
+    "question": "1-1",
+    "task": "geo_validate",
+    "outputs": {
+      "input shapes": {
+        "rides": [
+          36,
+          3
+        ],
+        "stations": [
+          3,
+          3
+        ],
+        "weather": [
+          36,
+          5
+        ]
+      }
+    },
+    "tests": []
+  },
+  {
+    "question": "1-2",
+    "task": "geo_map",
+    "outputs": {
+      "nearest sensor": [
+        {
+          "station_id": "S1",
+          "sensor_id": "W1",
+          "distance_km": 1.4362947839864137
+        },
+        {
+          "station_id": "S2",
+          "sensor_id": "W2",
+          "distance_km": 1.4360117629390292
+        },
+        {
+          "station_id": "S3",
+          "sensor_id": "W3",
+          "distance_km": 1.43650692045423
+        }
+      ]
+    },
+    "tests": []
+  },
+  {
+    "question": "1-3",
+    "task": "geo_join",
+    "outputs": {
+      "joined": {
+        "rows": 36,
+        "unmatched": 0,
+        "preview": [
+          {
+            "index": 0,
+            "date": "2023-01-01",
+            "station_id": "S1",
+            "rides": 336,
+            "sensor_id": "W1",
+            "distance_km": 1.4362947839864137,
+            "lat": 35.15,
+            "lon": 126.84,
+            "temp": 14.9785258,
+            "_merge": "both"
+          },
+          {
+            "index": 1,
+            "date": "2023-01-01",
+            "station_id": "S2",
+            "rides": 135,
+            "sensor_id": "W2",
+            "distance_km": 1.4360117629390292,
+            "lat": 35.2,
+            "lon": 126.91,
+            "temp": 11.3612575,
+            "_merge": "both"
+          },
+          {
+            "index": 2,
+            "date": "2023-01-01",
+            "station_id": "S3",
+            "rides": 210,
+            "sensor_id": "W3",
+            "distance_km": 1.43650692045423,
+            "lat": 35.13,
+            "lon": 126.93,
+            "temp": 16.675492,
+            "_merge": "both"
+          },
+          {
+            "index": 3,
+            "date": "2023-01-02",
+            "station_id": "S1",
+            "rides": 218,
+            "sensor_id": "W1",
+            "distance_km": 1.4362947839864137,
+            "lat": 35.15,
+            "lon": 126.84,
+            "temp": 13.7156345,
+            "_merge": "both"
+          },
+          {
+            "index": 4,
+            "date": "2023-01-02",
+            "station_id": "S2",
+            "rides": 268,
+            "sensor_id": "W2",
+            "distance_km": 1.4360117629390292,
+            "lat": 35.2,
+            "lon": 126.91,
+            "temp": 17.2055989,
+            "_merge": "both"
+          }
+        ]
+      }
+    },
+    "tests": []
+  }
+]
