@@ -1,0 +1,31 @@
+name: Survival statistics mock
+on:
+  push:
+    paths:
+      - '기출문제/모의고사/생존분석_통계/**'
+      - 'tools/exams/*survival_mock.py'
+      - 'tools/exams/execute_notebooks.py'
+      - '.github/workflows/survival-mock.yml'
+  pull_request:
+    paths:
+      - '기출문제/모의고사/생존분석_통계/**'
+      - 'tools/exams/*survival_mock.py'
+      - 'tools/exams/execute_notebooks.py'
+      - '.github/workflows/survival-mock.yml'
+permissions:
+  contents: read
+jobs:
+  survival:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: '기출문제/모의고사/생존분석_통계/requirements-py312.txt'
+      - run: python -m pip install -r 기출문제/모의고사/생존분석_통계/requirements-py312.txt
+      - run: python tools/exams/execute_notebooks.py 기출문제/모의고사/생존분석_통계/생존분석_통계_해설.ipynb
+        env:
+          MPLBACKEND: Agg
+      - run: python tools/exams/audit_survival_mock.py

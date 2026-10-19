@@ -1,0 +1,250 @@
+[
+  {
+    "question": "1-3",
+    "probabilities": [
+      {
+        "group": "A",
+        "month": 25,
+        "S": 0.6663461538461538,
+        "F": 0.3336538461538462
+      },
+      {
+        "group": "A",
+        "month": 30,
+        "S": 0.49975961538461544,
+        "F": 0.5002403846153846
+      },
+      {
+        "group": "A",
+        "month": 35,
+        "S": 0.39980769230769236,
+        "F": 0.6001923076923077
+      },
+      {
+        "group": "B",
+        "month": 25,
+        "S": 0.8555555555555554,
+        "F": 0.1444444444444446
+      },
+      {
+        "group": "B",
+        "month": 30,
+        "S": 0.7604938271604934,
+        "F": 0.2395061728395066
+      },
+      {
+        "group": "B",
+        "month": 35,
+        "S": 0.6337448559670779,
+        "F": 0.36625514403292214
+      }
+    ],
+    "conditional_A": 0.6000000000000001
+  },
+  {
+    "question": "1-4",
+    "median_months": {
+      "A": 30.0,
+      "B": null
+    },
+    "outside_followup_60_months": "not estimated"
+  },
+  {
+    "question": "1-5",
+    "method": "Log-rank",
+    "H0": "S_A(t)=S_B(t) for all t",
+    "H1": "different for some t",
+    "statistic": 2.461124994286966,
+    "p_value": 0.1166951758346206,
+    "df": 1,
+    "alpha": 0.05,
+    "reject_H0": false,
+    "conclusion": "공급사별 전체 생존분포가 다르다는 근거가 충분하지 않다."
+  },
+  {
+    "question": "2-1",
+    "retention24": {
+      "A": 0.09436274509803917,
+      "B": 0.21944678593282874,
+      "C": 0.3853825761205611
+    }
+  },
+  {
+    "question": "2-2",
+    "method": "Multivariate log-rank",
+    "H0": "S_A=S_B=S_C for all t",
+    "H1": "at least one differs",
+    "statistic": 33.08512519103864,
+    "p_value": 6.541183735698923e-08,
+    "df": 2,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "conclusion": "정책별 전체 유지기간 분포가 다르다는 근거가 있다."
+  },
+  {
+    "question": "2-3",
+    "method": "Pairwise log-rank A-B",
+    "H0": "S_left=S_right for all t",
+    "H1": "different for some t",
+    "statistic": 5.952303825161003,
+    "p_value": 0.014698064811615619,
+    "df": 1,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "conclusion": "해당 두 정책의 생존분포가 다르다는 근거가 있다.",
+    "p_holm": 0.014698064811615619
+  },
+  {
+    "question": "2-3",
+    "method": "Pairwise log-rank A-C",
+    "H0": "S_left=S_right for all t",
+    "H1": "different for some t",
+    "statistic": 35.227114773208996,
+    "p_value": 2.9340979980309907e-09,
+    "df": 1,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "conclusion": "해당 두 정책의 생존분포가 다르다는 근거가 있다.",
+    "p_holm": 8.802293994092972e-09
+  },
+  {
+    "question": "2-3",
+    "method": "Pairwise log-rank B-C",
+    "H0": "S_left=S_right for all t",
+    "H1": "different for some t",
+    "statistic": 10.397222262522044,
+    "p_value": 0.00126205021007839,
+    "df": 1,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "conclusion": "해당 두 정책의 생존분포가 다르다는 근거가 있다.",
+    "p_holm": 0.00252410042015678
+  },
+  {
+    "question": "2-4",
+    "rmst_24": {
+      "A": 8.977220098296574,
+      "B": 11.83549390308747,
+      "C": 16.79003087384675
+    },
+    "meaning": "descriptive only; no test/CI requested"
+  },
+  {
+    "question": "3-2",
+    "method": "Cox Wald z: temperature10",
+    "H0": "beta_temperature10=0",
+    "H1": "beta_temperature10 != 0",
+    "statistic": 8.356811341412353,
+    "p_value": 6.443622401158869e-17,
+    "df": null,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "conclusion": "temperature10과 조건부 고장 위험의 연관성이 있다는 근거가 있다."
+  },
+  {
+    "question": "3-2",
+    "method": "Cox Wald z: load10",
+    "H0": "beta_load10=0",
+    "H1": "beta_load10 != 0",
+    "statistic": 6.750300556245246,
+    "p_value": 1.475392029367734e-11,
+    "df": null,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "conclusion": "load10과 조건부 고장 위험의 연관성이 있다는 근거가 있다."
+  },
+  {
+    "question": "3-2",
+    "method": "Cox Wald z: new_part",
+    "H0": "beta_new_part=0",
+    "H1": "beta_new_part != 0",
+    "statistic": -4.75633871413277,
+    "p_value": 1.9713560128826824e-06,
+    "df": null,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "conclusion": "new_part과 조건부 고장 위험의 연관성이 있다는 근거가 있다."
+  },
+  {
+    "question": "3-2",
+    "coefficients": [
+      {
+        "covariate": "temperature10",
+        "coef": 0.6925265672493925,
+        "se(coef)": 0.08286971417166769,
+        "exp(coef)": 1.9987591584601094,
+        "exp(coef) lower 95%": 1.6991105564633076,
+        "exp(coef) upper 95%": 2.351252635286913,
+        "z": 8.356811341412353,
+        "p": 6.443622401158869e-17
+      },
+      {
+        "covariate": "load10",
+        "coef": 0.47971944243846776,
+        "se(coef)": 0.0710663826656786,
+        "exp(coef)": 1.6156210638960766,
+        "exp(coef) lower 95%": 1.4055545071027034,
+        "exp(coef) upper 95%": 1.8570830294480793,
+        "z": 6.750300556245246,
+        "p": 1.475392029367734e-11
+      },
+      {
+        "covariate": "new_part",
+        "coef": -0.684274066397932,
+        "se(coef)": 0.1438657142656201,
+        "exp(coef)": 0.5044562984657265,
+        "exp(coef) lower 95%": 0.380508910163132,
+        "exp(coef) upper 95%": 0.6687784445117013,
+        "z": -4.75633871413277,
+        "p": 1.9713560128826824e-06
+      }
+    ]
+  },
+  {
+    "question": "3-3",
+    "S24": {
+      "old": 0.10770613181498656,
+      "new": 0.32494330166638713
+    },
+    "HR": 0.5044562984657265
+  },
+  {
+    "question": "3-4",
+    "method": "Schoenfeld rank diagnostic: load10",
+    "H0": "beta_load10 constant over time",
+    "H1": "beta_load10 varies with time",
+    "statistic": 0.4326298321918786,
+    "p_value": 0.5107013431038734,
+    "df": 1,
+    "alpha": 0.05,
+    "reject_H0": false,
+    "conclusion": "load10의 비례위험 가정 위반을 시사하는 근거가 충분하지 않다.",
+    "p_holm": 0.9031308636069837
+  },
+  {
+    "question": "3-4",
+    "method": "Schoenfeld rank diagnostic: new_part",
+    "H0": "beta_new_part constant over time",
+    "H1": "beta_new_part varies with time",
+    "statistic": 2.1903361882931405,
+    "p_value": 0.13887899999932998,
+    "df": 1,
+    "alpha": 0.05,
+    "reject_H0": false,
+    "conclusion": "new_part의 비례위험 가정 위반을 시사하는 근거가 충분하지 않다.",
+    "p_holm": 0.41663699999799
+  },
+  {
+    "question": "3-4",
+    "method": "Schoenfeld rank diagnostic: temperature10",
+    "H0": "beta_temperature10 constant over time",
+    "H1": "beta_temperature10 varies with time",
+    "statistic": 0.5667195514809044,
+    "p_value": 0.45156543180349185,
+    "df": 1,
+    "alpha": 0.05,
+    "reject_H0": false,
+    "conclusion": "temperature10의 비례위험 가정 위반을 시사하는 근거가 충분하지 않다.",
+    "p_holm": 0.9031308636069837
+  }
+]
