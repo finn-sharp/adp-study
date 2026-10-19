@@ -1,0 +1,10 @@
+# 별도 Python 3.12 venv. 기존 분석 모듈/기출 환경을 변경하지 않는다.
+numpy==2.3.5
+pandas==2.2.3
+scipy==1.17.0
+matplotlib==3.10.8
+lifelines==0.30.0
+nbformat==5.10.4
+ipython==9.17.1
+reportlab==4.4.9
+PyMuPDF==1.26.6
