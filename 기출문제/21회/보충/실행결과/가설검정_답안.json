@@ -1,0 +1,50 @@
+[
+  {
+    "question": "4-1",
+    "method": "독립 집단 요인 모형의 Type II F 검정: sex 주효과",
+    "H0": "sex 주효과가 없다",
+    "H1": "sex 주효과가 있다",
+    "statistic": 4.938775510204059,
+    "p_value": 0.035939504821647664,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "assumptions": "독립 관측·정규 오차·등분산·식별 가능한 설계. 상호작용 유의 시 셀 평균과 조건부 효과를 우선 해석한다.",
+    "conclusion": "귀무가설을 기각한다. points에 대한 sex 주효과가 있다는 통계적 근거가 있다.",
+    "df": [
+      1.0,
+      24.0
+    ]
+  },
+  {
+    "question": "4-1",
+    "method": "독립 집단 요인 모형의 Type II F 검정: travel 주효과",
+    "H0": "travel 주효과가 없다",
+    "H1": "travel 주효과가 있다",
+    "statistic": 33.9183673469389,
+    "p_value": 1.014700082248867e-07,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "assumptions": "독립 관측·정규 오차·등분산·식별 가능한 설계. 상호작용 유의 시 셀 평균과 조건부 효과를 우선 해석한다.",
+    "conclusion": "귀무가설을 기각한다. points에 대한 travel 주효과가 있다는 통계적 근거가 있다.",
+    "df": [
+      2.0,
+      24.0
+    ]
+  },
+  {
+    "question": "4-1",
+    "method": "독립 집단 요인 모형의 Type II F 검정: sex × travel 상호작용",
+    "H0": "sex × travel 상호작용가 없다",
+    "H1": "sex × travel 상호작용가 있다",
+    "statistic": 15.469387755102042,
+    "p_value": 4.830445586280591e-05,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "assumptions": "독립 관측·정규 오차·등분산·식별 가능한 설계. 상호작용 유의 시 셀 평균과 조건부 효과를 우선 해석한다.",
+    "conclusion": "귀무가설을 기각한다. points에 대한 sex × travel 상호작용가 있다는 통계적 근거가 있다.",
+    "df": [
+      2.0,
+      24.0
+    ]
+  }
+]

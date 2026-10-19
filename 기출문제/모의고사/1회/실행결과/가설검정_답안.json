@@ -1,0 +1,66 @@
+[
+  {
+    "question": "2-3",
+    "method": "독립 집단 요인 모형의 Type II F 검정: Position_Class 주효과",
+    "H0": "Position_Class 주효과가 없다",
+    "H1": "Position_Class 주효과가 있다",
+    "statistic": 8.835609169377983,
+    "p_value": 1.2173921158136956e-05,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "assumptions": "독립 관측·정규 오차·등분산·식별 가능한 설계. 상호작용 유의 시 셀 평균과 조건부 효과를 우선 해석한다.",
+    "conclusion": "귀무가설을 기각한다. Value에 대한 Position_Class 주효과가 있다는 통계적 근거가 있다.",
+    "df": [
+      3.0,
+      316.0
+    ]
+  },
+  {
+    "question": "2-4",
+    "method": "독립 집단 요인 모형의 Type II F 검정: Position_Class 주효과",
+    "H0": "Position_Class 주효과가 없다",
+    "H1": "Position_Class 주효과가 있다",
+    "statistic": 8.765879107494593,
+    "p_value": 1.3440508780439013e-05,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "assumptions": "독립 관측·정규 오차·등분산·식별 가능한 설계. 상호작용 유의 시 셀 평균과 조건부 효과를 우선 해석한다.",
+    "conclusion": "귀무가설을 기각한다. Value에 대한 Position_Class 주효과가 있다는 통계적 근거가 있다.",
+    "df": [
+      3.0,
+      312.0
+    ]
+  },
+  {
+    "question": "2-4",
+    "method": "독립 집단 요인 모형의 Type II F 검정: Preferred_Foot 주효과",
+    "H0": "Preferred_Foot 주효과가 없다",
+    "H1": "Preferred_Foot 주효과가 있다",
+    "statistic": 1.5983157545028808,
+    "p_value": 0.20708569863179277,
+    "alpha": 0.05,
+    "reject_H0": false,
+    "assumptions": "독립 관측·정규 오차·등분산·식별 가능한 설계. 상호작용 유의 시 셀 평균과 조건부 효과를 우선 해석한다.",
+    "conclusion": "귀무가설을 기각하지 못한다. Value에 대한 Preferred_Foot 주효과가 있다는 통계적 근거가 충분하지 않다. 귀무가설의 참을 입증한 것은 아니다.",
+    "df": [
+      1.0,
+      312.0
+    ]
+  },
+  {
+    "question": "2-4",
+    "method": "독립 집단 요인 모형의 Type II F 검정: Position_Class × Preferred_Foot 상호작용",
+    "H0": "Position_Class × Preferred_Foot 상호작용가 없다",
+    "H1": "Position_Class × Preferred_Foot 상호작용가 있다",
+    "statistic": 4.290730937634405,
+    "p_value": 0.005499172754037872,
+    "alpha": 0.05,
+    "reject_H0": true,
+    "assumptions": "독립 관측·정규 오차·등분산·식별 가능한 설계. 상호작용 유의 시 셀 평균과 조건부 효과를 우선 해석한다.",
+    "conclusion": "귀무가설을 기각한다. Value에 대한 Position_Class × Preferred_Foot 상호작용가 있다는 통계적 근거가 있다.",
+    "df": [
+      3.0,
+      312.0
+    ]
+  }
+]

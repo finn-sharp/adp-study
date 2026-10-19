@@ -51,7 +51,7 @@ def styles():
                                 spaceAfter=3),
         'label': ParagraphStyle('label', **base, fontSize=9, leading=15),
         'question': ParagraphStyle('question', **base, fontSize=11, leading=19,
-                                   leftIndent=35, firstLineIndent=-35, spaceAfter=15),
+                                   leftIndent=35, firstLineIndent=-35, spaceAfter=12),
         'table': ParagraphStyle('table', **base, fontSize=8, leading=12),
         'caption': ParagraphStyle('caption', **base, fontSize=8, leading=13,
                                   spaceBefore=6, spaceAfter=5),
@@ -95,7 +95,7 @@ def paper_header(folder, exam, count):
             subtitle += ' · ' + parts[1]
     paper_title = '분석전문가(ADP) 실기'
     rows = [
-        [p('구    분', 'label'), p('복원 연습 문제지', 'label'),
+        [p('구    분', 'label'), p('상황형 연습 문제지', 'label'),
          p('문 항 수', 'label'), p(str(count) + '문항', 'label')],
         [p('성    명', 'label'), p('', 'label'), p('작 성 일', 'label'),
          p('______년 ____월 ____일', 'label')],
@@ -110,9 +110,9 @@ def paper_header(folder, exam, count):
         ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
         ('LEFTPADDING', (0, 0), (-1, -1), 10),
     ]))
-    notice = ('본 자료는 학습용 복원 문제지이며 공식 시험지가 아닙니다. '
+    notice = ('본 자료는 상황형 재구성 연습 문제지이며 공식 기출 원문이 아닙니다. '
               '별도 풀이 노트북과 해당 회차의 data 폴더를 함께 사용하십시오.')
-    return [p(paper_title, 'title'), p(subtitle + '  |  복원 연습 문제지', 'subtitle'),
+    return [p(paper_title, 'title'), p(subtitle + '  |  상황형 연습 문제지', 'subtitle'),
             identity, Spacer(1, 10), p('응시 안내', 'label'), p(notice, 'small'),
             p(exam.get('note', ''), 'small'),
             p('자료 출처: ' + exam['source'], 'small'), Spacer(1, 17)]
@@ -217,7 +217,7 @@ def render_paper(folder, exam):
                 ('LEFTPADDING', (0, 0), (-1, -1), 0),
                 ('RIGHTPADDING', (0, 0), (-1, -1), 0),
                 ('TOPPADDING', (0, 0), (-1, -1), 0),
-                ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
             ]))
             section_story.append(question_block)
         group = KeepTogether(section_story)
@@ -236,12 +236,12 @@ def render_paper(folder, exam):
         canvas.setFillColor(GREY)
         canvas.setFont('ExamGothic', 8)
         canvas.drawString(MARGIN, PAGE_H - 14 * mm, '분석전문가(ADP) 실기 · ' + folder.replace('/', ' / '))
-        canvas.drawRightString(PAGE_W - MARGIN, PAGE_H - 14 * mm, '학습용 복원 자료')
+        canvas.drawRightString(PAGE_W - MARGIN, PAGE_H - 14 * mm, '상황형 재구성 자료')
         canvas.setStrokeColor(RULE)
         canvas.setLineWidth(.35)
         canvas.line(MARGIN, PAGE_H - 17 * mm, PAGE_W - MARGIN, PAGE_H - 17 * mm)
         canvas.line(MARGIN, 18 * mm, PAGE_W - MARGIN, 18 * mm)
-        canvas.drawString(MARGIN, 13 * mm, '복원 연습 문제지')
+        canvas.drawString(MARGIN, 13 * mm, '상황형 연습 문제지')
         canvas.drawCentredString(PAGE_W / 2, 13 * mm, '- %d -' % doc.page)
         canvas.drawRightString(PAGE_W - MARGIN, 13 * mm, '공식 시험지 아님')
         canvas.restoreState()
@@ -257,7 +257,7 @@ def render_paper(folder, exam):
     return output
 
 
-def all_exams():
+def source_exams():
     original = json.loads((ROOT / '문항목록.json').read_text())
     for number, sections in original.items():
         copied = []
@@ -271,6 +271,14 @@ def all_exams():
     additional = json.loads((ROOT / '추가_문항명세.json').read_text())
     for folder, exam in additional.items():
         yield folder, exam
+
+
+def all_exams():
+    scenario = ROOT / '상황형_문항명세.json'
+    if scenario.exists():
+        yield from json.loads(scenario.read_text()).items()
+    else:
+        yield from source_exams()
 
 
 if __name__ == '__main__':

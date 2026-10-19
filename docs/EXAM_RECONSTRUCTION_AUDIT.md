@@ -1,3 +1,5 @@
+> 현재 배포 문제지·풀이는 [상황형 재구성](SCENARIO_EXAM_DESIGN.md)으로 개정했습니다. 아래 원문 대조·실행 수량은 기존 복원 단계의 기록이며 현재 수량은 `기출문제/검증결과.json`·`상황형_검증결과.json`을 확인하세요.
+
 # ADP 첨부 자료 대조와 복원 범위
 
 자료의 질문과 풀이를 분리하고, 원문 문항 복원과 주제 기반 연습문제를 구분했습니다. 정확한 문제 조건이 없는 후기의 수치·원자료를 임의로 원 시험 사실이라고 제시하지 않습니다. 출처 파일 SHA-256은 `기출문제/추가_출처목록.json`, 문항별 출처·보완 조건·풀이 근거는 `추가_문항명세.json`에 있습니다.
@@ -30,7 +32,7 @@
 
 ## 재생성과 실행
 
-저장소 루트에서 `python tools/exams/generate_fixtures.py`, `python tools/exams/build_reconstructions.py` 순서로 실행하면 합성 CSV와 추가 문제지·노트북을 재생성합니다. 생성기는 코드가 같으면 기존 실행 출력을 보존합니다. 독립 실행은 `python tools/exams/execute_notebooks.py <풀이.ipynb>`입니다. DataManim 원자료와 기존 5개 문제지는 별도 보존합니다.
+저장소 루트에서 `python tools/exams/generate_fixtures.py`, `python tools/exams/build_reconstructions.py` 순서로 실행하면 합성 CSV와 추가 문제지·노트북을 재생성합니다. 생성기는 코드가 같으면 기존 실행 출력을 보존합니다. 독립 실행은 `python tools/exams/execute_notebooks.py <풀이.ipynb>`입니다. DataManim 원자료와 원문 문항 명세를 보존합니다. 현재 5개 문제지와 풀이도 상황형 재구성본으로 갱신합니다.
 
 실행 기록은 회차별 `실행검증.json`과 전체 `검증결과.json`에 있습니다. Python 3.7은 문법 및 의존성 명세를 점검하고 CI matrix에서 모듈 테스트를 수행하도록 구성합니다. 복원 노트북의 실제 실행 환경은 Python 3.12입니다.
 
