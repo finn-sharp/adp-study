@@ -1,0 +1,29 @@
+name: Recent exam practice
+on:
+  push:
+    paths:
+      - '기출문제/유형연습/**'
+      - 'tools/exams/*recent_exam*.py'
+      - 'tools/exams/execute_notebooks.py'
+      - '.github/workflows/recent-exams.yml'
+  pull_request:
+    paths:
+      - '기출문제/유형연습/**'
+      - 'tools/exams/*recent_exam*.py'
+      - 'tools/exams/execute_notebooks.py'
+      - '.github/workflows/recent-exams.yml'
+permissions:
+  contents: read
+jobs:
+  recent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: '기출문제/유형연습/requirements-py312.txt'
+      - run: python -m pip install -r 기출문제/유형연습/requirements-py312.txt
+      - run: python tools/exams/run_recent_exams.py
+      - run: python tools/exams/audit_recent_exams.py

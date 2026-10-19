@@ -1,0 +1,13 @@
+# 이 확장 연습만을 위한 Python 3.12 환경. 기존 3.7 환경과 분리.
+numpy==2.3.5
+scipy==1.17.0
+pandas==2.2.3
+scikit-learn==1.8.0
+statsmodels==0.14.6
+imbalanced-learn==0.14.2
+matplotlib==3.10.8
+nbformat==5.10.4
+ipython==9.17.1
+reportlab==4.4.9
+PyMuPDF==1.26.6
+pingouin==0.5.5

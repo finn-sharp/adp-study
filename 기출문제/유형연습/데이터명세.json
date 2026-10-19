@@ -1,0 +1,341 @@
+[
+  {
+    "path": "30회/data/accident.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "date",
+      "weather",
+      "road",
+      "speed",
+      "severe"
+    ],
+    "seed": 20261030,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "30회/data/headset.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "age_group",
+      "preference"
+    ],
+    "seed": 20261030,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "30회/data/health.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "age",
+      "weight",
+      "waist",
+      "pulse",
+      "DBP"
+    ],
+    "seed": 20261030,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "30회/data/transport.json",
+    "format": "json",
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "31회/data/ads.csv",
+    "rows": 240,
+    "columns": [
+      "TV",
+      "radio",
+      "paper",
+      "sales"
+    ],
+    "seed": 20261031,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "31회/data/checkup.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "exam_date",
+      "birth_date",
+      "gender",
+      "height_cm",
+      "weight",
+      "exercise",
+      "sleep"
+    ],
+    "seed": 20261031,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "31회/data/obesity.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "height_cm",
+      "weight",
+      "activity",
+      "age",
+      "body_class"
+    ],
+    "seed": 20261031,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "31회/data/기준표.json",
+    "format": "json",
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "32회/data/category.csv",
+    "rows": 25,
+    "columns": [
+      "cyl",
+      "gear"
+    ],
+    "seed": 20261032,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "32회/data/housing.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "x1",
+      "x2",
+      "x3",
+      "x4",
+      "x5",
+      "target"
+    ],
+    "seed": 20261032,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "32회/data/salary.csv",
+    "rows": 240,
+    "columns": [
+      "group",
+      "salary"
+    ],
+    "seed": 20261032,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "33회/data/counts.csv",
+    "rows": 400,
+    "columns": [
+      "count"
+    ],
+    "seed": 20261033,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "33회/data/defect.csv",
+    "rows": 200,
+    "columns": [
+      "group",
+      "rate"
+    ],
+    "seed": 20261033,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "33회/data/delay.csv",
+    "rows": 240,
+    "columns": [
+      "line",
+      "minutes"
+    ],
+    "seed": 20261033,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "33회/data/hepatitis.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "x1",
+      "x2",
+      "x3",
+      "x4",
+      "x5",
+      "x6",
+      "Category"
+    ],
+    "seed": 20261033,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "33회/data/series.csv",
+    "rows": 220,
+    "columns": [
+      "value"
+    ],
+    "seed": 20261033,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "33회/data/subway.csv",
+    "rows": 158,
+    "columns": [
+      "date",
+      "board",
+      "h05",
+      "h06",
+      "h07"
+    ],
+    "seed": 20261033,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "33회/data/weather.csv",
+    "rows": 77,
+    "columns": [
+      "date",
+      "temp",
+      "rain"
+    ],
+    "seed": 20261033,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "34회/data/clinical.csv",
+    "rows": 300,
+    "columns": [
+      "id",
+      "age",
+      "bp",
+      "signal",
+      "s1",
+      "s2",
+      "s3",
+      "ind",
+      "dead"
+    ],
+    "seed": 20261034,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "34회/data/learning.csv",
+    "rows": 144,
+    "columns": [
+      "id",
+      "gender",
+      "method",
+      "score"
+    ],
+    "seed": 20261034,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "34회/data/power.csv",
+    "rows": 158,
+    "columns": [
+      "date",
+      "kind",
+      "p00",
+      "p12"
+    ],
+    "seed": 20261034,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "34회/data/score.csv",
+    "rows": 240,
+    "columns": [
+      "study",
+      "failures",
+      "absences",
+      "support",
+      "internet",
+      "score"
+    ],
+    "seed": 20261034,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "34회/data/weather_power.csv",
+    "rows": 79,
+    "columns": [
+      "date",
+      "temp",
+      "wind"
+    ],
+    "seed": 20261034,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "35회/data/rides.csv",
+    "rows": 36,
+    "columns": [
+      "date",
+      "station_id",
+      "rides"
+    ],
+    "seed": 20261035,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "35회/data/stations.csv",
+    "rows": 3,
+    "columns": [
+      "station_id",
+      "lat",
+      "lon"
+    ],
+    "seed": 20261035,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "35회/data/weather_geo.csv",
+    "rows": 36,
+    "columns": [
+      "date",
+      "sensor_id",
+      "lat",
+      "lon",
+      "temp"
+    ],
+    "seed": 20261035,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "36회/data/cascade.csv",
+    "rows": 240,
+    "columns": [
+      "id",
+      "x1",
+      "x2",
+      "x3",
+      "x4",
+      "target",
+      "label"
+    ],
+    "seed": 20261036,
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "36회/data/records.json",
+    "format": "json",
+    "origin": "original_synthetic"
+  },
+  {
+    "path": "36회/data/survey.csv",
+    "rows": 240,
+    "columns": [
+      "item1",
+      "item2",
+      "item3",
+      "item4",
+      "item5",
+      "item6"
+    ],
+    "seed": 20261036,
+    "origin": "original_synthetic"
+  }
+]

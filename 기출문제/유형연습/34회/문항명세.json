@@ -1,0 +1,80 @@
+{
+  "round": 34,
+  "kind": "source_inspired_original_practice",
+  "scope": "confirmed_topics_only",
+  "sources": [
+    "https://well-being-stat.tistory.com/3"
+  ],
+  "questions": 8,
+  "sections": [
+    {
+      "title": "1. 부분 관측 라벨을 이용한 후속 예측",
+      "context": "clinical.csv는 age·bp·signal·s1~s3·ind·dead다. s1~s3는 0~2 서열이며, 세 값이 다 있으면 합≥4일 때 bleed=1, 아니면0으로 생성한다. 결측이 있으면 bleed는 미관측이다. ind=0은 bleed 관측 학습,1은 bleed 미관측 학습,2는 최종 시험이다. bleed 예측 입력은 age·bp·signal만 허용한다. 이 규칙·라벨은 실제 의료 기준이 아닌 창작 조건이다.",
+      "data": "clinical.csv",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "서열값·결측·ind 규칙을 검증해 bleed를 만들고 누락 범주가 보존된 빈도/교차표를 제시하시오. ind=2의 정답은 평가 외에 사용하지 마시오.",
+          "answer": "결측 포함 조건문을 먼저 처리하고 dropna=False로 빈도를 확인한다. 라벨 정의에 직접 쓴 s1~s3를 bleed 예측 입력에서 제외한다.",
+          "task": "clinical_prepare"
+        },
+        {
+          "id": "1-2",
+          "text": "관측 학습 라벨로 선형 및 앙상블 분류기를 내부 CV로 비교하시오. 관측 학습 행에는 out-of-fold 확률을, 미관측 학습 및 최종 시험에는 학습 모형 예측을 생성하고 관측 시험 bleed의 F1·AUC를 보고하시오.",
+          "answer": "후속 학습용 예측을 자기 행을 본 모형의 in-sample 값으로 채우지 않는다. CV 선택 뒤 고정 모형의 OOF는 독립 최종 시험 평가와 구분한다.",
+          "task": "clinical_oof"
+        },
+        {
+          "id": "1-3",
+          "text": "age·bp·signal과 앞 단계 예측확률을 사용해 dead를 예측하시오. bleed를 관측 여부에 따라 진짜/예측 라벨로 섞지 않고, 시험 데이터에서 앞 단계 오차가 전파되는 한계를 설명하시오.",
+          "answer": "관측 여부와 무관하게 예측확률을 후속 특성으로 통일한다. 최종 시험의 bleed 정답·dead는 학습·모형 선택에서 제외한다.",
+          "task": "clinical_dead"
+        }
+      ]
+    },
+    {
+      "title": "2. 발전량과 기상자료",
+      "context": "power.csv의 date·kind와 p00·p12를 합해 일별 generation을 만들고 날씨와 결합한다. weather_power.csv는 날짜 키가 유일하다. 2021~2022 학습,2023 최종 시험이다. 날짜 관측은 연속되므로 독립 검정의 한계를 고려한다.",
+      "data": "power.csv + weather_power.csv",
+      "questions": [
+        {
+          "id": "2-1",
+          "text": "일별 발전량을 구성·결합하고 계절을 만들며 변수별 기술통계와 기상변수-발전량 관계를 제시하시오. 계절별 평균 차이를 단정하기 전에 시간 의존성을 설명하시오.",
+          "answer": "합계와 키 유일성을 검증한다. 상관은 기술통계로 제시하고 날짜가 독립이 아님을 고려한다. 단순 ANOVA p값을 확증적 계절 효과로 해석하지 않는다.",
+          "task": "power_merge"
+        },
+        {
+          "id": "2-2",
+          "text": "선형 및 비선형 회귀기를 시간순 CV로 선택해 최종 연도의 성능을 비교하시오. 미래 날짜의 실측 날씨가 필요하다는 가정과 실제 예보 운영의 차이를 설명하시오.",
+          "answer": "동시점 날씨가 주어진 조건부 예측 연습이다. 실제 사전 발전량 예보를 주장하려면 날씨 예보와 지연/가용성 검증이 추가로 필요하다.",
+          "task": "power_models"
+        }
+      ]
+    },
+    {
+      "title": "3. 학습법과 학생 성취",
+      "context": "learning.csv는 성별 집단별 학생이 세 학습법을 모두 경험한 완전 균형 반복측정 자료다. 학생은 독립, 각 학생 내 측정은 연관된다. 정규 오차·집단 간 공분산 동일을 가정하고 구형성은 보장하지 않는다. score.csv는 다른 독립 학생 표본이다.",
+      "data": "learning.csv + score.csv",
+      "questions": [
+        {
+          "id": "3-1",
+          "text": "성별·학습법·상호작용을 평가할 설계를 선택하고 효과별 H0/H1·F·자유도·p-value·기각 여부를 제시하시오. 반복측정을 반영하고 within 효과에는 Greenhouse-Geisser 보정을 적용하시오.",
+          "answer": "성별 between×학습법 within 혼합 분산분석이다. 학생 내 반복을 독립 행으로 취급하지 않는다. within·상호작용의 df를 epsilon으로 보정하며 성별 효과는 학생 평균 오차항을 사용한다.",
+          "task": "mixed_anova"
+        },
+        {
+          "id": "3-2",
+          "text": "학습법별 차이를 같은 학생끼리 후속 비교하고 세 쌍의 원/보정 p-value·가설·기각 여부를 제시하시오. 상호작용이 유의할 때 주효과 후속 비교만으로 충분한지 설명하시오.",
+          "answer": "대응 t 쌍별 비교에 Holm 보정을 적용한다. 상호작용이 유의하면 성별별 단순 효과 등 별도 가족 정의와 보정이 필요하다. 독립 Tukey를 반복측정에 그대로 쓰지 않는다.",
+          "task": "mixed_posthoc"
+        },
+        {
+          "id": "3-3",
+          "text": "독립 학생의 score를 study·failures·absences·support·internet으로 설명하시오. 전체 검정·계수·잔차 진단과 설명력, 단위가 다른 계수를 크기만으로 비교하는 문제를 설명하시오.",
+          "answer": "전체 F와 잔차 가정은 별개다. 계수의 원 단위와 기준 범주를 확인하고 표준화 효과·불확실성·도메인을 함께 고려한다.",
+          "task": "score_ols"
+        }
+      ]
+    }
+  ]
+}
