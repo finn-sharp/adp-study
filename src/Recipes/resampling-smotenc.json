@@ -1,0 +1,8 @@
+{
+  "sampling_strategy": "auto",
+  "random_state": 1234,
+  "k_neighbors": 5,
+  "categorical_features": [
+    0
+  ]
+}

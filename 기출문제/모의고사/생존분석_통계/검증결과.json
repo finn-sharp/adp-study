@@ -14,10 +14,10 @@
   ],
   "python": "3.12.14",
   "sha256": {
-    "생존분석_통계_해설.ipynb": "cd4709b8ef5d765361dbe7ae63a7312be06f75413994f041e785b95c0972e69e",
+    "생존분석_통계_해설.ipynb": "cf6d59a9e89bc0097665d323e5cdac2d2606bec78a78accc49c7b2ec46eeac3e",
     "생존분석_통계_문제지.pdf": "a7992cebb1bea70e9a3ef657a889a6af294dea382bdf00fc1b2378dc97a8f742",
-    "data/subscription.csv": "020266e7c970786275351ac2417cdf6f340bae9c1d52f14f4368454be53434e8",
     "data/equipment.csv": "7ddef495c83251a48f0f41e35022363eb8a8e7c51be9e96caa2273dfb3f0fdf3",
+    "data/subscription.csv": "020266e7c970786275351ac2417cdf6f340bae9c1d52f14f4368454be53434e8",
     "data/supplier.csv": "91fef25f7f0167febd9fdd517c6f2aa4c1de5da1c750f97615bf2f766eb3ae20"
   }
 }

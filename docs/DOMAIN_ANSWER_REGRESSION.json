@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "base": "22d39e6e44074db666a528149a9e10120e58227a",
+  "files": 30,
+  "numeric_values": 3377,
+  "relative_tolerance": 1e-08,
+  "absolute_tolerance": 1e-10,
+  "differences": [],
+  "baseline_tree": "e11c2dd9fab705b9615529cc6e9e20f5dbe62a26",
+  "equivalent_upstream_commit": "22d39e6e44074db666a528149a9e10120e58227a",
+  "local_comparison_ref": "0655428"
+}

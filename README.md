@@ -2,7 +2,7 @@
 
 ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다. 구현된 코드는
 **Profile → 모델별 JSON 레시피 → 실행 함수 → 전용 Output DTO**를 사용합니다.
-현재 표준 분석·시각화 모듈은 **192개**, 모델·목적별 레시피는 **219개**입니다.
+현재 표준 분석·시각화 모듈은 **211개**, 모델·목적별 레시피는 **238개**입니다.
 기존 단일·독립 두 표본 Z/t도 표준 공개 모듈로 정비하고 이전 호출을 호환 경로로 유지합니다.
 
 ## 기출·모의 복원 및 파라미터 최적화
@@ -10,6 +10,12 @@ ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다.
 - [기출문제 학습 묶음](기출문제/README.md): 기존 15·17·20·22·23회, 모의고사 1~4회, 18·19·21·24·25·26·28회 및 22회 보충. 문제지 PDF와 별도 실행 완료 풀이를 회차별로 제공합니다.
 - [최적화 명세](docs/PARAMETER_OPTIMIZATION.md): GridSearchCV·RandomizedSearchCV·Optuna TPE, Profile/DTO·모델별 JSON 및 RF/LightGBM skeleton. CV는 학습 자료만 사용합니다.
 - [자료 대조·복원 가정](docs/EXAM_RECONSTRUCTION_AUDIT.md): 원 자료가 없는 문항은 합성 연습 자료이며 공식 원문/정답과 구분합니다.
+
+## 도메인 통합 업데이트
+
+- [전체 30묶음·229문항 목록](기출문제/전체목록.md): 회차·문항·실행 환경·모듈 정적 참조.
+- [도메인 아키텍처·신규 API 명세](docs/DOMAIN_ARCHITECTURE.md): 19개 모듈과 시험 풀이 연결·남은 직접 호출 범위.
+- 선택 의존성 환경: `requirements-domain-py37.txt` / `requirements-domain-py312.txt`.
 
 ## 구현 범위
 
@@ -27,8 +33,8 @@ ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다.
 | 추가 검정·진단 | 카이제곱 적합도, 독립성, 정확/근사 McNemar, 두 표본 분산비 F, Shapiro/D’Agostino/Jarque–Bera, Levene/Bartlett/Fligner |
 | TensorFlow | Dense 분류·회귀, SimpleRNN/LSTM/GRU sequence-to-one, 시간 순 분할과 다중 스텝 시계열 예측 |
 
-빈 비모수 onesample/twosample 파일은 구현에 포함하지 않습니다. ARIMA/SARIMA,
-비선형 회귀 및 imbalanced-learn 실행 모듈은 현재 main에 포함되지 않았습니다.
+빈 비모수 onesample/twosample 파일은 구현에 포함하지 않습니다. 생존분석·ARIMA/SARIMA·
+명명된 비선형 회귀·불균형 처리 12종은 [도메인 확장 명세](docs/DOMAIN_ARCHITECTURE.md)를 참고하세요.
 SNA는 사회연결망 분석이며 신경망이 아닙니다. L2 자체는 희소화를 보장하지 않습니다.
 
 ## 빠른 실행

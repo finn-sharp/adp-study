@@ -179,24 +179,16 @@ def word_plot(tokens, top=10):
 
 def seasonal_forecast(df, out, period=12, orders=None):
     """학습 앞 80%에서만 SARIMA 차수 선정; validation 없음은 AIC로 선정."""
-    from statsmodels.tsa.statespace.sarimax import SARIMAX
+    from src.TimeSeries.sarima import run_sarima
     from statsmodels.tsa.stattools import adfuller
     values = pd.Series(df['value'].to_numpy(), index=pd.to_datetime(df['date']))
     train = values.iloc[:int(len(values)*.8)].copy(); test = values.iloc[len(train):]
     train = train.interpolate().ffill().bfill()
-    candidates = []
-    for order in (orders or [(1,0,0), (1,1,0), (0,1,1)]):
-        model = SARIMAX(train, order=order, seasonal_order=(1,0,0,period)).fit(disp=False, maxiter=100)
-        candidates.append((model.aic, order, model))
-    table = pd.DataFrame([{'order': order, 'AIC': aic,
-                          'converged': model.mle_retvals.get('converged', False)}
-                         for aic, order, model in candidates])
+    result = run_sarima(train, overrides={'steps':len(test), 'candidate_orders':[list(o) for o in (orders or [(1,0,0),(1,1,0),(0,1,1)])], 'seasonal_order':[1,0,0,period]})
+    table = pd.DataFrame([{'order':tuple(row['order']), 'AIC':row.get('aic',np.nan), 'converged':row['converged']} for row in result.candidates])
     print(table);table.to_csv(out/'sarima_candidates.csv', index=False)
-    eligible = [entry for entry in candidates if np.isfinite(entry[0]) and entry[2].mle_retvals.get('converged', False)]
-    if not eligible:
-        raise ValueError('수렴한 유한 AIC 후보가 없습니다. 후보나 최대 반복 수를 검토하세요.')
-    _, order, best = min(eligible, key=lambda x: x[0])
-    pred = np.asarray(best.forecast(len(test))); actual = test.to_numpy(); mask = np.isfinite(actual)
+    order = tuple(result.selected_order);best=result.model
+    pred=result.predictions;actual=test.to_numpy();mask=np.isfinite(actual)
     metrics = {'order': order, 'RMSE': float(np.sqrt(mean_squared_error(actual[mask], pred[mask]))),
                'MAE': float(np.mean(np.abs(actual[mask]-pred[mask]))), 'ADF_train_p': float(adfuller(train)[1])}
     print(metrics)
@@ -207,18 +199,10 @@ def seasonal_forecast(df, out, period=12, orders=None):
 
 def kaplan_meier(df):
     """동일 시각 사건을 검열보다 먼저 처리하는 KM 및 log-log Greenwood CI."""
-    rows=[]; survival=1.; greenwood=0.
-    for t in sorted(df.time.unique()):
-        risk = int((df.time >= t).sum()); events = int(((df.time == t) & (df.event == 1)).sum())
-        censor = int(((df.time == t) & (df.event == 0)).sum())
-        survival *= 1 - events / risk
-        if events and risk > events: greenwood += events / (risk*(risk-events))
-        low, high = survival, survival
-        if 0 < survival < 1:
-            z = stats.norm.ppf(.975); se = np.sqrt(greenwood)/abs(np.log(survival))
-            low = np.exp(-np.exp(np.log(-np.log(survival))+z*se))
-            high = np.exp(-np.exp(np.log(-np.log(survival))-z*se))
-        rows.append({'time': t, 'at_risk': risk, 'events': events, 'censored': censor, 'survival': survival, 'low': low, 'high': high})
+    from src.stats.survival.kaplan_meier import run_kaplan_meier
+    km=run_kaplan_meier(df.time,df.event)
+    rows=[dict(time=t,at_risk=n,events=d,censored=c,survival=v,low=lo,high=hi)
+          for t,n,d,c,v,lo,hi in zip(km.times,km.at_risk,km.events,km.censored,km.survival,km.confidence_lower,km.confidence_upper)]
     result=pd.DataFrame(rows);print(result)
     fig, ax=plt.subplots(figsize=(7,3));ax.step([0]+result.time.tolist(),[1]+result.survival.tolist(),where='post');ax.fill_between(result.time,result.low,result.high,step='post',alpha=.2);ax.set(xlabel='Time',ylabel='Survival',ylim=(0,1.05));plt.show()
     return result

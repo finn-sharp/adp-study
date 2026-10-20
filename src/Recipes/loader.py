@@ -37,6 +37,27 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    # Domain architecture extension (2026-10-20)
+    'survival-kaplan-meier': ('src.stats.survival.kaplan_meier', 'KaplanMeierProfile', None, (None,)),
+    'survival-rmst': ('src.stats.survival.rmst', 'RMSTProfile', None, (None,)),
+    'survival-logrank': ('src.stats.survival.logrank', 'LogrankProfile', None, (None,)),
+    'survival-cox': ('src.stats.survival.cox', 'CoxProfile', None, (None,)),
+    'timeseries-arima': ('src.TimeSeries.arima', 'ARIMAProfile', None, (None,)),
+    'timeseries-sarima': ('src.TimeSeries.sarima', 'SARIMAProfile', None, (None,)),
+    'nonlinear-regression': ('src.MachineLearning.NonlinearModels.nonlinear_regression', 'NonlinearRegressionProfile', None, (None,)),
+    'resampling-random-over': ('src.Preprocessing.resampling.random_over', 'RandomOverProfile', None, (None,)),
+    'resampling-smote': ('src.Preprocessing.resampling.smote', 'SMOTEProfile', None, (None,)),
+    'resampling-adasyn': ('src.Preprocessing.resampling.adasyn', 'ADASYNProfile', None, (None,)),
+    'resampling-borderline-smote': ('src.Preprocessing.resampling.borderline_smote', 'BorderlineSMOTEProfile', None, (None,)),
+    'resampling-svm-smote': ('src.Preprocessing.resampling.svm_smote', 'SVMSMOTEProfile', None, (None,)),
+    'resampling-smotenc': ('src.Preprocessing.resampling.smotenc', 'SMOTENCProfile', None, (None,)),
+    'resampling-smoten': ('src.Preprocessing.resampling.smoten', 'SMOTENProfile', None, (None,)),
+    'resampling-random-under': ('src.Preprocessing.resampling.random_under', 'RandomUnderProfile', None, (None,)),
+    'resampling-tomek-links': ('src.Preprocessing.resampling.tomek_links', 'TomekLinksProfile', None, (None,)),
+    'resampling-edited-nearest-neighbours': ('src.Preprocessing.resampling.edited_nearest_neighbours', 'EditedNearestNeighboursProfile', None, (None,)),
+    'resampling-near-miss': ('src.Preprocessing.resampling.near_miss', 'NearMissProfile', None, (None,)),
+    'resampling-cluster-centroids': ('src.Preprocessing.resampling.cluster_centroids', 'ClusterCentroidsProfile', None, (None,)),
+
     'optimization-grid-search': ('src.MachineLearning.Optimization.grid_search', 'GridSearchProfile', 'classification', ('classification', 'regression')),
     'optimization-random-search': ('src.MachineLearning.Optimization.random_search', 'RandomSearchProfile', 'classification', ('classification', 'regression')),
     'optimization-optuna-search': ('src.MachineLearning.Optimization.optuna_search', 'OptunaSearchProfile', 'classification', ('classification', 'regression')),

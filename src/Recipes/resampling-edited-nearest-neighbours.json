@@ -1,0 +1,4 @@
+{
+  "sampling_strategy": "auto",
+  "n_neighbors": 3
+}

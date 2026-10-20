@@ -1,0 +1,97 @@
+{
+  "survival-kaplan-meier": {
+    "module": "src.stats.survival.kaplan_meier",
+    "profile": "KaplanMeierProfile",
+    "recipe": "survival-kaplan-meier.json"
+  },
+  "survival-rmst": {
+    "module": "src.stats.survival.rmst",
+    "profile": "RMSTProfile",
+    "recipe": "survival-rmst.json"
+  },
+  "survival-logrank": {
+    "module": "src.stats.survival.logrank",
+    "profile": "LogrankProfile",
+    "recipe": "survival-logrank.json"
+  },
+  "survival-cox": {
+    "module": "src.stats.survival.cox",
+    "profile": "CoxProfile",
+    "recipe": "survival-cox.json"
+  },
+  "timeseries-arima": {
+    "module": "src.TimeSeries.arima",
+    "profile": "ARIMAProfile",
+    "recipe": "timeseries-arima.json"
+  },
+  "timeseries-sarima": {
+    "module": "src.TimeSeries.sarima",
+    "profile": "SARIMAProfile",
+    "recipe": "timeseries-sarima.json"
+  },
+  "nonlinear-regression": {
+    "module": "src.MachineLearning.NonlinearModels.nonlinear_regression",
+    "profile": "NonlinearRegressionProfile",
+    "recipe": "nonlinear-regression.json"
+  },
+  "resampling-random-over": {
+    "module": "src.Preprocessing.resampling.random_over",
+    "profile": "RandomOverProfile",
+    "recipe": "resampling-random-over.json"
+  },
+  "resampling-smote": {
+    "module": "src.Preprocessing.resampling.smote",
+    "profile": "SMOTEProfile",
+    "recipe": "resampling-smote.json"
+  },
+  "resampling-adasyn": {
+    "module": "src.Preprocessing.resampling.adasyn",
+    "profile": "ADASYNProfile",
+    "recipe": "resampling-adasyn.json"
+  },
+  "resampling-borderline-smote": {
+    "module": "src.Preprocessing.resampling.borderline_smote",
+    "profile": "BorderlineSMOTEProfile",
+    "recipe": "resampling-borderline-smote.json"
+  },
+  "resampling-svm-smote": {
+    "module": "src.Preprocessing.resampling.svm_smote",
+    "profile": "SVMSMOTEProfile",
+    "recipe": "resampling-svm-smote.json"
+  },
+  "resampling-smotenc": {
+    "module": "src.Preprocessing.resampling.smotenc",
+    "profile": "SMOTENCProfile",
+    "recipe": "resampling-smotenc.json"
+  },
+  "resampling-smoten": {
+    "module": "src.Preprocessing.resampling.smoten",
+    "profile": "SMOTENProfile",
+    "recipe": "resampling-smoten.json"
+  },
+  "resampling-random-under": {
+    "module": "src.Preprocessing.resampling.random_under",
+    "profile": "RandomUnderProfile",
+    "recipe": "resampling-random-under.json"
+  },
+  "resampling-tomek-links": {
+    "module": "src.Preprocessing.resampling.tomek_links",
+    "profile": "TomekLinksProfile",
+    "recipe": "resampling-tomek-links.json"
+  },
+  "resampling-edited-nearest-neighbours": {
+    "module": "src.Preprocessing.resampling.edited_nearest_neighbours",
+    "profile": "EditedNearestNeighboursProfile",
+    "recipe": "resampling-edited-nearest-neighbours.json"
+  },
+  "resampling-near-miss": {
+    "module": "src.Preprocessing.resampling.near_miss",
+    "profile": "NearMissProfile",
+    "recipe": "resampling-near-miss.json"
+  },
+  "resampling-cluster-centroids": {
+    "module": "src.Preprocessing.resampling.cluster_centroids",
+    "profile": "ClusterCentroidsProfile",
+    "recipe": "resampling-cluster-centroids.json"
+  }
+}

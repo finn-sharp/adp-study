@@ -1,0 +1,9 @@
+# 공통 도메인 확장 전용 Python 3.12 환경
+numpy==2.3.5
+pandas==2.2.3
+scipy==1.17.0
+scikit-learn==1.8.0
+statsmodels==0.14.6
+imbalanced-learn==0.14.2
+lifelines==0.30.0
+matplotlib==3.10.8

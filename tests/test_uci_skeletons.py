@@ -32,7 +32,7 @@ class UCISkeletonTest(unittest.TestCase):
         with self.assertRaises(ValueError):processor.get_preprocessor()
 
     def test_all_modules_import_without_network_or_training_and_follow_contract(self):
-        domains = {'MachineLearning':24, 'DeepLearning':8, 'Association':3, 'Networks':1, 'Preprocessing':7, 'stats':6}
+        domains = {'MachineLearning':25, 'DeepLearning':8, 'Association':3, 'Networks':1, 'Preprocessing':19, 'stats':10, 'TimeSeries':2}
         with patch.object(_datasets, 'urlopen', side_effect=AssertionError('Import must be offline')), patch.object(_adult, 'urlopen', side_effect=AssertionError('Import must be offline')):
             for domain,count in domains.items():
                 package=importlib.import_module('src.'+domain+'.skeleton')

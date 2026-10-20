@@ -1,0 +1,26 @@
+{
+  "status": "local_checks_passed",
+  "python": "3.12.14",
+  "module_tests": 8,
+  "module_examples": 19,
+  "skeleton_examples": 19,
+  "executed_exam_bundles": 30,
+  "questions": 229,
+  "code_cells": 259,
+  "answer_regression": "DOMAIN_ANSWER_REGRESSION.json",
+  "notes": [
+    "Python 3.7/3.12 actual domain execution passed on the recorded CI commit; final follow-up checks are in PR #18.",
+    "Local full suite passed; TensorFlow tests ran separately in GitHub CI."
+  ],
+  "full_suite": {
+    "tests": 146,
+    "skipped": 7,
+    "status": "passed",
+    "environment": "Python 3.12.14, general models + optional domain dependencies; TensorFlow not installed locally"
+  },
+  "previous_ci_verified_commit": "6d170820a317f8a2e7683a7d7676159834726240",
+  "previous_ci_domain_matrix": {
+    "3.7": "passed tests + 19 modules + 19 skeletons",
+    "3.12": "passed tests + 19 modules + 19 skeletons"
+  }
+}
