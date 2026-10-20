@@ -2,12 +2,14 @@ name: Recent exam practice
 on:
   push:
     paths:
+      - 'src/**'
       - '기출문제/유형연습/**'
       - 'tools/exams/*recent_exam*.py'
       - 'tools/exams/execute_notebooks.py'
       - '.github/workflows/recent-exams.yml'
   pull_request:
     paths:
+      - 'src/**'
       - '기출문제/유형연습/**'
       - 'tools/exams/*recent_exam*.py'
       - 'tools/exams/execute_notebooks.py'

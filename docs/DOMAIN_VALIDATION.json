@@ -1,0 +1,15 @@
+{
+  "status": "local_checks_passed",
+  "python": "3.12.14",
+  "module_tests": 8,
+  "module_examples": 19,
+  "skeleton_examples": 19,
+  "executed_exam_bundles": 30,
+  "questions": 229,
+  "code_cells": 259,
+  "answer_regression": "DOMAIN_ANSWER_REGRESSION.json",
+  "notes": [
+    "Python 3.7 grammar checked locally; actual Python 3.7 execution belongs to domain-extension CI.",
+    "Full pre-existing suite and GitHub CI results are reported separately."
+  ]
+}

@@ -21,7 +21,7 @@
 | `manova` | 해당 없음 | `manova.json` |
 | `posthoc` | 해당 없음 | `posthoc.json` |
 
-기존 모델·검정 레시피는 위 17개 파일입니다. 전체 추가 기법까지 총 145개 파일입니다. 지도 학습·변수 선택의 기본 목적은 선형회귀를 제외하면 `classification`,
+기존 모델·검정 레시피는 위 17개 파일입니다. 전체 추가 기법까지 총 등록된 모델·목적별 기본 파일 전체입니다. 지도 학습·변수 선택의 기본 목적은 선형회귀를 제외하면 `classification`,
 선형회귀에서는 `regression`입니다. 군집·차원 축소·통계·Apriori·SNA에는 task 인자를 지정하지 않습니다.
 
 ## 설정 순서와 형식
@@ -94,7 +94,7 @@ GridSearchCV에서도 각 학습 폴드 내부에서 분리하며, 보류 테스
 키와 형식은 로더가, 수치 범위와 데이터 조건은 공개 실행기가 검증합니다.
 JSON은 설정과 CV 후보만 저장하며 적합 모델이나 결과 자료를 저장하지 않습니다.
 
-`tests/test_recipes.py`는 145개 파일, 설정 우선순위, 파일 변경 반영, 작업 디렉터리 독립성,
+`tests/test_recipes.py`는 등록된 모델·목적별 기본 파일 전체, 설정 우선순위, 파일 변경 반영, 작업 디렉터리 독립성,
 잘못된 설정 거부, 조기 종료 분리 및 CV, 통계 설정 연결을 검증합니다.
 
 ## 추가 분석 기법 레시피
@@ -147,4 +147,9 @@ TensorFlow는 `tf-classification.json`, `tf-regression.json`, `tf-rnn-classifica
 
 ## 파라미터 최적화 레시피 (2026-10-14)
 
-optimization-grid-search, optimization-random-search, optimization-optuna-search를 추가했습니다. 각 분류/회귀 기본 6개 및 RF/LightGBM 전용 12개 JSON으로 검색 공간을 관리합니다. 전체 JSON 219개이며 기본 registry 로드 조합은 207개입니다. 모델별 후보는 skeleton이 명시 recipe_path로 로드합니다. [최적화 명세](PARAMETER_OPTIMIZATION.md)를 참고하세요.
+optimization-grid-search, optimization-random-search, optimization-optuna-search를 추가했습니다. 각 분류/회귀 기본 6개 및 RF/LightGBM 전용 12개 JSON으로 검색 공간을 관리합니다. 전체 JSON 238개이며 기본 registry 로드 조합은 226개입니다. 모델별 후보는 skeleton이 명시 recipe_path로 로드합니다. [최적화 명세](PARAMETER_OPTIMIZATION.md)를 참고하세요.
+
+
+## 도메인 통합 확장 (2026-10-20)
+
+생존분석·시계열·비선형 회귀·표본 보완 19개 모듈은 [도메인 전체 명세](DOMAIN_ARCHITECTURE.md)에 Profile·DTO 필드와 지원 경계를 정리했습니다. 등록부와 문서 집계는 `tools/exams/audit_catalog.py`로 검사합니다.

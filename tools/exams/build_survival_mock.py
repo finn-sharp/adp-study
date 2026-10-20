@@ -52,41 +52,41 @@ print('우측 중도절단: 실제 수명은 기록된 종료 시점보다 길�
 '''),
 '1-2': ('Kaplan-Meier 곱한계 추정을 선택한다. 각 고장 시점에서 S(t)=이전 S×(1-d/n)이며 중도절단은 그 이후 위험집합만 줄인다. 12개월 직전 A의 n=15, d=1, c=1이고 S(12)=(15/16)×(14/15)=0.875다. 동시 고장·절단 순서를 지문의 규약과 일치시킨다.', '''
 a = supplier[supplier.group=='A']
-km_a = KaplanMeierFitter(label='A').fit(a.time, a.event)
-display(km_a.event_table)
+km_a = run_kaplan_meier(a.time,a.event,overrides={'label':'A'})
+display(pd.DataFrame(dict(time=km_a.times,at_risk=km_a.at_risk,observed=km_a.events,censored=km_a.censored)))
 hand12 = (15/16)*(14/15)
-assert np.isclose(km_a.predict(12), hand12)
+assert np.isclose(km_at(km_a,12), hand12)
 print('A: n(12)=15, d(12)=1, c(12)=1, S(12)=',hand12)
 '''),
 '1-3': ('F(t)=1-S(t)는 t개월까지 고장이 발생할 누적확률이며 순간 위험률이 아니다. 조건부 확률은 S(35)/S(25)다. 사건 시점에서는 우연속 계단값을 사용하고 S(25)>0임을 확인한다.', '''
 kms = {}
 rows = []
 for g, d in supplier.groupby('group'):
-    km = KaplanMeierFitter(label=g).fit(d.time,d.event)
+    km = run_kaplan_meier(d.time,d.event,overrides={'label':str(g)})
     kms[g] = km
     for t in [25,30,35]:
-        s = float(km.predict(t)); rows.append(dict(group=g,month=t,S=s,F=1-s))
+        s = float(km_at(km,t)); rows.append(dict(group=g,month=t,S=s,F=1-s))
 probabilities = pd.DataFrame(rows)
 display(probabilities)
-conditional = float(kms['A'].predict(35)/kms['A'].predict(25))
+conditional = float(km_at(kms['A'],35)/km_at(kms['A'],25))
 print('P(T>35 | T>25), A =',conditional)
 record('1-3', probabilities=rows, conditional_A=conditional)
 '''),
 '1-4': ('그림은 우측 중도절단 표시와 Greenwood log-log 점별 신뢰구간, 시점별 위험집합을 포함한다. 곡선이 0.5 이하에 도달하지 않으면 중앙수명 미도달로 보고한다. 60개월은 두 집단 최대 관찰기간 밖이므로 마지막 계단값을 외삽 근거로 제시하지 않는다. 신뢰구간은 전체 곡선의 동시 신뢰대역이 아니다.', '''
 fig, ax = plt.subplots(figsize=(7,4))
-for km in kms.values(): km.plot_survival_function(ax=ax,show_censors=True,ci_show=True)
-add_at_risk_counts(*kms.values(), ax=ax)
+for km in kms.values(): plot_km(km,ax)
+add_risk_counts(kms,ax)
 ax.set(xlabel='Months',ylabel='Survival probability',title='Supplier survival (pointwise 95% CI)')
 plt.tight_layout(); plt.show()
-medians = {g: (float(k.median_survival_time_) if np.isfinite(k.median_survival_time_) else None) for g,k in kms.items()}
+medians = {g: (float(k.median_survival_time) if k.median_survival_time is not None else None) for g,k in kms.items()}
 print('Median (None = not reached):', medians)
 print('60개월: 관찰 범위 밖으로 추정 보고하지 않는다.')
 record('1-4', median_months=medians, outside_followup_60_months='not estimated')
 '''),
 '1-5': ('두 독립 집단의 우측 중도절단 생존분포 비교에 로그순위 검정을 선택한다. H0: 모든 t에서 S_A(t)=S_B(t), H1: 적어도 어떤 t에서 다르다. 독립성·비정보적 중도절단과 충분한 사건 수가 필요하다. 비례위험에서 검정력이 좋고 교차 시 차이를 놓칠 수 있으나 교차 자체가 영가설 하 크기를 자동으로 무효화하는 것은 아니다. 소표본의 점근 p-value를 신중히 해석한다.', '''
 b = supplier[supplier.group=='B']
-lr = logrank_test(a.time,b.time,event_observed_A=a.event,event_observed_B=b.event)
-report('1-5','Log-rank','S_A(t)=S_B(t) for all t','different for some t',lr.test_statistic,lr.p_value,1,
+lr = run_logrank(supplier.time,supplier.event,supplier.group)
+report('1-5','Log-rank','S_A(t)=S_B(t) for all t','different for some t',lr.statistic,lr.p_value,1,
        '공급사별 전체 생존분포가 다르다는 근거')
 print('생존분포 차이는 원인 효과나 특정 보증기간의 경제적 최적성을 증명하지 않는다.')
 '''),
@@ -96,24 +96,25 @@ display(subscription.groupby('group').event.apply(lambda x:1-x.mean()).rename('c
 sub_kms = {}
 fig,ax = plt.subplots(figsize=(7,4))
 for g,d in subscription.groupby('group'):
-    k = KaplanMeierFitter(label=g).fit(d.time,d.event);sub_kms[g]=k
-    k.plot_survival_function(ax=ax,show_censors=True)
+    k = run_kaplan_meier(d.time,d.event,overrides={'label':str(g)});sub_kms[g]=k
+    plot_km(k,ax)
 ax.set(xlabel='Months',ylabel='Retention probability');plt.tight_layout();plt.show()
-retention24={g:float(k.predict(24)) for g,k in sub_kms.items()}
+retention24={g:km_at(k,24) for g,k in sub_kms.items()}
 print('S(24):',retention24);record('2-1',retention24=retention24)
 '''),
 '2-2': ('세 독립 집단의 전체 곡선 비교에 다집단 로그순위 검정을 사용한다. H0: 세 생존함수가 모두 같다. H1: 적어도 하나 다르다. 자유도는 2다. 전체 기각은 모든 쌍이 다름을 뜻하지 않는다. 정책은 비무작위이므로 연관성만 판단한다.', '''
-overall = multivariate_logrank_test(subscription.time,subscription.group,subscription.event)
+overall = run_logrank(subscription.time,subscription.event,subscription.group)
 report('2-2','Multivariate log-rank','S_A=S_B=S_C for all t','at least one differs',
-       overall.test_statistic,overall.p_value,2,'정책별 전체 유지기간 분포가 다르다는 근거')
+       overall.statistic,overall.p_value,2,'정책별 전체 유지기간 분포가 다르다는 근거')
 '''),
 '2-3': ('전체 검정이 기각되면 미리 정한 세 쌍 모두를 비교하고 Holm 방식으로 가족단위 오류율을 통제한다. 쌍별 H0는 두 생존함수 동일, H1은 일부 시점에서 차이. 보정 p-value로 판단하며, 기각하지 못함은 동일성의 증명이 아니다.', '''
 if overall.p_value < ALPHA:
     pairs=[]
     for g,h in combinations(sorted(subscription.group.unique()),2):
         d=subscription[subscription.group==g];e=subscription[subscription.group==h]
-        r=logrank_test(d.time,e.time,event_observed_A=d.event,event_observed_B=e.event)
-        pairs.append(dict(pair=g+'-'+h,statistic=float(r.test_statistic),p_value=float(r.p_value)))
+        pair_data=subscription[subscription.group.isin([g,h])]
+        r=run_logrank(pair_data.time,pair_data.event,pair_data.group)
+        pairs.append(dict(pair=g+'-'+h,statistic=float(r.statistic),p_value=float(r.p_value)))
     adj=holm([x['p_value'] for x in pairs])
     for row,padj in zip(pairs,adj):
         report('2-3','Pairwise log-rank '+row['pair'],'S_left=S_right for all t','different for some t',
@@ -123,7 +124,7 @@ else:
     print('전체 검정 비기각: 사전 규칙에 따라 후속 비교하지 않는다.')
 '''),
 '2-4': ('24개월 제한평균생존시간(RMST)은 0~24개월 생존곡선 아래 면적으로 모든 집단에 같은 제한 시점을 적용한다. 중앙수명은 S(t)가 0.5 이하가 되는 최초 시점이다. 여기서 RMST 차이는 기술통계이며 유의성은 주장하지 않는다. 교차 곡선은 시간별 차이가 상쇄될 수 있어 사전 지정 RMST·시간구간별 효과 등 추가 분석을 고려하되 결과를 보고 유리한 검정을 선택하지 않는다.', '''
-rmst={g:float(restricted_mean_survival_time(k,t=24)) for g,k in sub_kms.items()}
+rmst={g:run_rmst(d.time,d.event,overrides={'tau':24}).estimate for g,d in subscription.groupby('group')}
 print('RMST(0,24), months:',rmst)
 record('2-4',rmst_24=rmst,meaning='descriptive only; no test/CI requested')
 print('비무작위 정책: 교란·비용·고객구성·후속 표본을 검토해야 한다.')
@@ -131,12 +132,14 @@ print('비무작위 정책: 교란·비용·고객구성·후속 표본을 검�
 '3-1': ('Cox 비례위험 모형 h(t|x)=h0(t)exp(β1 temperature10+β2 load10+β3 new_part)을 선택한다. 기준은 온도60도·부하70%·기존 부품이다. temperature10·load10 한 단위는 각각 10도·10%p다. 모형은 비례위험·로그 위험 선형성·독립성·조건부 비정보적 중도절단을 가정한다. 단순 고장여부 분류는 관찰기간 차이를 반영하지 못한다.', '''
 xcols=['temperature10','load10','new_part']
 model_data=equipment[['time','event']+xcols].copy()
-cph=CoxPHFitter().fit(model_data,duration_col='time',event_col='event')
+prediction_profiles=pd.DataFrame({'temperature10':[1.,1.],'load10':[1.,1.],'new_part':[0,1]},index=['old','new'])
+cox_result=run_cox(model_data,new_data=prediction_profiles,overrides={'prediction_times':[24.]})
+cph=cox_result.model
 print('장비 수:',len(model_data),'사건 수:',int(model_data.event.sum()))
-display(cph.summary[['coef','se(coef)','exp(coef)','p']])
+display(cox_result.coefficients[['coef','se(coef)','exp(coef)','p']])
 '''),
 '3-2': ('변수별 H0: βj=0(HR=1), H1: βj≠0. Wald z=β/SE이며 양측 검정이다. HR=exp(β), 95% CI=exp(β±1.96SE)다. 다른 조건이 같은 순간의 위험비이지 누적 고장확률비 또는 생존확률 증가율이 아니다. 세 계수 p값은 개별 탐색 검정이며 가족단위 오류율 통제를 주장하지 않는다.', '''
-coef=cph.summary[['coef','se(coef)','exp(coef)','exp(coef) lower 95%','exp(coef) upper 95%','z','p']]
+coef=cox_result.coefficients[['coef','se(coef)','exp(coef)','exp(coef) lower 95%','exp(coef) upper 95%','z','p']]
 display(coef)
 for name,row in coef.iterrows():
     report('3-2','Cox Wald z: '+name,'beta_'+name+'=0','beta_'+name+' != 0',row['z'],row['p'],None,
@@ -145,15 +148,15 @@ record('3-2',coefficients=coef.reset_index().to_dict(orient='records'))
 '''),
 '3-3': ('temperature10=1, load10=1로 변환한다. Cox 누적 기준위험을 이용한 생존확률과 1-S(24)를 보고한다. 동일 조건의 위험비 exp(β_new)와 고정 시점의 누적 고장확률비는 일반적으로 다르다. 학습 자료에 적합한 조건부 추정이므로 외부 예측 정확도나 인과 개선율로 해석하지 않는다.', '''
 profiles=pd.DataFrame({'temperature10':[1.,1.],'load10':[1.,1.],'new_part':[0,1]},index=['old','new'])
-pred=cph.predict_survival_function(profiles,times=[24]).iloc[0]
+pred=cox_result.predictions.iloc[0]
 display(pd.DataFrame({'S24':pred,'F24':1-pred}))
 hr=float(np.exp(cph.params_['new_part']))
 print('HR new/old:',hr,'F24 new/old:',float((1-pred['new'])/(1-pred['old'])))
 record('3-3',S24=pred.to_dict(),HR=hr)
 '''),
 '3-4': ('Schoenfeld 잔차 기반 PH 진단의 H0는 해당 계수가 시간에 따라 일정함, H1은 시간에 따라 변함이다. 계수=0 검정과 다르다. rank 시간변환과 세 변수 Holm 보정을 사전에 정했다. 보정 후 비기각은 PH 가정이 증명됐다는 뜻이 아니다. 작은 표본의 검정력, 함수형태 오류도 검토한다. 위반 시 층화·시간상호작용·시간가변 계수 등 대안을 고려한다.', '''
-ph=proportional_hazard_test(cph,model_data,time_transform='rank').summary
-ph['p_holm']=holm(ph.p.to_list())
+ph=cox_result.ph_diagnostics.copy()
+ph['p_holm']=ph.adjusted_p_value
 display(ph)
 for name,row in ph.iterrows():
     report('3-4','Schoenfeld rank diagnostic: '+name,'beta_'+name+' constant over time',
@@ -171,7 +174,7 @@ plt.tight_layout();plt.show()
 print('잔차 직선은 시각적 참고선이며 독립적인 확정 검정이 아니다. 비기각은 가정의 증명이 아니다.')
 '''),
 '3-5': ('실제 추정 HR·CI·계수 p와 PH 진단을 함께 확인해 조건부 연관성을 보고한다. 무작위 배정이 없는 합성 관찰 설계로 비용 절감이나 안전 개선의 인과 효과를 주장할 수 없다. 결측·비선형성·미측정 교란·외부 검증·예방정비에 따른 정보성 절단 가능성을 추가 점검한다.', '''
-r=cph.summary.loc['new_part']
+r=cox_result.coefficients.loc['new_part']
 print('신규 부품 HR={:.4f}, 95% CI=({:.4f},{:.4f}), individual p={:.6g}'.format(
     r['exp(coef)'],r['exp(coef) lower 95%'],r['exp(coef) upper 95%'],r['p']))
 print('위 수치는 합성 자료의 조건부 연관성이다. 부품 도입은 비용·안전·실험 설계·외부 검증을 추가해 판단한다.')
@@ -188,10 +191,33 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from IPython.display import display
-from lifelines import KaplanMeierFitter, CoxPHFitter
-from lifelines.statistics import logrank_test, multivariate_logrank_test, proportional_hazard_test
-from lifelines.plotting import add_at_risk_counts
-from lifelines.utils import restricted_mean_survival_time
+import sys
+from pathlib import Path
+repo=next(p for p in [Path.cwd()]+list(Path.cwd().parents) if (p/'src/Recipes').is_dir())
+sys.path.insert(0,str(repo))
+from src.stats.survival.kaplan_meier import run_kaplan_meier
+from src.stats.survival.rmst import run_rmst
+from src.stats.survival.logrank import run_logrank
+from src.stats.survival.cox import run_cox
+
+def km_at(km,t):
+    return float(np.r_[1.,km.survival][np.searchsorted(km.times,t,side='right')])
+
+def plot_km(km,ax):
+    times=np.r_[0.,km.times]; values=np.r_[1.,km.survival]
+    line=ax.step(times,values,where='post',label=km.parameters['label'])[0]
+    ax.fill_between(times,np.r_[1.,km.confidence_lower],np.r_[1.,km.confidence_upper],step='post',alpha=.15,color=line.get_color())
+    mask=km.censored>0;ax.plot(km.times[mask],km.survival[mask],'+',color=line.get_color())
+    ax.legend()
+
+def add_risk_counts(kms,ax):
+    ticks=[0,10,20,30,40]
+    rows=[];labels=[]
+    for g,km in kms.items():
+        removed=km.events+km.censored
+        rows.append([str(int(km.sample_size-removed[km.times<t].sum())) for t in ticks]);labels.append(g)
+    table=ax.table(cellText=rows,rowLabels=labels,colLabels=ticks,loc='bottom',bbox=[0,-.4,1,.23])
+    table.auto_set_font_size(False);table.set_fontsize(8)
 ALPHA=.05
 results=[]
 def record(question,**kwargs):

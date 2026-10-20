@@ -4,6 +4,8 @@
 각 문제는 독립 Context에 자료/중간결과/실제 수치 답안을 보존한다.
 """
 from pathlib import Path
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[3]))
 from itertools import combinations
 import json
 import warnings
@@ -24,8 +26,9 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor, Grad
 from sklearn.decomposition import PCA, FactorAnalysis
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, f1_score, precision_score, recall_score, roc_auc_score, roc_curve, confusion_matrix, classification_report
 from imblearn.pipeline import Pipeline as ImbPipeline
-from imblearn.over_sampling import RandomOverSampler
-from imblearn.under_sampling import RandomUnderSampler
+from src.Preprocessing.resampling._common import load_resampler
+from src.Preprocessing.resampling.random_over import run_random_over
+from src.TimeSeries.arima import run_arima
 import statsmodels.api as sm
 from statsmodels.stats.diagnostic import het_breuschpagan, linear_reset, acorr_ljungbox
 from statsmodels.stats.stattools import jarque_bera
@@ -84,7 +87,7 @@ def classpipe(model=None,cat=None,num=None,sampling=None):
                          ('cat',Pipeline([('fill',SimpleImputer(strategy='most_frequent')),('oh',OneHotEncoder(drop='first',handle_unknown='ignore',sparse_output=False))]),cat)])
  else:pre=None
  steps=[('pre',pre)] if pre is not None else [('fill',SimpleImputer(strategy='median')),('scale',StandardScaler())]
- if sampling:steps.append(('sample',RandomOverSampler(random_state=7) if sampling=='over' else RandomUnderSampler(random_state=7)))
+ if sampling:steps.append(('sample',load_resampler('random_over' if sampling=='over' else 'random_under',overrides={'random_state':7})))
  return ImbPipeline(steps+[('model',model)])
 
 
@@ -164,7 +167,7 @@ def accident_tests(c):
  for x,adj in zip(['weather','road'],multipletests(p,method='holm')[1]):categorical(c,d.loc[tr],x,'severe',adj)
 
 def accident_sampling(c):
- d=c.state['accident'];d=d[d.id%5!=0];X,y=RandomOverSampler(random_state=7).fit_resample(d[['weather','road','speed','weekend']],d.severe)
+ d=c.state['accident'];d=d[d.id%5!=0];sampled=run_random_over(d[['weather','road','speed','weekend']],d.severe,overrides={'random_state':7});X,y=sampled.X_resampled,sampled.y_resampled
  c.emit('class counts',dict(before=d.severe.value_counts(),after=y.value_counts()));assert set(X.weather)<=set(d.weather)
 
 def accident_models(c):
@@ -315,12 +318,11 @@ def delay(c):
 
 def arma(c):
  y=c.csv('series').value;cut=int(len(y)*.8);train=y.iloc[:cut];test=y.iloc[cut:];adf=adfuller(train,autolag='AIC');c.test('ADF','unit root','stationary',adf[0],adf[1],context='단위근 가설의 기각')
- models={};scores=[]
- for p,q in [(1,0),(2,0),(1,1),(2,1)]:
-  m=ARIMA(train,order=(p,0,q),trend='c').fit();models[(p,q)]=m;scores.append(dict(p=p,q=q,AIC=float(m.aic),converged=bool(m.mle_retvals.get('converged',True))))
- eligible=[s for s in scores if s['converged']];assert eligible;chosen=min(eligible,key=lambda x:x['AIC']);m=models[(chosen['p'],chosen['q'])]
+ result=run_arima(train,overrides={'steps':len(test),'trend':'c','candidate_orders':[[1,0,0],[2,0,0],[1,0,1],[2,0,1]]})
+ scores=[dict(p=row['order'][0],q=row['order'][2],AIC=row['aic'],converged=row['converged']) for row in result.candidates]
+ chosen=min([row for row in scores if row['converged']],key=lambda row:row['AIC']);m=result.model
  lb=acorr_ljungbox(m.resid,lags=[10],model_df=chosen['p']+chosen['q'],return_df=True).iloc[0]
- c.emit('ARMA candidates/forecast',dict(candidates=scores,selected=chosen,holdout_RMSE=np.sqrt(mean_squared_error(test,m.forecast(len(test))))))
+ c.emit('ARMA candidates/forecast',dict(candidates=scores,selected=chosen,holdout_RMSE=np.sqrt(mean_squared_error(test,result.predictions))))
  c.test('Ljung-Box lag10','no residual autocorrelation through lag10','some residual autocorrelation',lb.lb_stat,lb.lb_pvalue,10-chosen['p']-chosen['q'],context='잔차 자기상관')
  fig,axes=plt.subplots(1,2,figsize=(7,3));plot_acf(train,lags=20,ax=axes[0]);plot_pacf(train,lags=20,ax=axes[1],method='ywm');c.fig('acf_pacf')
 

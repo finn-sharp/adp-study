@@ -1,6 +1,6 @@
 # 전체 분석 모듈 명세
 
-현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 189개, 모델·목적별 JSON 레시피는 201개입니다.
+현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 211개, 모델·목적별 JSON 레시피는 238개입니다.
 기존 단일·독립 두 표본 Z·t 검정 파일 2개도 아래에 별도로 명세합니다.
 비모수 검정의 빈 파일은 구현 완료로 집계하지 않습니다.
 
@@ -1832,3 +1832,8 @@ ANOVA/사후검정은 parametric/Average/anova, MANOVA는 parametric/Multivariat
 | MachineLearning/Optimization/optuna_search | OptunaSearchProfile | OptunaSearchOutputDTO | run_optuna_search |
 
 공통 설정은 task/scoring/cv/split/shuffle/random_state/search_space/n_iter/n_jobs/refit/timeout/pruning입니다. 공통 결과는 method/task/scoring/best_params/best_score/cv_results/folds/n_candidates/elapsed_seconds/model/study입니다. 모델·study 객체는 기본 JSON에서 제외합니다. 18개 기본·RF·LightGBM 분류/회귀 레시피 및 방법별 skeleton과 연결합니다. 상세 입력 조건·음수 손실 scorer·그룹/시간 분할은 [최적화 명세](PARAMETER_OPTIMIZATION.md)를 참고하세요.
+
+
+## 도메인 통합 확장 (2026-10-20)
+
+생존분석·시계열·비선형 회귀·표본 보완 19개 모듈은 [도메인 전체 명세](DOMAIN_ARCHITECTURE.md)에 Profile·DTO 필드와 지원 경계를 정리했습니다. 등록부와 문서 집계는 `tools/exams/audit_catalog.py`로 검사합니다.

@@ -28,7 +28,7 @@
       "pdf_pages": 2,
       "figures": 10,
       "status": "passed",
-      "notebook_sha256": "b49ba760abd04e079123729f1c2c7d6f6797592df90a2c3cc42d3e98d8b6bddb",
+      "notebook_sha256": "3003025b01c2e67f57d8adf0add42116eb1e04049f3e84295ab9d5138d4cbaf9",
       "pdf_sha256": "9302c7dbb357a1426665f0e17c3ce76c9f0991e4994b10dd9c2acf98ff60a6e5"
     },
     {
@@ -48,7 +48,7 @@
       "pdf_pages": 2,
       "figures": 6,
       "status": "passed",
-      "notebook_sha256": "4501a5c6ced196312e6632f6cb335ce3aca39dc3860ca7cee3517c60f8c3db84",
+      "notebook_sha256": "5574569b0ce9f244c43a1dacef3bec732a706c5eefaa8198f739ea6e4ee02b92",
       "pdf_sha256": "e251138fb479640f883c5c58cb6044103f1bbb2410aa0b909836900de297865f"
     },
     {
@@ -58,7 +58,7 @@
       "pdf_pages": 1,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "21a443f30b5eb169dff07e8ba59d381fef2df92473e548ddc8e431d35939047a",
+      "notebook_sha256": "81bbf3bc47569546879a647c85f50f548a02bbb6e4eb6266a3f324845ef1ce6d",
       "pdf_sha256": "7eb11073ae4c6128112811f00bcf74060e404d2d19debd9b2154a1478f579a93"
     },
     {
@@ -158,7 +158,7 @@
       "pdf_pages": 4,
       "figures": 4,
       "status": "passed",
-      "notebook_sha256": "e4c7e08780b1aad48b9c685aa805b4fe0d9c57aeddddf200a04e8f464d046055",
+      "notebook_sha256": "2fc51ea4326366348d981258850f60e96277fcfb49c2f1f82f0de6dd7bc2121c",
       "pdf_sha256": "024774cfa2b6a4caeb382289647b48736882115ec077eb267637090a2a3ffd4f"
     },
     {
@@ -178,7 +178,7 @@
       "pdf_pages": 3,
       "figures": 2,
       "status": "passed",
-      "notebook_sha256": "7f57996449793e3440ce4304fce4059529315a5406be021f1acb7f8932e75f11",
+      "notebook_sha256": "d86c133c9bad30ea28c3ff8f626a91597750027c10766032c5210a83bf02072c",
       "pdf_sha256": "a4da9b925dfd170d577f767be1479e67b75a2fdc835e7dfcf96e4342e40699d4"
     },
     {
@@ -630,6 +630,198 @@
       "bytes": 579603,
       "sha256": "7e779a01dc310e4e5094b6b3f6c05da31ce2c0ada1e53aebde4ef12c995c5cca",
       "uncompressed_sha256": "7e779a01dc310e4e5094b6b3f6c05da31ce2c0ada1e53aebde4ef12c995c5cca"
+    },
+    {
+      "path": "모의고사/생존분석_통계/data/equipment.csv",
+      "bytes": 15323,
+      "sha256": "7ddef495c83251a48f0f41e35022363eb8a8e7c51be9e96caa2273dfb3f0fdf3",
+      "uncompressed_sha256": "7ddef495c83251a48f0f41e35022363eb8a8e7c51be9e96caa2273dfb3f0fdf3"
+    },
+    {
+      "path": "모의고사/생존분석_통계/data/subscription.csv",
+      "bytes": 4604,
+      "sha256": "020266e7c970786275351ac2417cdf6f340bae9c1d52f14f4368454be53434e8",
+      "uncompressed_sha256": "020266e7c970786275351ac2417cdf6f340bae9c1d52f14f4368454be53434e8"
+    },
+    {
+      "path": "모의고사/생존분석_통계/data/supplier.csv",
+      "bytes": 330,
+      "sha256": "91fef25f7f0167febd9fdd517c6f2aa4c1de5da1c750f97615bf2f766eb3ae20",
+      "uncompressed_sha256": "91fef25f7f0167febd9fdd517c6f2aa4c1de5da1c750f97615bf2f766eb3ae20"
+    },
+    {
+      "path": "유형연습/30회/data/accident.csv",
+      "bytes": 9385,
+      "sha256": "77e2d68f3f51d31c30d52fd24788060ad96d84174c8fb80826dced60fe996068",
+      "uncompressed_sha256": "77e2d68f3f51d31c30d52fd24788060ad96d84174c8fb80826dced60fe996068"
+    },
+    {
+      "path": "유형연습/30회/data/headset.csv",
+      "bytes": 4319,
+      "sha256": "3bb31cc6972cd33504bbb441c8c8fac785c73e9bc1783b407d70b8be23091d72",
+      "uncompressed_sha256": "3bb31cc6972cd33504bbb441c8c8fac785c73e9bc1783b407d70b8be23091d72"
+    },
+    {
+      "path": "유형연습/30회/data/health.csv",
+      "bytes": 11948,
+      "sha256": "721c3679eda6435f295a208b7814e4f6663c37ec9605840acdb2aec752f60a7c",
+      "uncompressed_sha256": "721c3679eda6435f295a208b7814e4f6663c37ec9605840acdb2aec752f60a7c"
+    },
+    {
+      "path": "유형연습/30회/data/transport.json",
+      "bytes": 220,
+      "sha256": "2fa7060e306caf543029ba265e0817ac6e935ae2ea5ed873405f694938bb80c1",
+      "uncompressed_sha256": "2fa7060e306caf543029ba265e0817ac6e935ae2ea5ed873405f694938bb80c1"
+    },
+    {
+      "path": "유형연습/31회/data/ads.csv",
+      "bytes": 10481,
+      "sha256": "54153e6361d28fb91e68cebb89b5d5a46bc0146d68f3443309daca7efa822307",
+      "uncompressed_sha256": "54153e6361d28fb91e68cebb89b5d5a46bc0146d68f3443309daca7efa822307"
+    },
+    {
+      "path": "유형연습/31회/data/checkup.csv",
+      "bytes": 12867,
+      "sha256": "0bdf1f6efce0f9f91655e8750f44ba1449388182af924cf5b35ae591d5b61224",
+      "uncompressed_sha256": "0bdf1f6efce0f9f91655e8750f44ba1449388182af924cf5b35ae591d5b61224"
+    },
+    {
+      "path": "유형연습/31회/data/obesity.csv",
+      "bytes": 7791,
+      "sha256": "b93b190aa4870608d8a44ce25733284291f7da8ef6df3ff6efdff1c5f4b3ddcc",
+      "uncompressed_sha256": "b93b190aa4870608d8a44ce25733284291f7da8ef6df3ff6efdff1c5f4b3ddcc"
+    },
+    {
+      "path": "유형연습/31회/data/기준표.json",
+      "bytes": 139,
+      "sha256": "9bf56652e76e2f6a50befc4a2ab5ec074ab02d85d64eb3bb3f7e026a0aaa3de0",
+      "uncompressed_sha256": "9bf56652e76e2f6a50befc4a2ab5ec074ab02d85d64eb3bb3f7e026a0aaa3de0"
+    },
+    {
+      "path": "유형연습/32회/data/category.csv",
+      "bytes": 109,
+      "sha256": "83ed7f9926f510b53ed52b0f367c02c2c00a5a62d2bcc178875180d53fbcef9d",
+      "uncompressed_sha256": "83ed7f9926f510b53ed52b0f367c02c2c00a5a62d2bcc178875180d53fbcef9d"
+    },
+    {
+      "path": "유형연습/32회/data/housing.csv",
+      "bytes": 18050,
+      "sha256": "27609a4d59da1f76d9755bee8aeefdcdbed4f8e1e1b102bfab1d5c7ab8ecdf10",
+      "uncompressed_sha256": "27609a4d59da1f76d9755bee8aeefdcdbed4f8e1e1b102bfab1d5c7ab8ecdf10"
+    },
+    {
+      "path": "유형연습/32회/data/salary.csv",
+      "bytes": 3108,
+      "sha256": "2cae96ddb1776b1d55d09ae6661a9e3bdd2e8ca575334dbda67adfbf05eeb783",
+      "uncompressed_sha256": "2cae96ddb1776b1d55d09ae6661a9e3bdd2e8ca575334dbda67adfbf05eeb783"
+    },
+    {
+      "path": "유형연습/33회/data/counts.csv",
+      "bytes": 807,
+      "sha256": "26fb7ded0ca9b30afdcb98a486e65f8cb5851d3d0a364062dcf4d17352eb1ddc",
+      "uncompressed_sha256": "26fb7ded0ca9b30afdcb98a486e65f8cb5851d3d0a364062dcf4d17352eb1ddc"
+    },
+    {
+      "path": "유형연습/33회/data/defect.csv",
+      "bytes": 2590,
+      "sha256": "227d08d1d34f9d35bccf832814520132f01d839788fe30f046a0423ea84b74c2",
+      "uncompressed_sha256": "227d08d1d34f9d35bccf832814520132f01d839788fe30f046a0423ea84b74c2"
+    },
+    {
+      "path": "유형연습/33회/data/delay.csv",
+      "bytes": 3389,
+      "sha256": "150fa6e98c18d93696d3b6517daab50907209f88a5483650e9f3830303d60038",
+      "uncompressed_sha256": "150fa6e98c18d93696d3b6517daab50907209f88a5483650e9f3830303d60038"
+    },
+    {
+      "path": "유형연습/33회/data/hepatitis.csv",
+      "bytes": 18564,
+      "sha256": "e0a853c5fb9d318ea7e254dcc71b30110339bb866266c95381dc0e7119966d45",
+      "uncompressed_sha256": "e0a853c5fb9d318ea7e254dcc71b30110339bb866266c95381dc0e7119966d45"
+    },
+    {
+      "path": "유형연습/33회/data/series.csv",
+      "bytes": 2624,
+      "sha256": "d4059a72d3b50366f667cda9c56ad2536afc83ad7610b13384840f117372a2ee",
+      "uncompressed_sha256": "d4059a72d3b50366f667cda9c56ad2536afc83ad7610b13384840f117372a2ee"
+    },
+    {
+      "path": "유형연습/33회/data/subway.csv",
+      "bytes": 7476,
+      "sha256": "f5521fb1d9b6551aed8d657419b69d8809d86f71436bf4a82c072fb4f129d0a7",
+      "uncompressed_sha256": "f5521fb1d9b6551aed8d657419b69d8809d86f71436bf4a82c072fb4f129d0a7"
+    },
+    {
+      "path": "유형연습/33회/data/weather.csv",
+      "bytes": 2431,
+      "sha256": "ea7a8123226826dac5e45c2905b759ac904a05b7dcb9049efd5f7c28b815214b",
+      "uncompressed_sha256": "ea7a8123226826dac5e45c2905b759ac904a05b7dcb9049efd5f7c28b815214b"
+    },
+    {
+      "path": "유형연습/34회/data/clinical.csv",
+      "bytes": 14227,
+      "sha256": "41351577a351b5e654c631d68c880f5a8d3e41bc0e7514e1d2f9f34d8d4290a6",
+      "uncompressed_sha256": "41351577a351b5e654c631d68c880f5a8d3e41bc0e7514e1d2f9f34d8d4290a6"
+    },
+    {
+      "path": "유형연습/34회/data/learning.csv",
+      "bytes": 3529,
+      "sha256": "4eca279d0239b79990c1e90da0418c6b870b1ef21d804f0e65b190bafff053fe",
+      "uncompressed_sha256": "4eca279d0239b79990c1e90da0418c6b870b1ef21d804f0e65b190bafff053fe"
+    },
+    {
+      "path": "유형연습/34회/data/power.csv",
+      "bytes": 6069,
+      "sha256": "ead964a100169f38eb7b680d1c442236e08c3e26f47fb0d9d35fdd1ac9e89a18",
+      "uncompressed_sha256": "ead964a100169f38eb7b680d1c442236e08c3e26f47fb0d9d35fdd1ac9e89a18"
+    },
+    {
+      "path": "유형연습/34회/data/score.csv",
+      "bytes": 7229,
+      "sha256": "010669a4bc9653691ab9a5311595d6d3cc51f7d06e7cd8780b9c3c266726ff5a",
+      "uncompressed_sha256": "010669a4bc9653691ab9a5311595d6d3cc51f7d06e7cd8780b9c3c266726ff5a"
+    },
+    {
+      "path": "유형연습/34회/data/weather_power.csv",
+      "bytes": 2555,
+      "sha256": "619f2df929ed41b7130f8037a208876d831dee21f21e14f6cf18cca4e265aa47",
+      "uncompressed_sha256": "619f2df929ed41b7130f8037a208876d831dee21f21e14f6cf18cca4e265aa47"
+    },
+    {
+      "path": "유형연습/35회/data/rides.csv",
+      "bytes": 670,
+      "sha256": "0c5429a35fd3345880bd3cb7ba09f791ff6bf714c7b37ca72d45a968876aa6da",
+      "uncompressed_sha256": "0c5429a35fd3345880bd3cb7ba09f791ff6bf714c7b37ca72d45a968876aa6da"
+    },
+    {
+      "path": "유형연습/35회/data/stations.csv",
+      "bytes": 66,
+      "sha256": "d09546d6f9103cea2f121f2c73eb8e8556eeda51b7782cec3c559d6d03ae0bc9",
+      "uncompressed_sha256": "d09546d6f9103cea2f121f2c73eb8e8556eeda51b7782cec3c559d6d03ae0bc9"
+    },
+    {
+      "path": "유형연습/35회/data/weather_geo.csv",
+      "bytes": 1380,
+      "sha256": "89de65ebfc58162fa9e43b5818dafc80bac923adf53b187aac8295b80fb79e6b",
+      "uncompressed_sha256": "89de65ebfc58162fa9e43b5818dafc80bac923adf53b187aac8295b80fb79e6b"
+    },
+    {
+      "path": "유형연습/36회/data/cascade.csv",
+      "bytes": 15895,
+      "sha256": "192a76ed94dadafcbcb4b83431473d8eb8df5109c84c46d7807c997caea482fe",
+      "uncompressed_sha256": "192a76ed94dadafcbcb4b83431473d8eb8df5109c84c46d7807c997caea482fe"
+    },
+    {
+      "path": "유형연습/36회/data/records.json",
+      "bytes": 2970,
+      "sha256": "c99b532c7f374394e4947d97474840380f96705e7cf4468839085bdeaceef591",
+      "uncompressed_sha256": "c99b532c7f374394e4947d97474840380f96705e7cf4468839085bdeaceef591"
+    },
+    {
+      "path": "유형연습/36회/data/survey.csv",
+      "bytes": 17513,
+      "sha256": "f0270ee5947826e6e82eebb02c94db22d18137e0e44493934e19ed754811e71a",
+      "uncompressed_sha256": "f0270ee5947826e6e82eebb02c94db22d18137e0e44493934e19ed754811e71a"
     }
   ],
   "total_notebooks": 22,

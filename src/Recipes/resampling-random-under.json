@@ -1,0 +1,4 @@
+{
+  "sampling_strategy": "auto",
+  "random_state": 1234
+}

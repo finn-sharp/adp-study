@@ -1,0 +1,14 @@
+# 공통 도메인 확장 전용 Python 3.7.17 환경
+numpy==1.21.6
+pandas==1.3.5
+scipy==1.7.3
+scikit-learn==1.0.2
+statsmodels==0.13.2
+imbalanced-learn==0.9.0
+lifelines==0.27.0
+matplotlib==3.5.3
+formulaic==0.5.2
+autograd==1.5
+autograd-gamma==0.5.0
+joblib==1.1.1
+patsy==0.5.6

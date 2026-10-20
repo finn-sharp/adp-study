@@ -2,12 +2,14 @@ name: Survival statistics mock
 on:
   push:
     paths:
+      - 'src/**'
       - '기출문제/모의고사/생존분석_통계/**'
       - 'tools/exams/*survival_mock.py'
       - 'tools/exams/execute_notebooks.py'
       - '.github/workflows/survival-mock.yml'
   pull_request:
     paths:
+      - 'src/**'
       - '기출문제/모의고사/생존분석_통계/**'
       - 'tools/exams/*survival_mock.py'
       - 'tools/exams/execute_notebooks.py'
