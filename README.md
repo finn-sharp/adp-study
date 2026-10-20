@@ -1,202 +1,196 @@
 # ADP 분석 모듈과 학습 자료
 
-ADP 학습 노트북과 재사용 가능한 분석 실행기를 관리합니다. 구현된 코드는
-**Profile → 모델별 JSON 레시피 → 실행 함수 → 전용 Output DTO**를 사용합니다.
-현재 표준 분석·시각화 모듈은 **211개**, 모델·목적별 레시피는 **238개**입니다.
-기존 단일·독립 두 표본 Z/t도 표준 공개 모듈로 정비하고 이전 호출을 호환 경로로 유지합니다.
+ADP 실기 학습에 필요한 분석 기법을 재사용 가능한 Python 모듈로 구현하고, 기출 유형·모의고사의 문제지와 실행 풀이를 함께 관리합니다.
 
-## 기출·모의 복원 및 파라미터 최적화
+현재 표준 분석·시각화 모듈은 **211개**, 모델·목적별 JSON 레시피는 **238개**입니다. 학습 자료는 **30묶음·229문항**이며, **259개 코드 셀·92개 그림·73쪽 문제지**를 포함합니다. 집계는 등록부와 회차별 명세를 기준으로 관리합니다.
 
-- [기출문제 학습 묶음](기출문제/README.md): 기존 15·17·20·22·23회, 모의고사 1~4회, 18·19·21·24·25·26·28회 및 22회 보충. 문제지 PDF와 별도 실행 완료 풀이를 회차별로 제공합니다.
-- [최적화 명세](docs/PARAMETER_OPTIMIZATION.md): GridSearchCV·RandomizedSearchCV·Optuna TPE, Profile/DTO·모델별 JSON 및 RF/LightGBM skeleton. CV는 학습 자료만 사용합니다.
-- [자료 대조·복원 가정](docs/EXAM_RECONSTRUCTION_AUDIT.md): 원 자료가 없는 문항은 합성 연습 자료이며 공식 원문/정답과 구분합니다.
+- [전체 학습 자료 목록](기출문제/전체목록.md): 회차·문항 수·실행 환경과 문항별 모듈 참조
+- [도메인 아키텍처](docs/DOMAIN_ARCHITECTURE.md): 역할 분리·신규 API·전체 Profile/DTO 필드
+- [분석 기법 카탈로그](docs/ANALYSIS_CATALOG.md): 기존 분석 모듈의 구현 범위
+- [레시피 사용법](docs/RECIPES.md): JSON 설정·사용자 레시피·일회성 재정의
 
-## 도메인 통합 업데이트
+## 빠른 시작
 
-- [전체 30묶음·229문항 목록](기출문제/전체목록.md): 회차·문항·실행 환경·모듈 정적 참조.
-- [도메인 아키텍처·신규 API 명세](docs/DOMAIN_ARCHITECTURE.md): 19개 모듈과 시험 풀이 연결·남은 직접 호출 범위.
-- 선택 의존성 환경: `requirements-domain-py37.txt` / `requirements-domain-py312.txt`.
-
-## 구현 범위
-
-| 영역 | 구현 내용 |
-| --- | --- |
-| Feature 전처리 | 수치형 결측·스케일·power, 범주형 결측·onehot/ordinal/frequency, FeatureSpec 순서 조합, 별도 RoPE |
-| 상관분석 | Pearson/Spearman/Kendall, Cramér V·signed Phi, 행렬 정리·삼각·거리 변환 |
-| 지도 학습 | XGBoost, CatBoost, LightGBM, AdaBoost, MLP, Perceptron, Adaline, 단순·다중 선형회귀, Gaussian/Multinomial/Bernoulli/Complement Naive Bayes |
-| 군집·거리 | K-means, DBSCAN, HDBSCAN, 자기 포함 k-distance 진단 |
-| 차원 축소 | PCA, 지도 LDA, UMAP, t-SNE, SOM, metric/nonmetric MDS |
-| 변수 선택 | Forward/Backward/CV Stepwise, L1/L2 계수 기반 선택 |
-| 연관·연결망 | Apriori와 support/confidence/lift 등 규칙 지표, SNA 중심성·PageRank·커뮤니티 |
-| 평균·다변량 검정 | 기존 Z/t, 고전/Welch 일원 ANOVA, 이원 ANOVA Type I·II·III, 일원 MANOVA, Tukey 및 Student/Welch 쌍별 t+Holm/Bonferroni |
-| 통계 PDF 확장 | 분포16종, 모비율·대응t·단일분산χ², 순위·반복측정, OR/RR·RxC Fisher·CMH·Bowker·Cochran Q, AD·KS/Lilliefors·Hotelling·Box M·ADF |
-| 추가 검정·진단 | 카이제곱 적합도, 독립성, 정확/근사 McNemar, 두 표본 분산비 F, Shapiro/D’Agostino/Jarque–Bera, Levene/Bartlett/Fligner |
-| TensorFlow | Dense 분류·회귀, SimpleRNN/LSTM/GRU sequence-to-one, 시간 순 분할과 다중 스텝 시계열 예측 |
-
-빈 비모수 onesample/twosample 파일은 구현에 포함하지 않습니다. 생존분석·ARIMA/SARIMA·
-명명된 비선형 회귀·불균형 처리 12종은 [도메인 확장 명세](docs/DOMAIN_ARCHITECTURE.md)를 참고하세요.
-SNA는 사회연결망 분석이며 신경망이 아닙니다. L2 자체는 희소화를 보장하지 않습니다.
-
-## 빠른 실행
-
-저장소 루트에서 실행하세요. Python 3.7/3.12별 의존성을 분리합니다.
+아래 명령은 저장소 루트의 bash/zsh에서 실행합니다. 먼저 Python 3.12의 별도 환경에서 생존분석·시계열·비선형 회귀·불균형 처리 예제를 실행할 수 있습니다.
 
 ```bash
-# 일반 분석 환경 (Python 3.12)
-python -m pip install -r requirements-models-py312.txt
-python -m unittest discover -s tests -v
-python -m src.stats.tests.nonParametric.independence
+python3.12 -m venv venv/domain
+source venv/domain/bin/activate
+python -m pip install -r requirements-domain-py312.txt
 
-# 별도 TensorFlow 환경 (Python 3.12; NumPy 핀이 달라 위 환경과 혼합하지 않음)
-python -m pip install -r requirements-tensorflow-py312.txt
-python -m unittest discover -s tests -p 'test_tensorflow_modules.py' -v
-python -m src.DeepLearning.TensorFlow.time_series
+# 고정 예제 데이터 → JSON 레시피 → 실행기 → 전용 DTO
+python -m src.stats.skeleton.kaplan_meier
+python -m src.TimeSeries.skeleton.arima
+python -m src.MachineLearning.skeleton.nonlinear_regression
+
+# 신규 도메인의 수치·입력·결과 계약 검증
+python -m unittest discover -s tests -p 'test_domain_extension.py' -v
 ```
 
-Python 3.7 일반 환경은 `requirements-models-py37.txt`를 사용합니다. HDBSCAN 빌드 전
-`numpy==1.21.6 Cython==0.29.37 wheel==0.38.4`를 설치하고
-`python -m pip install --no-build-isolation -r requirements-models-py37.txt`로 설치합니다.
-TensorFlow 3.7 환경은 `requirements-tensorflow-py37.txt`로 별도 설치합니다.
-`requirements.txt`는 기존 학습용 설정이며 새 표준 모듈 전체의 설치 명세가 아닙니다.
+Python에서 직접 호출할 때도 수식을 다시 정의할 필요 없이 데이터와 설정을 전달합니다.
 
 ```python
-from src.MachineLearning.Clustering.dbscan import run_dbscan
-from src.stats.tests.nonParametric.independence import run_independence
+from src.stats.survival.kaplan_meier import run_kaplan_meier
 
-result = run_independence([[30, 20], [10, 40]], overrides={"correction": False})
-print(result.p_value, result.reject_h0)
+result = run_kaplan_meier(
+    durations=[1, 2, 2, 3, 4],
+    event_observed=[1, 1, 0, 0, 1],  # 사건=1, 우측 중도절단=0
+    overrides={"label": "공급사 A", "evaluation_times": [0, 1, 2, 3, 4]},
+)
+
+print(result.survival_at_times)     # [1.0, 0.8, 0.6, 0.6, 0.0]
+print(result.median_survival_time)  # 4.0
 print(result.to_json(indent=2))
-# 군집: run_dbscan(X, overrides={"eps": 0.5, "min_samples": 5})
 ```
 
-Profile 생략 시 `src/Recipes`의 모델별 JSON을 매번 읽습니다. 설정 우선순위는
-JSON → overrides이며 명시적 Profile과 레시피 옵션을 동시에 지정하면 오류입니다.
-모델 객체는 DTO 속성으로 접근하며 기본 사전/JSON에서는 제외합니다.
+## 분석 도메인
 
-## 문서와 저장소 구조
+모듈 수는 `src/Recipes/loader.py`의 등록 항목 기준입니다. 한 모듈이 여러 분석 목적을 지원할 수 있어 모듈 수와 레시피 수는 다릅니다.
 
-| 경로·문서 | 내용 |
+| 도메인 | 모듈 | 주요 구현 | 경로 |
+| --- | ---: | --- | --- |
+| 통계 | 62 | 분포 16종, 평균·비율·분산·비모수 검정, ANOVA/MANOVA·사후검정, 진단·상관분석, 생존분석 | `src/stats/` |
+| 머신러닝 | 25 | 선형·비선형 회귀, Naive Bayes, 부스팅·신경망, 군집·차원 축소, 변수 선택·최적화 | `src/MachineLearning/` |
+| 전처리·표본 보완 | 19 | 수치·범주형 결측·스케일·변환·인코딩, Feature 파이프라인·RoPE, 리샘플링 12종 | `src/Preprocessing/` |
+| 평가 | 56 | 분류·확률·Lift/Gain·회귀·군집·시계열 지표, 분야별 묶음·모델 비교·CV 요약 | `src/Evaluation/` |
+| 시각화 | 35 | 분포·결측·범주·관계·군집·축소·분류·연관·연결망·시간 패턴 | `src/Visualization/` |
+| 딥러닝 | 8 | TensorFlow Dense·CNN·SimpleRNN·LSTM·GRU·시계열 예측 | `src/DeepLearning/` |
+| 시계열 | 2 | ARIMA·SARIMA, 학습 AIC 차수 선택·예측구간·외생변수 검증 | `src/TimeSeries/` |
+| 연관규칙 | 3 | Apriori·FP-Growth·Eclat | `src/Association/` |
+| 사회연결망 | 1 | 중심성·PageRank·커뮤니티 | `src/Networks/` |
+| **합계** | **211** | | |
+
+최근 도메인 확장에는 다음 19개 모듈과 대응 JSON·스켈레톤을 각각 추가했습니다.
+
+| 영역 | 제공 내용 |
 | --- | --- |
-| `src/MachineLearning` | 지도 학습·군집·차원 축소·변수 선택 |
-| `src/stats/tests` | 실제 통계 검정·가정 진단 코드 |
-| `src/DeepLearning/TensorFlow` | 선택 의존성 TensorFlow 실행기 |
-| `src/Association`, `src/Networks` | 연관규칙·사회연결망 |
-| `src/Recipes` | 모델·목적별 JSON과 공통 loader |
-| `tests` | 참조값·자료 분리·DTO·레시피·실제 학습 검증 |
-| [전체 명세](docs/ANALYSIS_CATALOG.md) | 모든 구현 목록과 Profile/DTO 필드 |
-| [모듈 컨벤션](docs/MODEL_MODULE_FORMAT.md) | 파일 메타데이터·7개 섹션·공통 실행 계약 |
-| [레시피 사용법](docs/RECIPES.md) | 기본·사용자 JSON과 overrides |
-| [ANOVA 계열](docs/ANOVA_MODULES.md) | 가정과 지원 범위 |
-| [추가 통계 검정](docs/STATISTICAL_TESTS.md) | 검정 선택·귀무가설·근사 조건 |
-| [TensorFlow 정리](docs/TENSORFLOW_MODULES.md) | 첨부 4개 자료의 핵심·입력 shape·학습/평가·윈도 |
-| [통계 전체 구현](docs/STATISTICS_COMPLETE.md) | PDF 대응·전체 입력/출력·분포·정확/근사 경계 |
-| [PDF 사전분석](docs/STATISTICS_PDF_AUDIT.md) | 구현 전 전수 조사·이관 전략 |
-| [검증 기록](docs/VALIDATION.md) | 환경과 실제 실행 범위 |
+| 생존분석 4개 | Kaplan–Meier·Greenwood 점별 신뢰구간·중앙수명, RMST, 다집단 로그순위·쌍별 Holm, Cox 회귀·HR/CI·생존예측·PH 진단 |
+| 시계열 2개 | ARIMA·SARIMA, 학습에서만 차수 선택, 수렴·실패 기록, 미래 외생변수의 크기·열·날짜 정렬 확인 |
+| 비선형 회귀 1개 | exponential·logistic·Michaelis–Menten 평균모형, 초기값·경계·근사 공분산, 학습과 보류 평가 분리 |
+| 불균형 처리 12개 | RandomOver·SMOTE·ADASYN·BorderlineSMOTE·SVMSMOTE·SMOTENC·SMOTEN, RandomUnder·TomekLinks·ENN·NearMiss·ClusterCentroids |
 
-## 실행·해석 범위
+수치 거리 기반 리샘플링을 범주 코드에 일괄 적용하지 않습니다. SMOTENC는 혼합 자료, SMOTEN은 전체 범주 자료에 사용합니다. 자료형별 지원 범위와 CV 사용법은 [도메인 명세](docs/DOMAIN_ARCHITECTURE.md)를 참고하세요.
 
-지도 학습과 변수 선택은 IID 분할이며 전처리는 학습 자료에 적합합니다.
-군집·차원 축소는 전체 입력의 탐색 분석입니다. t-SNE/MDS와 현재 밀도 군집 실행기는
-새 관측 predict/transform을 제공하지 않습니다. TensorFlow RNN 표본은 독립 시퀀스이며,
-연속 시계열은 시간 순 윈도 실행기를 사용합니다. 상세 범위는 각 문서에 있습니다.
-Python 3.7.4 시험 서버와 동일한 환경·패키지 제공을 보장하지 않습니다.
+## 아키텍처와 모듈 규약
 
-## 기존 로컬 학습 환경 설정
+공통 실행 계약은 **기법별 JSON → Profile → `run_*()` → 전용 Output DTO**입니다. Profile을 직접 전달하는 호출도 지원합니다.
 
-아래는 기존 Python 3.7 학습 환경 참고입니다. 시험 환경 정보는 현재 공식 안내를
-별도로 확인하고, 새 분석 모듈은 위의 전용 의존성 파일을 사용하세요.
+| 구성 | 책임 |
+| --- | --- |
+| `src/Recipes/` | 기본·사용자 JSON을 읽고 Profile을 구성합니다. 설정 우선순위는 JSON → `overrides`입니다. |
+| 각 분석 도메인 | 입력·가정·설정을 검증하고 계산·학습·예측을 수행합니다. |
+| `src/output.py` | 결과 DTO의 필드 접근과 사전·JSON 변환 규약을 제공합니다. |
+| 각 도메인의 `skeleton/` | `load_data`·`load_recipe`·`build_pipeline`·`main`으로 실행 흐름을 보여줍니다. |
+| `기출문제/` | 문항별 데이터 결합·중간 상태·표·그림·가설 보고·업무 해석을 관리합니다. |
+| `tools/exams/` | 문항·문제지·해설 생성, 실제 코드 실행, 수치·출처·레이아웃 대조와 통합 집계를 담당합니다. |
+| `tests/`, `.github/workflows/` | 참조값·경계값·자료 분리·호환성·실제 실행을 검사합니다. |
 
-## Mac (Apple Silicon) 환경 설정: Python 3.7 활성화
+모든 표준 분석 모듈은 작성 정보·변경 이력과 다음 7개 섹션을 유지합니다.
 
-> Apple Silicon(M1/M2/M3 등) Mac에서는 Python 3.7 버전을 공식 지원하지 않으므로, **Rosetta 2 (x86_64) 기반의 Miniconda**를 통해 설치를 진행해야 합니다.
+1. Imports
+2. Input Profile
+3. Output DTO
+4. Input Validation
+5. Individual Model Runners
+6. Public Runner
+7. Example Execution
 
-```bash
-# 1. x86_64 아키텍처로 터미널 실행 및 확인
-arch -x86_64 zsh
-uname -m  # 출력 결과가 x86_64인지 확인
+Profile·DTO의 필드에는 타입·기본값 또는 반환 조건·배열 대응 관계를, 함수에는 `Args`·`Returns`·`Raises`를 명시합니다. 명시적 Profile과 `recipe_path`·`overrides`를 동시에 전달하면 오류입니다. 적합 모델·변환기·sampler 등 실행 객체는 DTO 속성으로 접근하며 기본 JSON에서 제외됩니다. JSON은 결과 저장용으로, 적합 모델의 복원 형식이 아닙니다.
 
-# 2. x86_64용 Miniconda 설치 파일 다운로드 및 실행
-curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
-bash Miniconda3-latest-MacOSX-x86_64.sh
+기존 Z/t 검정의 import·CLI 호환 경로도 유지합니다. 상세 작성 규칙은 [모듈 컨벤션](docs/MODEL_MODULE_FORMAT.md)에 있습니다.
 
-# 3. 환경 설정 반영 및 플랫폼 확인
-source ~/.zshrc
-conda info | grep -E "platform|subdir"
+## 기출 유형과 모의고사
 
-```
+| 자료 | 구성 | 문항 | 안내 |
+| --- | --- | ---: | --- |
+| [기존 기출·모의](기출문제/README.md) | 15·17·18·19·20·21·22·23·24·25·26·28회, 보충 자료, 모의 1~4회 — 22묶음 | 162 | 제공 자료·출제 후기·보완 조건을 대조한 상황형 학습 자료 |
+| [생존분석 통계 모의](기출문제/모의고사/생존분석_통계/README.md) | 3개 대문항, 권장 90분, 연습 배점 60점 | 14 | 기본 출제 유형과 RMST·Cox 등의 확장 연습을 구분 |
+| [30~36회 유형 연습](기출문제/유형연습/README.md) | 공개 후기에서 확인한 유형을 정제한 7묶음 | 53 | 32회는 통계 영역, 35회는 공간 전처리 영역의 부분 연습 |
+| **합계** | **30묶음** | **229** | **259개 코드 셀·92개 그림·73쪽 문제지** |
 
----
+각 묶음에는 공문서형 A4 문제지 PDF, 별도 실행 풀이·해설 노트북, 데이터, 실제 답안 수치와 검증 기록이 있습니다. 30~36회에는 `분석코드.py`와 `해설.md`도 제공합니다.
 
-## 가상환경(Virtual Environment) 구축
+검정 문항은 **방법 선택 근거·가정 → H0/H1 → 통계량·p-value → 기각 여부 → 상황에 맞는 결론**을 다룹니다. 확률 계산·추정·최적화에는 불필요한 p-value를 붙이지 않습니다.
 
-> 충돌 방지를 위해 ADP 시험 환경과 동일한 **Python 3.7** 버전의 가상환경을 생성합니다.
+자료는 공식 원문·실제 시험 데이터·공식 정답의 완전 복원을 의미하지 않습니다. 원 자료, 후기에서 확인한 유형, 새 조건과 합성 데이터를 출처 명세에서 구분합니다. Cox 등 확장 연습을 실제 기출 출제 확인으로 표시하지 않습니다.
 
-```bash
-# Conda 설치 경로 확인
-type -a conda
+SARIMA·KM, 최근 회차의 표본 보완·ARMA, 생존분석 모의의 주요 계산은 공통 API에 연결했습니다. 기존 풀이에는 sklearn·SciPy·statsmodels 직접 호출도 남아 있습니다. [문항별 참조표](기출문제/전체목록.json)는 정적 참조를 기록하며 모든 계산의 이관 완료나 실행 커버리지를 뜻하지 않습니다.
 
-# Python 3.7 가상환경 생성 및 활성화
-conda create -n adp python=3.7
-# 가상환경 Python 버전 확인
-conda list -n adp python
-conda activate adp
+## 목적별 실행 환경
 
-# 버전 및 환경 확인
-python --version   # Python 3.7.x 확인
-conda env list     # 가상환경 목록 확인
+의존성은 용도와 Python 버전별로 분리합니다. TensorFlow 환경은 NumPy 핀이 달라 일반 분석 환경과 별도로 설치합니다.
 
-```
+| 목적 | Python 3.12 | Python 3.7 |
+| --- | --- | --- |
+| 일반 분석·모델 | `requirements-models-py312.txt` | `requirements-models-py37.txt` |
+| Grid·Random·Optuna 최적화 추가 | `requirements-optimization-py312.txt` | `requirements-optimization-py37.txt` |
+| 생존·시계열·비선형·표본 보완 | `requirements-domain-py312.txt` | `requirements-domain-py37.txt` |
+| TensorFlow | `requirements-tensorflow-py312.txt` | `requirements-tensorflow-py37.txt` |
+| 기존 기출·모의 실행 | `기출문제/requirements-py312.txt` | 별도 호환 안내: `기출문제/requirements-py37.txt` |
+| 30~36회 / 생존분석 모의 | 각 폴더의 `requirements-py312.txt` | Python 3.7 런타임 호환을 주장하지 않음 |
 
----
-
-## 필수 패키지 설치
-
-> 최신 `pip` 버전 사용 시 발생하는 패키지 의존성 충돌 및 설치 오류를 방지하기 위해 구버전을 기준으로 설치합니다.
+일반 모델·최적화·신규 도메인을 함께 사용할 Python 3.12 환경의 설치와 검증 예시입니다.
 
 ```bash
-# 1. pip 및 빌드 도구 버전 고정 설치
-python -m pip install \
-"pip<24" \
-"setuptools==57.5.0" \
-"wheel<0.38"
-
-# 2. 형태소 분석기 및 필수 라이브러리 설치
-conda install -c conda-forge mecab -y
-conda install -c conda-forge swig -y
-
-# 3. requirements.txt를 통한 추가 패키지 일괄 설치 및 jupyter에 가상환경 커널 추가
-python -m pip install -r requirements.txt
-python -m ipykernel install --user --name adp  \
---display-name "Python (adp)"  
-jupyter kernelspec list # 등록 커널 확인
+python -m pip install -r requirements-models-py312.txt \
+    -r requirements-optimization-py312.txt -r requirements-domain-py312.txt
+python -m unittest discover -s tests -v
 ```
-- 이후 환경 재시작하여 커널 지정하기 :
- > `command` + `shift` + `p` / `developer:reload window` 클릭하기
 
-## 통계 전체 범위와 경로 이관
+Python 3.7 일반 모델 환경은 HDBSCAN 빌드 전에 다음 의존성을 준비합니다.
 
-PDF의 신규 검정/효과크기23개·분포16종, 범주동질성 API와 기존평균 표준화를 제공합니다. 폴더는 검정계열·목적, 입력은 표본설계를 구분합니다. 기존 import와 python -m 경로는 유지합니다.
-[통계 전체 명세](docs/STATISTICS_COMPLETE.md)를 참고하세요.
+```bash
+python -m pip install numpy==1.21.6 Cython==0.29.37 wheel==0.38.4
+python -m pip install --no-build-isolation -r requirements-models-py37.txt
+```
 
-## UCI 모델 스켈레톤
+Python 3.7은 별도 호환 환경으로 관리하며 실제 검증 버전은 3.7.17입니다. Apple Silicon에서 이 환경이 필요하면 x86_64용 별도 환경을 준비하세요. 저장소의 실행 검증과 실제 시험 서버의 Python 3.7.4·제공 패키지는 구분합니다. 루트의 `requirements.txt`는 기존 학습용 설정이며 전체 표준 모듈의 설치 명세가 아닙니다.
 
-UCI 스켈레톤 46개는 구현 분야별 폴더에 둡니다: MachineLearning 21개, DeepLearning 8개, Association 3개, Networks 1개, Preprocessing 7개, stats 상관/행렬 6개.
-확률분포 예제는 `src/stats/skeleton/`, 공유 UCI 로더는 `src/datasets/`에 있습니다.
-참고 XGBoost의 데이터 로딩 → 레시피 → FeatureSpec 전처리 → 모델 → 수치 평가 흐름을 유지합니다.
-군집·차원 축소·변수 선택·TensorFlow·연관규칙·네트워크도 목적에 맞는 파이프라인을 제공합니다.
-[참고 코드 분석·데이터 출처·실행 방법](docs/UCI_SKELETONS.md)을 확인하세요. 시각화는 포함하지 않습니다.
+노트북은 `src`·공통 코드·데이터를 함께 사용하므로 저장소 전체를 내려받아 실행합니다. 회차별 설치·실행·재생성 명령은 각 README를 따릅니다.
 
-## Feature 전처리·상관분석 확장
+## 검증과 재생성
 
-수치/범주형 Feature의 순서가 있는 전처리, 별도 RoPE 임베딩 회전, 수치/범주 상관분석과
-상관행렬 변환을 추가했습니다. [전체 명세](docs/PREPROCESSING_CORRELATION_MODULES.md)를 참고하세요.
+2026-10-20 도메인 통합 기준으로 다음을 확인했습니다.
 
-## Axes 기반 EDA 시각화
+- Python 3.7·3.12에서 신규 모듈 19개와 스켈레톤 19개를 실제 실행했습니다.
+- 로컬 Python 3.12 전체 테스트 146개를 통과했습니다. 선택 TensorFlow 관련 검사 등 7개는 건너뛰었으며 TensorFlow는 별도 CI에서 검사했습니다.
+- 전체 30묶음·259개 코드 셀을 재실행하고 문항·문제지·가설 보고·독립 수치를 대조했습니다.
+- 이전 main과 답안 JSON 30개·3,377개 수치를 비교해 허용오차 내 차이가 없음을 확인했습니다.
+- 통합 PR의 최종 커밋에서 분석·TensorFlow·시험·도메인·집계 CI가 모두 통과했습니다. 이후 커밋의 상태는 [GitHub Actions](https://github.com/finn-sharp/adp-study/actions)에서 확인합니다.
 
-`src/Visualization`의 35개 모듈은 단일 ax에 그려 subplot으로 조합합니다. 회귀 시각화는 제외하고
-분포·결측·범주·군집·차원 축소·분류 결정·연관/연결망·시간 패턴을 포함합니다.
-[전체 Profile/DTO·의사결정 근거·UCI 조합 예제](docs/EDA_VISUALIZATION_MODULES.md)를 참고하세요.
+등록부·문서 수치와 전체 목록의 일치 여부를 검사하거나 학습 목록을 재생성할 수 있습니다.
 
-## 독립 평가 메트릭
+```bash
+# Python 3.12 환경에서 집계 도구 의존성을 준비
+python -m pip install nbformat==5.10.4
+python tools/exams/audit_catalog.py
+python tools/exams/build_catalog.py
 
-분류·확률·Lift/Gain·회귀·군집·시계열의 개별 지표 50개, 분야별 묶음 4개, 모델 비교/CV 요약 2개와 JSON·평가 skeleton 56개를 추가했습니다. 기존 ML/DL·군집 skeleton과 연결합니다. [전체 입력·출력·수식·경계 명세](docs/EVALUATION_METRICS.md)
+# 신규 모듈 19개 + 스켈레톤 19개의 독립 실행
+python tools/check_domain_examples.py
+
+# 회귀 비교: 대상 git ref가 로컬에 있어야 함
+python tools/exams/compare_answers.py --base 22d39e6e44074db666a528149a9e10120e58227a
+```
+
+생성기는 실행 출력을 초기화할 수 있습니다. 문제지·노트북을 재생성한 뒤에는 해당 묶음의 실제 실행과 검사를 다시 수행합니다. 기록은 [도메인 검증](docs/DOMAIN_VALIDATION.json), [답안 회귀 비교](docs/DOMAIN_ANSWER_REGRESSION.json), [기존 검증 명세](docs/VALIDATION.md)에 있습니다.
+
+## 상세 문서
+
+| 주제 | 문서 |
+| --- | --- |
+| 전체 API·도메인 경계 | [분석 카탈로그](docs/ANALYSIS_CATALOG.md), [도메인 확장 명세](docs/DOMAIN_ARCHITECTURE.md) |
+| 모듈 작성·설정 관리 | [모듈 컨벤션](docs/MODEL_MODULE_FORMAT.md), [레시피](docs/RECIPES.md) |
+| 통계·가정·지원 범위 | [통계 전체 명세](docs/STATISTICS_COMPLETE.md), [ANOVA](docs/ANOVA_MODULES.md), [검정·진단](docs/STATISTICAL_TESTS.md) |
+| 전처리·상관·최적화 | [전처리·상관분석](docs/PREPROCESSING_CORRELATION_MODULES.md), [파라미터 최적화](docs/PARAMETER_OPTIMIZATION.md) |
+| 예제·평가·시각화 | [UCI 스켈레톤](docs/UCI_SKELETONS.md), [평가 메트릭](docs/EVALUATION_METRICS.md), [Axes 기반 EDA](docs/EDA_VISUALIZATION_MODULES.md) |
+| 딥러닝·연관규칙 | [TensorFlow](docs/TENSORFLOW_MODULES.md), [딥러닝·연관 확장](docs/DEEP_ASSOCIATION_MODULES.md) |
+| 시험 설계·출처 | [상황형 설계](docs/SCENARIO_EXAM_DESIGN.md), [자료 대조·복원 가정](docs/EXAM_RECONSTRUCTION_AUDIT.md), [17~23회 대조](docs/ADP_17_23_SOURCE_AUDIT.md), [문제지 서식](docs/QUESTION_PAPER_STYLE.md) |
+
+## 분석·해석의 경계
+
+지도 학습과 변수 선택의 기본 실행기는 IID 분할을 사용하며 시간·그룹 자료에는 적절한 별도 분할이 필요합니다. 전처리·변수 선택·리샘플링은 학습 구간 또는 CV 학습 폴드 안에서 적합합니다. CV 최고점과 최종 보류 성능을 구분합니다.
+
+군집·차원 축소는 탐색 분석입니다. t-SNE/MDS와 현재 밀도 군집 실행기는 새 관측의 `predict`/`transform`을 제공하지 않습니다. L2 규제 자체는 희소화를 보장하지 않으며, SNA는 사회연결망 분석입니다.
+
+생존분석은 독립 관측·비정보성 우측 중도절단을 가정합니다. KM 신뢰구간은 점별 구간이고, HR은 순간 위험비입니다. 검정 비기각은 동일성이나 가정의 증명이 아니며, 합성 자료의 결과를 실제 현장의 인과 효과로 해석하지 않습니다.
