@@ -43,6 +43,9 @@ def validate(y, exog, future_exog, p, seasonal):
     if future_exog is None: raise ValueError('예측 시점에 이용 가능한 미래 외생변수가 필요합니다.')
     if isinstance(exog,pd.DataFrame) and isinstance(y,pd.Series) and not exog.index.equals(y.index): raise ValueError('학습 외생변수 시간 정렬 오류')
     if isinstance(exog,pd.DataFrame) and isinstance(future_exog,pd.DataFrame) and list(exog.columns)!=list(future_exog.columns): raise ValueError('미래 외생변수 열 순서 오류')
+    if isinstance(y,pd.Series) and isinstance(y.index,pd.DatetimeIndex) and isinstance(future_exog,pd.DataFrame):
+        expected=pd.date_range(start=y.index[-1],periods=p.steps+1,freq=y.index.freq)[1:]
+        if not future_exog.index.equals(expected): raise ValueError('미래 외생변수 시간 정렬 오류')
     x, xf = matrix(exog,len(a),'exog'), matrix(future_exog,p.steps,'future_exog')
     if x.shape[1]!=xf.shape[1]: raise ValueError('외생변수 열 수 오류')
     return y, x, xf, orders

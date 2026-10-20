@@ -216,7 +216,7 @@ def add_risk_counts(kms,ax):
     for g,km in kms.items():
         removed=km.events+km.censored
         rows.append([str(int(km.sample_size-removed[km.times<t].sum())) for t in ticks]);labels.append(g)
-    table=ax.table(cellText=rows,rowLabels=labels,colLabels=ticks,loc='bottom',bbox=[0,-.4,1,.23])
+    table=ax.table(cellText=rows,rowLabels=labels,colLabels=ticks,loc='bottom',bbox=[0,-.5,1,.23])
     table.auto_set_font_size(False);table.set_fontsize(8)
 ALPHA=.05
 results=[]

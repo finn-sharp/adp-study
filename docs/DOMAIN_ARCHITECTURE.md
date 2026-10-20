@@ -627,3 +627,4 @@ sampler (Any): 적합 네이티브 imblearn sampler. 기본 JSON에서 제외.
 warnings (List[str]): 평가 누출·원행 대응 제한.
 ```
 
+답안 회귀 비교 재현: `python tools/exams/compare_answers.py --base 22d39e6e44074db666a528149a9e10120e58227a`. 로컬 비교 참조 0655428과 이 main 커밋의 파일 트리는 동일합니다.
