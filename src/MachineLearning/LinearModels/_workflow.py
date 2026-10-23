@@ -43,13 +43,13 @@ def prepare_data(X, y, profile):
     """
     if not isinstance(X, pd.DataFrame) and np.ndim(X) != 2:
         raise ValueError("2차원 원 Feature가 필요합니다.")
-        # 후보별 옵션이 공통 추론 설정을 재정의합니다.
-        options = {
-            "alpha": profile.alpha,
-            "cov_type": profile.cov_type,
-            "hac_maxlags": profile.hac_maxlags,
-            **options,
-        }
+    raw = (
+        X.copy()
+        if isinstance(X, pd.DataFrame)
+        else pd.DataFrame(
+            X, columns=["feature_" + str(i) for i in range(np.shape(X)[1])]
+        )
+    )
     if (
         isinstance(X, pd.DataFrame)
         and isinstance(y, pd.Series)
