@@ -208,3 +208,7 @@ Raises:
     ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
 ```
 
+
+## 연산자 기술 참고
+
+토너먼트 선택·정수 재추출 변이·Gaussian 변이·균등 교차의 정의는 [DEAP 공식 연산자 문서](https://deap.readthedocs.io/en/master/api/tools.html)와 대조했습니다. 본 모듈은 이 연산 원리를 NumPy로 직접 구현하며 DEAP 또는 MATLAB ga의 결과·정지 규칙·난수열과 동일하다고 주장하지 않습니다.

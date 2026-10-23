@@ -186,3 +186,7 @@ Preprocessing에 7개, stats에 상관/행렬 6개를 추가하여 UCI skeleton�
 ## 독립 평가 skeleton 56개
 
 src/Evaluation/skeleton의 분야별 개별 지표·묶음 54개와 모델 비교/CV 요약 2개가 추가됩니다. 기존 46개 분야별 UCI skeleton과 별도이며, 모두 공식 UCI 로더와 독립 평가 API를 사용합니다. [자료·예측·평가 흐름과 전체 경계](EVALUATION_METRICS.md)를 참고하세요.
+
+## 회귀 추론·분포별 모형과 GA 확장
+
+기존 모델46개·EDA board11개와 별도로 각 분야 안에 회귀/전처리/통계 진단/QQ 및 NB7개의13개 실제 UCI 프로그램을 추가했습니다. Wine11개 특성, 시간순 Bike, Iris, 공식 train/test Optdigits, Adult 부분 표본의 사용 범위·가정·원행 위치는 [회귀·분포 명세](REGRESSION_DISTRIBUTION_MODULES.md)에 있습니다. `src/Optimization/skeleton/genetic_algorithm.py`는 실제 UCI Iris train CV에서 특성 부분집합을 선택합니다. `production_allocation.py` skeleton은 UCI가 아닌 사용자 제공 블로그의 공정 설계 상수 예제입니다. 모두 load_data·load_recipe·build_pipeline·main의 책임을 구분합니다.
