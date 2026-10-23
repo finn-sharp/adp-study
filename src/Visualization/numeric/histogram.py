@@ -15,6 +15,7 @@ histogram.py - 왜도·다봉성·희귀 구간을 확인하고 변환/구간화
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,11 +57,13 @@ class NumericHistogramProfile:
         bins (int): 양의 histogram 구간 수. 기본 20.
         density (bool): True는 면적 1 밀도, False는 도수. 기본 False.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     bins: int = 20
     density: bool = False
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -66,6 +81,7 @@ class NumericHistogramOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -73,6 +89,7 @@ class NumericHistogramOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -88,6 +105,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, NumericHistogramProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -105,20 +123,47 @@ def _draw(values, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    a,removed=vector(values)
-    if profile.bins<1:raise ValueError('bins는 양수입니다.')
-    counts,edges=np.histogram(a,bins=profile.bins,density=profile.density)
-    ax.bar(edges[:-1],counts,width=np.diff(edges),align='edge',color=profile.color,alpha=profile.alpha,edgecolor='white')
-    ax.set_xlabel('Value');ax.set_ylabel('Density' if profile.density else 'Count')
-    data=pd.DataFrame({'left':edges[:-1],'right':edges[1:],'height':counts})
-    diagnostics={'n':len(a),'missing_removed':removed,'mean':float(a.mean()),'median':float(np.median(a))}
-    notes=[]
-    return finish(ax, before, data, diagnostics, profile, NumericHistogramOutputDTO, 'Numeric — Histogram', notes)
+    a, removed = vector(values)
+    if profile.bins < 1:
+        raise ValueError("bins는 양수입니다.")
+    counts, edges = np.histogram(a, bins=profile.bins, density=profile.density)
+    ax.bar(
+        edges[:-1],
+        counts,
+        width=np.diff(edges),
+        align="edge",
+        color=profile.color,
+        alpha=profile.alpha,
+        edgecolor="white",
+    )
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Density" if profile.density else "Count")
+    data = pd.DataFrame({"left": edges[:-1], "right": edges[1:], "height": counts})
+    diagnostics = {
+        "n": len(a),
+        "missing_removed": removed,
+        "mean": float(a.mean()),
+        "median": float(np.median(a)),
+    }
+    notes = []
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        NumericHistogramOutputDTO,
+        "Numeric — Histogram",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_histogram(values, *, ax, profile=None, recipe_path=None, overrides=None) -> NumericHistogramOutputDTO:
+def plot_histogram(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> NumericHistogramOutputDTO:
     """왜도·다봉성·희귀 구간을 확인하고 변환/구간화 후보를 검토합니다.
 
     Args:
@@ -132,10 +177,13 @@ def plot_histogram(values, *, ax, profile=None, recipe_path=None, overrides=None
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-numeric-histogram', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-numeric-histogram", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

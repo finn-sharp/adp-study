@@ -15,6 +15,7 @@ spearman.py - Spearman 전용 상관분석
     2026-10-12  김재현(Finn)     v1.0.0    상관분석·명세·레시피 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -26,20 +27,25 @@ __status__ = "Development"
 # ---------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Any,Dict,List,Optional,Tuple
-import inspect,warnings as pywarnings
+from typing import Any, Dict, List, Optional, Tuple
+import inspect, warnings as pywarnings
 import numpy as np
 import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from src.MachineLearning.analysis_common import positive_int
-from src.stats.correlation._common import validate_profile,numeric_pair,correlation_matrix
+from src.stats.correlation._common import (
+    validate_profile,
+    numeric_pair,
+    correlation_matrix,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SpearmanProfile:
@@ -56,13 +62,14 @@ class SpearmanProfile:
         n_resamples (int): permutation 무작위 표본 수, 양수; 기본 9999.
         random_state (int): permutation 시드, 0 이상; 기본 1234.
     """
+
     alpha: float = 0.05
-    alternative: str = 'two-sided'
-    nan_policy: str = 'raise'
+    alternative: str = "two-sided"
+    nan_policy: str = "raise"
     min_samples: int = 3
     max_pairs: int = 10000
-    p_adjust: str = 'holm'
-    p_value_method: str = 'asymptotic'
+    p_adjust: str = "holm"
+    p_value_method: str = "asymptotic"
     n_resamples: int = 9999
     random_state: int = 1234
 
@@ -70,6 +77,7 @@ class SpearmanProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SpearmanOutputDTO(OutputDTO):
@@ -86,6 +94,7 @@ class SpearmanOutputDTO(OutputDTO):
         confidence_interval (Optional[Tuple[float, float]]): Pearson Fisher 근사 양측 구간; 다른 기법 None.
         warnings (List[str]): 제거·추론 가정·수치 경고.
     """
+
     method: str
     coefficient: float
     p_value: float
@@ -93,7 +102,7 @@ class SpearmanOutputDTO(OutputDTO):
     alpha: float
     alternative: str
     n_samples: int
-    confidence_interval: Optional[Tuple[float,float]]
+    confidence_interval: Optional[Tuple[float, float]]
     warnings: List[str]
 
 
@@ -112,6 +121,7 @@ class SpearmanMatrixOutputDTO(OutputDTO):
         alpha (float): 유의수준.
         warnings (List[str]): 미정의 쌍·결측·추론 경고.
     """
+
     method: str
     correlation_matrix: pd.DataFrame
     p_value_matrix: pd.DataFrame
@@ -127,6 +137,7 @@ class SpearmanMatrixOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_profile(profile):
     """전용 Profile 및 기법 조건을 확인합니다.
 
@@ -137,17 +148,21 @@ def _validate_profile(profile):
     Raises:
         ValueError/TypeError: Profile·설정 오류.
     """
-    if not isinstance(profile,SpearmanProfile):raise TypeError('SpearmanProfile이 필요합니다.')
+    if not isinstance(profile, SpearmanProfile):
+        raise TypeError("SpearmanProfile이 필요합니다.")
     validate_profile(profile)
-    if profile.p_value_method not in ('asymptotic','permutation'):raise ValueError('p_value_method 오류')
-    positive_int(profile.n_resamples,'n_resamples');positive_int(profile.random_state,'random_state',0)
+    if profile.p_value_method not in ("asymptotic", "permutation"):
+        raise ValueError("p_value_method 오류")
+    positive_int(profile.n_resamples, "n_resamples")
+    positive_int(profile.random_state, "random_state", 0)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _run_pair(a,b,removed,profile):
+
+def _run_pair(a, b, removed, profile):
     """해당 기법의 계수와 추론을 계산합니다.
 
     Args:
@@ -160,29 +175,77 @@ def _run_pair(a,b,removed,profile):
     Raises:
         ValueError: 퇴화 자료·수치 오류·미지원 exact 동률.
     """
-    notes=[]
-    if removed:notes.append(str(removed)+'개 대응 결측 쌍을 제거했습니다.')
-    kwargs={'alternative':profile.alternative} if 'alternative' in inspect.signature(stats.spearmanr).parameters else {}
-    coefficient,p=stats.spearmanr(a,b,**kwargs);coefficient=float(coefficient);p=float(p);interval=None
-    if not kwargs and profile.alternative!='two-sided':p=p/2 if (coefficient>0)==(profile.alternative=='greater') else 1-p/2
-    if profile.p_value_method=='permutation':
-        first=stats.rankdata(a);second=stats.rankdata(b);first-=first.mean();second-=second.mean()
-        denominator=np.linalg.norm(first)*np.linalg.norm(second);rng=np.random.RandomState(profile.random_state);hits=0
+    notes = []
+    if removed:
+        notes.append(str(removed) + "개 대응 결측 쌍을 제거했습니다.")
+    kwargs = (
+        {"alternative": profile.alternative}
+        if "alternative" in inspect.signature(stats.spearmanr).parameters
+        else {}
+    )
+    coefficient, p = stats.spearmanr(a, b, **kwargs)
+    coefficient = float(coefficient)
+    p = float(p)
+    interval = None
+    if not kwargs and profile.alternative != "two-sided":
+        p = (
+            p / 2
+            if (coefficient > 0) == (profile.alternative == "greater")
+            else 1 - p / 2
+        )
+    if profile.p_value_method == "permutation":
+        first = stats.rankdata(a)
+        second = stats.rankdata(b)
+        first -= first.mean()
+        second -= second.mean()
+        denominator = np.linalg.norm(first) * np.linalg.norm(second)
+        rng = np.random.RandomState(profile.random_state)
+        hits = 0
         for _ in range(profile.n_resamples):
-            value=float(first@rng.permutation(second)/denominator)
-            hits+=abs(value)>=abs(coefficient)-1e-12 if profile.alternative=='two-sided' else value>=coefficient-1e-12 if profile.alternative=='greater' else value<=coefficient+1e-12
-        p=(hits+1)/(profile.n_resamples+1)
-    elif len(a)<=500:notes.append('Spearman 점근 p 값은 작은 표본에서 부정확할 수 있습니다. permutation을 고려하세요.')
-    method='spearman-'+profile.p_value_method
-    if not np.isfinite(coefficient) or not np.isfinite(p):raise ValueError('비유한 상관 결과')
-    return SpearmanOutputDTO(method,coefficient,p,bool(p<profile.alpha),profile.alpha,profile.alternative,len(a),interval,notes)
+            value = float(first @ rng.permutation(second) / denominator)
+            hits += (
+                abs(value) >= abs(coefficient) - 1e-12
+                if profile.alternative == "two-sided"
+                else (
+                    value >= coefficient - 1e-12
+                    if profile.alternative == "greater"
+                    else value <= coefficient + 1e-12
+                )
+            )
+        p = (hits + 1) / (profile.n_resamples + 1)
+    elif len(a) <= 500:
+        notes.append(
+            "Spearman 점근 p 값은 작은 표본에서 부정확할 수 있습니다. permutation을 고려하세요."
+        )
+    method = "spearman-" + profile.p_value_method
+    if not np.isfinite(coefficient) or not np.isfinite(p):
+        raise ValueError("비유한 상관 결과")
+    return SpearmanOutputDTO(
+        method,
+        coefficient,
+        p,
+        bool(p < profile.alpha),
+        profile.alpha,
+        profile.alternative,
+        len(a),
+        interval,
+        notes,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_spearman(x: Any,y: Any,profile: Optional[SpearmanProfile] = None,*,recipe_path: Optional[str] = None,overrides: Optional[Dict[str,Any]] = None) -> SpearmanOutputDTO:
+
+def run_spearman(
+    x: Any,
+    y: Any,
+    profile: Optional[SpearmanProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> SpearmanOutputDTO:
     """단일 대응 수치 쌍의 상관분석을 실행합니다.
 
     Args:
@@ -196,15 +259,24 @@ def run_spearman(x: Any,y: Any,profile: Optional[SpearmanProfile] = None,*,recip
     Raises:
         ValueError/TypeError/OSError: 자료·설정·레시피 오류.
     """
-    profile=resolve_profile('correlation-spearman',profile,recipe_path=recipe_path,overrides=overrides);_validate_profile(profile)
-    a,b,removed=numeric_pair(x,y,profile)
+    profile = resolve_profile(
+        "correlation-spearman", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    _validate_profile(profile)
+    a, b, removed = numeric_pair(x, y, profile)
     with pywarnings.catch_warnings(record=True) as caught:
-        result=_run_pair(a,b,removed,profile)
+        result = _run_pair(a, b, removed, profile)
     result.warnings.extend(str(w.message) for w in caught)
     return result
 
 
-def run_spearman_matrix(X: Any,profile: Optional[SpearmanProfile] = None,*,recipe_path: Optional[str] = None,overrides: Optional[Dict[str,Any]] = None) -> SpearmanMatrixOutputDTO:
+def run_spearman_matrix(
+    X: Any,
+    profile: Optional[SpearmanProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> SpearmanMatrixOutputDTO:
     """열별 상관·유효 표본·상삼각 다중검정을 함께 반환합니다.
 
     Args:
@@ -217,13 +289,18 @@ def run_spearman_matrix(X: Any,profile: Optional[SpearmanProfile] = None,*,recip
     Raises:
         ValueError/TypeError/OSError: shape·한도·설정·레시피 오류.
     """
-    profile=resolve_profile('correlation-spearman',profile,recipe_path=recipe_path,overrides=overrides);_validate_profile(profile)
-    return correlation_matrix(X,profile,run_spearman,SpearmanMatrixOutputDTO,'spearman')
+    profile = resolve_profile(
+        "correlation-spearman", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    _validate_profile(profile)
+    return correlation_matrix(
+        X, profile, run_spearman, SpearmanMatrixOutputDTO, "spearman"
+    )
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__=='__main__':
-    print(run_spearman([1,2,4,5,6],[2,5,3,7,8]).to_json(indent=2))
+if __name__ == "__main__":
+    print(run_spearman([1, 2, 4, 5, 6], [2, 5, 3, 7, 8]).to_json(indent=2))

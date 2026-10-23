@@ -49,13 +49,16 @@ from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AdalineProfile:
@@ -95,6 +98,7 @@ class AdalineProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AdalineOutputDTO(OutputDTO):
@@ -181,7 +185,11 @@ def _require_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·범위를 만족하지 않는 값.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 범위를 확인하세요.")
@@ -229,6 +237,7 @@ def _validate_adaline_parameters(settings: Any) -> None:
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 class AdalineClassifier(ClassifierMixin, BaseEstimator):
     """영벡터 초기화 및 배치 평균 경사하강법을 사용하는 ADALINE 추정기.
@@ -301,7 +310,7 @@ class AdalineClassifier(ClassifierMixin, BaseEstimator):
                     if self.fit_intercept:
                         self.intercept_[0] += self.eta0 * error.mean()
                     residual = target - (X.dot(self.coef_[0]) + self.intercept_[0])
-                    loss = float(0.5 * np.mean(residual ** 2))
+                    loss = float(0.5 * np.mean(residual**2))
                     if not np.isfinite(loss):
                         raise FloatingPointError("non-finite loss")
                     history.append(loss)
@@ -311,12 +320,17 @@ class AdalineClassifier(ClassifierMixin, BaseEstimator):
                         break
                     previous_loss = loss
         except FloatingPointError as exc:
-            raise ValueError("Adaline 학습이 발산했습니다. 특성을 스케일링하고 eta0를 낮추세요.") from exc
+            raise ValueError(
+                "Adaline 학습이 발산했습니다. 특성을 스케일링하고 eta0를 낮추세요."
+            ) from exc
         self.loss_curve_ = np.asarray(history)
         self.n_iter_ = len(history)
         if self.tol is not None and not self.converged_:
-            warnings.warn("Adaline이 max_iter 안에 수렴하지 않았습니다. loss_curve를 확인하세요.",
-                          ConvergenceWarning, stacklevel=2)
+            warnings.warn(
+                "Adaline이 max_iter 안에 수렴하지 않았습니다. loss_curve를 확인하세요.",
+                ConvergenceWarning,
+                stacklevel=2,
+            )
         return self
 
     def decision_function(self, X: Any) -> np.ndarray:
@@ -362,11 +376,17 @@ def _create_model(profile: AdalineProfile) -> Any:
         ImportError: 필요한 모델 라이브러리 미설치.
         ValueError: 라이브러리가 설정을 거부한 경우.
     """
-    return AdalineClassifier(max_iter=profile.max_iter, eta0=profile.eta0,
-                             tol=profile.tol, fit_intercept=profile.fit_intercept)
+    return AdalineClassifier(
+        max_iter=profile.max_iter,
+        eta0=profile.eta0,
+        tol=profile.tol,
+        fit_intercept=profile.fit_intercept,
+    )
 
 
-def _fit_model(X: Any, y: Any, profile: AdalineProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: AdalineProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -387,6 +407,7 @@ def _fit_model(X: Any, y: Any, profile: AdalineProfile, estimator: Any) -> Super
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_adaline(
     X: Any,
@@ -418,7 +439,9 @@ def run_adaline(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("adaline", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "adaline", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)
@@ -427,7 +450,9 @@ def run_adaline(
         **result.to_dict(include_runtime=True),
         coefficients=fitted.coef_.copy(),
         intercepts=fitted.intercept_.copy(),
-        activation_scores=result.model.decision_function(np.asarray(X)[result.test_indices]),
+        activation_scores=result.model.decision_function(
+            np.asarray(X)[result.test_indices]
+        ),
         loss_curve=fitted.loss_curve_.copy(),
         n_iter=int(fitted.n_iter_),
         converged=bool(fitted.converged_),

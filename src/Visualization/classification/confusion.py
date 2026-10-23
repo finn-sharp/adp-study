@@ -15,6 +15,7 @@ confusion.py - 어느 클래스 사이에서 오분류가 발생하는지 비교
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,11 +57,13 @@ class ClassificationConfusionProfile:
         normalization (str): count/true/pred/all 분모. 기본 'true'.
         annotate (bool): 셀 숫자 표시. 기본 True.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    normalization: str = 'true'
+    normalization: str = "true"
     annotate: bool = True
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -66,6 +81,7 @@ class ClassificationConfusionOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -73,6 +89,7 @@ class ClassificationConfusionOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -88,6 +105,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, ClassificationConfusionProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -109,18 +127,72 @@ def _draw(y_true, y_pred, labels, ax, profile, before, cax):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from sklearn.metrics import confusion_matrix
-    raw,removed=paired(true=y_true,pred=y_pred)
-    if profile.normalization not in ('count','true','pred','all'):raise ValueError('normalization 오류')
-    order=sorted(pd.unique(pd.concat([raw.true,raw.pred],ignore_index=True))) if labels is None else list(labels)
-    if not order or len(set(order))!=len(order) or not raw.true.isin(order).all() or not raw.pred.isin(order).all():raise ValueError('labels는 모든 관측 클래스와 고유 순서를 포함해야 합니다.')
-    counts=confusion_matrix(raw.true,raw.pred,labels=order);normalize=None if profile.normalization=='count' else profile.normalization;shown=confusion_matrix(raw.true,raw.pred,labels=order,normalize=normalize)
-    heatmap(ax,shown,[str(v) for v in order],[str(v) for v in order],cax=cax,annotate=profile.annotate);ax.set_xlabel('Predicted');ax.set_ylabel('True');data=pd.DataFrame(shown,index=order,columns=order);diagnostics={'counts':pd.DataFrame(counts,index=order,columns=order),'n':len(raw),'missing_removed':removed,'accuracy':float(np.trace(counts)/counts.sum()),'normalization':profile.normalization};notes=['보류/외부 예측으로 평가하세요. 정규화 분모와 클래스 표본 수를 함께 확인하세요.']
-    return finish(ax, before, data, diagnostics, profile, ClassificationConfusionOutputDTO, 'Classification — Confusion', notes)
+
+    raw, removed = paired(true=y_true, pred=y_pred)
+    if profile.normalization not in ("count", "true", "pred", "all"):
+        raise ValueError("normalization 오류")
+    order = (
+        sorted(pd.unique(pd.concat([raw.true, raw.pred], ignore_index=True)))
+        if labels is None
+        else list(labels)
+    )
+    if (
+        not order
+        or len(set(order)) != len(order)
+        or not raw.true.isin(order).all()
+        or not raw.pred.isin(order).all()
+    ):
+        raise ValueError("labels는 모든 관측 클래스와 고유 순서를 포함해야 합니다.")
+    counts = confusion_matrix(raw.true, raw.pred, labels=order)
+    normalize = None if profile.normalization == "count" else profile.normalization
+    shown = confusion_matrix(raw.true, raw.pred, labels=order, normalize=normalize)
+    heatmap(
+        ax,
+        shown,
+        [str(v) for v in order],
+        [str(v) for v in order],
+        cax=cax,
+        annotate=profile.annotate,
+    )
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("True")
+    data = pd.DataFrame(shown, index=order, columns=order)
+    diagnostics = {
+        "counts": pd.DataFrame(counts, index=order, columns=order),
+        "n": len(raw),
+        "missing_removed": removed,
+        "accuracy": float(np.trace(counts) / counts.sum()),
+        "normalization": profile.normalization,
+    }
+    notes = [
+        "보류/외부 예측으로 평가하세요. 정규화 분모와 클래스 표본 수를 함께 확인하세요."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ClassificationConfusionOutputDTO,
+        "Classification — Confusion",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_confusion(y_true, y_pred, labels=None, *, ax, profile=None, recipe_path=None, overrides=None, cax=None) -> ClassificationConfusionOutputDTO:
+def plot_confusion(
+    y_true,
+    y_pred,
+    labels=None,
+    *,
+    ax,
+    profile=None,
+    recipe_path=None,
+    overrides=None,
+    cax=None,
+) -> ClassificationConfusionOutputDTO:
     """어느 클래스 사이에서 오분류가 발생하는지 비교합니다.
 
     Args:
@@ -137,10 +209,16 @@ def plot_confusion(y_true, y_pred, labels=None, *, ax, profile=None, recipe_path
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-classification-confusion', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-classification-confusion",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax, cax)
+    before = start(ax, cax)
     return _draw(y_true, y_pred, labels, ax, profile, before, cax)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

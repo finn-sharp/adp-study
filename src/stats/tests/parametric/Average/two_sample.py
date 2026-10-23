@@ -16,6 +16,7 @@ two_sample - 독립 두 표본 평균 Z/Student/Welch t
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, tail, mean_interval, result)
+from src.stats.tests._common import number, numeric, tail, mean_interval, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TwoSampleMeanProfile:
@@ -54,6 +56,7 @@ class TwoSampleMeanProfile:
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     diff_0: float = 0.0
     known_var: bool = False
@@ -67,6 +70,7 @@ class TwoSampleMeanProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TwoSampleMeanOutputDTO(OutputDTO):
@@ -90,6 +94,7 @@ class TwoSampleMeanOutputDTO(OutputDTO):
         n_effective (int): 유효 표본/대응 쌍 수.
         group_sizes (List[int]): 첫/둘째 표본 수.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -112,6 +117,7 @@ class TwoSampleMeanOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -124,26 +130,29 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = numeric(args['x'], 1, 2, policy)
-    b = numeric(args['y'], 1, 2, policy) if 'y' in args else None
+    a = numeric(args["x"], 1, 2, policy)
+    b = numeric(args["y"], 1, 2, policy) if "y" in args else None
     if p.known_var:
-        number(p.sigma1, 'sigma1', True)
-        number(p.sigma2, 'sigma2', True)
-    return {'x': a, 'y': b}
+        number(p.sigma1, "sigma1", True)
+        number(p.sigma2, "sigma2", True)
+    return {"x": a, "y": b}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: TwoSampleMeanProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: TwoSampleMeanProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -154,13 +163,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: TwoSampleMeanProfile) -
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, TwoSampleMeanProfile): raise TypeError("TwoSampleMeanProfile이 필요합니다.")
+    if not isinstance(profile, TwoSampleMeanProfile):
+        raise TypeError("TwoSampleMeanProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -173,9 +184,9 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    a = d['x']
-    b = d['y']
+    alt = getattr(p, "alternative", "two-sided")
+    a = d["x"]
+    b = d["y"]
     n = len(a)
     m = len(b)
     v1 = a.var(ddof=1)
@@ -183,32 +194,67 @@ def _calculate(d, p):
     value = float(a.mean() - b.mean())
     null = p.diff_0
     if p.known_var:
-        se = np.sqrt(p.sigma1 ** 2 / n + p.sigma2 ** 2 / m)
-        df = float('inf')
-        method = 'z'
+        se = np.sqrt(p.sigma1**2 / n + p.sigma2**2 / m)
+        df = float("inf")
+        method = "z"
     elif p.equal_var:
         df = n + m - 2
         se = np.sqrt(((n - 1) * v1 + (m - 1) * v2) / df * (1 / n + 1 / m))
-        method = 'student-t'
+        method = "student-t"
     else:
         vv1 = v1 / n
         vv2 = v2 / m
         se = np.sqrt(vv1 + vv2)
-        df = (vv1 + vv2) ** 2 / (vv1 ** 2 / (n - 1) + vv2 ** 2 / (m - 1))
-        method = 'welch-t'
-    extras = {'group_sizes': [n, m]}
+        df = (vv1 + vv2) ** 2 / (vv1**2 / (n - 1) + vv2**2 / (m - 1))
+        method = "welch-t"
+    extras = {"group_sizes": [n, m]}
     if not np.isfinite(se) or se <= 0:
-        raise ValueError('양의 유한 표준오차가 필요합니다.')
-    if method == 'z':
-        df = float('inf')
+        raise ValueError("양의 유한 표준오차가 필요합니다.")
+    if method == "z":
+        df = float("inf")
         dist = stats.norm
     else:
         dist = stats.t(df)
     s = (value - null) / se
-    extras.update(mean_difference=value, standard_error=float(se), df=float(df), confidence_interval=mean_interval(value, se, p.alpha, alt, dist), n_effective=n + len(b))
-    return result('Two-sample Z-test' if method == 'z' else 'Two-sample T-test (Equal Variance)' if method == 'student-t' else "Welch's T-test (Unequal Variance)", p, s, tail(s, alt, dist), '평균 또는 평균차가 지정 귀무값과 같다', method, extras, dict(null_value=null, estimate=value, **{'sample_mean1': float(a.mean()), 'sample_mean2': float(b.mean()), 'sample_std1': float(a.std(ddof=1)), 'sample_std2': float(b.std(ddof=1))}))
+    extras.update(
+        mean_difference=value,
+        standard_error=float(se),
+        df=float(df),
+        confidence_interval=mean_interval(value, se, p.alpha, alt, dist),
+        n_effective=n + len(b),
+    )
+    return result(
+        (
+            "Two-sample Z-test"
+            if method == "z"
+            else (
+                "Two-sample T-test (Equal Variance)"
+                if method == "student-t"
+                else "Welch's T-test (Unequal Variance)"
+            )
+        ),
+        p,
+        s,
+        tail(s, alt, dist),
+        "평균 또는 평균차가 지정 귀무값과 같다",
+        method,
+        extras,
+        dict(
+            null_value=null,
+            estimate=value,
+            **{
+                "sample_mean1": float(a.mean()),
+                "sample_mean2": float(b.mean()),
+                "sample_std1": float(a.std(ddof=1)),
+                "sample_std2": float(b.std(ddof=1)),
+            },
+        ),
+    )
 
-def _run_test(data: Dict[str, Any], profile: TwoSampleMeanProfile) -> TwoSampleMeanOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: TwoSampleMeanProfile
+) -> TwoSampleMeanOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -226,7 +272,15 @@ def _run_test(data: Dict[str, Any], profile: TwoSampleMeanProfile) -> TwoSampleM
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_two_sample_mean(x: Any, y: Any, profile: Optional[TwoSampleMeanProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> TwoSampleMeanOutputDTO:
+
+def run_two_sample_mean(
+    x: Any,
+    y: Any,
+    profile: Optional[TwoSampleMeanProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> TwoSampleMeanOutputDTO:
     """독립 두 표본 평균 Z/Student/Welch t.
 
     Args:
@@ -241,8 +295,10 @@ def run_two_sample_mean(x: Any, y: Any, profile: Optional[TwoSampleMeanProfile] 
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("two-sample-mean", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x, 'y': y}, profile)
+    profile = resolve_profile(
+        "two-sample-mean", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x, "y": y}, profile)
     return _run_test(data, profile)
 
 
@@ -251,5 +307,5 @@ def run_two_sample_mean(x: Any, y: Any, profile: Optional[TwoSampleMeanProfile] 
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_two_sample_mean([1,2,4,5,8], [2,3,4,6,9])
+    result = run_two_sample_mean([1, 2, 4, 5, 8], [2, 3, 4, 6, 9])
     print(result.to_json(indent=2))

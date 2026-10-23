@@ -15,22 +15,23 @@ logistic.py - logistic 분포 전용 Q-Q 비교
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
-from src.Visualization._common import PlotOutputDTO,validate_profile,start,vector
+from src.Visualization._common import PlotOutputDTO, validate_profile, start, vector
 from src.Visualization.qq._common import render_qq
 
 
@@ -50,13 +51,15 @@ class QQLogisticProfile:
         loc (float): 명시 위치; 양수 지지 분포 fit에서는 고정. 기본 0.0.
         scale (float): 양수 명시 척도. 기본 1.0.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    reference: str = 'identity'
+    reference: str = "identity"
     fit_parameters: bool = False
     loc: float = 0.0
     scale: float = 1.0
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -74,17 +77,20 @@ class QQLogisticOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): 전용 Profile 설정.
         warnings (List[str]): 분포·동률·같은 자료 fitting·해석 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -96,14 +102,17 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,QQLogisticProfile)
-    if profile.scale<=0 or profile.reference not in ('identity','quartile','none'):raise ValueError('QQ 척도/기준선 오류')
+    validate_profile(profile, QQLogisticProfile)
+    if profile.scale <= 0 or profile.reference not in ("identity", "quartile", "none"):
+        raise ValueError("QQ 척도/기준선 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _distribution(values,profile):
+
+def _distribution(values, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -114,13 +123,18 @@ def _distribution(values,profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    a,removed=vector(values,min_size=3)
-    if profile.fit_parameters and np.ptp(a)==0:raise ValueError('상수 자료의 분포 fit은 퇴화합니다.')
-    if profile.fit_parameters:loc,scale=stats.logistic.fit(a)
-    else:loc,scale=profile.loc,profile.scale
-    params={'loc':float(loc),'scale':float(scale)}
-    if params['scale']<=0 or not all(np.isfinite(v) for v in params.values()):raise ValueError('추정 인자 오류')
-    return stats.logistic(**params),params
+    a, removed = vector(values, min_size=3)
+    if profile.fit_parameters and np.ptp(a) == 0:
+        raise ValueError("상수 자료의 분포 fit은 퇴화합니다.")
+    if profile.fit_parameters:
+        loc, scale = stats.logistic.fit(a)
+    else:
+        loc, scale = profile.loc, profile.scale
+    params = {"loc": float(loc), "scale": float(scale)}
+    if params["scale"] <= 0 or not all(np.isfinite(v) for v in params.values()):
+        raise ValueError("추정 인자 오류")
+    return stats.logistic(**params), params
+
 
 def _run(values, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -134,13 +148,24 @@ def _run(values, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    before=start(ax)
-    distribution,params=_distribution(values,profile)
-    return render_qq(values,distribution,params,profile,ax,before,QQLogisticOutputDTO,'logistic')
+    before = start(ax)
+    distribution, params = _distribution(values, profile)
+    return render_qq(
+        values,
+        distribution,
+        params,
+        profile,
+        ax,
+        before,
+        QQLogisticOutputDTO,
+        "logistic",
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def plot_logistic(values, *, ax, profile=None, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -156,9 +181,12 @@ def plot_logistic(values, *, ax, profile=None, recipe_path=None, overrides=None)
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-qq-logistic',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-qq-logistic", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(values, ax,profile)
+    return _run(values, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

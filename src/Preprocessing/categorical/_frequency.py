@@ -1,11 +1,12 @@
 """학습 상대빈도 기반 범주 변환기. 범주 순서 또는 타깃을 학습하지 않습니다."""
+
 import numpy as np
 import pandas as pd
-from sklearn.base import BaseEstimator,TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 
-class FrequencyEncoder(TransformerMixin,BaseEstimator):
+class FrequencyEncoder(TransformerMixin, BaseEstimator):
     """범주별 학습 빈도를 재사용합니다.
 
     Attributes:
@@ -13,7 +14,8 @@ class FrequencyEncoder(TransformerMixin,BaseEstimator):
         unknown_frequency (float): 미지 범주 값.
         frequencies_ (list): 열별 상대빈도 사전.
     """
-    def __init__(self,handle_unknown='ignore',unknown_frequency=0.):
+
+    def __init__(self, handle_unknown="ignore", unknown_frequency=0.0):
         """설정 보존.
 
         Args:
@@ -24,9 +26,10 @@ class FrequencyEncoder(TransformerMixin,BaseEstimator):
         Raises:
             None: Profile에서 검증.
         """
-        self.handle_unknown=handle_unknown;self.unknown_frequency=unknown_frequency
+        self.handle_unknown = handle_unknown
+        self.unknown_frequency = unknown_frequency
 
-    def fit(self,X,y=None):
+    def fit(self, X, y=None):
         """학습 빈도를 적합합니다.
 
         Args:
@@ -37,11 +40,14 @@ class FrequencyEncoder(TransformerMixin,BaseEstimator):
         Raises:
             ValueError: 입력 shape 오류.
         """
-        a=np.asarray(X,dtype=object);self.n_features_in_=a.shape[1]
-        self.frequencies_=[(pd.Series(column).value_counts()/len(a)).to_dict() for column in a.T]
+        a = np.asarray(X, dtype=object)
+        self.n_features_in_ = a.shape[1]
+        self.frequencies_ = [
+            (pd.Series(column).value_counts() / len(a)).to_dict() for column in a.T
+        ]
         return self
 
-    def transform(self,X):
+    def transform(self, X):
         """학습 빈도로 새 범주를 변환합니다.
 
         Args:
@@ -51,10 +57,17 @@ class FrequencyEncoder(TransformerMixin,BaseEstimator):
         Raises:
             ValueError/NotFittedError: 미지 범주·열·미적합 오류.
         """
-        check_is_fitted(self,'frequencies_');a=np.asarray(X,dtype=object)
-        if a.ndim!=2 or a.shape[1]!=self.n_features_in_:raise ValueError('열 수 불일치')
-        result=np.empty(a.shape,dtype=float)
-        for index,mapping in enumerate(self.frequencies_):
-            if self.handle_unknown=='error' and any(value not in mapping for value in a[:,index]):raise ValueError('미지 범주')
-            result[:,index]=[mapping.get(value,self.unknown_frequency) for value in a[:,index]]
+        check_is_fitted(self, "frequencies_")
+        a = np.asarray(X, dtype=object)
+        if a.ndim != 2 or a.shape[1] != self.n_features_in_:
+            raise ValueError("열 수 불일치")
+        result = np.empty(a.shape, dtype=float)
+        for index, mapping in enumerate(self.frequencies_):
+            if self.handle_unknown == "error" and any(
+                value not in mapping for value in a[:, index]
+            ):
+                raise ValueError("미지 범주")
+            result[:, index] = [
+                mapping.get(value, self.unknown_frequency) for value in a[:, index]
+            ]
         return result

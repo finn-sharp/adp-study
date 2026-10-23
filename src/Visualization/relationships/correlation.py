@@ -15,6 +15,7 @@ correlation.py - 강한 중복 Feature와 보정 유의성 조건을 함께 검�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -45,12 +58,14 @@ class RelationshipsCorrelationProfile:
         mask_upper (bool): 중복 상삼각을 숨김. 기본 True.
         max_p_value (Optional[float]): 선택 p 필터; 보정 p 사용 권장. 기본 None.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     annotate: bool = True
     mask_upper: bool = True
     max_p_value: Optional[float] = None
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,6 +83,7 @@ class RelationshipsCorrelationOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -75,6 +91,7 @@ class RelationshipsCorrelationOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -90,6 +107,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, RelationshipsCorrelationProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -110,19 +128,64 @@ def _draw(matrix, p_values, ax, profile, before, cax):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from src.stats.correlation.matrix_transform import run_correlation_matrix_transform
-    converted=run_correlation_matrix_transform(matrix,p_values,overrides={'mode':'lower' if profile.mask_upper else 'tidy','include_diagonal':True,'allow_missing':True,'max_p_value':profile.max_p_value})
-    raw=frame(matrix,allow_missing=True)
-    if profile.mask_upper:data=converted.transformed_matrix
+
+    converted = run_correlation_matrix_transform(
+        matrix,
+        p_values,
+        overrides={
+            "mode": "lower" if profile.mask_upper else "tidy",
+            "include_diagonal": True,
+            "allow_missing": True,
+            "max_p_value": profile.max_p_value,
+        },
+    )
+    raw = frame(matrix, allow_missing=True)
+    if profile.mask_upper:
+        data = converted.transformed_matrix
     else:
-        data=raw.copy()
-        if profile.max_p_value is not None:data=data.where(np.asarray(p_values)<=profile.max_p_value)
-    heatmap(ax,data.values,data.index,data.columns,cmap='coolwarm',cax=cax,vmin=-1,vmax=1,annotate=profile.annotate);diagnostics={'n_features':len(data),'p_filter':profile.max_p_value};notes=['입력 계수와 p를 사용합니다. 시각화가 상관을 재추정하거나 추가 검정을 수행하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, RelationshipsCorrelationOutputDTO, 'Relationships — Correlation', notes)
+        data = raw.copy()
+        if profile.max_p_value is not None:
+            data = data.where(np.asarray(p_values) <= profile.max_p_value)
+    heatmap(
+        ax,
+        data.values,
+        data.index,
+        data.columns,
+        cmap="coolwarm",
+        cax=cax,
+        vmin=-1,
+        vmax=1,
+        annotate=profile.annotate,
+    )
+    diagnostics = {"n_features": len(data), "p_filter": profile.max_p_value}
+    notes = [
+        "입력 계수와 p를 사용합니다. 시각화가 상관을 재추정하거나 추가 검정을 수행하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        RelationshipsCorrelationOutputDTO,
+        "Relationships — Correlation",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_correlation(matrix, p_values=None, *, ax, profile=None, recipe_path=None, overrides=None, cax=None) -> RelationshipsCorrelationOutputDTO:
+def plot_correlation(
+    matrix,
+    p_values=None,
+    *,
+    ax,
+    profile=None,
+    recipe_path=None,
+    overrides=None,
+    cax=None,
+) -> RelationshipsCorrelationOutputDTO:
     """강한 중복 Feature와 보정 유의성 조건을 함께 검토합니다.
 
     Args:
@@ -138,10 +201,16 @@ def plot_correlation(matrix, p_values=None, *, ax, profile=None, recipe_path=Non
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-relationships-correlation', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-relationships-correlation",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax, cax)
+    before = start(ax, cax)
     return _draw(matrix, p_values, ax, profile, before, cax)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

@@ -15,6 +15,7 @@ hexbin.py - 대량 관측에서 겹침을 줄여 집중 영역과 희소 영역�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,11 +57,13 @@ class RelationshipsHexbinProfile:
         gridsize (int): 양의 육각 격자 수. 기본 30.
         log_counts (bool): 색을 로그 빈도로 표시. 기본 False.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     gridsize: int = 30
     log_counts: bool = False
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -66,6 +81,7 @@ class RelationshipsHexbinOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -73,6 +89,7 @@ class RelationshipsHexbinOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -88,6 +105,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, RelationshipsHexbinProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -107,17 +125,52 @@ def _draw(x, y, ax, profile, before, cax):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw,removed=paired(x=x,y=y);raw['x']=vector(raw.x,allow_missing=False)[0];raw['y']=vector(raw.y,allow_missing=False)[0]
-    if profile.gridsize<1:raise ValueError('gridsize 오류')
-    artist=ax.hexbin(raw.x,raw.y,gridsize=profile.gridsize,mincnt=1,bins='log' if profile.log_counts else None,cmap='viridis',alpha=profile.alpha)
-    if cax is not None:ax.figure.colorbar(artist,cax=cax)
-    offsets=artist.get_offsets();data=pd.DataFrame({'x_center':offsets[:,0],'y_center':offsets[:,1],'count':artist.get_array()});ax.set_xlabel('X');ax.set_ylabel('Y');diagnostics={'n':len(raw),'missing_removed':removed};notes=[]
-    return finish(ax, before, data, diagnostics, profile, RelationshipsHexbinOutputDTO, 'Relationships — Hexbin', notes)
+    raw, removed = paired(x=x, y=y)
+    raw["x"] = vector(raw.x, allow_missing=False)[0]
+    raw["y"] = vector(raw.y, allow_missing=False)[0]
+    if profile.gridsize < 1:
+        raise ValueError("gridsize 오류")
+    artist = ax.hexbin(
+        raw.x,
+        raw.y,
+        gridsize=profile.gridsize,
+        mincnt=1,
+        bins="log" if profile.log_counts else None,
+        cmap="viridis",
+        alpha=profile.alpha,
+    )
+    if cax is not None:
+        ax.figure.colorbar(artist, cax=cax)
+    offsets = artist.get_offsets()
+    data = pd.DataFrame(
+        {
+            "x_center": offsets[:, 0],
+            "y_center": offsets[:, 1],
+            "count": artist.get_array(),
+        }
+    )
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    diagnostics = {"n": len(raw), "missing_removed": removed}
+    notes = []
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        RelationshipsHexbinOutputDTO,
+        "Relationships — Hexbin",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_hexbin(x, y, *, ax, profile=None, recipe_path=None, overrides=None, cax=None) -> RelationshipsHexbinOutputDTO:
+def plot_hexbin(
+    x, y, *, ax, profile=None, recipe_path=None, overrides=None, cax=None
+) -> RelationshipsHexbinOutputDTO:
     """대량 관측에서 겹침을 줄여 집중 영역과 희소 영역을 비교합니다.
 
     Args:
@@ -133,10 +186,16 @@ def plot_hexbin(x, y, *, ax, profile=None, recipe_path=None, overrides=None, cax
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-relationships-hexbin', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-relationships-hexbin",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax, cax)
+    before = start(ax, cax)
     return _draw(x, y, ax, profile, before, cax)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

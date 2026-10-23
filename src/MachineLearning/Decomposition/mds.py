@@ -22,6 +22,7 @@ mds.py - MDS 다차원 척도법
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MDSProfile:
@@ -75,6 +81,7 @@ class MDSProfile:
 # 3. Output DTO
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class MDSOutputDTO(OutputDTO):
     """MDS 다차원 척도법 결과. 배열은 원 입력 행 순서.
@@ -102,6 +109,7 @@ class MDSOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, profile: MDSProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -123,14 +131,17 @@ def _validate_inputs(X: Any, profile: MDSProfile) -> np.ndarray:
     positive_int(profile.n_init, "n_init")
     positive_int(profile.max_iter, "max_iter")
     finite_number(profile.eps, "eps", positive=True)
-    if not isinstance(profile.metric, bool): raise ValueError("metric은 bool이어야 합니다.")
-    if profile.n_components >= len(arr): raise ValueError("n_components는 표본 수 미만이어야 합니다.")
+    if not isinstance(profile.metric, bool):
+        raise ValueError("metric은 bool이어야 합니다.")
+    if profile.n_components >= len(arr):
+        raise ValueError("n_components는 표본 수 미만이어야 합니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, profile: MDSProfile) -> MDSOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -146,27 +157,57 @@ def _run_model(X: Any, profile: MDSProfile) -> MDSOutputDTO:
     """
     import inspect
     from sklearn.manifold import MDS
-    kwargs = {"normalized_stress": False} if "normalized_stress" in inspect.signature(MDS).parameters else {}
-    estimator = MDS(n_components=profile.n_components, metric=profile.metric, n_init=profile.n_init,
-                    max_iter=profile.max_iter, eps=profile.eps, dissimilarity="euclidean",
-                    random_state=profile.random_state, n_jobs=1, **kwargs)
+
+    kwargs = (
+        {"normalized_stress": False}
+        if "normalized_stress" in inspect.signature(MDS).parameters
+        else {}
+    )
+    estimator = MDS(
+        n_components=profile.n_components,
+        metric=profile.metric,
+        n_init=profile.n_init,
+        max_iter=profile.max_iter,
+        eps=profile.eps,
+        dissimilarity="euclidean",
+        random_state=profile.random_state,
+        n_jobs=1,
+        **kwargs,
+    )
     arr = validate_features(X)
     model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", estimator)])
     embedding = model.fit_transform(arr)
-    if not np.isfinite(embedding).all(): raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
+    if not np.isfinite(embedding).all():
+        raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
     from scipy.spatial.distance import pdist
-    scaled = model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
+
+    scaled = (
+        model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
+    )
     error = float(np.sum((pdist(scaled) - pdist(embedding)) ** 2))
-    return MDSOutputDTO(model, embedding, feature_names(X), False, float(estimator.stress_), int(estimator.n_iter_), error)
+    return MDSOutputDTO(
+        model,
+        embedding,
+        feature_names(X),
+        False,
+        float(estimator.stress_),
+        int(estimator.n_iter_),
+        error,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_mds(X: Any, profile: Optional[MDSProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> MDSOutputDTO:
+
+def run_mds(
+    X: Any,
+    profile: Optional[MDSProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> MDSOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -182,7 +223,9 @@ def run_mds(X: Any, profile: Optional[MDSProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("mds", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "mds", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, profile)
     return _run_model(X, profile)
 
@@ -193,6 +236,7 @@ def run_mds(X: Any, profile: Optional[MDSProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_mds(X, load_profile("mds"))
     print(result.to_json(indent=2)[:500])

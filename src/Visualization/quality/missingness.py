@@ -15,6 +15,7 @@ missingness.py - 결측 처리 우선순위와 완전 관측 손실 규모를 �
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -42,9 +55,11 @@ class QualityMissingnessProfile:
         color (str): Matplotlib 기본 선/표식 색. 기본 'C0'.
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -62,6 +77,7 @@ class QualityMissingnessOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -69,6 +85,7 @@ class QualityMissingnessOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -84,6 +101,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, QualityMissingnessProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -101,17 +119,53 @@ def _draw(values, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    data=values.copy() if isinstance(values,pd.DataFrame) else pd.DataFrame(values)
-    if data.empty or not data.columns.is_unique:raise ValueError('고유 열의 비어 있지 않은 자료가 필요합니다.')
-    count=data.isna().sum();fraction=count/len(data);summary=pd.DataFrame({'feature':data.columns.astype(str),'missing_count':count.values,'missing_fraction':fraction.values}).sort_values('missing_fraction',ascending=False,kind='stable')
-    ax.barh(np.arange(len(summary)),summary.missing_fraction,color=profile.color,alpha=profile.alpha);ax.set_yticks(np.arange(len(summary)));ax.set_yticklabels(summary.feature);ax.invert_yaxis();ax.set_xlim(0,1);ax.set_xlabel('Missing fraction')
-    diagnostics={'n_rows':len(data),'complete_rows':int(data.notna().all(axis=1).sum())};data=summary;notes=['결측률만으로 컬럼 삭제 또는 MCAR/MAR/MNAR를 결정하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, QualityMissingnessOutputDTO, 'Quality — Missingness', notes)
+    data = values.copy() if isinstance(values, pd.DataFrame) else pd.DataFrame(values)
+    if data.empty or not data.columns.is_unique:
+        raise ValueError("고유 열의 비어 있지 않은 자료가 필요합니다.")
+    count = data.isna().sum()
+    fraction = count / len(data)
+    summary = pd.DataFrame(
+        {
+            "feature": data.columns.astype(str),
+            "missing_count": count.values,
+            "missing_fraction": fraction.values,
+        }
+    ).sort_values("missing_fraction", ascending=False, kind="stable")
+    ax.barh(
+        np.arange(len(summary)),
+        summary.missing_fraction,
+        color=profile.color,
+        alpha=profile.alpha,
+    )
+    ax.set_yticks(np.arange(len(summary)))
+    ax.set_yticklabels(summary.feature)
+    ax.invert_yaxis()
+    ax.set_xlim(0, 1)
+    ax.set_xlabel("Missing fraction")
+    diagnostics = {
+        "n_rows": len(data),
+        "complete_rows": int(data.notna().all(axis=1).sum()),
+    }
+    data = summary
+    notes = ["결측률만으로 컬럼 삭제 또는 MCAR/MAR/MNAR를 결정하지 않습니다."]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        QualityMissingnessOutputDTO,
+        "Quality — Missingness",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_missingness(values, *, ax, profile=None, recipe_path=None, overrides=None) -> QualityMissingnessOutputDTO:
+def plot_missingness(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> QualityMissingnessOutputDTO:
     """결측 처리 우선순위와 완전 관측 손실 규모를 확인합니다.
 
     Args:
@@ -125,10 +179,16 @@ def plot_missingness(values, *, ax, profile=None, recipe_path=None, overrides=No
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-quality-missingness', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-quality-missingness",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

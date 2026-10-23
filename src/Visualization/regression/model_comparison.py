@@ -15,21 +15,28 @@ model_comparison.py - 기준·전처리·대안 회귀의 검증 점수 비교
     2026-10-23  김재현(Finn)     v1.0.0    응용 분석 모듈·모의10회 실행 연결
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO,start,finish,validate_profile as validate_plot_profile
+from src.Visualization._common import (
+    PlotOutputDTO,
+    start,
+    finish,
+    validate_profile as validate_plot_profile,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,10 +51,12 @@ class RegressionModelComparisonProfile:
         alpha (float): 표시 투명도 [0,1] 기본 0.8.
         metric (str): 동일 검증 행·원단위 점수 열 이름 기본 'cv_r2'.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    metric: str = 'cv_r2'
+    metric: str = "cv_r2"
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -65,17 +74,20 @@ class RegressionModelComparisonOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): Profile 전체.
         warnings (List[str]): 다른 응답 척도·분할 점수 혼용 금지.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -87,11 +99,13 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_plot_profile(profile,RegressionModelComparisonProfile)
+    validate_plot_profile(profile, RegressionModelComparisonProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(comparison, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -105,16 +119,44 @@ def _run(comparison, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    data=pd.DataFrame(comparison).copy()
-    if 'name' not in data or profile.metric not in data or data.empty or not np.isfinite(data[profile.metric].to_numpy(dtype=float)).all():raise ValueError('name 및 유한 점수 열이 필요합니다.')
-    before=start(ax);ax.barh(data.name.astype(str),data[profile.metric],color=profile.color,alpha=profile.alpha);ax.set_xlabel(profile.metric)
-    return finish(ax,before,data,{'metric':profile.metric,'n_models':len(data)},profile,RegressionModelComparisonOutputDTO,'Regression CV comparison',['같은 분할·같은 원 반응 단위의 점수만 함께 비교하세요. 그림이 모델 선택이나 검정을 자동 수행하지 않습니다.'])
+    data = pd.DataFrame(comparison).copy()
+    if (
+        "name" not in data
+        or profile.metric not in data
+        or data.empty
+        or not np.isfinite(data[profile.metric].to_numpy(dtype=float)).all()
+    ):
+        raise ValueError("name 및 유한 점수 열이 필요합니다.")
+    before = start(ax)
+    ax.barh(
+        data.name.astype(str),
+        data[profile.metric],
+        color=profile.color,
+        alpha=profile.alpha,
+    )
+    ax.set_xlabel(profile.metric)
+    return finish(
+        ax,
+        before,
+        data,
+        {"metric": profile.metric, "n_models": len(data)},
+        profile,
+        RegressionModelComparisonOutputDTO,
+        "Regression CV comparison",
+        [
+            "같은 분할·같은 원 반응 단위의 점수만 함께 비교하세요. 그림이 모델 선택이나 검정을 자동 수행하지 않습니다."
+        ],
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def plot_model_comparison(comparison, *, ax, profile=None, recipe_path=None, overrides=None):
+
+def plot_model_comparison(
+    comparison, *, ax, profile=None, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -128,9 +170,15 @@ def plot_model_comparison(comparison, *, ax, profile=None, recipe_path=None, ove
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-regression-model-comparison',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-regression-model-comparison",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    return _run(comparison, ax,profile)
+    return _run(comparison, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

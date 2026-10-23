@@ -45,13 +45,16 @@ import numpy as np
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class LinearRegressionProfile:
@@ -89,6 +92,7 @@ class LinearRegressionProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class LinearRegressionOutputDTO(OutputDTO):
@@ -173,6 +177,7 @@ def _validate_inputs(X: Any, y: Any, profile: LinearRegressionProfile) -> None:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
+
 def _create_model(profile: LinearRegressionProfile) -> Any:
     """회귀 목적에 맞는 미적합 모델을 생성합니다.
 
@@ -185,11 +190,18 @@ def _create_model(profile: LinearRegressionProfile) -> Any:
         ValueError: 라이브러리가 설정을 거부한 경우.
     """
     from sklearn.linear_model import LinearRegression
-    return LinearRegression(fit_intercept=profile.fit_intercept, copy_X=profile.copy_X,
-                            positive=profile.positive, n_jobs=profile.n_jobs)
+
+    return LinearRegression(
+        fit_intercept=profile.fit_intercept,
+        copy_X=profile.copy_X,
+        positive=profile.positive,
+        n_jobs=profile.n_jobs,
+    )
 
 
-def _fit_model(X: Any, y: Any, profile: LinearRegressionProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: LinearRegressionProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -210,6 +222,7 @@ def _fit_model(X: Any, y: Any, profile: LinearRegressionProfile, estimator: Any)
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_linear_regression(
     X: Any,
@@ -241,7 +254,13 @@ def run_linear_regression(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("linear-regression", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "linear-regression",
+        profile,
+        recipe_path=recipe_path,
+        task=task,
+        overrides=overrides,
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)
@@ -252,7 +271,11 @@ def run_linear_regression(
         intercept=float(fitted.intercept_),
         residuals=result.y_test - result.predictions,
         rank=int(fitted.rank_) if hasattr(fitted, "rank_") else None,
-        singular_values=np.asarray(fitted.singular_).copy() if hasattr(fitted, "singular_") else None,
+        singular_values=(
+            np.asarray(fitted.singular_).copy()
+            if hasattr(fitted, "singular_")
+            else None
+        ),
     )
 
 

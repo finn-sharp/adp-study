@@ -43,13 +43,16 @@ import numpy as np
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class LightGBMProfile:
@@ -97,6 +100,7 @@ class LightGBMProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class LightGBMOutputDTO(OutputDTO):
@@ -173,7 +177,11 @@ def _require_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·범위를 만족하지 않는 값.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 범위를 확인하세요.")
@@ -209,7 +217,11 @@ def _validate_inputs(X: Any, y: Any, profile: LightGBMProfile) -> None:
         _require_number(value, name, positive=True)
         if value > 1:
             raise ValueError(name + "는 1 이하여야 합니다.")
-    if isinstance(profile.subsample_freq, bool) or not isinstance(profile.subsample_freq, int) or profile.subsample_freq < 0:
+    if (
+        isinstance(profile.subsample_freq, bool)
+        or not isinstance(profile.subsample_freq, int)
+        or profile.subsample_freq < 0
+    ):
         raise ValueError("subsample_freq는 0 이상 정수여야 합니다.")
     if profile.subsample < 1 and profile.subsample_freq == 0:
         raise ValueError("subsample<1일 때 subsample_freq를 1 이상 지정하세요.")
@@ -218,6 +230,7 @@ def _validate_inputs(X: Any, y: Any, profile: LightGBMProfile) -> None:
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _create_model(profile: LightGBMProfile) -> Any:
     """분류/회귀 목적에 맞는 미적합 모델을 생성합니다.
@@ -236,17 +249,23 @@ def _create_model(profile: LightGBMProfile) -> Any:
         raise ImportError("lightgbm 패키지를 설치하세요.") from exc
     estimator = LGBMClassifier if profile.task == "classification" else LGBMRegressor
     return estimator(
-        n_estimators=profile.n_estimators, num_leaves=profile.num_leaves,
-        learning_rate=profile.learning_rate, max_depth=profile.max_depth,
+        n_estimators=profile.n_estimators,
+        num_leaves=profile.num_leaves,
+        learning_rate=profile.learning_rate,
+        max_depth=profile.max_depth,
         min_child_samples=profile.min_child_samples,
-        subsample=profile.subsample, subsample_freq=profile.subsample_freq,
+        subsample=profile.subsample,
+        subsample_freq=profile.subsample_freq,
         colsample_bytree=profile.colsample_bytree,
-        random_state=profile.random_state, n_jobs=profile.n_jobs,
+        random_state=profile.random_state,
+        n_jobs=profile.n_jobs,
         verbosity=-1,
     )
 
 
-def _fit_model(X: Any, y: Any, profile: LightGBMProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: LightGBMProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -267,6 +286,7 @@ def _fit_model(X: Any, y: Any, profile: LightGBMProfile, estimator: Any) -> Supe
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_lightgbm(
     X: Any,
@@ -298,7 +318,9 @@ def run_lightgbm(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("lightgbm", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "lightgbm", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)

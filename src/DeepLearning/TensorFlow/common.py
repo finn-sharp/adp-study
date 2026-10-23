@@ -16,6 +16,7 @@ common.py - TensorFlow 자료 분할·학습 공통 구현
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -24,7 +25,12 @@ from dataclasses import asdict
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
-from sklearn.metrics import accuracy_score, log_loss, mean_squared_error, mean_absolute_error
+from sklearn.metrics import (
+    accuracy_score,
+    log_loss,
+    mean_squared_error,
+    mean_absolute_error,
+)
 from src.MachineLearning.analysis_common import positive_int, finite_number
 
 
@@ -39,31 +45,43 @@ def validate_profile(p, kind):
     Raises:
         ValueError/TypeError: 입력 shape·타입·조건 위반.
     """
-    for name in ('random_state', 'patience'):
+    for name in ("random_state", "patience"):
         positive_int(getattr(p, name), name, 0)
-    for name in ('epochs', 'batch_size'):
+    for name in ("epochs", "batch_size"):
         positive_int(getattr(p, name), name)
-    finite_number(p.learning_rate, 'learning_rate', True)
-    for name in ('test_size', 'validation_size'):
+    finite_number(p.learning_rate, "learning_rate", True)
+    for name in ("test_size", "validation_size"):
         value = getattr(p, name)
         finite_number(value, name, True)
-        if value >= 1: raise ValueError(name + '는 1 미만이어야 합니다.')
-    if p.test_size+p.validation_size >= 1: raise ValueError('학습 자료 비율이 양수여야 합니다.')
-    if p.scaling not in ('none', 'standard'): raise ValueError('scaling은 none/standard입니다.')
-    if isinstance(p.verbose, bool) or p.verbose not in (0, 1, 2): raise ValueError('verbose는 0/1/2입니다.')
-    if kind in ('classification', 'regression'):
-        if not isinstance(p.hidden_layer_sizes, tuple): raise ValueError('hidden_layer_sizes는 tuple입니다.')
-        for width in p.hidden_layer_sizes: positive_int(width, 'hidden_layer_sizes')
+        if value >= 1:
+            raise ValueError(name + "는 1 미만이어야 합니다.")
+    if p.test_size + p.validation_size >= 1:
+        raise ValueError("학습 자료 비율이 양수여야 합니다.")
+    if p.scaling not in ("none", "standard"):
+        raise ValueError("scaling은 none/standard입니다.")
+    if isinstance(p.verbose, bool) or p.verbose not in (0, 1, 2):
+        raise ValueError("verbose는 0/1/2입니다.")
+    if kind in ("classification", "regression"):
+        if not isinstance(p.hidden_layer_sizes, tuple):
+            raise ValueError("hidden_layer_sizes는 tuple입니다.")
+        for width in p.hidden_layer_sizes:
+            positive_int(width, "hidden_layer_sizes")
     else:
-        if p.cell not in ('simple_rnn', 'lstm', 'gru'): raise ValueError('cell 오류')
-        positive_int(p.units, 'units')
-    if kind == 'rnn' and p.task not in ('classification', 'regression'): raise ValueError('task 오류')
-    if kind == 'time_series':
-        positive_int(p.input_width, 'input_width'); positive_int(p.horizon, 'horizon')
+        if p.cell not in ("simple_rnn", "lstm", "gru"):
+            raise ValueError("cell 오류")
+        positive_int(p.units, "units")
+    if kind == "rnn" and p.task not in ("classification", "regression"):
+        raise ValueError("task 오류")
+    if kind == "time_series":
+        positive_int(p.input_width, "input_width")
+        positive_int(p.horizon, "horizon")
         if p.target_columns is not None:
-            if not isinstance(p.target_columns, tuple) or not p.target_columns: raise ValueError('target_columns는 비어있지 않은 tuple입니다.')
-            for c in p.target_columns: positive_int(c, 'target_columns', 0)
-            if len(set(p.target_columns)) != len(p.target_columns): raise ValueError('target_columns 중복')
+            if not isinstance(p.target_columns, tuple) or not p.target_columns:
+                raise ValueError("target_columns는 비어있지 않은 tuple입니다.")
+            for c in p.target_columns:
+                positive_int(c, "target_columns", 0)
+            if len(set(p.target_columns)) != len(p.target_columns):
+                raise ValueError("target_columns 중복")
 
 
 def numeric_X(X, ndim):
@@ -79,7 +97,7 @@ def numeric_X(X, ndim):
     """
     a = np.asarray(X, dtype=np.float32)
     if a.ndim != ndim or min(a.shape) < 1 or not np.isfinite(a).all():
-        raise ValueError('입력 rank/비어 있는 축/결측을 확인하세요.')
+        raise ValueError("입력 rank/비어 있는 축/결측을 확인하세요.")
     return a
 
 
@@ -89,6 +107,7 @@ class PredictionAdapter:
     시계열 predict 입력은 이미 구성한 (창,input_width,특성)입니다. 원 시계열을
     자동 windowing하지 않습니다. keras_model은 scaler를 포함하지 않습니다.
     """
+
     def __init__(self, model, scaler, shape, encoder=None, scalar_output=False):
         """
 
@@ -119,8 +138,9 @@ class PredictionAdapter:
         Raises:
             ValueError/TypeError: 입력 shape·타입·조건 위반.
         """
-        a = numeric_X(X, len(self.input_shape)+1)
-        if a.shape[1:] != self.input_shape: raise ValueError('학습과 같은 입력 shape가 필요합니다.')
+        a = numeric_X(X, len(self.input_shape) + 1)
+        if a.shape[1:] != self.input_shape:
+            raise ValueError("학습과 같은 입력 shape가 필요합니다.")
         if self.scaler is not None:
             a = self.scaler.transform(a.reshape(-1, a.shape[-1])).reshape(a.shape)
         return a.astype(np.float32)
@@ -149,7 +169,8 @@ class PredictionAdapter:
             ValueError/TypeError: 입력 shape·타입·조건 위반.
         """
         a = self._raw(X)
-        if self.encoder is not None: return self.encoder.inverse_transform(a.argmax(axis=1))
+        if self.encoder is not None:
+            return self.encoder.inverse_transform(a.argmax(axis=1))
         return a[:, 0] if self.scalar_output else a
 
     def predict_proba(self, X):
@@ -162,7 +183,8 @@ class PredictionAdapter:
         Raises:
             ValueError/TypeError: 입력 shape·타입·조건 위반.
         """
-        if self.encoder is None: raise ValueError('회귀는 predict_proba를 지원하지 않습니다.')
+        if self.encoder is None:
+            raise ValueError("회귀는 predict_proba를 지원하지 않습니다.")
         return self._raw(X)
 
 
@@ -178,11 +200,16 @@ def _tensorflow(seed):
         ImportError: TensorFlow 미설치.
     """
     import random
+
     try:
         import tensorflow as tf
     except ImportError as exc:
-        raise ImportError('TensorFlow 전용 requirements-tensorflow-py37/py312.txt를 설치하세요.') from exc
-    random.seed(seed); np.random.seed(seed); tf.random.set_seed(seed)
+        raise ImportError(
+            "TensorFlow 전용 requirements-tensorflow-py37/py312.txt를 설치하세요."
+        ) from exc
+    random.seed(seed)
+    np.random.seed(seed)
+    tf.random.set_seed(seed)
     return tf
 
 
@@ -225,13 +252,22 @@ def _fit(X, y, train, val, test, p, kind, classification, target_indices=None):
         ValueError/TypeError: 입력 shape·타입·조건 위반.
         ImportError: TensorFlow 미설치.
     """
-    scaler = StandardScaler().fit(X[train].reshape(-1, X.shape[-1])) if p.scaling == 'standard' else None
-    scaled = scaler.transform(X.reshape(-1,X.shape[-1])).reshape(X.shape).astype(np.float32) if scaler is not None else X
+    scaler = (
+        StandardScaler().fit(X[train].reshape(-1, X.shape[-1]))
+        if p.scaling == "standard"
+        else None
+    )
+    scaled = (
+        scaler.transform(X.reshape(-1, X.shape[-1])).reshape(X.shape).astype(np.float32)
+        if scaler is not None
+        else X
+    )
     encoder = None
     scalar = not classification and y.ndim == 1
     if classification:
         encoder = LabelEncoder().fit(y[train])
-        if len(encoder.classes_) < 2: raise ValueError('학습에 2개 이상 클래스가 필요합니다.')
+        if len(encoder.classes_) < 2:
+            raise ValueError("학습에 2개 이상 클래스가 필요합니다.")
         target = encoder.transform(y)
         output_shape = (len(encoder.classes_),)
     else:
@@ -239,33 +275,80 @@ def _fit(X, y, train, val, test, p, kind, classification, target_indices=None):
         output_shape = target.shape[1:]
     tf = _tensorflow(p.random_state)
     layers = [tf.keras.layers.Input(shape=X.shape[1:])]
-    if kind in ('rnn', 'time_series'):
-        Cell = {'simple_rnn':tf.keras.layers.SimpleRNN, 'lstm':tf.keras.layers.LSTM, 'gru':tf.keras.layers.GRU}[p.cell]
+    if kind in ("rnn", "time_series"):
+        Cell = {
+            "simple_rnn": tf.keras.layers.SimpleRNN,
+            "lstm": tf.keras.layers.LSTM,
+            "gru": tf.keras.layers.GRU,
+        }[p.cell]
         layers.append(Cell(p.units))
     else:
-        for width in p.hidden_layer_sizes: layers.append(tf.keras.layers.Dense(width, activation='relu'))
-    layers.append(tf.keras.layers.Dense(int(np.prod(output_shape)), activation='softmax' if classification else None))
-    if len(output_shape) > 1: layers.append(tf.keras.layers.Reshape(output_shape))
+        for width in p.hidden_layer_sizes:
+            layers.append(tf.keras.layers.Dense(width, activation="relu"))
+    layers.append(
+        tf.keras.layers.Dense(
+            int(np.prod(output_shape)), activation="softmax" if classification else None
+        )
+    )
+    if len(output_shape) > 1:
+        layers.append(tf.keras.layers.Reshape(output_shape))
     model = tf.keras.Sequential(layers)
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=p.learning_rate), loss='sparse_categorical_crossentropy' if classification else 'mse')
-    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=p.patience, restore_best_weights=True)
-    history = model.fit(_dataset(tf,scaled[train],target[train],p.batch_size),
-                        validation_data=_dataset(tf,scaled[val],target[val],p.batch_size),
-                        epochs=p.epochs, callbacks=[callback], verbose=p.verbose, shuffle=False).history
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=p.learning_rate),
+        loss="sparse_categorical_crossentropy" if classification else "mse",
+    )
+    callback = tf.keras.callbacks.EarlyStopping(
+        monitor="val_loss", patience=p.patience, restore_best_weights=True
+    )
+    history = model.fit(
+        _dataset(tf, scaled[train], target[train], p.batch_size),
+        validation_data=_dataset(tf, scaled[val], target[val], p.batch_size),
+        epochs=p.epochs,
+        callbacks=[callback],
+        verbose=p.verbose,
+        shuffle=False,
+    ).history
     # TF 2.11 restores only on early stop; also restore after a full epoch budget.
     if callback.best_weights is not None:
         model.set_weights(callback.best_weights)
-    if not all(np.isfinite(v).all() for v in history.values()): raise ValueError('비유한 학습 loss입니다. 스케일/학습률을 확인하세요.')
-    adapter = PredictionAdapter(model,scaler,X.shape[1:],encoder,scalar)
+    if not all(np.isfinite(v).all() for v in history.values()):
+        raise ValueError("비유한 학습 loss입니다. 스케일/학습률을 확인하세요.")
+    adapter = PredictionAdapter(model, scaler, X.shape[1:], encoder, scalar)
     predictions = adapter.predict(X[test])
-    if not np.isfinite(model(scaled[test],training=False).numpy()).all(): raise ValueError('비유한 예측')
+    if not np.isfinite(model(scaled[test], training=False).numpy()).all():
+        raise ValueError("비유한 예측")
     proba = adapter.predict_proba(X[test]) if classification else None
     from src.Evaluation.adapters import evaluate_predictions
-    metrics = evaluate_predictions(y[test], predictions, 'classification', proba, encoder.classes_) if classification else evaluate_predictions(y[test].reshape(len(test),-1), predictions.reshape(len(test),-1), 'regression')
-    return dict(task='classification' if classification else 'regression', parameters=asdict(p), model=adapter, history={k:[float(v) for v in vs] for k,vs in history.items()}, test_metrics=metrics,
-                predictions=predictions, probabilities=proba, classes=None if encoder is None else encoder.classes_,
-                train_indices=train,validation_indices=val,test_indices=test,target_indices=target_indices,
-                y_test=y[test],input_shape=tuple(X.shape[1:]),epochs_trained=len(history['loss']),best_epoch=int(np.argmin(history['val_loss']))+1)
+
+    metrics = (
+        evaluate_predictions(
+            y[test], predictions, "classification", proba, encoder.classes_
+        )
+        if classification
+        else evaluate_predictions(
+            y[test].reshape(len(test), -1),
+            predictions.reshape(len(test), -1),
+            "regression",
+        )
+    )
+    return dict(
+        task="classification" if classification else "regression",
+        parameters=asdict(p),
+        model=adapter,
+        history={k: [float(v) for v in vs] for k, vs in history.items()},
+        test_metrics=metrics,
+        predictions=predictions,
+        probabilities=proba,
+        classes=None if encoder is None else encoder.classes_,
+        train_indices=train,
+        validation_indices=val,
+        test_indices=test,
+        target_indices=target_indices,
+        y_test=y[test],
+        input_shape=tuple(X.shape[1:]),
+        epochs_trained=len(history["loss"]),
+        best_epoch=int(np.argmin(history["val_loss"])) + 1,
+    )
 
 
 def run_supervised(X, y, p, kind):
@@ -282,21 +365,42 @@ def run_supervised(X, y, p, kind):
         ValueError/TypeError: 입력 shape·타입·조건 위반.
         ImportError: TensorFlow 미설치.
     """
-    X = numeric_X(X, 3 if kind == 'rnn' else 2)
-    classification = kind == 'classification' or (kind == 'rnn' and p.task == 'classification')
+    X = numeric_X(X, 3 if kind == "rnn" else 2)
+    classification = kind == "classification" or (
+        kind == "rnn" and p.task == "classification"
+    )
     y = np.asarray(y)
-    if y.ndim == 0: raise ValueError('타깃은 표본 축이 필요합니다.')
-    if len(y) != len(X): raise ValueError('X/y 표본수 불일치')
+    if y.ndim == 0:
+        raise ValueError("타깃은 표본 축이 필요합니다.")
+    if len(y) != len(X):
+        raise ValueError("X/y 표본수 불일치")
     if classification:
-        if y.ndim != 1 or y.dtype.kind not in 'biufUS': raise ValueError('분류 타깃은 1차원 수치/문자 라벨입니다.')
-        if y.dtype.kind in 'f' and not np.isfinite(y).all(): raise ValueError('타깃 결측')
+        if y.ndim != 1 or y.dtype.kind not in "biufUS":
+            raise ValueError("분류 타깃은 1차원 수치/문자 라벨입니다.")
+        if y.dtype.kind in "f" and not np.isfinite(y).all():
+            raise ValueError("타깃 결측")
     else:
-        y = np.asarray(y,dtype=np.float32)
-        if y.ndim not in (1,2) or (y.ndim == 2 and y.shape[1] == 0) or not np.isfinite(y).all(): raise ValueError('유한한 회귀 타깃이 필요합니다.')
+        y = np.asarray(y, dtype=np.float32)
+        if (
+            y.ndim not in (1, 2)
+            or (y.ndim == 2 and y.shape[1] == 0)
+            or not np.isfinite(y).all()
+        ):
+            raise ValueError("유한한 회귀 타깃이 필요합니다.")
     indices = np.arange(len(X))
-    remaining, test = train_test_split(indices,test_size=p.test_size,random_state=p.random_state,stratify=y if classification else None)
-    train, val = train_test_split(remaining,test_size=p.validation_size/(1-p.test_size),random_state=p.random_state,stratify=y[remaining] if classification else None)
-    return _fit(X,y,train,val,test,p,kind,classification)
+    remaining, test = train_test_split(
+        indices,
+        test_size=p.test_size,
+        random_state=p.random_state,
+        stratify=y if classification else None,
+    )
+    train, val = train_test_split(
+        remaining,
+        test_size=p.validation_size / (1 - p.test_size),
+        random_state=p.random_state,
+        stratify=y[remaining] if classification else None,
+    )
+    return _fit(X, y, train, val, test, p, kind, classification)
 
 
 def make_windows(series, input_width, horizon, target_columns=None, offset=0):
@@ -313,19 +417,25 @@ def make_windows(series, input_width, horizon, target_columns=None, offset=0):
     Raises:
         ValueError/TypeError: 입력 shape·타입·조건 위반.
     """
-    a = numeric_X(series,2)
-    positive_int(input_width,'input_width'); positive_int(horizon,'horizon')
+    a = numeric_X(series, 2)
+    positive_int(input_width, "input_width")
+    positive_int(horizon, "horizon")
     columns = tuple(range(a.shape[1])) if target_columns is None else target_columns
-    if not columns or len(set(columns)) != len(columns): raise ValueError('타깃 열 선택 오류')
+    if not columns or len(set(columns)) != len(columns):
+        raise ValueError("타깃 열 선택 오류")
     for c in columns:
-        positive_int(c,'target_columns',0)
-        if c >= a.shape[1]: raise ValueError('타깃 열 범위 오류')
-    n = len(a)-input_width-horizon+1
-    if n <= 0: raise ValueError('각 분할에 input_width+horizon 이상의 시점이 필요합니다.')
-    X = np.stack([a[i:i+input_width] for i in range(n)])
-    times = np.stack([np.arange(i+input_width,i+input_width+horizon) for i in range(n)])
-    y = a[times][:,:,columns]
-    return X,y,times+offset
+        positive_int(c, "target_columns", 0)
+        if c >= a.shape[1]:
+            raise ValueError("타깃 열 범위 오류")
+    n = len(a) - input_width - horizon + 1
+    if n <= 0:
+        raise ValueError("각 분할에 input_width+horizon 이상의 시점이 필요합니다.")
+    X = np.stack([a[i : i + input_width] for i in range(n)])
+    times = np.stack(
+        [np.arange(i + input_width, i + input_width + horizon) for i in range(n)]
+    )
+    y = a[times][:, :, columns]
+    return X, y, times + offset
 
 
 def run_forecast(series, p):
@@ -340,13 +450,24 @@ def run_forecast(series, p):
         ValueError/TypeError: 입력 shape·타입·조건 위반.
         ImportError: TensorFlow 미설치.
     """
-    a = numeric_X(series,2)
-    n = len(a); end_train = int(n*(1-p.test_size-p.validation_size)); end_val = int(n*(1-p.test_size))
-    blocks = [(0,end_train),(end_train,end_val),(end_val,n)]
-    windows = [make_windows(a[start:end],p.input_width,p.horizon,p.target_columns,start) for start,end in blocks]
-    X = np.concatenate([w[0] for w in windows]); y = np.concatenate([w[1] for w in windows])
-    sizes = [len(w[0]) for w in windows]; cut = np.cumsum([0]+sizes)
-    train,val,test = [np.arange(cut[i],cut[i+1]) for i in range(3)]
-    result = _fit(X,y,train,val,test,p,'time_series',False,windows[2][2])
-    result.update(train_indices=np.arange(end_train),validation_indices=np.arange(end_train,end_val),test_indices=np.arange(end_val,n))
+    a = numeric_X(series, 2)
+    n = len(a)
+    end_train = int(n * (1 - p.test_size - p.validation_size))
+    end_val = int(n * (1 - p.test_size))
+    blocks = [(0, end_train), (end_train, end_val), (end_val, n)]
+    windows = [
+        make_windows(a[start:end], p.input_width, p.horizon, p.target_columns, start)
+        for start, end in blocks
+    ]
+    X = np.concatenate([w[0] for w in windows])
+    y = np.concatenate([w[1] for w in windows])
+    sizes = [len(w[0]) for w in windows]
+    cut = np.cumsum([0] + sizes)
+    train, val, test = [np.arange(cut[i], cut[i + 1]) for i in range(3)]
+    result = _fit(X, y, train, val, test, p, "time_series", False, windows[2][2])
+    result.update(
+        train_indices=np.arange(end_train),
+        validation_indices=np.arange(end_train, end_val),
+        test_indices=np.arange(end_val, n),
+    )
     return result

@@ -3,6 +3,7 @@
 작성 정보: 김재현(Finn), 2026-10-14, Proprietary.
 원 자료 ML Template Code의 RF/LightGBM tuning 흐름을 실행 가능한 코드로 연결.
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -49,8 +50,17 @@ def load_recipe(task="classification", model="random-forest", overrides=None):
     """
     if model not in ("random-forest", "lightgbm"):
         raise ValueError("model은 random-forest/lightgbm입니다.")
-    path = Path(__file__).resolve().parents[2] / "Recipes" / ("optimization-" + model + "-grid-search-" + task + ".json")
-    return load_profile("optimization-grid-search", task=task, recipe_path=str(path), overrides=overrides)
+    path = (
+        Path(__file__).resolve().parents[2]
+        / "Recipes"
+        / ("optimization-" + model + "-grid-search-" + task + ".json")
+    )
+    return load_profile(
+        "optimization-grid-search",
+        task=task,
+        recipe_path=str(path),
+        overrides=overrides,
+    )
 
 
 def build_pipeline(task="classification", model="random-forest"):
@@ -67,16 +77,26 @@ def build_pipeline(task="classification", model="random-forest"):
     if task not in ("classification", "regression"):
         raise ValueError("task 오류")
     if model == "random-forest":
-        cls = RandomForestClassifier if task == "classification" else RandomForestRegressor
+        cls = (
+            RandomForestClassifier
+            if task == "classification"
+            else RandomForestRegressor
+        )
         estimator = cls(random_state=1234, n_jobs=1)
     elif model == "lightgbm":
         from lightgbm import LGBMClassifier, LGBMRegressor
+
         cls = LGBMClassifier if task == "classification" else LGBMRegressor
         estimator = cls(random_state=1234, n_jobs=1, verbosity=-1)
     else:
         raise ValueError("model 오류")
-    return Pipeline([("imputer", SimpleImputer(strategy="median")),
-                     ("scaler", StandardScaler()), ("model", estimator)])
+    return Pipeline(
+        [
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+            ("model", estimator),
+        ]
+    )
 
 
 def main(task="classification", model="random-forest", overrides=None, data=None):
@@ -93,22 +113,44 @@ def main(task="classification", model="random-forest", overrides=None, data=None
     """
     import numpy as np
     from sklearn.utils import _safe_indexing
+
     X, y = load_data(task) if data is None else data
     ids = np.arange(len(y))
-    train, test = train_test_split(ids, test_size=.3, random_state=1234,
-                                  stratify=y if task == "classification" else None)
+    train, test = train_test_split(
+        ids,
+        test_size=0.3,
+        random_state=1234,
+        stratify=y if task == "classification" else None,
+    )
     profile = load_recipe(task, model, overrides)
-    result = run_grid_search(_safe_indexing(X, train), _safe_indexing(y, train),
-                          build_pipeline(task, model), profile)
+    result = run_grid_search(
+        _safe_indexing(X, train),
+        _safe_indexing(y, train),
+        build_pipeline(task, model),
+        profile,
+    )
     if result.model is None:
         raise ValueError("보류 평가 skeleton에는 refit=True가 필요합니다.")
     pred = result.model.predict(_safe_indexing(X, test))
-    prob = result.model.predict_proba(_safe_indexing(X, test)) if task == "classification" else None
-    metrics = evaluate_predictions(_safe_indexing(y, test), pred, task, probabilities=prob,
-                                   classes=result.model.classes_ if task == "classification" else None)
+    prob = (
+        result.model.predict_proba(_safe_indexing(X, test))
+        if task == "classification"
+        else None
+    )
+    metrics = evaluate_predictions(
+        _safe_indexing(y, test),
+        pred,
+        task,
+        probabilities=prob,
+        classes=result.model.classes_ if task == "classification" else None,
+    )
     print(result.best_params, result.best_score, metrics)
-    return {"optimization": result, "holdout_metrics": metrics,
-             "train_indices": train, "test_indices": test}
+    return {
+        "optimization": result,
+        "holdout_metrics": metrics,
+        "train_indices": train,
+        "test_indices": test,
+    }
 
 
 if __name__ == "__main__":

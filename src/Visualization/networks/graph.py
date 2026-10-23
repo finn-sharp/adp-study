@@ -15,6 +15,7 @@ graph.py - 연결 구조·분리 요소·허브 후보를 검토합니다.
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -45,12 +58,14 @@ class NetworksGraphProfile:
         random_state (int): spring 배치 재현성 seed. 기본 1234.
         show_labels (bool): 노드 label 표시. 기본 True.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     max_nodes: int = 100
     random_state: int = 1234
     show_labels: bool = True
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,6 +83,7 @@ class NetworksGraphOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -75,6 +91,7 @@ class NetworksGraphOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -90,6 +107,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, NetworksGraphProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -108,19 +126,74 @@ def _draw(graph, ax, profile, before):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     import networkx as nx
-    if not isinstance(graph,nx.Graph) or graph.number_of_nodes()<1 or graph.number_of_nodes()>profile.max_nodes or profile.max_nodes<1:raise ValueError('Graph/노드 한도 오류')
-    for u,v,attributes in graph.edges(data=True):
-        weight=attributes.get('weight',1.)
-        if isinstance(weight,bool) or not isinstance(weight,(int,float)) or not np.isfinite(weight) or weight<0:raise ValueError('spring 가중치는 비음수 유한 실수입니다.')
-    positions=nx.spring_layout(graph,seed=profile.random_state,weight='weight');degrees=dict(graph.degree());nodes=list(graph.nodes());sizes=[40+25*degrees[node] for node in nodes]
-    nx.draw_networkx(graph,pos=positions,ax=ax,node_size=sizes,node_color=profile.color,alpha=profile.alpha,with_labels=profile.show_labels,font_size=8,arrows=graph.is_directed());ax.set_axis_off()
-    data=pd.DataFrame({'node':[str(n) for n in nodes],'x':[positions[n][0] for n in nodes],'y':[positions[n][1] for n in nodes],'degree':[degrees[n] for n in nodes]});diagnostics={'n_nodes':len(nodes),'n_edges':graph.number_of_edges(),'directed':graph.is_directed(),'isolates':len(list(nx.isolates(graph)))};notes=['배치 거리와 node 크기는 탐색 표현입니다. degree 크기는 영향력·인과를 뜻하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, NetworksGraphOutputDTO, 'Networks — Graph', notes)
+
+    if (
+        not isinstance(graph, nx.Graph)
+        or graph.number_of_nodes() < 1
+        or graph.number_of_nodes() > profile.max_nodes
+        or profile.max_nodes < 1
+    ):
+        raise ValueError("Graph/노드 한도 오류")
+    for u, v, attributes in graph.edges(data=True):
+        weight = attributes.get("weight", 1.0)
+        if (
+            isinstance(weight, bool)
+            or not isinstance(weight, (int, float))
+            or not np.isfinite(weight)
+            or weight < 0
+        ):
+            raise ValueError("spring 가중치는 비음수 유한 실수입니다.")
+    positions = nx.spring_layout(graph, seed=profile.random_state, weight="weight")
+    degrees = dict(graph.degree())
+    nodes = list(graph.nodes())
+    sizes = [40 + 25 * degrees[node] for node in nodes]
+    nx.draw_networkx(
+        graph,
+        pos=positions,
+        ax=ax,
+        node_size=sizes,
+        node_color=profile.color,
+        alpha=profile.alpha,
+        with_labels=profile.show_labels,
+        font_size=8,
+        arrows=graph.is_directed(),
+    )
+    ax.set_axis_off()
+    data = pd.DataFrame(
+        {
+            "node": [str(n) for n in nodes],
+            "x": [positions[n][0] for n in nodes],
+            "y": [positions[n][1] for n in nodes],
+            "degree": [degrees[n] for n in nodes],
+        }
+    )
+    diagnostics = {
+        "n_nodes": len(nodes),
+        "n_edges": graph.number_of_edges(),
+        "directed": graph.is_directed(),
+        "isolates": len(list(nx.isolates(graph))),
+    }
+    notes = [
+        "배치 거리와 node 크기는 탐색 표현입니다. degree 크기는 영향력·인과를 뜻하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        NetworksGraphOutputDTO,
+        "Networks — Graph",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_graph(graph, *, ax, profile=None, recipe_path=None, overrides=None) -> NetworksGraphOutputDTO:
+def plot_graph(
+    graph, *, ax, profile=None, recipe_path=None, overrides=None
+) -> NetworksGraphOutputDTO:
     """연결 구조·분리 요소·허브 후보를 검토합니다.
 
     Args:
@@ -134,10 +207,13 @@ def plot_graph(graph, *, ax, profile=None, recipe_path=None, overrides=None) -> 
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-networks-graph', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-networks-graph", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(graph, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

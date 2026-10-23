@@ -15,22 +15,24 @@ logistic.py - logistic 전용 GLM 계수·우도·조건별 잔차·영향도
     2026-10-23  김재현(Finn)     v1.0.0    응용 분석 모듈·모의10회 실행 연결
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from src.stats.regression._common import validate_profile
 from ._common import fit_family
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,9 +46,11 @@ class LogisticGLMProfile:
         maxiter (int): IRLS 최대 적합 반복, 양수 기본 100.
         cov_type (str): nonrobust/HC0 robust 공분산 기본 'nonrobust'.
     """
+
     alpha: float = 0.05
     maxiter: int = 100
-    cov_type: str = 'nonrobust'
+    cov_type: str = "nonrobust"
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,17 +68,20 @@ class LogisticGLMOutputDTO(OutputDTO):
         parameters (Dict[str,Any]): 적용 Profile.
         warnings (List[str]): 분포/링크/노출/추론·선택 한계.
     """
+
     model: Any
     coefficients: pd.DataFrame
-    fit_metrics: Dict[str,Any]
+    fit_metrics: Dict[str, Any]
     diagnostics: pd.DataFrame
     predictions: Optional[np.ndarray]
-    parameters: Dict[str,Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -86,12 +93,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,LogisticGLMProfile)
-    if profile.maxiter<1 or profile.cov_type not in ('nonrobust','HC0'):raise ValueError('반복/공분산 오류')
+    validate_profile(profile, LogisticGLMProfile)
+    if profile.maxiter < 1 or profile.cov_type not in ("nonrobust", "HC0"):
+        raise ValueError("반복/공분산 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(X, y, X_new, offset, new_offset, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -108,13 +118,27 @@ def _run(X, y, X_new, offset, new_offset, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    return fit_family(X,y,X_new,offset,new_offset,profile,'logistic',LogisticGLMOutputDTO)
+    return fit_family(
+        X, y, X_new, offset, new_offset, profile, "logistic", LogisticGLMOutputDTO
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_logistic(X, y, X_new=None, offset=None, new_offset=None, profile=None, *, recipe_path=None, overrides=None):
+
+def run_logistic(
+    X,
+    y,
+    X_new=None,
+    offset=None,
+    new_offset=None,
+    profile=None,
+    *,
+    recipe_path=None,
+    overrides=None,
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -131,9 +155,12 @@ def run_logistic(X, y, X_new=None, offset=None, new_offset=None, profile=None, *
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('glm-logistic',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "glm-logistic", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X, y, X_new, offset, new_offset,profile)
+    return _run(X, y, X_new, offset, new_offset, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

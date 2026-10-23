@@ -29,8 +29,6 @@ __version__ = "1.2.0"
 __status__ = "Development"
 
 
-
-
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
@@ -42,13 +40,18 @@ import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
-from src.stats.tests.parametric.Average.Multivariate._common import validate_alpha, validate_groups, validate_labels
+from src.stats.tests.parametric.Average.Multivariate._common import (
+    validate_alpha,
+    validate_groups,
+    validate_labels,
+)
 from statsmodels.multivariate.manova import MANOVA
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MANOVAProfile:
@@ -66,6 +69,7 @@ class MANOVAProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MANOVAOutputDTO(OutputDTO):
@@ -108,8 +112,14 @@ class MANOVAOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
-def _validate_inputs(Y: Any, groups: Any, profile: MANOVAProfile,
-                     response_names: Optional[List[str]], group_name: str) -> Any:
+
+def _validate_inputs(
+    Y: Any,
+    groups: Any,
+    profile: MANOVAProfile,
+    response_names: Optional[List[str]],
+    group_name: str,
+) -> Any:
     """다변량 반응 및 일원 요인을 검증합니다.
 
     Args:
@@ -124,33 +134,54 @@ def _validate_inputs(Y: Any, groups: Any, profile: MANOVAProfile,
         TypeError: 잘못된 Profile 타입.
         ValueError: 조건·차원·유한성·표본·이름 오류.
     """
-    if not isinstance(profile,MANOVAProfile):
+    if not isinstance(profile, MANOVAProfile):
         raise TypeError("MANOVAProfile이 필요합니다.")
     validate_alpha(profile.alpha)
-    if profile.criterion not in ('pillai','wilks','hotelling','roy'):
+    if profile.criterion not in ("pillai", "wilks", "hotelling", "roy"):
         raise ValueError("criterion은 pillai/wilks/hotelling/roy여야 합니다.")
-    response = np.asarray(Y,dtype=float)
-    if response.ndim!=2 or response.shape[1]<2 or not np.isfinite(response).all():
+    response = np.asarray(Y, dtype=float)
+    if response.ndim != 2 or response.shape[1] < 2 or not np.isfinite(response).all():
         raise ValueError("Y는 최소 두 열의 유한한 수치형 2차원 행렬이어야 합니다.")
-    labels = validate_labels(groups,len(response))
-    levels,counts = np.unique(labels,return_counts=True)
-    if counts.min()<2 or len(response)-len(levels)<=response.shape[1]:
-        raise ValueError("각 집단 최소 두 관측과 반응 열 수보다 큰 잔차 자유도가 필요합니다.")
-    names = list(response_names) if response_names is not None else (
-        [str(c) for c in Y.columns] if hasattr(Y,'columns') else ['Y'+str(i) for i in range(response.shape[1])])
-    if len(names)!=response.shape[1] or any(not isinstance(s,str) or not s.strip() for s in names) or len(set(names))!=len(names):
-        raise ValueError("response_names는 반응 열 수와 같은 고유한 비어 있지 않은 문자열 목록이어야 합니다.")
-    if not isinstance(group_name,str) or not group_name.strip():
+    labels = validate_labels(groups, len(response))
+    levels, counts = np.unique(labels, return_counts=True)
+    if counts.min() < 2 or len(response) - len(levels) <= response.shape[1]:
+        raise ValueError(
+            "각 집단 최소 두 관측과 반응 열 수보다 큰 잔차 자유도가 필요합니다."
+        )
+    names = (
+        list(response_names)
+        if response_names is not None
+        else (
+            [str(c) for c in Y.columns]
+            if hasattr(Y, "columns")
+            else ["Y" + str(i) for i in range(response.shape[1])]
+        )
+    )
+    if (
+        len(names) != response.shape[1]
+        or any(not isinstance(s, str) or not s.strip() for s in names)
+        or len(set(names)) != len(names)
+    ):
+        raise ValueError(
+            "response_names는 반응 열 수와 같은 고유한 비어 있지 않은 문자열 목록이어야 합니다."
+        )
+    if not isinstance(group_name, str) or not group_name.strip():
         raise ValueError("group_name은 비어 있지 않은 문자열이어야 합니다.")
-    return response,labels,names
+    return response, labels, names
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _run_manova(Y: np.ndarray, labels: np.ndarray, names: List[str],
-                group_name: str, profile: MANOVAProfile) -> MANOVAOutputDTO:
+
+def _run_manova(
+    Y: np.ndarray,
+    labels: np.ndarray,
+    names: List[str],
+    group_name: str,
+    profile: MANOVAProfile,
+) -> MANOVAOutputDTO:
     """한 요인의 모든 집단 대비를 공동 검정합니다.
 
     Args:
@@ -167,34 +198,72 @@ def _run_manova(Y: np.ndarray, labels: np.ndarray, names: List[str],
         절편을 제외한 모든 집단 더미 계수에 하나의 공동 대비를 적용합니다.
         다요인 MANOVA 및 MANCOVA는 이 실행기의 범위에 포함하지 않습니다.
     """
-    levels,counts = np.unique(labels,return_counts=True)
-    means = np.array([Y[labels==level].mean(axis=0) for level in levels])
+    levels, counts = np.unique(labels, return_counts=True)
+    means = np.array([Y[labels == level].mean(axis=0) for level in levels])
     residual = Y.copy()
-    for level,mean in zip(levels,means):
-        residual[labels==level] -= mean
-    if np.linalg.matrix_rank(residual)<Y.shape[1]:
-        raise ValueError("잔차 공분산이 특이합니다. 중복·선형종속 반응변수를 제거하세요.")
-    design = np.column_stack([np.ones(len(Y))]+[(labels==level).astype(float) for level in levels[1:]])
+    for level, mean in zip(levels, means):
+        residual[labels == level] -= mean
+    if np.linalg.matrix_rank(residual) < Y.shape[1]:
+        raise ValueError(
+            "잔차 공분산이 특이합니다. 중복·선형종속 반응변수를 제거하세요."
+        )
+    design = np.column_stack(
+        [np.ones(len(Y))] + [(labels == level).astype(float) for level in levels[1:]]
+    )
     contrast = np.eye(len(levels))[1:]
-    table = MANOVA(Y,design).mv_test([('Group',contrast)]).results['Group']['stat'].copy()
-    table = table.rename(columns={'Value':'value','Num DF':'df_num','Den DF':'df_den','F Value':'statistic','Pr > F':'p_value'}).astype(float)
+    table = (
+        MANOVA(Y, design).mv_test([("Group", contrast)]).results["Group"]["stat"].copy()
+    )
+    table = table.rename(
+        columns={
+            "Value": "value",
+            "Num DF": "df_num",
+            "Den DF": "df_den",
+            "F Value": "statistic",
+            "Pr > F": "p_value",
+        }
+    ).astype(float)
     if not np.isfinite(table.to_numpy()).all():
-        raise ValueError("MANOVA 지표가 유한하지 않습니다. 표본 수와 공분산을 점검하세요.")
-    table['reject_h0'] = table['p_value']<profile.alpha
-    rows={'pillai':"Pillai's trace",'wilks':"Wilks' lambda",'hotelling':"Hotelling-Lawley trace",'roy':"Roy's greatest root"}
-    selected=table.loc[rows[profile.criterion]]
-    return MANOVAOutputDTO('One-way MANOVA',profile.criterion,float(selected['value']),
-        float(selected['statistic']),float(selected['p_value']),bool(selected['reject_h0']),
-        float(selected['df_num']),float(selected['df_den']),group_name,names,levels.tolist(),counts.tolist(),
-        pd.DataFrame(means,index=levels,columns=names),table)
+        raise ValueError(
+            "MANOVA 지표가 유한하지 않습니다. 표본 수와 공분산을 점검하세요."
+        )
+    table["reject_h0"] = table["p_value"] < profile.alpha
+    rows = {
+        "pillai": "Pillai's trace",
+        "wilks": "Wilks' lambda",
+        "hotelling": "Hotelling-Lawley trace",
+        "roy": "Roy's greatest root",
+    }
+    selected = table.loc[rows[profile.criterion]]
+    return MANOVAOutputDTO(
+        "One-way MANOVA",
+        profile.criterion,
+        float(selected["value"]),
+        float(selected["statistic"]),
+        float(selected["p_value"]),
+        bool(selected["reject_h0"]),
+        float(selected["df_num"]),
+        float(selected["df_den"]),
+        group_name,
+        names,
+        levels.tolist(),
+        counts.tolist(),
+        pd.DataFrame(means, index=levels, columns=names),
+        table,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_manova(Y: Any, groups: Any, profile: Optional[MANOVAProfile] = None,
-               response_names: Optional[List[str]] = None, group_name: str = "Group",
+
+def run_manova(
+    Y: Any,
+    groups: Any,
+    profile: Optional[MANOVAProfile] = None,
+    response_names: Optional[List[str]] = None,
+    group_name: str = "Group",
     *,
     recipe_path: Optional[str] = None,
     overrides: Optional[Dict[str, Any]] = None,
@@ -219,9 +288,13 @@ def run_manova(Y: Any, groups: Any, profile: Optional[MANOVAProfile] = None,
         네 지표를 개별 보고하지만 기본 기각 판단은 사전에 정한 한 지표(Pillai)를 사용합니다.
         종속변수별 사후검정을 여러 번 수행하면 추가 다중검정 보정이 필요합니다.
     """
-    profile = resolve_profile("manova", profile, recipe_path=recipe_path, overrides=overrides)
-    response,labels,names = _validate_inputs(Y,groups,profile,response_names,group_name)
-    return _run_manova(response,labels,names,group_name,profile)
+    profile = resolve_profile(
+        "manova", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    response, labels, names = _validate_inputs(
+        Y, groups, profile, response_names, group_name
+    )
+    return _run_manova(response, labels, names, group_name, profile)
 
 
 # ---------------------------------------------------------------------------
@@ -230,8 +303,8 @@ def run_manova(Y: Any, groups: Any, profile: Optional[MANOVAProfile] = None,
 
 if __name__ == "__main__":
     rng = np.random.RandomState(1234)
-    Y = np.vstack([rng.normal(size=(20,2))+shift for shift in (0,1,2)])
-    groups = ['A']*20+['B']*20+['C']*20
-    result = run_manova(Y,groups,load_profile("manova"))
+    Y = np.vstack([rng.normal(size=(20, 2)) + shift for shift in (0, 1, 2)])
+    groups = ["A"] * 20 + ["B"] * 20 + ["C"] * 20
+    result = run_manova(Y, groups, load_profile("manova"))
     print(result.test_table)
     print(result.to_json()[:200])

@@ -18,6 +18,7 @@ kaplan_meier.py - 우측 중도절단 자료의 Kaplan-Meier 생존함수 추정
     2026-10-20  김재현(Finn)     v1.0.0    승인된 생존분석 모듈·Greenwood 신뢰구간 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -48,6 +49,7 @@ class KaplanMeierProfile:
         evaluation_times (Optional[List[float]]): 조회할 시각. 기본 None.
             유한한 비음수 값이며 최대 관측시간 이하. 입력 순서·중복을 보존합니다.
     """
+
     alpha: float = 0.05
     label: str = "sample"
     evaluation_times: Optional[List[float]] = None
@@ -78,6 +80,7 @@ class KaplanMeierOutputDTO(OutputDTO):
         survival_at_times (Optional[np.ndarray]): 요청 시각의 S(t), 미요청 None.
         warnings (List[str]): 해석과 지원 범위의 제한.
     """
+
     method: str
     parameters: Dict[str, Any]
     sample_size: int
@@ -113,7 +116,11 @@ def _validate_inputs(durations, event_observed, profile):
     """
     if not isinstance(profile, KaplanMeierProfile):
         raise TypeError("KaplanMeierProfile이 필요합니다.")
-    if isinstance(profile.alpha, bool) or not isinstance(profile.alpha, (int, float)) or not 0 < profile.alpha < 1:
+    if (
+        isinstance(profile.alpha, bool)
+        or not isinstance(profile.alpha, (int, float))
+        or not 0 < profile.alpha < 1
+    ):
         raise ValueError("alpha는 0과 1 사이여야 합니다.")
     if not isinstance(profile.label, str) or not profile.label.strip():
         raise ValueError("label은 공백이 아닌 문자열이어야 합니다.")
@@ -164,10 +171,13 @@ def _fit_kaplan_meier(t, e):
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def run_kaplan_meier(durations, event_observed,
-                    profile: Optional[KaplanMeierProfile] = None,
-                    recipe_path: Optional[str] = None,
-                    overrides: Optional[Dict[str, Any]] = None) -> KaplanMeierOutputDTO:
+def run_kaplan_meier(
+    durations,
+    event_observed,
+    profile: Optional[KaplanMeierProfile] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> KaplanMeierOutputDTO:
     """JSON 또는 명시적 Profile로 생존함수를 추정합니다.
 
     Args:
@@ -185,8 +195,12 @@ def run_kaplan_meier(durations, event_observed,
         추정 전용입니다. p-value나 H0/H1을 임의로 생성하지 않습니다.
         신뢰구간은 점별 구간이며 동시 신뢰대역이 아닙니다. RMST·검정·Cox는 별도 모듈입니다.
     """
-    p = resolve_profile("survival-kaplan-meier", profile=profile,
-                        recipe_path=recipe_path, overrides=overrides)
+    p = resolve_profile(
+        "survival-kaplan-meier",
+        profile=profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     t, e, query = _validate_inputs(durations, event_observed, p)
     times, risk, events, censored, survival = _fit_kaplan_meier(t, e)
     reached = np.flatnonzero(survival <= 0.5)
@@ -210,8 +224,22 @@ def run_kaplan_meier(durations, event_observed,
     if median is None:
         notes.append("관찰 기간에 중앙수명에 도달하지 않았습니다.")
     return KaplanMeierOutputDTO(
-        "Kaplan-Meier", asdict(p), len(t), times, risk, events, censored,
-        survival, lower, upper, 1.0 - survival, median, query, values, notes)
+        "Kaplan-Meier",
+        asdict(p),
+        len(t),
+        times,
+        risk,
+        events,
+        censored,
+        survival,
+        lower,
+        upper,
+        1.0 - survival,
+        median,
+        query,
+        values,
+        notes,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -219,6 +247,9 @@ def run_kaplan_meier(durations, event_observed,
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     # 정식 이관 후 기본 registry/JSON을 사용하는 실행 예제입니다.
-    result = run_kaplan_meier([1, 2, 2, 3, 4], [1, 1, 0, 0, 1],
-                             overrides={"evaluation_times": [0, 1, 2, 3, 4]})
+    result = run_kaplan_meier(
+        [1, 2, 2, 3, 4],
+        [1, 1, 0, 0, 1],
+        overrides={"evaluation_times": [0, 1, 2, 3, 4]},
+    )
     print(result.to_json(indent=2))

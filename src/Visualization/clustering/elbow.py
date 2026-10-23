@@ -15,6 +15,7 @@ elbow.py - 추가 군집 수에 따른 개선 규모를 비교합니다. 모델�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -42,9 +55,11 @@ class ClusteringElbowProfile:
         color (str): Matplotlib 기본 선/표식 색. 기본 'C0'.
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -62,6 +77,7 @@ class ClusteringElbowOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -69,6 +85,7 @@ class ClusteringElbowOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -84,6 +101,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, ClusteringElbowProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -102,16 +120,54 @@ def _draw(k_values, inertias, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw,removed=paired(k=k_values,inertia=inertias);raw['k']=vector(raw.k,allow_missing=False)[0];raw['inertia']=vector(raw.inertia,allow_missing=False)[0]
-    if removed or len(raw)<2 or (raw.k<1).any() or (raw.k%1!=0).any() or raw.k.duplicated().any() or (raw.inertia<0).any():raise ValueError('고유 양의 정수 k와 비음수 inertia가 필요합니다.')
-    data=raw.sort_values('k').reset_index(drop=True);ax.plot(data.k,data.inertia,'o-',color=profile.color,alpha=profile.alpha);ax.set_xlabel('Number of clusters k');ax.set_ylabel('Inertia')
-    diagnostics={'relative_improvement':(1-data.inertia.iloc[1:].to_numpy()/np.where(data.inertia.iloc[:-1].to_numpy()==0,np.nan,data.inertia.iloc[:-1].to_numpy())).tolist()};notes=['같은 학습 Feature·스케일·표본에서 계산한 inertia만 비교하세요. 무릎을 자동 최적 k로 표시하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, ClusteringElbowOutputDTO, 'Clustering — Elbow', notes)
+    raw, removed = paired(k=k_values, inertia=inertias)
+    raw["k"] = vector(raw.k, allow_missing=False)[0]
+    raw["inertia"] = vector(raw.inertia, allow_missing=False)[0]
+    if (
+        removed
+        or len(raw) < 2
+        or (raw.k < 1).any()
+        or (raw.k % 1 != 0).any()
+        or raw.k.duplicated().any()
+        or (raw.inertia < 0).any()
+    ):
+        raise ValueError("고유 양의 정수 k와 비음수 inertia가 필요합니다.")
+    data = raw.sort_values("k").reset_index(drop=True)
+    ax.plot(data.k, data.inertia, "o-", color=profile.color, alpha=profile.alpha)
+    ax.set_xlabel("Number of clusters k")
+    ax.set_ylabel("Inertia")
+    diagnostics = {
+        "relative_improvement": (
+            1
+            - data.inertia.iloc[1:].to_numpy()
+            / np.where(
+                data.inertia.iloc[:-1].to_numpy() == 0,
+                np.nan,
+                data.inertia.iloc[:-1].to_numpy(),
+            )
+        ).tolist()
+    }
+    notes = [
+        "같은 학습 Feature·스케일·표본에서 계산한 inertia만 비교하세요. 무릎을 자동 최적 k로 표시하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ClusteringElbowOutputDTO,
+        "Clustering — Elbow",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_elbow(k_values, inertias, *, ax, profile=None, recipe_path=None, overrides=None) -> ClusteringElbowOutputDTO:
+def plot_elbow(
+    k_values, inertias, *, ax, profile=None, recipe_path=None, overrides=None
+) -> ClusteringElbowOutputDTO:
     """추가 군집 수에 따른 개선 규모를 비교합니다. 모델을 다시 적합하지 않습니다.
 
     Args:
@@ -126,10 +182,13 @@ def plot_elbow(k_values, inertias, *, ax, profile=None, recipe_path=None, overri
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-clustering-elbow', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-clustering-elbow", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(k_values, inertias, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

@@ -15,6 +15,7 @@ calibration.py - 확률의 과신·과소신과 실제 발생률의 일치를 �
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,11 +57,13 @@ class ClassificationCalibrationProfile:
         positive_label (Any): probabilities가 의미하는 양성 라벨. 기본 1.
         n_bins (int): 양의 동일 폭 확률 구간 수. 기본 10.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     positive_label: Any = 1
     n_bins: int = 10
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -66,6 +81,7 @@ class ClassificationCalibrationOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -73,6 +89,7 @@ class ClassificationCalibrationOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -88,6 +105,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, ClassificationCalibrationProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -106,20 +124,70 @@ def _draw(y_true, probabilities, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    y,s,removed=binary_scores(y_true,probabilities,profile.positive_label,probability=True)
-    if profile.n_bins<1:raise ValueError('n_bins 오류')
-    edges=np.linspace(0,1,profile.n_bins+1);ids=np.minimum(np.searchsorted(edges,s,side='right')-1,profile.n_bins-1);rows=[]
+    y, s, removed = binary_scores(
+        y_true, probabilities, profile.positive_label, probability=True
+    )
+    if profile.n_bins < 1:
+        raise ValueError("n_bins 오류")
+    edges = np.linspace(0, 1, profile.n_bins + 1)
+    ids = np.minimum(np.searchsorted(edges, s, side="right") - 1, profile.n_bins - 1)
+    rows = []
     for i in range(profile.n_bins):
-        mask=ids==i
-        if mask.any():rows.append(dict(bin=i,left=edges[i],right=edges[i+1],n=int(mask.sum()),mean_probability=float(s[mask].mean()),positive_fraction=float(y[mask].mean())))
-    data=pd.DataFrame(rows);ax.plot(data.mean_probability,data.positive_fraction,'o-',color=profile.color,alpha=profile.alpha);ax.plot([0,1],[0,1],color='gray',linestyle='--');ax.set_xlim(0,1);ax.set_ylim(0,1);ax.set_xlabel('Mean predicted probability');ax.set_ylabel('Observed positive fraction')
-    diagnostics={'brier_score':float(np.mean((s-y)**2)),'ece':float(np.sum(data.n*np.abs(data.mean_probability-data.positive_fraction))/len(y)),'n':len(y),'missing_removed':removed};notes=['빈 구간은 표시하지 않으며 n을 반환합니다. ECE는 구간 정의에 의존하고 보류 확률을 사용해야 합니다.']
-    return finish(ax, before, data, diagnostics, profile, ClassificationCalibrationOutputDTO, 'Classification — Calibration', notes)
+        mask = ids == i
+        if mask.any():
+            rows.append(
+                dict(
+                    bin=i,
+                    left=edges[i],
+                    right=edges[i + 1],
+                    n=int(mask.sum()),
+                    mean_probability=float(s[mask].mean()),
+                    positive_fraction=float(y[mask].mean()),
+                )
+            )
+    data = pd.DataFrame(rows)
+    ax.plot(
+        data.mean_probability,
+        data.positive_fraction,
+        "o-",
+        color=profile.color,
+        alpha=profile.alpha,
+    )
+    ax.plot([0, 1], [0, 1], color="gray", linestyle="--")
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_xlabel("Mean predicted probability")
+    ax.set_ylabel("Observed positive fraction")
+    diagnostics = {
+        "brier_score": float(np.mean((s - y) ** 2)),
+        "ece": float(
+            np.sum(data.n * np.abs(data.mean_probability - data.positive_fraction))
+            / len(y)
+        ),
+        "n": len(y),
+        "missing_removed": removed,
+    }
+    notes = [
+        "빈 구간은 표시하지 않으며 n을 반환합니다. ECE는 구간 정의에 의존하고 보류 확률을 사용해야 합니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ClassificationCalibrationOutputDTO,
+        "Classification — Calibration",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_calibration(y_true, probabilities, *, ax, profile=None, recipe_path=None, overrides=None) -> ClassificationCalibrationOutputDTO:
+def plot_calibration(
+    y_true, probabilities, *, ax, profile=None, recipe_path=None, overrides=None
+) -> ClassificationCalibrationOutputDTO:
     """확률의 과신·과소신과 실제 발생률의 일치를 점검합니다.
 
     Args:
@@ -134,10 +202,16 @@ def plot_calibration(y_true, probabilities, *, ax, profile=None, recipe_path=Non
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-classification-calibration', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-classification-calibration",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(y_true, probabilities, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

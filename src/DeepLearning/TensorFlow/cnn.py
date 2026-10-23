@@ -16,12 +16,11 @@ cnn.py - TensorFlow CNN 1D·2D 전용 분류·회귀
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -41,6 +40,7 @@ from ._deep_common import validate_training, target_array, fit_supervised
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TFCNNProfile:
@@ -64,6 +64,7 @@ class TFCNNProfile:
         hidden_layer_sizes (Tuple[int, ...]): Flatten 이후 Dense 폭; 기본 (32,).
         dropout (float): 각 Dense 이후 dropout 비율 [0,1); 기본 0.
     """
+
     random_state: int = 1234
     epochs: int = 30
     batch_size: int = 32
@@ -85,6 +86,7 @@ class TFCNNProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TFCNNOutputDTO(OutputDTO):
@@ -109,6 +111,7 @@ class TFCNNOutputDTO(OutputDTO):
         epochs_trained (int): 실제 실행한 epoch 수.
         best_epoch (int): 최저 val_loss epoch, 1부터 시작. 최적 weights 복원.
     """
+
     task: str
     parameters: Dict[str, Any]
     model: Any
@@ -132,6 +135,7 @@ class TFCNNOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, y: Any, profile: TFCNNProfile) -> tuple:
     """전용 설정과 모델의 rank·축·타깃을 검증합니다.
 
@@ -144,25 +148,33 @@ def _validate_inputs(X: Any, y: Any, profile: TFCNNProfile) -> tuple:
     Raises:
         ValueError/TypeError: Profile·설정·shape·타깃 오류.
     """
-    if not isinstance(profile,TFCNNProfile):raise TypeError('TFCNNProfile이 필요합니다.')
+    if not isinstance(profile, TFCNNProfile):
+        raise TypeError("TFCNNProfile이 필요합니다.")
     validate_training(profile)
-    if np.iscomplexobj(X):raise ValueError('실수 입력이 필요합니다.')
-    positive_int(profile.dimension, 'dimension')
-    if profile.dimension not in (1,2):raise ValueError('dimension은 1/2입니다.')
-    for field in ('conv_filters','hidden_layer_sizes'):
-        values=getattr(profile,field)
-        if not isinstance(values,tuple) or (field=='conv_filters' and not values):raise ValueError(field+'는 tuple입니다.')
-        for width in values:positive_int(width,field)
-    positive_int(profile.kernel_size,'kernel_size');positive_int(profile.pool_size,'pool_size')
-    arr=numeric_X(X,profile.dimension+2)
+    if np.iscomplexobj(X):
+        raise ValueError("실수 입력이 필요합니다.")
+    positive_int(profile.dimension, "dimension")
+    if profile.dimension not in (1, 2):
+        raise ValueError("dimension은 1/2입니다.")
+    for field in ("conv_filters", "hidden_layer_sizes"):
+        values = getattr(profile, field)
+        if not isinstance(values, tuple) or (field == "conv_filters" and not values):
+            raise ValueError(field + "는 tuple입니다.")
+        for width in values:
+            positive_int(width, field)
+    positive_int(profile.kernel_size, "kernel_size")
+    positive_int(profile.pool_size, "pool_size")
+    arr = numeric_X(X, profile.dimension + 2)
     for width in arr.shape[1:-1]:
-        if width//(profile.pool_size**len(profile.conv_filters))<1:raise ValueError('풀링 블록 이후 공간/시간 축이 사라집니다.')
-    return arr,target_array(y,len(arr),profile.task)
+        if width // (profile.pool_size ** len(profile.conv_filters)) < 1:
+            raise ValueError("풀링 블록 이후 공간/시간 축이 사라집니다.")
+    return arr, target_array(y, len(arr), profile.task)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _build_model(tf, input_shape, output_shape, classification, profile):
     """해당 파일의 전용 TFCNN 아키텍처를 구성합니다.
@@ -178,18 +190,30 @@ def _build_model(tf, input_shape, output_shape, classification, profile):
     Raises:
         ValueError: 아키텍처 shape·층 조건 오류.
     """
-    layers=[tf.keras.layers.Input(shape=input_shape)]
-    Conv=tf.keras.layers.Conv1D if profile.dimension==1 else tf.keras.layers.Conv2D
-    Pool=tf.keras.layers.MaxPooling1D if profile.dimension==1 else tf.keras.layers.MaxPooling2D
+    layers = [tf.keras.layers.Input(shape=input_shape)]
+    Conv = tf.keras.layers.Conv1D if profile.dimension == 1 else tf.keras.layers.Conv2D
+    Pool = (
+        tf.keras.layers.MaxPooling1D
+        if profile.dimension == 1
+        else tf.keras.layers.MaxPooling2D
+    )
     for filters in profile.conv_filters:
-        layers.append(Conv(filters,profile.kernel_size,padding='same',activation='relu'))
+        layers.append(
+            Conv(filters, profile.kernel_size, padding="same", activation="relu")
+        )
         layers.append(Pool(pool_size=profile.pool_size))
     layers.append(tf.keras.layers.Flatten())
     for width in profile.hidden_layer_sizes:
-        layers.append(tf.keras.layers.Dense(width,activation='relu'))
-        if profile.dropout:layers.append(tf.keras.layers.Dropout(profile.dropout))
-    layers.append(tf.keras.layers.Dense(int(np.prod(output_shape)),activation='softmax' if classification else None))
-    if len(output_shape)>1:layers.append(tf.keras.layers.Reshape(output_shape))
+        layers.append(tf.keras.layers.Dense(width, activation="relu"))
+        if profile.dropout:
+            layers.append(tf.keras.layers.Dropout(profile.dropout))
+    layers.append(
+        tf.keras.layers.Dense(
+            int(np.prod(output_shape)), activation="softmax" if classification else None
+        )
+    )
+    if len(output_shape) > 1:
+        layers.append(tf.keras.layers.Reshape(output_shape))
     return tf.keras.Sequential(layers)
 
 
@@ -206,15 +230,27 @@ def _run_model(X, y, profile, test_data=None):
     Raises:
         ValueError/ImportError: 학습·분할 오류 또는 TensorFlow 미설치.
     """
-    builder=lambda tf,shape,output,classification:_build_model(tf,shape,output,classification,profile)
-    return TFCNNOutputDTO(**fit_supervised(X,y,profile,builder,test_data))
+    builder = lambda tf, shape, output, classification: _build_model(
+        tf, shape, output, classification, profile
+    )
+    return TFCNNOutputDTO(**fit_supervised(X, y, profile, builder, test_data))
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_tf_cnn(X: Any, y: Any, profile: Optional[TFCNNProfile] = None, *, task: Optional[str] = None, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None, test_data: Any = None) -> TFCNNOutputDTO:
+
+def run_tf_cnn(
+    X: Any,
+    y: Any,
+    profile: Optional[TFCNNProfile] = None,
+    *,
+    task: Optional[str] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+    test_data: Any = None,
+) -> TFCNNOutputDTO:
     """TFCNN 분류·회귀를 전용 JSON/Profile로 실행합니다.
 
     Args:
@@ -230,17 +266,20 @@ def run_tf_cnn(X: Any, y: Any, profile: Optional[TFCNNProfile] = None, *, task: 
     Raises:
         ValueError/TypeError/OSError/ImportError: 자료·설정·레시피·TensorFlow 오류.
     """
-    profile=resolve_profile('tf-cnn',profile,task=task,recipe_path=recipe_path,overrides=overrides)
-    X,y=_validate_inputs(X,y,profile)
-    return _run_model(X,y,profile,test_data)
+    profile = resolve_profile(
+        "tf-cnn", profile, task=task, recipe_path=recipe_path, overrides=overrides
+    )
+    X, y = _validate_inputs(X, y, profile)
+    return _run_model(X, y, profile, test_data)
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__ == '__main__':
-    rng=np.random.RandomState(4)
-    X=rng.normal(size=(80,8,8,1));y=np.where(X[:,0,0,0]>0,'high','low')
-    result=run_tf_cnn(X,y,overrides={'epochs':2,'patience':1})
+if __name__ == "__main__":
+    rng = np.random.RandomState(4)
+    X = rng.normal(size=(80, 8, 8, 1))
+    y = np.where(X[:, 0, 0, 0] > 0, "high", "low")
+    result = run_tf_cnn(X, y, overrides={"epochs": 2, "patience": 1})
     print(result.test_metrics, result.input_shape)

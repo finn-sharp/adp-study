@@ -2,6 +2,7 @@
 
 학습용 시나리오이며 실측 UCI 자료로 표시하지 않습니다. 비용 단위는 만원입니다.
 """
+
 from functools import partial
 from src.Recipes import load_profile
 from src.Optimization.production_allocation import run_production_allocation
@@ -17,7 +18,7 @@ def load_data():
     Raises:
         None: 고정 상수 반환.
     """
-    return [3,2,4],[5000,7000,4000],[1000,1200,800]
+    return [3, 2, 4], [5000, 7000, 4000], [1000, 1200, 800]
 
 
 def load_recipe(overrides=None):
@@ -30,7 +31,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    return load_profile('production-allocation',overrides=overrides)
+    return load_profile("production-allocation", overrides=overrides)
 
 
 def build_pipeline(profile):
@@ -43,10 +44,10 @@ def build_pipeline(profile):
     Raises:
         TypeError: 실행 시 설정 오류.
     """
-    return partial(run_production_allocation,profile=profile)
+    return partial(run_production_allocation, profile=profile)
 
 
-def main(overrides=None,data=None):
+def main(overrides=None, data=None):
     """생산량 제약·비용과 GA/전수 차이를 보고합니다.
 
     Args:
@@ -57,7 +58,10 @@ def main(overrides=None,data=None):
     Raises:
         ValueError/TypeError/OSError: 공정·설정·레시피 오류.
     """
-    return build_pipeline(load_recipe(overrides))(*(load_data() if data is None else data))
+    return build_pipeline(load_recipe(overrides))(
+        *(load_data() if data is None else data)
+    )
 
 
-if __name__=='__main__':print(main().to_json(indent=2))
+if __name__ == "__main__":
+    print(main().to_json(indent=2))

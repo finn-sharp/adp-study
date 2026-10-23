@@ -16,6 +16,7 @@ independence.py - 카이제곱 독립성 검정
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,6 +41,7 @@ from src.MachineLearning.analysis_common import positive_int, finite_number
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class IndependenceProfile:
     """IndependenceProfile 필드 계약.
@@ -48,6 +50,7 @@ class IndependenceProfile:
         alpha (float): 유의수준, 기본 0.05.
         correction (bool): 자유도 1일 때 Yates 보정, 기본 True.
     """
+
     alpha: float = 0.05
     correction: bool = True
 
@@ -55,6 +58,7 @@ class IndependenceProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class IndependenceOutputDTO(OutputDTO):
@@ -69,6 +73,7 @@ class IndependenceOutputDTO(OutputDTO):
         details (Dict[str, Any]): 자유도·기대도수·표본수 등 검정별 진단.
         warnings (List[str]): 근사 조건과 해석 제약.
     """
+
     statistic: float
     p_value: float
     reject_h0: bool
@@ -82,6 +87,7 @@ class IndependenceOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(table: Any, profile: Optional[IndependenceProfile] = None) -> Any:
     """입력 검증.
 
@@ -93,17 +99,21 @@ def _validate_inputs(table: Any, profile: Optional[IndependenceProfile] = None) 
     Raises:
         ValueError/TypeError: 입력 조건 오류.
     """
-    if not isinstance(profile, IndependenceProfile): raise TypeError("IndependenceProfile이 필요합니다")
+    if not isinstance(profile, IndependenceProfile):
+        raise TypeError("IndependenceProfile이 필요합니다")
     alpha(profile.alpha)
     a = counts(table, table=True)
-    if min(a.shape) < 2 or (a.sum(axis=0) == 0).any() or (a.sum(axis=1) == 0).any(): raise ValueError("각 주변합이 양수인 2×2 이상 표가 필요합니다.")
-    if not isinstance(profile.correction, bool): raise ValueError("correction은 bool입니다.")
+    if min(a.shape) < 2 or (a.sum(axis=0) == 0).any() or (a.sum(axis=1) == 0).any():
+        raise ValueError("각 주변합이 양수인 2×2 이상 표가 필요합니다.")
+    if not isinstance(profile.correction, bool):
+        raise ValueError("correction은 bool입니다.")
     return a
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_test(data: Any, profile: Optional[IndependenceProfile]) -> tuple:
     """검정 계산.
@@ -117,14 +127,41 @@ def _run_test(data: Any, profile: Optional[IndependenceProfile]) -> tuple:
         ValueError: 미정의 통계량.
     """
     s, p, df, exp = stats.chi2_contingency(data, correction=profile.correction)
-    return float(s), float(p), "행 변수와 열 변수가 독립이다", {"df": df, "expected": exp, "observed": data, "cramers_v": float(np.sqrt(stats.chi2_contingency(data, correction=False)[0]/(data.sum()*min(data.shape[0]-1,data.shape[1]-1))))}, (["기대도수 5 미만: 근사 검정 대신 정확 검정을 고려하세요."] if (exp < 5).any() else [])
+    return (
+        float(s),
+        float(p),
+        "행 변수와 열 변수가 독립이다",
+        {
+            "df": df,
+            "expected": exp,
+            "observed": data,
+            "cramers_v": float(
+                np.sqrt(
+                    stats.chi2_contingency(data, correction=False)[0]
+                    / (data.sum() * min(data.shape[0] - 1, data.shape[1] - 1))
+                )
+            ),
+        },
+        (
+            ["기대도수 5 미만: 근사 검정 대신 정확 검정을 고려하세요."]
+            if (exp < 5).any()
+            else []
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_independence(table: Any, profile: Optional[IndependenceProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> IndependenceOutputDTO:
+
+def run_independence(
+    table: Any,
+    profile: Optional[IndependenceProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> IndependenceOutputDTO:
     """카이제곱 독립성 검정.
 
     Args:
@@ -138,10 +175,14 @@ def run_independence(table: Any, profile: Optional[IndependenceProfile] = None, 
         ValueError/TypeError: 입력·설정 오류.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("independence", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "independence", profile, recipe_path=recipe_path, overrides=overrides
+    )
     data = _validate_inputs(table, profile=profile)
     statistic, p, h0, details, notes = _run_test(data, profile)
-    return IndependenceOutputDTO(statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes)
+    return IndependenceOutputDTO(
+        statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes
+    )
 
 
 # ---------------------------------------------------------------------------

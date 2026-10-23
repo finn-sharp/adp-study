@@ -15,22 +15,30 @@ residual_order.py - 잔차 관측/시간 순서 탐색
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO,validate_profile,start,finish,paired,vector
-from src.stats.regression._common import ols_result,numeric_data
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    paired,
+    vector,
+)
+from src.stats.regression._common import ols_result, numeric_data
 from statsmodels.stats.outliers_influence import OLSInfluence
 
 
@@ -47,10 +55,12 @@ class ResidualOrderProfile:
         alpha (float): 표식 투명도 [0,1]. 기본 0.8.
         ordered (bool): True는 시간 순·동일 간격임을 호출자가 명시. 기본 False.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     ordered: bool = False
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,17 +78,20 @@ class ResidualOrderOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): 적용 Profile.
         warnings (List[str]): 진단 가정·선택 후 해석 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -90,11 +103,13 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,ResidualOrderProfile)
+    validate_profile(profile, ResidualOrderProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(model, order, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -109,18 +124,45 @@ def _run(model, order, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    before=start(ax)
-    result=ols_result(model);residual=np.asarray(result.resid);x=np.arange(len(residual)) if order is None else np.asarray(order)
-    if x.ndim!=1 or len(x)!=len(residual) or pd.isna(x).any():raise ValueError('관측 순서 길이/결측 오류')
-    if profile.ordered and not pd.Index(x).is_monotonic_increasing:raise ValueError('명시 시간 순서가 오름차순이 아닙니다.')
-    ax.plot(x,residual,color=profile.color,alpha=profile.alpha);ax.axhline(0,color='black',linestyle='--');ax.set_xlabel('Time / ordered observations' if profile.ordered else 'Input observation order');ax.set_ylabel('Residual');data=pd.DataFrame({'order':x,'residual':residual});diagnostics={'n':len(residual),'ordered':profile.ordered};notes=['시간 순·간격이 명시되지 않으면 입력 행 패턴일 뿐입니다. 자기상관 또는 독립성의 자동 검정이 아닙니다.']
-    return finish(ax,before,data,diagnostics,profile,ResidualOrderOutputDTO,'Regression — residual order',notes)
+    before = start(ax)
+    result = ols_result(model)
+    residual = np.asarray(result.resid)
+    x = np.arange(len(residual)) if order is None else np.asarray(order)
+    if x.ndim != 1 or len(x) != len(residual) or pd.isna(x).any():
+        raise ValueError("관측 순서 길이/결측 오류")
+    if profile.ordered and not pd.Index(x).is_monotonic_increasing:
+        raise ValueError("명시 시간 순서가 오름차순이 아닙니다.")
+    ax.plot(x, residual, color=profile.color, alpha=profile.alpha)
+    ax.axhline(0, color="black", linestyle="--")
+    ax.set_xlabel(
+        "Time / ordered observations" if profile.ordered else "Input observation order"
+    )
+    ax.set_ylabel("Residual")
+    data = pd.DataFrame({"order": x, "residual": residual})
+    diagnostics = {"n": len(residual), "ordered": profile.ordered}
+    notes = [
+        "시간 순·간격이 명시되지 않으면 입력 행 패턴일 뿐입니다. 자기상관 또는 독립성의 자동 검정이 아닙니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ResidualOrderOutputDTO,
+        "Regression — residual order",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def plot_residual_order(model, order=None, *, ax, profile=None, recipe_path=None, overrides=None):
+
+def plot_residual_order(
+    model, order=None, *, ax, profile=None, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -135,9 +177,15 @@ def plot_residual_order(model, order=None, *, ax, profile=None, recipe_path=None
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-regression-residual-order',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-regression-residual-order",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    return _run(model, order, ax,profile)
+    return _run(model, order, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

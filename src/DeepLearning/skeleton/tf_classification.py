@@ -16,6 +16,7 @@ tf_classification.py - tf-classification UCI 스켈레톤
     2026-10-12  김재현(Finn)       v1.0.0    기존 파이프라인 기반 UCI 수치 예제
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -36,7 +37,7 @@ def load_data(cache_dir=None):
     Raises:
         ValueError/OSError: 자료·다운로드 오류.
     """
-    return load_tabular('classification', cache_dir=cache_dir)
+    return load_tabular("classification", cache_dir=cache_dir)
 
 
 def load_recipe(overrides=None):
@@ -49,7 +50,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    return load_profile('tf-classification', task=None, overrides=overrides)
+    return load_profile("tf-classification", task=None, overrides=overrides)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -64,8 +65,9 @@ def build_pipeline(profile=None, overrides=None):
         ValueError: Profile과 overrides 동시 지정.
     """
     if profile is not None and overrides is not None:
-        raise ValueError('profile과 overrides를 동시에 지정하지 않습니다.')
+        raise ValueError("profile과 overrides를 동시에 지정하지 않습니다.")
     profile = load_recipe(overrides) if profile is None else profile
+
     def execute(data):
         """기존 runner의 내부 분할 이후에만 scaler를 적합합니다.
 
@@ -76,7 +78,12 @@ def build_pipeline(profile=None, overrides=None):
         Raises:
             ValueError/ImportError: 자료 조건 또는 TensorFlow 미설치.
         """
-        return run_tf_classification(data.drop(columns='target'), data.target.to_numpy(dtype=str), profile=profile)
+        return run_tf_classification(
+            data.drop(columns="target"),
+            data.target.to_numpy(dtype=str),
+            profile=profile,
+        )
+
     return execute
 
 
@@ -96,17 +103,22 @@ def main(cache_dir=None, overrides=None):
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
     from src.Evaluation.adapters import evaluate_predictions
+
     actual, predicted = result.y_test, result.predictions
-    if result.task == 'regression':
+    if result.task == "regression":
         actual = actual.reshape(len(actual), -1)
         predicted = predicted.reshape(len(predicted), -1)
-    result.test_metrics.update(evaluate_predictions(actual, predicted, result.task, result.probabilities, result.classes))
-    print('=== Example : UCI iris tf_classification ===')
-    print('input_shape:', result.input_shape)
-    print('metrics:', result.test_metrics)
-    print('epochs_trained:', result.epochs_trained)
+    result.test_metrics.update(
+        evaluate_predictions(
+            actual, predicted, result.task, result.probabilities, result.classes
+        )
+    )
+    print("=== Example : UCI iris tf_classification ===")
+    print("input_shape:", result.input_shape)
+    print("metrics:", result.test_metrics)
+    print("epochs_trained:", result.epochs_trained)
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

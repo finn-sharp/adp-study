@@ -16,6 +16,7 @@ cmh - Cochran–Mantel–Haenszel
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, table_data, result)
+from src.stats.tests._common import number, table_data, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CMHProfile:
@@ -49,6 +51,7 @@ class CMHProfile:
         correction (bool): CMH 연속성 보정 기본 False.
         zero_correction (str): none/haldane; 0셀 있는 층만 0.5 보정 기본 "none".
     """
+
     alpha: float = 0.05
     correction: bool = False
     zero_correction: str = "none"
@@ -57,6 +60,7 @@ class CMHProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CMHOutputDTO(OutputDTO):
@@ -78,6 +82,7 @@ class CMHOutputDTO(OutputDTO):
         n_strata (int): 층 수.
         tables_used (np.ndarray): 실제 계산 층별 표.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -98,6 +103,7 @@ class CMHOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -110,24 +116,25 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    arr = np.asarray(args['tables'])
+    arr = np.asarray(args["tables"])
     if arr.ndim != 3 or arr.shape[1:] != (2, 2) or len(arr) < 1:
-        raise ValueError('층×2×2 자료 필요')
-    if p.zero_correction not in ('none', 'haldane'):
-        raise ValueError('zero_correction 오류')
-    return {'tables': np.stack([table_data(t) for t in arr])}
+        raise ValueError("층×2×2 자료 필요")
+    if p.zero_correction not in ("none", "haldane"):
+        raise ValueError("zero_correction 오류")
+    return {"tables": np.stack([table_data(t) for t in arr])}
+
 
 def _validate_inputs(arguments: Dict[str, Any], profile: CMHProfile) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
@@ -140,13 +147,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: CMHProfile) -> Dict[str
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, CMHProfile): raise TypeError("CMHProfile이 필요합니다.")
+    if not isinstance(profile, CMHProfile):
+        raise TypeError("CMHProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -159,11 +168,12 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
+    alt = getattr(p, "alternative", "two-sided")
     from statsmodels.stats.contingency_tables import StratifiedTable
-    ts = d['tables'].astype(float)
+
+    ts = d["tables"].astype(float)
     corrected = []
-    if p.zero_correction == 'haldane':
+    if p.zero_correction == "haldane":
         for i in range(len(ts)):
             if (ts[i] == 0).any():
                 ts[i] += 0.5
@@ -173,8 +183,23 @@ def _calculate(d, p):
     est = float(model.oddsratio_pooled)
     ci = tuple((float(v) for v in model.oddsratio_pooled_confint(alpha=p.alpha)))
     if not np.isfinite(est) or not np.isfinite(ci).all() or est <= 0:
-        raise ValueError('공통 OR/구간 미정의. 0셀 보정 또는 표 설계를 확인하세요.')
-    return result('cmh', p, r.statistic, r.pvalue, '층을 통제한 공통 OR가 1이다', 'mantel-haenszel', dict(pooled_odds_ratio=est, confidence_interval=ci, n_strata=len(ts), tables_used=ts), {'corrected_strata': corrected, 'df': 1})
+        raise ValueError("공통 OR/구간 미정의. 0셀 보정 또는 표 설계를 확인하세요.")
+    return result(
+        "cmh",
+        p,
+        r.statistic,
+        r.pvalue,
+        "층을 통제한 공통 OR가 1이다",
+        "mantel-haenszel",
+        dict(
+            pooled_odds_ratio=est,
+            confidence_interval=ci,
+            n_strata=len(ts),
+            tables_used=ts,
+        ),
+        {"corrected_strata": corrected, "df": 1},
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: CMHProfile) -> CMHOutputDTO:
     """검증된 자료를 계산합니다.
@@ -194,7 +219,14 @@ def _run_test(data: Dict[str, Any], profile: CMHProfile) -> CMHOutputDTO:
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_cmh(tables: Any, profile: Optional[CMHProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> CMHOutputDTO:
+
+def run_cmh(
+    tables: Any,
+    profile: Optional[CMHProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> CMHOutputDTO:
     """Cochran–Mantel–Haenszel.
 
     Args:
@@ -208,8 +240,10 @@ def run_cmh(tables: Any, profile: Optional[CMHProfile] = None, *, recipe_path: O
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("cmh", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'tables': tables}, profile)
+    profile = resolve_profile(
+        "cmh", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"tables": tables}, profile)
     return _run_test(data, profile)
 
 
@@ -218,5 +252,7 @@ def run_cmh(tables: Any, profile: Optional[CMHProfile] = None, *, recipe_path: O
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_cmh([[[11,6],[9,5]], [[8,3],[7,5]], [[7,5],[4,6]], [[26,4],[18,11]]])
+    result = run_cmh(
+        [[[11, 6], [9, 5]], [[8, 3], [7, 5]], [[7, 5], [4, 6]], [[26, 4], [18, 11]]]
+    )
     print(result.to_json(indent=2))

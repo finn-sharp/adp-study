@@ -22,6 +22,7 @@ analysis_common.py - 탐색 분석 입력 검증과 군집 요약
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -61,7 +62,11 @@ def finite_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·하한 위반.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 하한을 확인하세요.")
@@ -93,7 +98,11 @@ def feature_names(X: Any) -> List[str]:
     Raises:
         ValueError: 문자열 변환 후 열 이름 중복.
     """
-    names = [str(c) for c in X.columns] if hasattr(X, "columns") else ["feature_" + str(i) for i in range(np.asarray(X).shape[1])]
+    names = (
+        [str(c) for c in X.columns]
+        if hasattr(X, "columns")
+        else ["feature_" + str(i) for i in range(np.asarray(X).shape[1])]
+    )
     if len(set(names)) != len(names):
         raise ValueError("입력 열 이름은 중복될 수 없습니다.")
     return names

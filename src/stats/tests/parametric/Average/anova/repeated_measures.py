@@ -16,6 +16,7 @@ repeated_measures - 일원 반복측정 ANOVA
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, result)
+from src.stats.tests._common import number, numeric, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RepeatedMeasuresANOVAProfile:
@@ -49,6 +51,7 @@ class RepeatedMeasuresANOVAProfile:
         correction (str): none/greenhouse_geisser; GG는 추정 epsilon으로 자유도 보정 기본 "none".
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     correction: str = "none"
     nan_policy: str = "raise"
@@ -57,6 +60,7 @@ class RepeatedMeasuresANOVAProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RepeatedMeasuresANOVAOutputDTO(OutputDTO):
@@ -79,6 +83,7 @@ class RepeatedMeasuresANOVAOutputDTO(OutputDTO):
         n_subjects (int): 완전 피험자 수.
         condition_means (np.ndarray): 조건 평균.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -100,6 +105,7 @@ class RepeatedMeasuresANOVAOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -112,26 +118,33 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
-        if hasattr(p, name) and (not name == 'correction') and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
+        if (
+            hasattr(p, name)
+            and (not name == "correction")
+            and (not isinstance(getattr(p, name), bool))
+        ):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = numeric(args['data'], 2, 2, policy)
+    a = numeric(args["data"], 2, 2, policy)
     if a.shape[1] < 2:
-        raise ValueError('조건 수 부족')
-    if p.correction not in ('none', 'greenhouse_geisser'):
-        raise ValueError('correction 오류')
-    return {'data': a}
+        raise ValueError("조건 수 부족")
+    if p.correction not in ("none", "greenhouse_geisser"):
+        raise ValueError("correction 오류")
+    return {"data": a}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: RepeatedMeasuresANOVAProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: RepeatedMeasuresANOVAProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -142,13 +155,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: RepeatedMeasuresANOVAPr
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, RepeatedMeasuresANOVAProfile): raise TypeError("RepeatedMeasuresANOVAProfile이 필요합니다.")
+    if not isinstance(profile, RepeatedMeasuresANOVAProfile):
+        raise TypeError("RepeatedMeasuresANOVAProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -161,8 +176,8 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    a = d['data']
+    alt = getattr(p, "alternative", "two-sided")
+    a = d["data"]
     n, k = a.shape
     means = a.mean(axis=0)
     grand = a.mean()
@@ -173,22 +188,45 @@ def _calculate(d, p):
     df1 = k - 1
     df2 = (n - 1) * (k - 1)
     if sse <= np.finfo(float).eps * max(1.0, float(np.square(a - grand).sum())):
-        raise ValueError('잔차 변동이 없어 F 검정 미정의입니다.')
+        raise ValueError("잔차 변동이 없어 F 검정 미정의입니다.")
     S = np.atleast_2d(np.cov(a, rowvar=False))
     J = np.eye(k) - np.ones((k, k)) / k
     C = J @ S @ J
     trace = np.trace(C)
     den = (k - 1) * np.trace(C @ C)
     if den <= 0:
-        raise ValueError('구형성 epsilon 미정의')
-    eps = float(np.clip(trace ** 2 / den, 1 / (k - 1), 1))
+        raise ValueError("구형성 epsilon 미정의")
+    eps = float(np.clip(trace**2 / den, 1 / (k - 1), 1))
     F = sst / df1 / (sse / df2)
-    if p.correction == 'greenhouse_geisser':
+    if p.correction == "greenhouse_geisser":
         df1 *= eps
         df2 *= eps
-    return result('repeated-measures-anova', p, F, stats.f.sf(F, df1, df2), '대응 조건 평균이 같다', p.correction, dict(df_num=float(df1), df_den=float(df2), epsilon=eps, n_subjects=n, condition_means=means), {'ss_condition': sst, 'ss_error': sse}, ['구형성 가정 필요; GG 보정은 자유도만 보정합니다.'] if p.correction == 'none' else [])
+    return result(
+        "repeated-measures-anova",
+        p,
+        F,
+        stats.f.sf(F, df1, df2),
+        "대응 조건 평균이 같다",
+        p.correction,
+        dict(
+            df_num=float(df1),
+            df_den=float(df2),
+            epsilon=eps,
+            n_subjects=n,
+            condition_means=means,
+        ),
+        {"ss_condition": sst, "ss_error": sse},
+        (
+            ["구형성 가정 필요; GG 보정은 자유도만 보정합니다."]
+            if p.correction == "none"
+            else []
+        ),
+    )
 
-def _run_test(data: Dict[str, Any], profile: RepeatedMeasuresANOVAProfile) -> RepeatedMeasuresANOVAOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: RepeatedMeasuresANOVAProfile
+) -> RepeatedMeasuresANOVAOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -206,7 +244,14 @@ def _run_test(data: Dict[str, Any], profile: RepeatedMeasuresANOVAProfile) -> Re
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_repeated_measures_anova(data: Any, profile: Optional[RepeatedMeasuresANOVAProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> RepeatedMeasuresANOVAOutputDTO:
+
+def run_repeated_measures_anova(
+    data: Any,
+    profile: Optional[RepeatedMeasuresANOVAProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> RepeatedMeasuresANOVAOutputDTO:
     """일원 반복측정 ANOVA.
 
     Args:
@@ -220,8 +265,10 @@ def run_repeated_measures_anova(data: Any, profile: Optional[RepeatedMeasuresANO
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("repeated-measures-anova", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'data': data}, profile)
+    profile = resolve_profile(
+        "repeated-measures-anova", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"data": data}, profile)
     return _run_test(data, profile)
 
 
@@ -230,5 +277,7 @@ def run_repeated_measures_anova(data: Any, profile: Optional[RepeatedMeasuresANO
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_repeated_measures_anova([[1,3,5],[2,1,6],[3,4,2],[4,2,7],[5,6,8]])
+    result = run_repeated_measures_anova(
+        [[1, 3, 5], [2, 1, 6], [3, 4, 2], [4, 2, 7], [5, 6, 8]]
+    )
     print(result.to_json(indent=2))

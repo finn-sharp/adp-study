@@ -15,22 +15,30 @@ categorical.py - 원 명목 범주·unknown/missing을 분리한 Categorical Nai
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from sklearn.base import BaseEstimator,ClassifierMixin
-from src.MachineLearning.NaiveBayes._distribution_common import validate_nb_profile,run_distribution,numeric_counts,labels_for_fit,log_priors,DistributionClassifierMixin
+from sklearn.base import BaseEstimator, ClassifierMixin
+from src.MachineLearning.NaiveBayes._distribution_common import (
+    validate_nb_profile,
+    run_distribution,
+    numeric_counts,
+    labels_for_fit,
+    log_priors,
+    DistributionClassifierMixin,
+)
 from src.Preprocessing._common import feature_array
 
 
@@ -55,18 +63,20 @@ class CategoricalProfile:
         fit_prior (bool): 학습 클래스 prior 여부. 기본 True.
         max_categories (int): Feature별 학습 수준 수 한도; 고카디널리티 보호. 기본 1000.
     """
+
     test_size: float = 0.3
     random_state: int = 1234
     stratify: bool = True
-    split_strategy: str = 'random'
-    scaling: str = 'none'
+    split_strategy: str = "random"
+    scaling: str = "none"
     cv: int = 3
     scoring: Optional[str] = None
     n_jobs: int = 1
-    param_grid: Optional[Dict[str,Any]] = None
+    param_grid: Optional[Dict[str, Any]] = None
     alpha: float = 1.0
     fit_prior: bool = True
     max_categories: int = 1000
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -94,10 +104,11 @@ class CategoricalOutputDTO(OutputDTO):
         cv_results (Optional[Dict[str,Any]]): 전체 CV 결과 또는 None.
         warnings (List[str]): 분포·독립·확률 해석 가정.
     """
+
     model_name: str
     model: Any
-    train_metrics: Dict[str,float]
-    test_metrics: Dict[str,float]
+    train_metrics: Dict[str, float]
+    test_metrics: Dict[str, float]
     y_test: np.ndarray
     predictions: np.ndarray
     probabilities: np.ndarray
@@ -107,14 +118,16 @@ class CategoricalOutputDTO(OutputDTO):
     train_indices: np.ndarray
     test_indices: np.ndarray
     feature_names: List[str]
-    best_params: Dict[str,Any]
+    best_params: Dict[str, Any]
     best_cv_score: Optional[float]
-    cv_results: Optional[Dict[str,Any]]
+    cv_results: Optional[Dict[str, Any]]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -126,12 +139,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_nb_profile(profile,CategoricalProfile,False)
-    if profile.alpha<=0 or profile.max_categories<1:raise ValueError('범주 평활화/한도 오류')
+    validate_nb_profile(profile, CategoricalProfile, False)
+    if profile.alpha <= 0 or profile.max_categories < 1:
+        raise ValueError("범주 평활화/한도 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def build_categorical_classifier(profile=None, *, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -145,13 +161,17 @@ def build_categorical_classifier(profile=None, *, recipe_path=None, overrides=No
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-categorical',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-categorical", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return CategoricalNB(profile.alpha,profile.fit_prior,profile.max_categories)
+    return CategoricalNB(profile.alpha, profile.fit_prior, profile.max_categories)
 
-class CategoricalNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
+
+class CategoricalNB(ClassifierMixin, DistributionClassifierMixin, BaseEstimator):
     """원 범주를 Feature별로 학습하고 unknown=0/missing=1 bucket을 별도 보존합니다."""
-    def __init__(self,alpha=1.,fit_prior=True,max_categories=1000):
+
+    def __init__(self, alpha=1.0, fit_prior=True, max_categories=1000):
         """설정 보존.
 
         Args:
@@ -163,9 +183,11 @@ class CategoricalNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         Raises:
             None: fit에서 검증.
         """
-        self.alpha=alpha;self.fit_prior=fit_prior;self.max_categories=max_categories
+        self.alpha = alpha
+        self.fit_prior = fit_prior
+        self.max_categories = max_categories
 
-    def fit(self,X,y):
+    def fit(self, X, y):
         """학습 원 범주의 빈도와 Dirichlet 가산 평활화를 적합합니다.
 
         Args:
@@ -176,17 +198,35 @@ class CategoricalNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         Raises:
             ValueError: 범주 충돌·한도·alpha 오류.
         """
-        from src.MachineLearning.analysis_common import finite_number,positive_int
-        finite_number(self.alpha,'alpha',True);positive_int(self.max_categories,'max_categories')
-        a,names=feature_array(X,False,True);self.classes_,index,self.class_count_=labels_for_fit(y,len(a));self.n_features_in_=a.shape[1];self.feature_names_in_=np.asarray(names,dtype=object);self.class_log_prior_=log_priors(self.class_count_,self.fit_prior);self.category_maps_=[];self.category_count_=[];self.feature_log_prob_=[]
+        from src.MachineLearning.analysis_common import finite_number, positive_int
+
+        finite_number(self.alpha, "alpha", True)
+        positive_int(self.max_categories, "max_categories")
+        a, names = feature_array(X, False, True)
+        self.classes_, index, self.class_count_ = labels_for_fit(y, len(a))
+        self.n_features_in_ = a.shape[1]
+        self.feature_names_in_ = np.asarray(names, dtype=object)
+        self.class_log_prior_ = log_priors(self.class_count_, self.fit_prior)
+        self.category_maps_ = []
+        self.category_count_ = []
+        self.feature_log_prob_ = []
         for column in a.T:
-            known=sorted(set(column[~pd.isna(column)]));mapping={value:i+2 for i,value in enumerate(known)}
-            if len(known)>self.max_categories:raise ValueError('Feature 범주 한도 초과')
-            codes=np.array([1 if pd.isna(v) else mapping[v] for v in column]);count=np.zeros((len(self.classes_),len(known)+2));np.add.at(count,(index,codes),1)
-            self.category_maps_.append(mapping);self.category_count_.append(count);self.feature_log_prob_.append(np.log(count+self.alpha)-np.log(self.class_count_[:,None]+self.alpha*count.shape[1]))
+            known = sorted(set(column[~pd.isna(column)]))
+            mapping = {value: i + 2 for i, value in enumerate(known)}
+            if len(known) > self.max_categories:
+                raise ValueError("Feature 범주 한도 초과")
+            codes = np.array([1 if pd.isna(v) else mapping[v] for v in column])
+            count = np.zeros((len(self.classes_), len(known) + 2))
+            np.add.at(count, (index, codes), 1)
+            self.category_maps_.append(mapping)
+            self.category_count_.append(count)
+            self.feature_log_prob_.append(
+                np.log(count + self.alpha)
+                - np.log(self.class_count_[:, None] + self.alpha * count.shape[1])
+            )
         return self
 
-    def _joint_log_likelihood(self,X):
+    def _joint_log_likelihood(self, X):
         """학습 범주/미지/결측 bucket likelihood를 계산합니다.
 
         Args:
@@ -196,12 +236,21 @@ class CategoricalNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         Raises:
             ValueError: 열/범주 정의역 오류.
         """
-        a,names=feature_array(X,False,True)
-        if a.shape[1]!=self.n_features_in_ or (isinstance(X,pd.DataFrame) and names!=self.feature_names_in_.tolist()):raise ValueError('Feature 이름/순서 불일치')
-        score=np.broadcast_to(self.class_log_prior_,(len(a),len(self.classes_))).copy()
-        for j,column in enumerate(a.T):
-            codes=np.array([1 if pd.isna(v) else self.category_maps_[j].get(v,0) for v in column]);score+=self.feature_log_prob_[j][:,codes].T
+        a, names = feature_array(X, False, True)
+        if a.shape[1] != self.n_features_in_ or (
+            isinstance(X, pd.DataFrame) and names != self.feature_names_in_.tolist()
+        ):
+            raise ValueError("Feature 이름/순서 불일치")
+        score = np.broadcast_to(
+            self.class_log_prior_, (len(a), len(self.classes_))
+        ).copy()
+        for j, column in enumerate(a.T):
+            codes = np.array(
+                [1 if pd.isna(v) else self.category_maps_[j].get(v, 0) for v in column]
+            )
+            score += self.feature_log_prob_[j][:, codes].T
         return score
+
 
 def _run(X, y, test_indices, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -216,13 +265,25 @@ def _run(X, y, test_indices, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    return run_distribution(X,y,build_categorical_classifier(profile),profile,CategoricalOutputDTO,categorical=True,test_indices=test_indices)
+    return run_distribution(
+        X,
+        y,
+        build_categorical_classifier(profile),
+        profile,
+        CategoricalOutputDTO,
+        categorical=True,
+        test_indices=test_indices,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_categorical(X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None):
+
+def run_categorical(
+    X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -237,9 +298,12 @@ def run_categorical(X, y, test_indices=None, profile=None, *, recipe_path=None, 
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-categorical',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-categorical", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X, y, test_indices,profile)
+    return _run(X, y, test_indices, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

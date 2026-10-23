@@ -15,6 +15,7 @@ missing_association.py - 함께 누락되는 Feature를 탐색해 공동 대치�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class QualityMissingAssociationProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         annotate (bool): 결측 지표 간 상관을 셀에 표시. 기본 True.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     annotate: bool = True
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class QualityMissingAssociationOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class QualityMissingAssociationOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, QualityMissingAssociationProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -104,16 +122,50 @@ def _draw(values, ax, profile, before, cax):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw=values.copy() if isinstance(values,pd.DataFrame) else pd.DataFrame(values)
-    if len(raw)<3 or raw.shape[1]<2 or not raw.columns.is_unique:raise ValueError('3행·2개 이상 고유 열이 필요합니다.')
-    indicators=raw.isna().astype(float);data=indicators.corr();heatmap(ax,data.values,data.index.astype(str),data.columns.astype(str),cmap='coolwarm',cax=cax,vmin=-1,vmax=1,annotate=profile.annotate)
-    diagnostics={'n_rows':len(raw),'undefined_features':indicators.columns[indicators.nunique()<2].astype(str).tolist(),'missing_counts':raw.isna().sum()};notes=['결측 여부 지표의 상관입니다. 항상/절대 결측 열은 NaN이고 결측 발생 원인은 식별하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, QualityMissingAssociationOutputDTO, 'Quality — Missing Association', notes)
+    raw = values.copy() if isinstance(values, pd.DataFrame) else pd.DataFrame(values)
+    if len(raw) < 3 or raw.shape[1] < 2 or not raw.columns.is_unique:
+        raise ValueError("3행·2개 이상 고유 열이 필요합니다.")
+    indicators = raw.isna().astype(float)
+    data = indicators.corr()
+    heatmap(
+        ax,
+        data.values,
+        data.index.astype(str),
+        data.columns.astype(str),
+        cmap="coolwarm",
+        cax=cax,
+        vmin=-1,
+        vmax=1,
+        annotate=profile.annotate,
+    )
+    diagnostics = {
+        "n_rows": len(raw),
+        "undefined_features": indicators.columns[indicators.nunique() < 2]
+        .astype(str)
+        .tolist(),
+        "missing_counts": raw.isna().sum(),
+    }
+    notes = [
+        "결측 여부 지표의 상관입니다. 항상/절대 결측 열은 NaN이고 결측 발생 원인은 식별하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        QualityMissingAssociationOutputDTO,
+        "Quality — Missing Association",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_missing_association(values, *, ax, profile=None, recipe_path=None, overrides=None, cax=None) -> QualityMissingAssociationOutputDTO:
+def plot_missing_association(
+    values, *, ax, profile=None, recipe_path=None, overrides=None, cax=None
+) -> QualityMissingAssociationOutputDTO:
     """함께 누락되는 Feature를 탐색해 공동 대치와 수집 과정을 검토합니다.
 
     Args:
@@ -128,10 +180,16 @@ def plot_missing_association(values, *, ax, profile=None, recipe_path=None, over
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-quality-missing-association', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-quality-missing-association",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax, cax)
+    before = start(ax, cax)
     return _draw(values, ax, profile, before, cax)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

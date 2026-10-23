@@ -16,6 +16,7 @@ chi_square.py - 카이제곱 적합도 검정
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,6 +41,7 @@ from src.MachineLearning.analysis_common import positive_int, finite_number
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class ChiSquareProfile:
     """ChiSquareProfile 필드 계약.
@@ -48,6 +50,7 @@ class ChiSquareProfile:
         alpha (float): 유의수준, 기본 0.05.
         ddof (int): 추정 모수 수에 따른 자유도 감소, 기본 0.
     """
+
     alpha: float = 0.05
     ddof: int = 0
 
@@ -55,6 +58,7 @@ class ChiSquareProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ChiSquareOutputDTO(OutputDTO):
@@ -69,6 +73,7 @@ class ChiSquareOutputDTO(OutputDTO):
         details (Dict[str, Any]): 자유도·기대도수·표본수 등 검정별 진단.
         warnings (List[str]): 근사 조건과 해석 제약.
     """
+
     statistic: float
     p_value: float
     reject_h0: bool
@@ -82,7 +87,10 @@ class ChiSquareOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
-def _validate_inputs(observed: Any, expected: Any = None, profile: Optional[ChiSquareProfile] = None) -> Any:
+
+def _validate_inputs(
+    observed: Any, expected: Any = None, profile: Optional[ChiSquareProfile] = None
+) -> Any:
     """입력 검증.
 
     Args:
@@ -94,20 +102,34 @@ def _validate_inputs(observed: Any, expected: Any = None, profile: Optional[ChiS
     Raises:
         ValueError/TypeError: 입력 조건 오류.
     """
-    if not isinstance(profile, ChiSquareProfile): raise TypeError("ChiSquareProfile이 필요합니다")
+    if not isinstance(profile, ChiSquareProfile):
+        raise TypeError("ChiSquareProfile이 필요합니다")
     alpha(profile.alpha)
     obs = counts(observed)
-    if len(obs) < 2 or obs.sum() <= 0: raise ValueError("2개 이상 범주와 양의 총빈도가 필요합니다.")
-    exp = np.full(len(obs), obs.mean()) if expected is None else np.asarray(expected, dtype=float)
-    if exp.shape != obs.shape or not np.isfinite(exp).all() or (exp <= 0).any() or not np.isclose(exp.sum(), obs.sum(), rtol=1e-8, atol=1e-8): raise ValueError("양의 기대도수와 같은 총빈도가 필요합니다.")
+    if len(obs) < 2 or obs.sum() <= 0:
+        raise ValueError("2개 이상 범주와 양의 총빈도가 필요합니다.")
+    exp = (
+        np.full(len(obs), obs.mean())
+        if expected is None
+        else np.asarray(expected, dtype=float)
+    )
+    if (
+        exp.shape != obs.shape
+        or not np.isfinite(exp).all()
+        or (exp <= 0).any()
+        or not np.isclose(exp.sum(), obs.sum(), rtol=1e-8, atol=1e-8)
+    ):
+        raise ValueError("양의 기대도수와 같은 총빈도가 필요합니다.")
     positive_int(profile.ddof, "ddof", 0)
-    if len(obs)-1-profile.ddof <= 0: raise ValueError("자유도는 양수여야 합니다.")
+    if len(obs) - 1 - profile.ddof <= 0:
+        raise ValueError("자유도는 양수여야 합니다.")
     return obs, exp
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_test(data: Any, profile: Optional[ChiSquareProfile]) -> tuple:
     """검정 계산.
@@ -122,14 +144,32 @@ def _run_test(data: Any, profile: Optional[ChiSquareProfile]) -> tuple:
     """
     obs, exp = data
     result = stats.chisquare(obs, exp, ddof=profile.ddof)
-    return float(result.statistic), float(result.pvalue), "범주 분포가 지정 기대 분포와 같다", {"df": len(obs)-1-profile.ddof, "observed": obs, "expected": exp}, (["기대도수 5 미만: 카이제곱 근사의 적절성을 확인하세요."] if (exp < 5).any() else [])
+    return (
+        float(result.statistic),
+        float(result.pvalue),
+        "범주 분포가 지정 기대 분포와 같다",
+        {"df": len(obs) - 1 - profile.ddof, "observed": obs, "expected": exp},
+        (
+            ["기대도수 5 미만: 카이제곱 근사의 적절성을 확인하세요."]
+            if (exp < 5).any()
+            else []
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_chi_square(observed: Any, expected: Any = None, profile: Optional[ChiSquareProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> ChiSquareOutputDTO:
+
+def run_chi_square(
+    observed: Any,
+    expected: Any = None,
+    profile: Optional[ChiSquareProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> ChiSquareOutputDTO:
     """카이제곱 적합도 검정.
 
     Args:
@@ -144,10 +184,14 @@ def run_chi_square(observed: Any, expected: Any = None, profile: Optional[ChiSqu
         ValueError/TypeError: 입력·설정 오류.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("chi-square", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "chi-square", profile, recipe_path=recipe_path, overrides=overrides
+    )
     data = _validate_inputs(observed, expected, profile=profile)
     statistic, p, h0, details, notes = _run_test(data, profile)
-    return ChiSquareOutputDTO(statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes)
+    return ChiSquareOutputDTO(
+        statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes
+    )
 
 
 # ---------------------------------------------------------------------------

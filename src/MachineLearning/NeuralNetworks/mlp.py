@@ -43,13 +43,16 @@ import numpy as np
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MLPProfile:
@@ -99,6 +102,7 @@ class MLPProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MLPOutputDTO(OutputDTO):
@@ -181,7 +185,11 @@ def _require_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·범위를 만족하지 않는 값.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 범위를 확인하세요.")
@@ -203,7 +211,10 @@ def _validate_inputs(X: Any, y: Any, profile: MLPProfile) -> None:
     if not isinstance(profile, MLPProfile):
         raise TypeError("MLPProfile이 필요합니다.")
     _, target = validate_supervised_inputs(X, y, profile)
-    if not isinstance(profile.hidden_layer_sizes, tuple) or not profile.hidden_layer_sizes:
+    if (
+        not isinstance(profile.hidden_layer_sizes, tuple)
+        or not profile.hidden_layer_sizes
+    ):
         raise ValueError("hidden_layer_sizes는 비어 있지 않은 튜플이어야 합니다.")
     for width in profile.hidden_layer_sizes:
         _require_positive_integer(width, "hidden_layer_sizes 원소")
@@ -228,6 +239,7 @@ def _validate_inputs(X: Any, y: Any, profile: MLPProfile) -> None:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
+
 def _create_model(profile: MLPProfile) -> Any:
     """분류/회귀 목적에 맞는 미적합 모델을 생성합니다.
 
@@ -240,11 +252,15 @@ def _create_model(profile: MLPProfile) -> Any:
         ValueError: 라이브러리가 설정을 거부한 경우.
     """
     from sklearn.neural_network import MLPClassifier, MLPRegressor
+
     estimator = MLPClassifier if profile.task == "classification" else MLPRegressor
     return estimator(
-        hidden_layer_sizes=profile.hidden_layer_sizes, solver=profile.solver,
-        activation=profile.activation, alpha=profile.alpha,
-        learning_rate_init=profile.learning_rate_init, max_iter=profile.max_iter,
+        hidden_layer_sizes=profile.hidden_layer_sizes,
+        solver=profile.solver,
+        activation=profile.activation,
+        alpha=profile.alpha,
+        learning_rate_init=profile.learning_rate_init,
+        max_iter=profile.max_iter,
         early_stopping=profile.early_stopping,
         validation_fraction=profile.validation_fraction,
         n_iter_no_change=profile.n_iter_no_change,
@@ -252,7 +268,9 @@ def _create_model(profile: MLPProfile) -> Any:
     )
 
 
-def _fit_model(X: Any, y: Any, profile: MLPProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: MLPProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -273,6 +291,7 @@ def _fit_model(X: Any, y: Any, profile: MLPProfile, estimator: Any) -> Supervise
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_mlp(
     X: Any,
@@ -304,7 +323,9 @@ def run_mlp(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("mlp", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "mlp", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)
@@ -313,7 +334,11 @@ def run_mlp(
         **result.to_dict(include_runtime=True),
         weights=[np.asarray(value).copy() for value in fitted.coefs_],
         intercepts=[np.asarray(value).copy() for value in fitted.intercepts_],
-        loss_curve=np.asarray(fitted.loss_curve_).copy() if hasattr(fitted, "loss_curve_") else None,
+        loss_curve=(
+            np.asarray(fitted.loss_curve_).copy()
+            if hasattr(fitted, "loss_curve_")
+            else None
+        ),
         n_iter=int(fitted.n_iter_),
     )
 

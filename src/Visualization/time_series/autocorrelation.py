@@ -15,6 +15,7 @@ autocorrelation.py - 시간 의존성과 계절 지연 후보를 탐색합니다
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -45,12 +58,14 @@ class TimeSeriesAutocorrelationProfile:
         kind (str): acf/pacf. 기본 'acf'.
         confidence (float): 근사 신뢰수준 (0,1). 기본 0.95.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     nlags: int = 20
-    kind: str = 'acf'
+    kind: str = "acf"
     confidence: float = 0.95
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,6 +83,7 @@ class TimeSeriesAutocorrelationOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -75,6 +91,7 @@ class TimeSeriesAutocorrelationOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -90,6 +107,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, TimeSeriesAutocorrelationProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -107,19 +125,73 @@ def _draw(values, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    from statsmodels.tsa.stattools import acf,pacf
-    a,removed=vector(values,min_size=4,allow_missing=False)
-    if np.ptp(a)==0 or not 1<=profile.nlags<len(a) or not 0<profile.confidence<1 or profile.kind not in ('acf','pacf'):raise ValueError('자기상관 설정/상수 오류')
-    if profile.kind=='pacf' and profile.nlags>=len(a)//2:raise ValueError('pacf nlags는 n//2 미만이어야 합니다.')
-    if profile.kind=='acf':coefficients,interval=acf(a,nlags=profile.nlags,fft=False,alpha=1-profile.confidence)
-    else:coefficients,interval=pacf(a,nlags=profile.nlags,method='ywm',alpha=1-profile.confidence)
-    x=np.arange(len(coefficients));ax.vlines(x,0,coefficients,color=profile.color,alpha=profile.alpha);ax.scatter(x,coefficients,color=profile.color,s=14);ax.axhline(0,color='black',linewidth=.5);ax.fill_between(x,interval[:,0]-coefficients,interval[:,1]-coefficients,color=profile.color,alpha=.15);ax.set_xlabel('Lag in rows');ax.set_ylabel(profile.kind.upper());data=pd.DataFrame({'lag':x,'coefficient':coefficients,'lower':interval[:,0],'upper':interval[:,1]});diagnostics={'n':len(a),'confidence':profile.confidence,'band_center':'zero reference; DTO intervals centered on estimates'};notes=['정상성·동일 시간 간격을 확인하세요. 근사 개별 구간으로 다중 지연 검정/모델 차수를 자동 확정하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, TimeSeriesAutocorrelationOutputDTO, 'Time Series — Autocorrelation', notes)
+    from statsmodels.tsa.stattools import acf, pacf
+
+    a, removed = vector(values, min_size=4, allow_missing=False)
+    if (
+        np.ptp(a) == 0
+        or not 1 <= profile.nlags < len(a)
+        or not 0 < profile.confidence < 1
+        or profile.kind not in ("acf", "pacf")
+    ):
+        raise ValueError("자기상관 설정/상수 오류")
+    if profile.kind == "pacf" and profile.nlags >= len(a) // 2:
+        raise ValueError("pacf nlags는 n//2 미만이어야 합니다.")
+    if profile.kind == "acf":
+        coefficients, interval = acf(
+            a, nlags=profile.nlags, fft=False, alpha=1 - profile.confidence
+        )
+    else:
+        coefficients, interval = pacf(
+            a, nlags=profile.nlags, method="ywm", alpha=1 - profile.confidence
+        )
+    x = np.arange(len(coefficients))
+    ax.vlines(x, 0, coefficients, color=profile.color, alpha=profile.alpha)
+    ax.scatter(x, coefficients, color=profile.color, s=14)
+    ax.axhline(0, color="black", linewidth=0.5)
+    ax.fill_between(
+        x,
+        interval[:, 0] - coefficients,
+        interval[:, 1] - coefficients,
+        color=profile.color,
+        alpha=0.15,
+    )
+    ax.set_xlabel("Lag in rows")
+    ax.set_ylabel(profile.kind.upper())
+    data = pd.DataFrame(
+        {
+            "lag": x,
+            "coefficient": coefficients,
+            "lower": interval[:, 0],
+            "upper": interval[:, 1],
+        }
+    )
+    diagnostics = {
+        "n": len(a),
+        "confidence": profile.confidence,
+        "band_center": "zero reference; DTO intervals centered on estimates",
+    }
+    notes = [
+        "정상성·동일 시간 간격을 확인하세요. 근사 개별 구간으로 다중 지연 검정/모델 차수를 자동 확정하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        TimeSeriesAutocorrelationOutputDTO,
+        "Time Series — Autocorrelation",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_autocorrelation(values, *, ax, profile=None, recipe_path=None, overrides=None) -> TimeSeriesAutocorrelationOutputDTO:
+def plot_autocorrelation(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> TimeSeriesAutocorrelationOutputDTO:
     """시간 의존성과 계절 지연 후보를 탐색합니다.
 
     Args:
@@ -133,10 +205,16 @@ def plot_autocorrelation(values, *, ax, profile=None, recipe_path=None, override
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-time-series-autocorrelation', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-time-series-autocorrelation",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

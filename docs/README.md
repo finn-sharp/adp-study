@@ -6,6 +6,7 @@
 
 | 목적 | 기준 문서 | 다루는 범위 |
 | --- | --- | --- |
+| 모듈·자료 읽기 | [가독성 기준](READABILITY.md) | 리팩터링 책임·도메인 사전·문제/풀이/해설 구성·생성/검증 |
 | 전체 분석 설계 | [파이프라인](ANALYSIS_PIPELINE.md) | 분할·학습/CV·Feature·sampling·예측 후 처리·DTO 연결·목적별 분기 |
 | 전체 모듈 선택 | [기능 카탈로그](ANALYSIS_CATALOG.md) | 등록 모듈266개의 기능·입력·대표 결과, 10단계 분류 |
 | 설정 재현 | [레시피](RECIPES.md) | JSON·Profile·overrides·task·설정 오류·설정과 결과의 구분 |

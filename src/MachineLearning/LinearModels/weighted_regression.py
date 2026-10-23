@@ -15,23 +15,25 @@ weighted_regression.py - 학습 분산 추정을 포함하는 실행가능 가�
     2026-10-23  김재현(Finn)     v1.0.0    응용 분석 모듈·모의10회 실행 연결
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from src.stats.regression._common import validate_profile
 from src.MachineLearning.LinearModels._weighted_estimator import FeasibleWLSRegressor
-from sklearn.metrics import r2_score,mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -46,10 +48,12 @@ class WeightedRegressionProfile:
         weight_ratio (float): 평균정규화 전 가중치 최대/최소 비율 상한, 1 이상 기본 100.0.
         cov_type (str): 추정 가중치에 조건부 nonrobust/HC3 공분산 기본 'HC3'.
     """
+
     iterations: int = 2
     variance_floor: float = 0.0001
     weight_ratio: float = 100.0
-    cov_type: str = 'HC3'
+    cov_type: str = "HC3"
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,18 +72,21 @@ class WeightedRegressionOutputDTO(OutputDTO):
         parameters (Dict[str,Any]): 설정 전체.
         warnings (List[str]): 가중치 추정·추론·정보량 비교의 한계.
     """
+
     model: Any
     coefficients: pd.DataFrame
     weights: np.ndarray
     weighted_residuals: np.ndarray
-    fit_metrics: Dict[str,Any]
+    fit_metrics: Dict[str, Any]
     predictions: Optional[np.ndarray]
-    parameters: Dict[str,Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -91,12 +98,20 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,WeightedRegressionProfile)
-    if not 1<=profile.iterations<=5 or profile.variance_floor<=0 or profile.weight_ratio<1 or profile.cov_type not in ("nonrobust","HC3"):raise ValueError("분산 모형 설정 오류")
+    validate_profile(profile, WeightedRegressionProfile)
+    if (
+        not 1 <= profile.iterations <= 5
+        or profile.variance_floor <= 0
+        or profile.weight_ratio < 1
+        or profile.cov_type not in ("nonrobust", "HC3")
+    ):
+        raise ValueError("분산 모형 설정 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def build_weighted_regressor(profile=None, *, recipe_path=None, overrides=None):
     """구성만 수행하는 미적합 CV 가중 회귀 factory.
@@ -110,7 +125,10 @@ def build_weighted_regressor(profile=None, *, recipe_path=None, overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피·설정 오류.
     """
-    p=resolve_profile('regression-weighted',profile,recipe_path=recipe_path,overrides=overrides);_validate(p)
+    p = resolve_profile(
+        "regression-weighted", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    _validate(p)
     return FeasibleWLSRegressor(**asdict(p))
 
 
@@ -127,15 +145,49 @@ def _run(X, y, X_new, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    model=FeasibleWLSRegressor(**asdict(profile)).fit(X,y)
-    native=model.model_;ci=np.asarray(native.conf_int());table=pd.DataFrame(dict(term=['Intercept']+model.feature_names_in_.tolist(),coefficient=np.asarray(native.params),standard_error=np.asarray(native.bse),t_statistic=np.asarray(native.tvalues),p_value=np.asarray(native.pvalues),lower=ci[:,0],upper=ci[:,1]))
-    return WeightedRegressionOutputDTO(model,table,model.weights_,np.asarray(native.wresid),dict(r2=float(r2_score(y,model.predict(X))),rmse=float(np.sqrt(mean_squared_error(y,model.predict(X)))),weighted_r2=float(native.rsquared),conditional_aic=float(native.aic),conditional_bic=float(native.bic)),None if X_new is None else model.predict(X_new),asdict(profile),['계수는 학습 대치·표준화 Feature 좌표계입니다. 학습 폴드에서만 분산 모형을 추정합니다. 가중치는 알려진 진실이 아니며 조건부 t/p/CI는 가중치 추정 불확실성을 반영하지 않습니다.','weighted R²와 원 단위 예측 R²를 구별합니다. WLS 정보량을 OLS 또는 다른 가중치의 AIC/BIC와 직접 비교하지 않습니다.'])
+    model = FeasibleWLSRegressor(**asdict(profile)).fit(X, y)
+    native = model.model_
+    ci = np.asarray(native.conf_int())
+    table = pd.DataFrame(
+        dict(
+            term=["Intercept"] + model.feature_names_in_.tolist(),
+            coefficient=np.asarray(native.params),
+            standard_error=np.asarray(native.bse),
+            t_statistic=np.asarray(native.tvalues),
+            p_value=np.asarray(native.pvalues),
+            lower=ci[:, 0],
+            upper=ci[:, 1],
+        )
+    )
+    return WeightedRegressionOutputDTO(
+        model,
+        table,
+        model.weights_,
+        np.asarray(native.wresid),
+        dict(
+            r2=float(r2_score(y, model.predict(X))),
+            rmse=float(np.sqrt(mean_squared_error(y, model.predict(X)))),
+            weighted_r2=float(native.rsquared),
+            conditional_aic=float(native.aic),
+            conditional_bic=float(native.bic),
+        ),
+        None if X_new is None else model.predict(X_new),
+        asdict(profile),
+        [
+            "계수는 학습 대치·표준화 Feature 좌표계입니다. 학습 폴드에서만 분산 모형을 추정합니다. 가중치는 알려진 진실이 아니며 조건부 t/p/CI는 가중치 추정 불확실성을 반영하지 않습니다.",
+            "weighted R²와 원 단위 예측 R²를 구별합니다. WLS 정보량을 OLS 또는 다른 가중치의 AIC/BIC와 직접 비교하지 않습니다.",
+        ],
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_weighted_regression(X, y, X_new=None, profile=None, *, recipe_path=None, overrides=None):
+
+def run_weighted_regression(
+    X, y, X_new=None, profile=None, *, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -150,9 +202,12 @@ def run_weighted_regression(X, y, X_new=None, profile=None, *, recipe_path=None,
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('regression-weighted',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "regression-weighted", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X, y, X_new,profile)
+    return _run(X, y, X_new, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

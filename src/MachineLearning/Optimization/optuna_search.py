@@ -16,6 +16,7 @@ optuna_search.py - Optuna TPE 교차검증 탐색
     2026-10-14  김재현(Finn)       v1.0.0    Profile/DTO/JSON/skeleton 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -31,6 +32,7 @@ import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from ._common import validate_inputs, execute_search
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -54,6 +56,7 @@ class OptunaSearchProfile:
         timeout (Optional[float]): Optuna 시간 예산(초); grid/random은 None만 허용.
         pruning (bool): Optuna median fold pruning; grid/random은 False만 허용.
     """
+
     task: str = "classification"
     scoring: Optional[str] = None
     cv: int = 3
@@ -66,6 +69,7 @@ class OptunaSearchProfile:
     refit: bool = True
     timeout: Optional[float] = None
     pruning: bool = False
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -87,6 +91,7 @@ class OptunaSearchOutputDTO(OutputDTO):
         model (Any): 재적합 clone. refit=False이면 None, JSON 제외.
         study (Any): Optuna Study 또는 None, JSON 제외.
     """
+
     method: str
     task: str
     scoring: str
@@ -99,6 +104,7 @@ class OptunaSearchOutputDTO(OutputDTO):
     model: Any
     study: Any = None
     runtime_fields = OutputDTO.runtime_fields | frozenset(("study",))
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -120,6 +126,7 @@ def _validate_inputs(X, y, estimator, profile, groups=None):
         raise TypeError("OptunaSearchProfile이 필요합니다.")
     return validate_inputs(X, y, estimator, profile, "optuna_search", groups)
 
+
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
@@ -134,13 +141,25 @@ def _run_model(X, y, estimator, profile, folds, scoring):
     Raises:
         ValueError/ImportError: 적합 실패·비유한 점수·선택 의존성 미설치.
     """
-    return OptunaSearchOutputDTO(**execute_search(X, y, estimator, profile, "optuna_search", folds, scoring))
+    return OptunaSearchOutputDTO(
+        **execute_search(X, y, estimator, profile, "optuna_search", folds, scoring)
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def run_optuna_search(X, y, estimator, profile=None, *, groups=None, task=None,
-               recipe_path=None, overrides=None):
+def run_optuna_search(
+    X,
+    y,
+    estimator,
+    profile=None,
+    *,
+    groups=None,
+    task=None,
+    recipe_path=None,
+    overrides=None,
+):
     """Profile 또는 전용 JSON으로 학습 자료 파라미터를 최적화합니다.
 
     Args:
@@ -154,10 +173,16 @@ def run_optuna_search(X, y, estimator, profile=None, *, groups=None, task=None,
     Raises:
         TypeError/ValueError/OSError/ImportError: 입력·설정·CV·학습·선택 의존성 오류.
     """
-    profile = resolve_profile("optimization-optuna-search", profile, recipe_path=recipe_path,
-                              task=task, overrides=overrides)
+    profile = resolve_profile(
+        "optimization-optuna-search",
+        profile,
+        recipe_path=recipe_path,
+        task=task,
+        overrides=overrides,
+    )
     folds, scoring = _validate_inputs(X, y, estimator, profile, groups)
     return _run_model(X, y, estimator, profile, folds, scoring)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
@@ -165,7 +190,15 @@ def run_optuna_search(X, y, estimator, profile=None, *, groups=None, task=None,
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
     from sklearn.tree import DecisionTreeClassifier
+
     X, y = load_iris(return_X_y=True)
-    result = run_optuna_search(X, y, DecisionTreeClassifier(random_state=1234),
-                        overrides={"search_space": {'max_depth': {'type': 'int', 'low': 2, 'high': 4}}, "n_iter": 3})
+    result = run_optuna_search(
+        X,
+        y,
+        DecisionTreeClassifier(random_state=1234),
+        overrides={
+            "search_space": {"max_depth": {"type": "int", "low": 2, "high": 4}},
+            "n_iter": 3,
+        },
+    )
     print(result.to_json(indent=2)[:800])

@@ -22,6 +22,7 @@ naive_bayes.py - 나이브 베이즈 분류
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class NaiveBayesProfile:
@@ -68,7 +74,7 @@ class NaiveBayesProfile:
         binarize (Optional[float]): Bernoulli 이진화 임계값. 유한한 수 또는 None. None이면 입력은 0/1이어야 함. 기본 0.0.
     """
 
-    task: str = 'classification'
+    task: str = "classification"
     test_size: float = 0.3
     random_state: int = 1234
     scaling: str = "none"
@@ -86,6 +92,7 @@ class NaiveBayesProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class NaiveBayesOutputDTO(OutputDTO):
@@ -134,6 +141,7 @@ class NaiveBayesOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, y: Any, profile: NaiveBayesProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -151,24 +159,37 @@ def _validate_inputs(X: Any, y: Any, profile: NaiveBayesProfile) -> np.ndarray:
         raise TypeError("NaiveBayesProfile이 필요합니다.")
     arr = validate_features(X)
     from src.MachineLearning.common import validate_supervised_inputs
+
     arr, target = validate_supervised_inputs(X, y, profile)
-    if profile.task != "classification": raise ValueError("나이브 베이즈는 classification만 지원합니다.")
-    if profile.variant not in ("gaussian", "multinomial", "bernoulli", "complement"): raise ValueError("variant를 확인하세요.")
+    if profile.task != "classification":
+        raise ValueError("나이브 베이즈는 classification만 지원합니다.")
+    if profile.variant not in ("gaussian", "multinomial", "bernoulli", "complement"):
+        raise ValueError("variant를 확인하세요.")
     finite_number(profile.alpha, "alpha", positive=True)
     finite_number(profile.var_smoothing, "var_smoothing", positive=True)
-    if profile.binarize is not None and (isinstance(profile.binarize, bool) or not isinstance(profile.binarize, (float,int)) or not np.isfinite(profile.binarize)):
+    if profile.binarize is not None and (
+        isinstance(profile.binarize, bool)
+        or not isinstance(profile.binarize, (float, int))
+        or not np.isfinite(profile.binarize)
+    ):
         raise ValueError("binarize는 유한한 수 또는 None입니다.")
     if profile.variant in ("multinomial", "complement"):
-        if profile.scaling != "none" or np.any(arr < 0): raise ValueError("빈도 기반 Bayes는 음이 아닌 입력과 scaling=none이 필요합니다.")
+        if profile.scaling != "none" or np.any(arr < 0):
+            raise ValueError(
+                "빈도 기반 Bayes는 음이 아닌 입력과 scaling=none이 필요합니다."
+            )
     if profile.variant == "bernoulli":
-        if profile.scaling != "none": raise ValueError("Bernoulli Bayes는 scaling=none을 사용하세요.")
-        if profile.binarize is None and not np.isin(arr, [0,1]).all(): raise ValueError("이진화 생략 시 입력은 0/1이어야 합니다.")
+        if profile.scaling != "none":
+            raise ValueError("Bernoulli Bayes는 scaling=none을 사용하세요.")
+        if profile.binarize is None and not np.isin(arr, [0, 1]).all():
+            raise ValueError("이진화 생략 시 입력은 0/1이어야 합니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, y: Any, profile: NaiveBayesProfile) -> NaiveBayesOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -185,23 +206,36 @@ def _run_model(X: Any, y: Any, profile: NaiveBayesProfile) -> NaiveBayesOutputDT
     """
     from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB, ComplementNB
     from src.MachineLearning.common import run_supervised
-    factories = {"gaussian": lambda: GaussianNB(var_smoothing=profile.var_smoothing),
-                 "multinomial": lambda: MultinomialNB(alpha=profile.alpha),
-                 "bernoulli": lambda: BernoulliNB(alpha=profile.alpha, binarize=profile.binarize),
-                 "complement": lambda: ComplementNB(alpha=profile.alpha)}
+
+    factories = {
+        "gaussian": lambda: GaussianNB(var_smoothing=profile.var_smoothing),
+        "multinomial": lambda: MultinomialNB(alpha=profile.alpha),
+        "bernoulli": lambda: BernoulliNB(
+            alpha=profile.alpha, binarize=profile.binarize
+        ),
+        "complement": lambda: ComplementNB(alpha=profile.alpha),
+    }
     result = run_supervised(X, y, factories[profile.variant](), profile)
-    return NaiveBayesOutputDTO(**result.to_dict(include_runtime=True),
-                              class_counts=result.model.named_steps["model"].class_count_.copy())
+    return NaiveBayesOutputDTO(
+        **result.to_dict(include_runtime=True),
+        class_counts=result.model.named_steps["model"].class_count_.copy(),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_naive_bayes(X: Any, y: Any, profile: Optional[NaiveBayesProfile] = None, *,
-              task: Optional[str] = None,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> NaiveBayesOutputDTO:
+
+def run_naive_bayes(
+    X: Any,
+    y: Any,
+    profile: Optional[NaiveBayesProfile] = None,
+    *,
+    task: Optional[str] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> NaiveBayesOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -219,7 +253,9 @@ def run_naive_bayes(X: Any, y: Any, profile: Optional[NaiveBayesProfile] = None,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("naive-bayes", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     return _run_model(X, y, profile)
 
@@ -230,6 +266,7 @@ def run_naive_bayes(X: Any, y: Any, profile: Optional[NaiveBayesProfile] = None,
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_naive_bayes(X, y, load_profile("naive-bayes"))
     print(result.to_json(indent=2)[:500])

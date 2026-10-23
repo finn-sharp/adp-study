@@ -15,22 +15,30 @@ poisson.py - Gamma 평활화 rate의 독립 Poisson Naive Bayes
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from sklearn.base import BaseEstimator,ClassifierMixin
-from src.MachineLearning.NaiveBayes._distribution_common import validate_nb_profile,run_distribution,numeric_counts,labels_for_fit,log_priors,DistributionClassifierMixin
+from sklearn.base import BaseEstimator, ClassifierMixin
+from src.MachineLearning.NaiveBayes._distribution_common import (
+    validate_nb_profile,
+    run_distribution,
+    numeric_counts,
+    labels_for_fit,
+    log_priors,
+    DistributionClassifierMixin,
+)
 from src.Preprocessing._common import feature_array
 
 
@@ -55,18 +63,20 @@ class PoissonProfile:
         rate_beta (float): Gamma 양수 rate; 클래스 표본 수에 더하는 노출 prior. 기본 1.0.
         fit_prior (bool): 학습 클래스 빈도 prior; False면 균등. 기본 True.
     """
+
     test_size: float = 0.3
     random_state: int = 1234
     stratify: bool = True
-    split_strategy: str = 'random'
-    scaling: str = 'none'
+    split_strategy: str = "random"
+    scaling: str = "none"
     cv: int = 3
     scoring: Optional[str] = None
     n_jobs: int = 1
-    param_grid: Optional[Dict[str,Any]] = None
+    param_grid: Optional[Dict[str, Any]] = None
     rate_alpha: float = 1.0
     rate_beta: float = 1.0
     fit_prior: bool = True
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -94,10 +104,11 @@ class PoissonOutputDTO(OutputDTO):
         cv_results (Optional[Dict[str,Any]]): 전체 CV 결과 또는 None.
         warnings (List[str]): 분포·독립·확률 해석 가정.
     """
+
     model_name: str
     model: Any
-    train_metrics: Dict[str,float]
-    test_metrics: Dict[str,float]
+    train_metrics: Dict[str, float]
+    test_metrics: Dict[str, float]
     y_test: np.ndarray
     predictions: np.ndarray
     probabilities: np.ndarray
@@ -107,14 +118,16 @@ class PoissonOutputDTO(OutputDTO):
     train_indices: np.ndarray
     test_indices: np.ndarray
     feature_names: List[str]
-    best_params: Dict[str,Any]
+    best_params: Dict[str, Any]
     best_cv_score: Optional[float]
-    cv_results: Optional[Dict[str,Any]]
+    cv_results: Optional[Dict[str, Any]]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -126,12 +139,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_nb_profile(profile,PoissonProfile)
-    if profile.rate_alpha<=0 or profile.rate_beta<=0:raise ValueError('Gamma prior는 양수입니다.')
+    validate_nb_profile(profile, PoissonProfile)
+    if profile.rate_alpha <= 0 or profile.rate_beta <= 0:
+        raise ValueError("Gamma prior는 양수입니다.")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def build_poisson_classifier(profile=None, *, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -145,11 +161,14 @@ def build_poisson_classifier(profile=None, *, recipe_path=None, overrides=None):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-poisson',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-poisson", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return PoissonNB(profile.rate_alpha,profile.rate_beta,profile.fit_prior)
+    return PoissonNB(profile.rate_alpha, profile.rate_beta, profile.fit_prior)
 
-class PoissonNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
+
+class PoissonNB(ClassifierMixin, DistributionClassifierMixin, BaseEstimator):
     """같은 노출 단위의 클래스 조건부 독립 Poisson Feature 분류기.
 
     Attributes:
@@ -158,7 +177,8 @@ class PoissonNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         fit_prior (bool): 경험 prior 여부.
         rates_ (np.ndarray): 클래스×Feature lambda posterior 평균.
     """
-    def __init__(self,rate_alpha=1.,rate_beta=1.,fit_prior=True):
+
+    def __init__(self, rate_alpha=1.0, rate_beta=1.0, fit_prior=True):
         """설정 보존.
 
         Args:
@@ -170,9 +190,11 @@ class PoissonNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         Raises:
             None: fit에서 검증.
         """
-        self.rate_alpha=rate_alpha;self.rate_beta=rate_beta;self.fit_prior=fit_prior
+        self.rate_alpha = rate_alpha
+        self.rate_beta = rate_beta
+        self.fit_prior = fit_prior
 
-    def fit(self,X,y):
+    def fit(self, X, y):
         """학습 클래스별 rate와 prior만 적합합니다.
 
         Args:
@@ -184,13 +206,24 @@ class PoissonNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
             ValueError: 정의역·prior 설정 오류.
         """
         from src.MachineLearning.analysis_common import finite_number
-        finite_number(self.rate_alpha,'rate_alpha',True);finite_number(self.rate_beta,'rate_beta',True)
-        a=numeric_counts(X);self.classes_,index,self.class_count_=labels_for_fit(y,len(a));self.n_features_in_=a.shape[1]
-        self.class_log_prior_=log_priors(self.class_count_,self.fit_prior);self.feature_count_=np.vstack([a[index==i].sum(axis=0) for i in range(len(self.classes_))]);self.rates_=(self.feature_count_+self.rate_alpha)/(self.class_count_[:,None]+self.rate_beta)
-        if not np.isfinite(self.rates_).all():raise ValueError('Poisson rate overflow')
+
+        finite_number(self.rate_alpha, "rate_alpha", True)
+        finite_number(self.rate_beta, "rate_beta", True)
+        a = numeric_counts(X)
+        self.classes_, index, self.class_count_ = labels_for_fit(y, len(a))
+        self.n_features_in_ = a.shape[1]
+        self.class_log_prior_ = log_priors(self.class_count_, self.fit_prior)
+        self.feature_count_ = np.vstack(
+            [a[index == i].sum(axis=0) for i in range(len(self.classes_))]
+        )
+        self.rates_ = (self.feature_count_ + self.rate_alpha) / (
+            self.class_count_[:, None] + self.rate_beta
+        )
+        if not np.isfinite(self.rates_).all():
+            raise ValueError("Poisson rate overflow")
         return self
 
-    def _joint_log_likelihood(self,X):
+    def _joint_log_likelihood(self, X):
         """Poisson log PMF의 합과 log prior를 계산합니다.
 
         Args:
@@ -201,9 +234,17 @@ class PoissonNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
             ValueError: 정의역·열 수 오류.
         """
         from scipy.special import gammaln
-        a=numeric_counts(X)
-        if a.shape[1]!=self.n_features_in_:raise ValueError('Feature 수 불일치')
-        return a@np.log(self.rates_).T-self.rates_.sum(axis=1)[None,:]-gammaln(a+1).sum(axis=1)[:,None]+self.class_log_prior_[None,:]
+
+        a = numeric_counts(X)
+        if a.shape[1] != self.n_features_in_:
+            raise ValueError("Feature 수 불일치")
+        return (
+            a @ np.log(self.rates_).T
+            - self.rates_.sum(axis=1)[None, :]
+            - gammaln(a + 1).sum(axis=1)[:, None]
+            + self.class_log_prior_[None, :]
+        )
+
 
 def _run(X, y, test_indices, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -219,13 +260,24 @@ def _run(X, y, test_indices, profile):
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
     numeric_counts(X)
-    return run_distribution(X,y,build_poisson_classifier(profile),profile,PoissonOutputDTO,test_indices=test_indices)
+    return run_distribution(
+        X,
+        y,
+        build_poisson_classifier(profile),
+        profile,
+        PoissonOutputDTO,
+        test_indices=test_indices,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_poisson(X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None):
+
+def run_poisson(
+    X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -240,9 +292,12 @@ def run_poisson(X, y, test_indices=None, profile=None, *, recipe_path=None, over
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-poisson',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-poisson", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X, y, test_indices,profile)
+    return _run(X, y, test_indices, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

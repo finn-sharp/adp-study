@@ -16,6 +16,7 @@ normality.py - 정규성 검정
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,6 +41,7 @@ from src.MachineLearning.analysis_common import positive_int, finite_number
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class NormalityProfile:
     """NormalityProfile 필드 계약.
@@ -48,6 +50,7 @@ class NormalityProfile:
         alpha (float): 유의수준, 기본 0.05.
         method (str): shapiro/dagostino/jarque_bera. 기본 shapiro.
     """
+
     alpha: float = 0.05
     method: str = "shapiro"
 
@@ -55,6 +58,7 @@ class NormalityProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class NormalityOutputDTO(OutputDTO):
@@ -69,6 +73,7 @@ class NormalityOutputDTO(OutputDTO):
         details (Dict[str, Any]): 자유도·기대도수·표본수 등 검정별 진단.
         warnings (List[str]): 근사 조건과 해석 제약.
     """
+
     statistic: float
     p_value: float
     reject_h0: bool
@@ -82,6 +87,7 @@ class NormalityOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(x: Any, profile: Optional[NormalityProfile] = None) -> Any:
     """입력 검증.
 
@@ -93,17 +99,21 @@ def _validate_inputs(x: Any, profile: Optional[NormalityProfile] = None) -> Any:
     Raises:
         ValueError/TypeError: 입력 조건 오류.
     """
-    if not isinstance(profile, NormalityProfile): raise TypeError("NormalityProfile이 필요합니다")
+    if not isinstance(profile, NormalityProfile):
+        raise TypeError("NormalityProfile이 필요합니다")
     alpha(profile.alpha)
-    if profile.method not in ("shapiro", "dagostino", "jarque_bera"): raise ValueError("method 오류")
+    if profile.method not in ("shapiro", "dagostino", "jarque_bera"):
+        raise ValueError("method 오류")
     a = vector(x, 8 if profile.method == "dagostino" else 3)
-    if np.ptp(a) == 0: raise ValueError("상수 표본은 정규성 검정 불가")
+    if np.ptp(a) == 0:
+        raise ValueError("상수 표본은 정규성 검정 불가")
     return a
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_test(data: Any, profile: Optional[NormalityProfile]) -> tuple:
     """검정 계산.
@@ -116,19 +126,38 @@ def _run_test(data: Any, profile: Optional[NormalityProfile]) -> tuple:
     Raises:
         ValueError: 미정의 통계량.
     """
-    func = {"shapiro": stats.shapiro, "dagostino": stats.normaltest, "jarque_bera": stats.jarque_bera}[profile.method]
+    func = {
+        "shapiro": stats.shapiro,
+        "dagostino": stats.normaltest,
+        "jarque_bera": stats.jarque_bera,
+    }[profile.method]
     r = func(data)
     notes = []
-    if profile.method == "shapiro" and len(data) > 5000: notes.append("Shapiro n>5000에서 p 값 정확성이 제한됩니다.")
-    if profile.method == "jarque_bera" and len(data) < 2000: notes.append("Jarque–Bera는 큰 표본의 점근 근사입니다.")
-    return float(r.statistic), float(r.pvalue), "표본은 정규 모집단에서 추출되었다", {"n": len(data), "method": profile.method}, notes
+    if profile.method == "shapiro" and len(data) > 5000:
+        notes.append("Shapiro n>5000에서 p 값 정확성이 제한됩니다.")
+    if profile.method == "jarque_bera" and len(data) < 2000:
+        notes.append("Jarque–Bera는 큰 표본의 점근 근사입니다.")
+    return (
+        float(r.statistic),
+        float(r.pvalue),
+        "표본은 정규 모집단에서 추출되었다",
+        {"n": len(data), "method": profile.method},
+        notes,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_normality(x: Any, profile: Optional[NormalityProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> NormalityOutputDTO:
+
+def run_normality(
+    x: Any,
+    profile: Optional[NormalityProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> NormalityOutputDTO:
     """정규성 검정.
 
     Args:
@@ -142,10 +171,14 @@ def run_normality(x: Any, profile: Optional[NormalityProfile] = None, *, recipe_
         ValueError/TypeError: 입력·설정 오류.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("normality", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "normality", profile, recipe_path=recipe_path, overrides=overrides
+    )
     data = _validate_inputs(x, profile=profile)
     statistic, p, h0, details, notes = _run_test(data, profile)
-    return NormalityOutputDTO(statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes)
+    return NormalityOutputDTO(
+        statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes
+    )
 
 
 # ---------------------------------------------------------------------------

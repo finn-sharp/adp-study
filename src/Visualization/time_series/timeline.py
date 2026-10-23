@@ -15,6 +15,7 @@ timeline.py - 수준 변화·추세·수집 공백·관측 급변을 탐색합�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class TimeSeriesTimelineProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         rolling_window (int): 이전/현재 행만 쓰는 후행 이동평균; 0이면 미표시. 기본 7.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     rolling_window: int = 7
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class TimeSeriesTimelineOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class TimeSeriesTimelineOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, TimeSeriesTimelineProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -104,21 +122,63 @@ def _draw(times, values, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw,removed=paired(time=times,value=values);raw['value']=vector(raw.value,allow_missing=False)[0];raw['time']=pd.to_datetime(raw.time,errors='raise')
-    if raw.time.isna().any() or raw.time.duplicated().any() or not raw.time.is_monotonic_increasing or profile.rolling_window<0:raise ValueError('시간은 고유하고 오름차순이어야 합니다.')
-    data=raw;ax.plot(data.time,data.value,color=profile.color,alpha=profile.alpha,label='Observed')
-    from matplotlib.dates import AutoDateLocator,ConciseDateFormatter
-    locator=AutoDateLocator(minticks=3,maxticks=5)
-    ax.xaxis.set_major_locator(locator);ax.xaxis.set_major_formatter(ConciseDateFormatter(locator))
+    raw, removed = paired(time=times, value=values)
+    raw["value"] = vector(raw.value, allow_missing=False)[0]
+    raw["time"] = pd.to_datetime(raw.time, errors="raise")
+    if (
+        raw.time.isna().any()
+        or raw.time.duplicated().any()
+        or not raw.time.is_monotonic_increasing
+        or profile.rolling_window < 0
+    ):
+        raise ValueError("시간은 고유하고 오름차순이어야 합니다.")
+    data = raw
+    ax.plot(
+        data.time,
+        data.value,
+        color=profile.color,
+        alpha=profile.alpha,
+        label="Observed",
+    )
+    from matplotlib.dates import AutoDateLocator, ConciseDateFormatter
+
+    locator = AutoDateLocator(minticks=3, maxticks=5)
+    ax.xaxis.set_major_locator(locator)
+    ax.xaxis.set_major_formatter(ConciseDateFormatter(locator))
     if profile.rolling_window:
-        data['trailing_mean']=data.value.rolling(profile.rolling_window,min_periods=profile.rolling_window).mean();ax.plot(data.time,data.trailing_mean,color='C3',label='Trailing mean')
-    ax.set_xlabel('Time');ax.set_ylabel('Value');ax.legend(fontsize=8);diagnostics={'n':len(data),'missing_removed':removed,'rolling_window_in_rows':profile.rolling_window};notes=['이동평균은 후행 관측 요약이며 예측값이 아닙니다. 행 간격이 일정한지 별도로 확인하세요.']
-    return finish(ax, before, data, diagnostics, profile, TimeSeriesTimelineOutputDTO, 'Time Series — Timeline', notes)
+        data["trailing_mean"] = data.value.rolling(
+            profile.rolling_window, min_periods=profile.rolling_window
+        ).mean()
+        ax.plot(data.time, data.trailing_mean, color="C3", label="Trailing mean")
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Value")
+    ax.legend(fontsize=8)
+    diagnostics = {
+        "n": len(data),
+        "missing_removed": removed,
+        "rolling_window_in_rows": profile.rolling_window,
+    }
+    notes = [
+        "이동평균은 후행 관측 요약이며 예측값이 아닙니다. 행 간격이 일정한지 별도로 확인하세요."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        TimeSeriesTimelineOutputDTO,
+        "Time Series — Timeline",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_timeline(times, values, *, ax, profile=None, recipe_path=None, overrides=None) -> TimeSeriesTimelineOutputDTO:
+def plot_timeline(
+    times, values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> TimeSeriesTimelineOutputDTO:
     """수준 변화·추세·수집 공백·관측 급변을 탐색합니다.
 
     Args:
@@ -133,10 +193,16 @@ def plot_timeline(times, values, *, ax, profile=None, recipe_path=None, override
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-time-series-timeline', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-time-series-timeline",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(times, values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

@@ -22,6 +22,7 @@ som.py - SOM 자기조직화 지도
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,7 +41,12 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
@@ -48,6 +54,7 @@ from sklearn.utils.validation import check_is_fitted
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SOMProfile:
@@ -76,6 +83,7 @@ class SOMProfile:
 # 3. Output DTO
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class SOMOutputDTO(OutputDTO):
     """SOM 자기조직화 지도 결과. 배열은 원 입력 행 순서.
@@ -103,6 +111,7 @@ class SOMOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, profile: SOMProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -120,10 +129,12 @@ def _validate_inputs(X: Any, profile: SOMProfile) -> np.ndarray:
     arr = validate_features(X)
     validate_scaling(profile.scaling, profile.random_state)
     positive_int(profile.random_state, "random_state", 0)
-    for key in ("rows", "columns", "n_iter"): positive_int(getattr(profile, key), key)
+    for key in ("rows", "columns", "n_iter"):
+        positive_int(getattr(profile, key), key)
     finite_number(profile.learning_rate, "learning_rate", positive=True)
     finite_number(profile.sigma, "sigma", positive=True)
-    if profile.learning_rate > 1: raise ValueError("learning_rate는 1 이하여야 합니다.")
+    if profile.learning_rate > 1:
+        raise ValueError("learning_rate는 1 이하여야 합니다.")
     return arr
 
 
@@ -131,10 +142,19 @@ def _validate_inputs(X: Any, profile: SOMProfile) -> np.ndarray:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
+
 class SOMTransformer(TransformerMixin, BaseEstimator):
     """신규 입력을 최적 일치 노드(BMU) 좌표로 변환하는 SOM."""
 
-    def __init__(self, rows=5, columns=5, n_iter=1000, learning_rate=0.5, sigma=1.5, random_state=1234):
+    def __init__(
+        self,
+        rows=5,
+        columns=5,
+        n_iter=1000,
+        learning_rate=0.5,
+        sigma=1.5,
+        random_state=1234,
+    ):
         """코드북 적합 조건을 저장합니다.
 
         Args:
@@ -170,15 +190,22 @@ class SOMTransformer(TransformerMixin, BaseEstimator):
         arr = _validate_inputs(X, SOMProfile(scaling="none", **self.get_params()))
         rng = np.random.RandomState(self.random_state)
         self.n_features_in_ = arr.shape[1]
-        self.coordinates_ = np.array([(r, c) for r in range(self.rows) for c in range(self.columns)])
+        self.coordinates_ = np.array(
+            [(r, c) for r in range(self.rows) for c in range(self.columns)]
+        )
         weights = arr[rng.randint(len(arr), size=len(self.coordinates_))].copy()
         for step in range(self.n_iter):
             sample = arr[rng.randint(len(arr))]
             bmu = np.argmin(((weights - sample) ** 2).sum(axis=1))
             decay = np.exp(-step / self.n_iter)
             radius = self.sigma * decay
-            neighborhood = np.exp(-((self.coordinates_ - self.coordinates_[bmu]) ** 2).sum(axis=1) / (2 * radius ** 2))
-            weights += self.learning_rate * decay * neighborhood[:, None] * (sample - weights)
+            neighborhood = np.exp(
+                -((self.coordinates_ - self.coordinates_[bmu]) ** 2).sum(axis=1)
+                / (2 * radius**2)
+            )
+            weights += (
+                self.learning_rate * decay * neighborhood[:, None] * (sample - weights)
+            )
         self.weights_ = weights.reshape(self.rows, self.columns, self.n_features_in_)
         return self
 
@@ -195,8 +222,10 @@ class SOMTransformer(TransformerMixin, BaseEstimator):
         """
         check_is_fitted(self, "weights_")
         arr = validate_features(X, min_samples=1)
-        if arr.shape[1] != self.n_features_in_: raise ValueError("학습 특성 수와 다릅니다.")
+        if arr.shape[1] != self.n_features_in_:
+            raise ValueError("학습 특성 수와 다릅니다.")
         from scipy.spatial.distance import cdist
+
         return cdist(arr, self.weights_.reshape(-1, self.n_features_in_))
 
     def transform(self, X):
@@ -234,9 +263,12 @@ class SOMTransformer(TransformerMixin, BaseEstimator):
             NotFittedError/ValueError: 코드북 또는 입력 오류.
         """
         distances = self._distances(X)
-        if distances.shape[1] == 1: return 0.0
+        if distances.shape[1] == 1:
+            return 0.0
         best = np.argsort(distances, axis=1, kind="stable")[:, :2]
-        delta = np.abs(self.coordinates_[best[:, 0]] - self.coordinates_[best[:, 1]]).sum(axis=1)
+        delta = np.abs(
+            self.coordinates_[best[:, 0]] - self.coordinates_[best[:, 1]]
+        ).sum(axis=1)
         return float(np.mean(delta != 1))
 
 
@@ -253,23 +285,44 @@ def _run_model(X: Any, profile: SOMProfile) -> SOMOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     arr = validate_features(X)
-    estimator = SOMTransformer(rows=profile.rows, columns=profile.columns, n_iter=profile.n_iter,
-                               learning_rate=profile.learning_rate, sigma=profile.sigma, random_state=profile.random_state)
+    estimator = SOMTransformer(
+        rows=profile.rows,
+        columns=profile.columns,
+        n_iter=profile.n_iter,
+        learning_rate=profile.learning_rate,
+        sigma=profile.sigma,
+        random_state=profile.random_state,
+    )
     model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", estimator)])
     embedding = model.fit_transform(arr)
-    if not np.isfinite(embedding).all(): raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
-    scaled = model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
-    return SOMOutputDTO(model, embedding, feature_names(X), True, estimator.weights_.copy(),
-                        estimator.quantization_error(scaled), estimator.topographic_error(scaled))
+    if not np.isfinite(embedding).all():
+        raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
+    scaled = (
+        model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
+    )
+    return SOMOutputDTO(
+        model,
+        embedding,
+        feature_names(X),
+        True,
+        estimator.weights_.copy(),
+        estimator.quantization_error(scaled),
+        estimator.topographic_error(scaled),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_som(X: Any, profile: Optional[SOMProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> SOMOutputDTO:
+
+def run_som(
+    X: Any,
+    profile: Optional[SOMProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> SOMOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -285,7 +338,9 @@ def run_som(X: Any, profile: Optional[SOMProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("som", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "som", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, profile)
     return _run_model(X, profile)
 
@@ -296,6 +351,7 @@ def run_som(X: Any, profile: Optional[SOMProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_som(X, load_profile("som"))
     print(result.to_json(indent=2)[:500])

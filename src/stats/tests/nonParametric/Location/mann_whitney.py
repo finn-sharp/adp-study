@@ -16,6 +16,7 @@ mann_whitney - Mann–Whitney U
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, result)
+from src.stats.tests._common import number, numeric, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MannWhitneyProfile:
@@ -51,6 +53,7 @@ class MannWhitneyProfile:
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     method: str = "auto"
     correction: bool = True
@@ -61,6 +64,7 @@ class MannWhitneyProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MannWhitneyOutputDTO(OutputDTO):
@@ -81,6 +85,7 @@ class MannWhitneyOutputDTO(OutputDTO):
         u2 (float): 둘째 집단 U.
         group_sizes (List[int]): 집단별 n.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -100,6 +105,7 @@ class MannWhitneyOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -112,23 +118,29 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    if p.method not in ('auto', 'exact', 'asymptotic'):
-        raise ValueError('method 오류')
-    return {'x': numeric(args['x'], 1, 1, policy), 'y': numeric(args['y'], 1, 1, policy)}
+    if p.method not in ("auto", "exact", "asymptotic"):
+        raise ValueError("method 오류")
+    return {
+        "x": numeric(args["x"], 1, 1, policy),
+        "y": numeric(args["y"], 1, 1, policy),
+    }
 
-def _validate_inputs(arguments: Dict[str, Any], profile: MannWhitneyProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: MannWhitneyProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -139,13 +151,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: MannWhitneyProfile) -> 
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, MannWhitneyProfile): raise TypeError("MannWhitneyProfile이 필요합니다.")
+    if not isinstance(profile, MannWhitneyProfile):
+        raise TypeError("MannWhitneyProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -158,16 +172,38 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    a, b = (d['x'], d['y'])
+    alt = getattr(p, "alternative", "two-sided")
+    a, b = (d["x"], d["y"])
     ties = len(np.unique(np.r_[a, b])) < len(a) + len(b)
-    method = ('exact' if min(len(a), len(b)) <= 8 and (not ties) else 'asymptotic') if p.method == 'auto' else p.method
-    if method == 'exact' and ties:
-        raise ValueError('동률 포함 exact를 지원하지 않습니다.')
-    r = stats.mannwhitneyu(a, b, alternative=alt, method=method, use_continuity=p.correction)
-    return result('mann-whitney', p, r.statistic, r.pvalue, '두 독립 집단의 분포가 같다', method, dict(u1=float(r.statistic), u2=float(len(a) * len(b) - r.statistic), group_sizes=[len(a), len(b)]), {'ties': ties})
+    method = (
+        ("exact" if min(len(a), len(b)) <= 8 and (not ties) else "asymptotic")
+        if p.method == "auto"
+        else p.method
+    )
+    if method == "exact" and ties:
+        raise ValueError("동률 포함 exact를 지원하지 않습니다.")
+    r = stats.mannwhitneyu(
+        a, b, alternative=alt, method=method, use_continuity=p.correction
+    )
+    return result(
+        "mann-whitney",
+        p,
+        r.statistic,
+        r.pvalue,
+        "두 독립 집단의 분포가 같다",
+        method,
+        dict(
+            u1=float(r.statistic),
+            u2=float(len(a) * len(b) - r.statistic),
+            group_sizes=[len(a), len(b)],
+        ),
+        {"ties": ties},
+    )
 
-def _run_test(data: Dict[str, Any], profile: MannWhitneyProfile) -> MannWhitneyOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: MannWhitneyProfile
+) -> MannWhitneyOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -185,7 +221,15 @@ def _run_test(data: Dict[str, Any], profile: MannWhitneyProfile) -> MannWhitneyO
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_mann_whitney(x: Any, y: Any, profile: Optional[MannWhitneyProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> MannWhitneyOutputDTO:
+
+def run_mann_whitney(
+    x: Any,
+    y: Any,
+    profile: Optional[MannWhitneyProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> MannWhitneyOutputDTO:
     """Mann–Whitney U.
 
     Args:
@@ -200,8 +244,10 @@ def run_mann_whitney(x: Any, y: Any, profile: Optional[MannWhitneyProfile] = Non
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("mann-whitney", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x, 'y': y}, profile)
+    profile = resolve_profile(
+        "mann-whitney", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x, "y": y}, profile)
     return _run_test(data, profile)
 
 
@@ -210,5 +256,5 @@ def run_mann_whitney(x: Any, y: Any, profile: Optional[MannWhitneyProfile] = Non
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_mann_whitney([1,2,4,5,8], [2,3,4,6,9])
+    result = run_mann_whitney([1, 2, 4, 5, 8], [2, 3, 4, 6, 9])
     print(result.to_json(indent=2))

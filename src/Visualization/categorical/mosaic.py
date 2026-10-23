@@ -15,6 +15,7 @@ mosaic.py - 전체 구성과 범주 간 조건부 연관 패턴을 동시에 비
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,11 +57,13 @@ class CategoricalMosaicProfile:
         max_categories (int): 각 축의 최대 범주 수. 기본 12.
         annotate (bool): 셀 원 빈도를 표시. 기본 True.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     max_categories: int = 12
     annotate: bool = True
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -66,6 +81,7 @@ class CategoricalMosaicOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -73,6 +89,7 @@ class CategoricalMosaicOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -88,6 +105,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, CategoricalMosaicProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -107,24 +125,73 @@ def _draw(x, y, ax, profile, before):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from matplotlib.patches import Rectangle
-    raw,removed=paired(x=x,y=y);table=pd.crosstab(levels(raw.x),levels(raw.y))
-    if profile.max_categories<1 or max(table.shape)>profile.max_categories:raise ValueError('범주 한도 초과')
-    left=0.;colors=['C'+str(i%10) for i in range(table.shape[1])]
-    for i,(name,row) in enumerate(table.iterrows()):
-        width=row.sum()/len(raw);bottom=0.
-        for j,(other,count) in enumerate(row.items()):
-            height=count/row.sum();ax.add_patch(Rectangle((left,bottom),width,height,facecolor=colors[j],alpha=profile.alpha,edgecolor='white',label=other if i==0 else None))
-            if profile.annotate and width*height>.025:ax.text(left+width/2,bottom+height/2,str(int(count)),ha='center',va='center',fontsize=8)
-            bottom+=height
-        ax.text(left+width/2,-.03,name,ha='right',va='top',rotation=45,fontsize=8);left+=width
-    ax.set_xlim(0,1);ax.set_ylim(0,1);ax.set_xticks([]);ax.set_ylabel('Conditional Y fraction');ax.legend(fontsize=8)
-    data=table;diagnostics={'n':len(raw),'missing_removed':removed,'area_denominator':'all valid rows'};notes=['면적은 공동 비율, 높이는 X 안에서의 Y 비율입니다.']
-    return finish(ax, before, data, diagnostics, profile, CategoricalMosaicOutputDTO, 'Categorical — Mosaic', notes)
+
+    raw, removed = paired(x=x, y=y)
+    table = pd.crosstab(levels(raw.x), levels(raw.y))
+    if profile.max_categories < 1 or max(table.shape) > profile.max_categories:
+        raise ValueError("범주 한도 초과")
+    left = 0.0
+    colors = ["C" + str(i % 10) for i in range(table.shape[1])]
+    for i, (name, row) in enumerate(table.iterrows()):
+        width = row.sum() / len(raw)
+        bottom = 0.0
+        for j, (other, count) in enumerate(row.items()):
+            height = count / row.sum()
+            ax.add_patch(
+                Rectangle(
+                    (left, bottom),
+                    width,
+                    height,
+                    facecolor=colors[j],
+                    alpha=profile.alpha,
+                    edgecolor="white",
+                    label=other if i == 0 else None,
+                )
+            )
+            if profile.annotate and width * height > 0.025:
+                ax.text(
+                    left + width / 2,
+                    bottom + height / 2,
+                    str(int(count)),
+                    ha="center",
+                    va="center",
+                    fontsize=8,
+                )
+            bottom += height
+        ax.text(
+            left + width / 2, -0.03, name, ha="right", va="top", rotation=45, fontsize=8
+        )
+        left += width
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_xticks([])
+    ax.set_ylabel("Conditional Y fraction")
+    ax.legend(fontsize=8)
+    data = table
+    diagnostics = {
+        "n": len(raw),
+        "missing_removed": removed,
+        "area_denominator": "all valid rows",
+    }
+    notes = ["면적은 공동 비율, 높이는 X 안에서의 Y 비율입니다."]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        CategoricalMosaicOutputDTO,
+        "Categorical — Mosaic",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_mosaic(x, y, *, ax, profile=None, recipe_path=None, overrides=None) -> CategoricalMosaicOutputDTO:
+def plot_mosaic(
+    x, y, *, ax, profile=None, recipe_path=None, overrides=None
+) -> CategoricalMosaicOutputDTO:
     """전체 구성과 범주 간 조건부 연관 패턴을 동시에 비교합니다.
 
     Args:
@@ -139,10 +206,13 @@ def plot_mosaic(x, y, *, ax, profile=None, recipe_path=None, overrides=None) -> 
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-categorical-mosaic', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-categorical-mosaic", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(x, y, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

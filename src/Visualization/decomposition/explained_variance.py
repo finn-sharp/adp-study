@@ -15,6 +15,7 @@ explained_variance.py - 목표 누적분산에 필요한 성분 수와 차원 �
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class DecompositionExplainedVarianceProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         target_fraction (float): 누적 설명분산 선택 기준 (0,1]. 기본 0.9.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     target_fraction: float = 0.9
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class DecompositionExplainedVarianceOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class DecompositionExplainedVarianceOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, DecompositionExplainedVarianceProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -103,16 +121,45 @@ def _draw(ratios, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    a,removed=vector(ratios,allow_missing=False)
-    if (a<0).any() or a.sum()>1+1e-8 or not 0<profile.target_fraction<=1:raise ValueError('설명분산 비율/기준 오류')
-    x=np.arange(1,len(a)+1);cumulative=np.cumsum(a);ax.bar(x,a,color=profile.color,alpha=profile.alpha,label='Per component');ax.plot(x,cumulative,'o-',color='C3',label='Cumulative');ax.axhline(profile.target_fraction,color='black',linestyle='--');ax.set_ylim(0,1.05);ax.set_xlabel('Component');ax.set_ylabel('Explained variance fraction');ax.legend(fontsize=8)
-    data=pd.DataFrame({'component':x,'ratio':a,'cumulative_ratio':cumulative});indices=np.flatnonzero(cumulative>=profile.target_fraction);diagnostics={'components_to_target':int(indices[0]+1) if len(indices) else None,'covered_fraction':float(a.sum())};notes=['미제공 성분의 분산은 추정하지 않습니다. 설명분산 자체는 예측 품질이 아닙니다.']
-    return finish(ax, before, data, diagnostics, profile, DecompositionExplainedVarianceOutputDTO, 'Decomposition — Explained Variance', notes)
+    a, removed = vector(ratios, allow_missing=False)
+    if (a < 0).any() or a.sum() > 1 + 1e-8 or not 0 < profile.target_fraction <= 1:
+        raise ValueError("설명분산 비율/기준 오류")
+    x = np.arange(1, len(a) + 1)
+    cumulative = np.cumsum(a)
+    ax.bar(x, a, color=profile.color, alpha=profile.alpha, label="Per component")
+    ax.plot(x, cumulative, "o-", color="C3", label="Cumulative")
+    ax.axhline(profile.target_fraction, color="black", linestyle="--")
+    ax.set_ylim(0, 1.05)
+    ax.set_xlabel("Component")
+    ax.set_ylabel("Explained variance fraction")
+    ax.legend(fontsize=8)
+    data = pd.DataFrame({"component": x, "ratio": a, "cumulative_ratio": cumulative})
+    indices = np.flatnonzero(cumulative >= profile.target_fraction)
+    diagnostics = {
+        "components_to_target": int(indices[0] + 1) if len(indices) else None,
+        "covered_fraction": float(a.sum()),
+    }
+    notes = [
+        "미제공 성분의 분산은 추정하지 않습니다. 설명분산 자체는 예측 품질이 아닙니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        DecompositionExplainedVarianceOutputDTO,
+        "Decomposition — Explained Variance",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_explained_variance(ratios, *, ax, profile=None, recipe_path=None, overrides=None) -> DecompositionExplainedVarianceOutputDTO:
+def plot_explained_variance(
+    ratios, *, ax, profile=None, recipe_path=None, overrides=None
+) -> DecompositionExplainedVarianceOutputDTO:
     """목표 누적분산에 필요한 성분 수와 차원 축소 손실을 비교합니다.
 
     Args:
@@ -126,10 +173,16 @@ def plot_explained_variance(ratios, *, ax, profile=None, recipe_path=None, overr
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-decomposition-explained-variance', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-decomposition-explained-variance",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(ratios, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

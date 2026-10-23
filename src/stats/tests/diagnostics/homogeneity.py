@@ -16,6 +16,7 @@ homogeneity.py - 등분산 검정
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,6 +41,7 @@ from src.MachineLearning.analysis_common import positive_int, finite_number
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class HomogeneityProfile:
     """HomogeneityProfile 필드 계약.
@@ -49,6 +51,7 @@ class HomogeneityProfile:
         method (str): levene/bartlett/fligner. 기본 levene.
         center (str): Levene/Fligner 중심 mean/median/trimmed. 기본 median.
     """
+
     alpha: float = 0.05
     method: str = "levene"
     center: str = "median"
@@ -57,6 +60,7 @@ class HomogeneityProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class HomogeneityOutputDTO(OutputDTO):
@@ -71,6 +75,7 @@ class HomogeneityOutputDTO(OutputDTO):
         details (Dict[str, Any]): 자유도·기대도수·표본수 등 검정별 진단.
         warnings (List[str]): 근사 조건과 해석 제약.
     """
+
     statistic: float
     p_value: float
     reject_h0: bool
@@ -84,6 +89,7 @@ class HomogeneityOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(*groups: Any, profile: Optional[HomogeneityProfile] = None) -> Any:
     """입력 검증.
 
@@ -95,19 +101,29 @@ def _validate_inputs(*groups: Any, profile: Optional[HomogeneityProfile] = None)
     Raises:
         ValueError/TypeError: 입력 조건 오류.
     """
-    if not isinstance(profile, HomogeneityProfile): raise TypeError("HomogeneityProfile이 필요합니다")
+    if not isinstance(profile, HomogeneityProfile):
+        raise TypeError("HomogeneityProfile이 필요합니다")
     alpha(profile.alpha)
-    if profile.method not in ("levene", "bartlett", "fligner") or profile.center not in ("mean", "median", "trimmed"): raise ValueError("method/center 오류")
-    if len(groups) < 2: raise ValueError("2개 이상 독립 집단이 필요합니다.")
+    if profile.method not in (
+        "levene",
+        "bartlett",
+        "fligner",
+    ) or profile.center not in ("mean", "median", "trimmed"):
+        raise ValueError("method/center 오류")
+    if len(groups) < 2:
+        raise ValueError("2개 이상 독립 집단이 필요합니다.")
     arrays = [vector(g) for g in groups]
-    if any(np.var(g, ddof=1) <= 0 for g in arrays): raise ValueError("각 집단의 양의 분산이 필요합니다.")
-    if profile.method == "bartlett" and profile.center != "median": raise ValueError("Bartlett는 center를 사용하지 않습니다. 기본값을 유지하세요.")
+    if any(np.var(g, ddof=1) <= 0 for g in arrays):
+        raise ValueError("각 집단의 양의 분산이 필요합니다.")
+    if profile.method == "bartlett" and profile.center != "median":
+        raise ValueError("Bartlett는 center를 사용하지 않습니다. 기본값을 유지하세요.")
     return arrays
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_test(data: Any, profile: Optional[HomogeneityProfile]) -> tuple:
     """검정 계산.
@@ -120,16 +136,41 @@ def _run_test(data: Any, profile: Optional[HomogeneityProfile]) -> tuple:
     Raises:
         ValueError: 미정의 통계량.
     """
-    r = stats.bartlett(*data) if profile.method == "bartlett" else getattr(stats, profile.method)(*data, center=profile.center)
-    if not np.isfinite(r.statistic) or not np.isfinite(r.pvalue): raise ValueError("미정의 검정: 집단의 중심 편차 분산을 확인하세요.")
-    return float(r.statistic), float(r.pvalue), "모든 집단의 모집단 분산이 같다", {"group_sizes": [len(g) for g in data], "method": profile.method, "center": None if profile.method == "bartlett" else profile.center}, (["Bartlett는 각 집단의 정규성을 가정합니다."] if profile.method == "bartlett" else [])
+    r = (
+        stats.bartlett(*data)
+        if profile.method == "bartlett"
+        else getattr(stats, profile.method)(*data, center=profile.center)
+    )
+    if not np.isfinite(r.statistic) or not np.isfinite(r.pvalue):
+        raise ValueError("미정의 검정: 집단의 중심 편차 분산을 확인하세요.")
+    return (
+        float(r.statistic),
+        float(r.pvalue),
+        "모든 집단의 모집단 분산이 같다",
+        {
+            "group_sizes": [len(g) for g in data],
+            "method": profile.method,
+            "center": None if profile.method == "bartlett" else profile.center,
+        },
+        (
+            ["Bartlett는 각 집단의 정규성을 가정합니다."]
+            if profile.method == "bartlett"
+            else []
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_homogeneity(*groups: Any, profile: Optional[HomogeneityProfile] = None, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> HomogeneityOutputDTO:
+
+def run_homogeneity(
+    *groups: Any,
+    profile: Optional[HomogeneityProfile] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> HomogeneityOutputDTO:
     """등분산 검정.
 
     Args:
@@ -143,10 +184,14 @@ def run_homogeneity(*groups: Any, profile: Optional[HomogeneityProfile] = None, 
         ValueError/TypeError: 입력·설정 오류.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("homogeneity", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "homogeneity", profile, recipe_path=recipe_path, overrides=overrides
+    )
     data = _validate_inputs(*groups, profile=profile)
     statistic, p, h0, details, notes = _run_test(data, profile)
-    return HomogeneityOutputDTO(statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes)
+    return HomogeneityOutputDTO(
+        statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -1,53 +1,73 @@
-"""해당 파일 폴더 또는 임의 cwd에서 실행 가능한 실제 모의 풀이."""
+"""이 파일 위치를 기준으로 위에서 아래로 실행하는 모의 풀이."""
+from pathlib import Path
+import os
+os.chdir(Path(__file__).resolve().parent)
+
 from pathlib import Path
 import sys
-FOLDER=Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
-sys.path.insert(0,str(FOLDER.parent/'공통'))
+
+FOLDER = Path(__file__).resolve().parent if "__file__" in globals() else Path.cwd()
+sys.path.insert(0, str(FOLDER.parent / "공통"))
 from analysis import Context
-ctx=Context(FOLDER)
 
+ctx = Context(FOLDER)
 
-# 1-1
-ctx.run('1-1','reg_design')
+# 문항 1-1
 
-# 1-2
-ctx.run('1-2','reg_baseline')
+ctx.run("1-1", "reg_design")
 
-# 1-3
-ctx.run('1-3','reg_diagnostics')
+# 문항 1-2
 
-# 1-4
-ctx.run('1-4','reg_selection')
+ctx.run("1-2", "reg_baseline")
 
-# 1-5
-ctx.run('1-5','reg_tuning')
+# 문항 1-3
 
-# 1-6
-ctx.run('1-6','reg_final')
+ctx.run("1-3", "reg_diagnostics")
 
-# 2-1
-ctx.run('2-1','cls_design')
+# 문항 1-4
 
-# 2-2
-ctx.run('2-2','cls_tuning')
+ctx.run("1-4", "reg_selection")
 
-# 2-3
-ctx.run('2-3','cls_logit')
+# 문항 1-5
 
-# 2-4
-ctx.run('2-4','cls_final')
+ctx.run("1-5", "reg_tuning")
 
-# 2-5
-ctx.run('2-5','cls_decision')
+# 문항 1-6
 
-# 3-1
-ctx.run('3-1','ts_design')
+ctx.run("1-6", "reg_final")
 
-# 3-2
-ctx.run('3-2','ts_tuning')
+# 문항 2-1
 
-# 3-3
-ctx.run('3-3','ts_diagnostics')
+ctx.run("2-1", "cls_design")
 
-# 3-4
-ctx.run('3-4','ts_final')
+# 문항 2-2
+
+ctx.run("2-2", "cls_tuning")
+
+# 문항 2-3
+
+ctx.run("2-3", "cls_logit")
+
+# 문항 2-4
+
+ctx.run("2-4", "cls_final")
+
+# 문항 2-5
+
+ctx.run("2-5", "cls_decision")
+
+# 문항 3-1
+
+ctx.run("3-1", "ts_design")
+
+# 문항 3-2
+
+ctx.run("3-2", "ts_tuning")
+
+# 문항 3-3
+
+ctx.run("3-3", "ts_diagnostics")
+
+# 문항 3-4
+
+ctx.run("3-4", "ts_final")

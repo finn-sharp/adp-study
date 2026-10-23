@@ -15,6 +15,7 @@ pipeline.py - 전처리·모델의 Basepipeline 연결
     2026-10-12  김재현(Finn)       v1.0.0    UCI 스켈레톤 파이프라인 연결 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -31,6 +32,7 @@ class Basepipeline:
         model (object): 학습/예측/분석 추정기.
         pipeline (Pipeline): preprocessor → model 순서의 sklearn Pipeline.
     """
+
     def __init__(self, preprocessor, model):
         """전처리와 모델을 같은 학습 파이프라인으로 연결합니다.
 
@@ -44,7 +46,7 @@ class Basepipeline:
         """
         self.preprocessor = preprocessor
         self.model = model
-        self.pipeline = Pipeline([('preprocessor', preprocessor), ('model', model)])
+        self.pipeline = Pipeline([("preprocessor", preprocessor), ("model", model)])
 
     def get_model(self):
         """현재 모델을 조회합니다.

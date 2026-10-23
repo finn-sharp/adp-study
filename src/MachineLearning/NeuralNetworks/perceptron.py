@@ -43,13 +43,16 @@ import numpy as np
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PerceptronProfile:
@@ -95,6 +98,7 @@ class PerceptronProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PerceptronOutputDTO(OutputDTO):
@@ -175,7 +179,11 @@ def _require_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·범위를 만족하지 않는 값.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 범위를 확인하세요.")
@@ -206,13 +214,16 @@ def _validate_inputs(X: Any, y: Any, profile: PerceptronProfile) -> None:
     _require_number(profile.alpha, "alpha")
     if profile.penalty not in (None, "l1", "l2", "elasticnet"):
         raise ValueError("지원하지 않는 penalty입니다.")
-    if not isinstance(profile.fit_intercept, bool) or not isinstance(profile.shuffle, bool):
+    if not isinstance(profile.fit_intercept, bool) or not isinstance(
+        profile.shuffle, bool
+    ):
         raise ValueError("fit_intercept와 shuffle은 bool이어야 합니다.")
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _create_model(profile: PerceptronProfile) -> Any:
     """분류/회귀 목적에 맞는 미적합 모델을 생성합니다.
@@ -226,15 +237,23 @@ def _create_model(profile: PerceptronProfile) -> Any:
         ValueError: 라이브러리가 설정을 거부한 경우.
     """
     from sklearn.linear_model import Perceptron
+
     return Perceptron(
-        max_iter=profile.max_iter, tol=profile.tol, eta0=profile.eta0,
-        penalty=profile.penalty, alpha=profile.alpha,
-        fit_intercept=profile.fit_intercept, shuffle=profile.shuffle,
-        random_state=profile.random_state, n_jobs=profile.n_jobs,
+        max_iter=profile.max_iter,
+        tol=profile.tol,
+        eta0=profile.eta0,
+        penalty=profile.penalty,
+        alpha=profile.alpha,
+        fit_intercept=profile.fit_intercept,
+        shuffle=profile.shuffle,
+        random_state=profile.random_state,
+        n_jobs=profile.n_jobs,
     )
 
 
-def _fit_model(X: Any, y: Any, profile: PerceptronProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: PerceptronProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -255,6 +274,7 @@ def _fit_model(X: Any, y: Any, profile: PerceptronProfile, estimator: Any) -> Su
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_perceptron(
     X: Any,
@@ -286,7 +306,9 @@ def run_perceptron(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("perceptron", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "perceptron", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)

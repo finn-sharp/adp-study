@@ -15,6 +15,7 @@ rules.py - 빈도·조건부 확률·독립 대비 lift를 함께 비교해 규�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -46,13 +59,15 @@ class AssociationRulesProfile:
         min_lift (float): 비음수 최소 lift. 기본 0.0.
         max_rules (int): lift 내림차순 표시 한도. 기본 200.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     min_support: float = 0.0
     min_confidence: float = 0.0
     min_lift: float = 0.0
     max_rules: int = 200
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -70,6 +85,7 @@ class AssociationRulesOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -77,6 +93,7 @@ class AssociationRulesOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -92,6 +109,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, AssociationRulesProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -110,20 +128,73 @@ def _draw(rules, ax, profile, before, cax):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw=rules.copy() if isinstance(rules,pd.DataFrame) else pd.DataFrame(rules)
-    if raw.empty or not {'support','confidence','lift'}.issubset(raw.columns):raise ValueError('support/confidence/lift 열이 필요합니다.')
-    for name in ('support','confidence','lift'):raw[name]=vector(raw[name],allow_missing=False)[0]
-    if not 0<=profile.min_support<=1 or not 0<=profile.min_confidence<=1 or profile.min_lift<0 or profile.max_rules<1 or ((raw[['support','confidence']]<0)|(raw[['support','confidence']]>1)).any().any() or (raw.lift<0).any():raise ValueError('규칙/필터 정의역 오류')
-    data=raw.loc[(raw.support>=profile.min_support)&(raw.confidence>=profile.min_confidence)&(raw.lift>=profile.min_lift)].sort_values('lift',ascending=False,kind='stable').reset_index(drop=True);shown=data.iloc[:profile.max_rules]
-    artist=ax.scatter(shown.support,shown.confidence,c=shown.lift,s=25+50*shown.support,alpha=profile.alpha,cmap='viridis')
-    if cax is not None and len(shown):ax.figure.colorbar(artist,cax=cax)
-    ax.set_xlabel('Support');ax.set_ylabel('Confidence');ax.set_ylim(0,1.02);diagnostics={'input_rules':len(raw),'eligible_rules':len(data),'displayed_rules':len(shown),'color':'lift','size':'support'};notes=['높은 lift의 낮은 support 규칙은 희소성을 확인하세요. 규칙은 인과·수익성을 보장하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, AssociationRulesOutputDTO, 'Association — Rules', notes)
+    raw = rules.copy() if isinstance(rules, pd.DataFrame) else pd.DataFrame(rules)
+    if raw.empty or not {"support", "confidence", "lift"}.issubset(raw.columns):
+        raise ValueError("support/confidence/lift 열이 필요합니다.")
+    for name in ("support", "confidence", "lift"):
+        raw[name] = vector(raw[name], allow_missing=False)[0]
+    if (
+        not 0 <= profile.min_support <= 1
+        or not 0 <= profile.min_confidence <= 1
+        or profile.min_lift < 0
+        or profile.max_rules < 1
+        or ((raw[["support", "confidence"]] < 0) | (raw[["support", "confidence"]] > 1))
+        .any()
+        .any()
+        or (raw.lift < 0).any()
+    ):
+        raise ValueError("규칙/필터 정의역 오류")
+    data = (
+        raw.loc[
+            (raw.support >= profile.min_support)
+            & (raw.confidence >= profile.min_confidence)
+            & (raw.lift >= profile.min_lift)
+        ]
+        .sort_values("lift", ascending=False, kind="stable")
+        .reset_index(drop=True)
+    )
+    shown = data.iloc[: profile.max_rules]
+    artist = ax.scatter(
+        shown.support,
+        shown.confidence,
+        c=shown.lift,
+        s=25 + 50 * shown.support,
+        alpha=profile.alpha,
+        cmap="viridis",
+    )
+    if cax is not None and len(shown):
+        ax.figure.colorbar(artist, cax=cax)
+    ax.set_xlabel("Support")
+    ax.set_ylabel("Confidence")
+    ax.set_ylim(0, 1.02)
+    diagnostics = {
+        "input_rules": len(raw),
+        "eligible_rules": len(data),
+        "displayed_rules": len(shown),
+        "color": "lift",
+        "size": "support",
+    }
+    notes = [
+        "높은 lift의 낮은 support 규칙은 희소성을 확인하세요. 규칙은 인과·수익성을 보장하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        AssociationRulesOutputDTO,
+        "Association — Rules",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_rules(rules, *, ax, profile=None, recipe_path=None, overrides=None, cax=None) -> AssociationRulesOutputDTO:
+def plot_rules(
+    rules, *, ax, profile=None, recipe_path=None, overrides=None, cax=None
+) -> AssociationRulesOutputDTO:
     """빈도·조건부 확률·독립 대비 lift를 함께 비교해 규칙 검토 우선순위를 정합니다.
 
     Args:
@@ -138,10 +209,13 @@ def plot_rules(rules, *, ax, profile=None, recipe_path=None, overrides=None, cax
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-association-rules', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-association-rules", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax, cax)
+    before = start(ax, cax)
     return _draw(rules, ax, profile, before, cax)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

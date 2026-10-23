@@ -16,6 +16,7 @@ rnn.py - TensorFlow RNN 시퀀스 분류·회귀
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -38,6 +39,7 @@ from .common import validate_profile, run_supervised, run_forecast
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TFRNNProfile:
     """TFRNNProfile 필드 계약.
@@ -56,6 +58,7 @@ class TFRNNProfile:
         cell (str): simple_rnn/lstm/gru 셀 선택. 기본 lstm.
         units (int): 순환 층 폭, 양수. 기본 16.
     """
+
     random_state: int = 1234
     epochs: int = 30
     batch_size: int = 32
@@ -73,6 +76,7 @@ class TFRNNProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TFRNNOutputDTO(OutputDTO):
@@ -96,6 +100,7 @@ class TFRNNOutputDTO(OutputDTO):
         epochs_trained (int): 실제 실행한 epoch 수.
         best_epoch (int): 최저 val_loss epoch, 1부터 시작. 최적 weights 복원.
     """
+
     task: str
     parameters: Dict[str, Any]
     model: Any
@@ -118,6 +123,7 @@ class TFRNNOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(profile: Optional[TFRNNProfile]) -> None:
     """설정을 검증합니다.
 
@@ -128,13 +134,15 @@ def _validate_inputs(profile: Optional[TFRNNProfile]) -> None:
     Raises:
         TypeError/ValueError: 잘못된 타입·범위.
     """
-    if not isinstance(profile, TFRNNProfile): raise TypeError("TFRNNProfile이 필요합니다.")
+    if not isinstance(profile, TFRNNProfile):
+        raise TypeError("TFRNNProfile이 필요합니다.")
     validate_profile(profile, "rnn")
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, y: Any, profile: Optional[TFRNNProfile]) -> TFRNNOutputDTO:
     """검증된 모델을 적합합니다.
@@ -156,7 +164,16 @@ def _run_model(X: Any, y: Any, profile: Optional[TFRNNProfile]) -> TFRNNOutputDT
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_tf_rnn(X: Any, y: Any, profile: Optional[TFRNNProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None, task: Optional[str] = None) -> TFRNNOutputDTO:
+
+def run_tf_rnn(
+    X: Any,
+    y: Any,
+    profile: Optional[TFRNNProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+    task: Optional[str] = None,
+) -> TFRNNOutputDTO:
     """TensorFlow RNN 시퀀스 분류·회귀 실행.
 
     Args:
@@ -173,7 +190,9 @@ def run_tf_rnn(X: Any, y: Any, profile: Optional[TFRNNProfile] = None, *, recipe
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: TensorFlow 미설치.
     """
-    profile = resolve_profile("tf-rnn", profile, recipe_path=recipe_path, overrides=overrides, task=task)
+    profile = resolve_profile(
+        "tf-rnn", profile, recipe_path=recipe_path, overrides=overrides, task=task
+    )
     _validate_inputs(profile)
     return _run_model(X, y, profile)
 

@@ -22,6 +22,7 @@ sna.py - SNA 사회연결망 분석
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SNAProfile:
@@ -70,6 +76,7 @@ class SNAProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SNAOutputDTO(OutputDTO):
@@ -98,6 +105,7 @@ class SNAOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _graph(edges: Any, profile: SNAProfile) -> Any:
     """연결 목록을 단순 그래프로 구성하고 중복 연결 강도를 합산합니다.
 
@@ -111,26 +119,37 @@ def _graph(edges: Any, profile: SNAProfile) -> Any:
         ImportError: networkx 미설치.
     """
     import networkx as nx
-    if not isinstance(edges, (list, tuple)): raise ValueError("edges는 연결 목록이어야 합니다.")
+
+    if not isinstance(edges, (list, tuple)):
+        raise ValueError("edges는 연결 목록이어야 합니다.")
     G = nx.DiGraph() if profile.directed else nx.Graph()
     if profile.nodes is not None:
-        if not isinstance(profile.nodes, (list, tuple)) or any(not isinstance(n, str) or not n.strip() for n in profile.nodes):
+        if not isinstance(profile.nodes, (list, tuple)) or any(
+            not isinstance(n, str) or not n.strip() for n in profile.nodes
+        ):
             raise ValueError("nodes는 비어 있지 않은 문자열 목록이어야 합니다.")
-        if len(set(profile.nodes)) != len(profile.nodes): raise ValueError("nodes에 중복이 있습니다.")
+        if len(set(profile.nodes)) != len(profile.nodes):
+            raise ValueError("nodes에 중복이 있습니다.")
         G.add_nodes_from(profile.nodes)
     for edge in edges:
-        if not isinstance(edge, (tuple,list)) or len(edge) not in (2,3): raise ValueError("연결은 2개 노드와 선택적 강도로 구성합니다.")
+        if not isinstance(edge, (tuple, list)) or len(edge) not in (2, 3):
+            raise ValueError("연결은 2개 노드와 선택적 강도로 구성합니다.")
         left, right = edge[:2]
-        if any(not isinstance(n, str) or not n.strip() for n in (left,right)): raise ValueError("노드는 비어 있지 않은 문자열입니다.")
-        if left == right: raise ValueError("자기 연결은 지원하지 않습니다.")
+        if any(not isinstance(n, str) or not n.strip() for n in (left, right)):
+            raise ValueError("노드는 비어 있지 않은 문자열입니다.")
+        if left == right:
+            raise ValueError("자기 연결은 지원하지 않습니다.")
         weight = edge[2] if len(edge) == 3 else 1.0
         finite_number(weight, "strength", positive=True)
         weight += G.get_edge_data(left, right, {}).get("weight", 0)
-        if not np.isfinite(weight): raise ValueError("합산 연결 강도는 유한해야 합니다.")
-        distance = 1.0/weight
-        if not np.isfinite(distance) or distance <= 0: raise ValueError("연결 강도의 역수는 유한한 양수여야 합니다.")
+        if not np.isfinite(weight):
+            raise ValueError("합산 연결 강도는 유한해야 합니다.")
+        distance = 1.0 / weight
+        if not np.isfinite(distance) or distance <= 0:
+            raise ValueError("연결 강도의 역수는 유한한 양수여야 합니다.")
         G.add_edge(left, right, weight=weight, distance=distance)
-    if len(G) < 2: raise ValueError("그래프에 최소 두 노드가 필요합니다.")
+    if len(G) < 2:
+        raise ValueError("그래프에 최소 두 노드가 필요합니다.")
     return G
 
 
@@ -148,11 +167,13 @@ def _validate_inputs(edges: Any, profile: SNAProfile) -> Any:
     """
     if not isinstance(profile, SNAProfile):
         raise TypeError("SNAProfile이 필요합니다.")
-    if not isinstance(profile.directed, bool): raise ValueError("directed는 bool이어야 합니다.")
+    if not isinstance(profile.directed, bool):
+        raise ValueError("directed는 bool이어야 합니다.")
     finite_number(profile.pagerank_alpha, "pagerank_alpha", positive=True)
     finite_number(profile.pagerank_tol, "pagerank_tol", positive=True)
     positive_int(profile.pagerank_max_iter, "pagerank_max_iter")
-    if profile.pagerank_alpha >= 1: raise ValueError("pagerank_alpha는 1 미만이어야 합니다.")
+    if profile.pagerank_alpha >= 1:
+        raise ValueError("pagerank_alpha는 1 미만이어야 합니다.")
     arr = _graph(edges, profile)
     return arr
 
@@ -160,6 +181,7 @@ def _validate_inputs(edges: Any, profile: SNAProfile) -> Any:
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(edges: Any, profile: SNAProfile) -> SNAOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -174,34 +196,87 @@ def _run_model(edges: Any, profile: SNAProfile) -> SNAOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     import networkx as nx
+
     G = _graph(edges, profile)
     nodes = list(G.nodes())
     projection = nx.Graph()
     projection.add_nodes_from(nodes)
     for left, right, data in G.edges(data=True):
         current = projection.get_edge_data(left, right, {}).get("weight", 0)
-        projection.add_edge(left, right, weight=current+data["weight"])
-    communities = list(nx.algorithms.community.greedy_modularity_communities(projection, weight="weight")) if projection.number_of_edges() else [frozenset([n]) for n in nodes]
+        projection.add_edge(left, right, weight=current + data["weight"])
+    communities = (
+        list(
+            nx.algorithms.community.greedy_modularity_communities(
+                projection, weight="weight"
+            )
+        )
+        if projection.number_of_edges()
+        else [frozenset([n]) for n in nodes]
+    )
     communities = sorted([sorted(c) for c in communities], key=lambda c: c[0])
-    membership = {node: i for i, community in enumerate(communities) for node in community}
+    membership = {
+        node: i for i, community in enumerate(communities) for node in community
+    }
     degree = nx.degree_centrality(G)
     betweenness = nx.betweenness_centrality(G, weight="distance", normalized=True)
     closeness = nx.closeness_centrality(G, distance="distance")
-    pagerank = nx.pagerank(G, alpha=profile.pagerank_alpha, max_iter=profile.pagerank_max_iter, tol=profile.pagerank_tol, weight="weight")
-    metrics = pd.DataFrame([dict(node=n, degree=G.degree(n), strength=G.degree(n, weight="weight"),
-        degree_centrality=degree[n], betweenness=betweenness[n], closeness=closeness[n], pagerank=pagerank[n], community=membership[n]) for n in nodes]).set_index("node")
-    components = nx.number_weakly_connected_components(G) if profile.directed else nx.number_connected_components(G)
-    modularity = nx.algorithms.community.modularity(projection, [set(c) for c in communities], weight="weight") if projection.number_of_edges() else 0.0
-    return SNAOutputDTO(G, nodes, metrics, communities, float(nx.density(G)), components, float(modularity))
+    pagerank = nx.pagerank(
+        G,
+        alpha=profile.pagerank_alpha,
+        max_iter=profile.pagerank_max_iter,
+        tol=profile.pagerank_tol,
+        weight="weight",
+    )
+    metrics = pd.DataFrame(
+        [
+            dict(
+                node=n,
+                degree=G.degree(n),
+                strength=G.degree(n, weight="weight"),
+                degree_centrality=degree[n],
+                betweenness=betweenness[n],
+                closeness=closeness[n],
+                pagerank=pagerank[n],
+                community=membership[n],
+            )
+            for n in nodes
+        ]
+    ).set_index("node")
+    components = (
+        nx.number_weakly_connected_components(G)
+        if profile.directed
+        else nx.number_connected_components(G)
+    )
+    modularity = (
+        nx.algorithms.community.modularity(
+            projection, [set(c) for c in communities], weight="weight"
+        )
+        if projection.number_of_edges()
+        else 0.0
+    )
+    return SNAOutputDTO(
+        G,
+        nodes,
+        metrics,
+        communities,
+        float(nx.density(G)),
+        components,
+        float(modularity),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_sna(edges: Any, profile: Optional[SNAProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> SNAOutputDTO:
+
+def run_sna(
+    edges: Any,
+    profile: Optional[SNAProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> SNAOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -217,7 +292,9 @@ def run_sna(edges: Any, profile: Optional[SNAProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("sna", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "sna", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(edges, profile)
     return _run_model(edges, profile)
 

@@ -16,6 +16,7 @@ sign - 부호 검정
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, paired, result)
+from src.stats.tests._common import number, numeric, paired, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SignProfile:
@@ -51,6 +53,7 @@ class SignProfile:
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     sample_design: str = "one_sample"
     location_0: float = 0.0
@@ -61,6 +64,7 @@ class SignProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class SignOutputDTO(OutputDTO):
@@ -82,6 +86,7 @@ class SignOutputDTO(OutputDTO):
         zero_count (int): 제외한 0 차이 수.
         n_effective (int): 양+음 부호 수.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -102,6 +107,7 @@ class SignOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -114,32 +120,33 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    if p.sample_design not in ('one_sample', 'paired'):
-        raise ValueError('sample_design 오류')
-    if p.sample_design == 'paired':
-        if args['y'] is None:
-            raise ValueError('paired는 y가 필요합니다.')
-        a, b = paired(args['x'], args['y'], policy)
+    if p.sample_design not in ("one_sample", "paired"):
+        raise ValueError("sample_design 오류")
+    if p.sample_design == "paired":
+        if args["y"] is None:
+            raise ValueError("paired는 y가 필요합니다.")
+        a, b = paired(args["x"], args["y"], policy)
         d = a - b - p.location_0
     else:
-        if args['y'] is not None:
-            raise ValueError('one_sample에서는 y를 지정하지 않습니다.')
-        d = numeric(args['x'], 1, 1, policy) - p.location_0
+        if args["y"] is not None:
+            raise ValueError("one_sample에서는 y를 지정하지 않습니다.")
+        d = numeric(args["x"], 1, 1, policy) - p.location_0
     if not np.isfinite(d).all():
-        raise ValueError('차이 계산 overflow입니다.')
-    return {'d': d}
+        raise ValueError("차이 계산 overflow입니다.")
+    return {"d": d}
+
 
 def _validate_inputs(arguments: Dict[str, Any], profile: SignProfile) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
@@ -152,13 +159,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: SignProfile) -> Dict[st
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, SignProfile): raise TypeError("SignProfile이 필요합니다.")
+    if not isinstance(profile, SignProfile):
+        raise TypeError("SignProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -171,17 +180,26 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    diff = d['d']
+    alt = getattr(p, "alternative", "two-sided")
+    diff = d["d"]
     zeros = int((diff == 0).sum())
     nonzero = diff[diff != 0]
     n = len(nonzero)
     if n == 0:
-        raise ValueError('0이 아닌 차이가 필요합니다.')
+        raise ValueError("0이 아닌 차이가 필요합니다.")
     pos = int((nonzero > 0).sum())
     neg = n - pos
     pv = stats.binomtest(pos, n, 0.5, alternative=alt).pvalue
-    return result('sign', p, pos, pv, '중앙값/대응 차이 중앙값이 location_0와 같다', 'exact-binomial', dict(positive_count=pos, negative_count=neg, zero_count=zeros, n_effective=n))
+    return result(
+        "sign",
+        p,
+        pos,
+        pv,
+        "중앙값/대응 차이 중앙값이 location_0와 같다",
+        "exact-binomial",
+        dict(positive_count=pos, negative_count=neg, zero_count=zeros, n_effective=n),
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: SignProfile) -> SignOutputDTO:
     """검증된 자료를 계산합니다.
@@ -201,7 +219,15 @@ def _run_test(data: Dict[str, Any], profile: SignProfile) -> SignOutputDTO:
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_sign(x: Any, y: Any = None, profile: Optional[SignProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> SignOutputDTO:
+
+def run_sign(
+    x: Any,
+    y: Any = None,
+    profile: Optional[SignProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> SignOutputDTO:
     """부호 검정.
 
     Args:
@@ -216,8 +242,10 @@ def run_sign(x: Any, y: Any = None, profile: Optional[SignProfile] = None, *, re
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("sign", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x, 'y': y}, profile)
+    profile = resolve_profile(
+        "sign", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x, "y": y}, profile)
     return _run_test(data, profile)
 
 
@@ -226,5 +254,5 @@ def run_sign(x: Any, y: Any = None, profile: Optional[SignProfile] = None, *, re
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_sign([1,2,-3,4,5])
+    result = run_sign([1, 2, -3, 4, 5])
     print(result.to_json(indent=2))

@@ -16,11 +16,13 @@ _validation.py - 통계 검정 공통 입력 검증
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
 import numpy as np
+
 
 def alpha(value):
     """
@@ -33,8 +35,14 @@ def alpha(value):
         ValueError/TypeError: 입력 shape·타입·조건 위반.
     """
 
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value) or not 0 < value < 1:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+        or not 0 < value < 1
+    ):
         raise ValueError("alpha는 0과 1 사이 유한한 수여야 합니다.")
+
 
 def vector(value, minimum=2):
     """
@@ -52,6 +60,7 @@ def vector(value, minimum=2):
         raise ValueError("유한한 1차원 표본과 충분한 관측이 필요합니다.")
     return a
 
+
 def counts(value, table=False):
     """
 
@@ -64,6 +73,12 @@ def counts(value, table=False):
         ValueError/TypeError: 입력 shape·타입·조건 위반.
     """
     a = np.asarray(value, dtype=float)
-    if a.ndim != (2 if table else 1) or a.size == 0 or not np.isfinite(a).all() or (a < 0).any() or (a != np.floor(a)).any():
+    if (
+        a.ndim != (2 if table else 1)
+        or a.size == 0
+        or not np.isfinite(a).all()
+        or (a < 0).any()
+        or (a != np.floor(a)).any()
+    ):
         raise ValueError("빈도가 아닌 확률/음수/결측은 사용할 수 없습니다.")
     return a

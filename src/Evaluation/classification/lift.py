@@ -16,6 +16,7 @@ lift.py - classification lift 평가
     2026-10-13  김재현(Finn)      v1.0.0    독립 메트릭·JSON·Profile·Output DTO
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -27,6 +28,7 @@ from typing import Any
 from src.output import OutputDTO
 from src.Recipes.loader import resolve_profile
 from src.Evaluation._common import validate_profile, evaluate, example_inputs
+
 
 # 2. Input Profile
 @dataclass
@@ -42,13 +44,15 @@ class ClassificationLiftProfile:
         top_fractions (Any): Lift/Gain 선별 비율 (0,1]; ceil(n*f), 동률은 원 행 순서.
         n_bins (int): calibration 동일 너비 bin 수, 양의 정수.
     """
-    average: str = 'weighted'
+
+    average: str = "weighted"
     positive_label: Any = 1
     labels: Any = None
     zero_division: int = 0
     beta: float = 1.0
     top_fractions: Any = field(default_factory=lambda: [0.1, 0.2, 0.3])
     n_bins: int = 10
+
 
 # 3. Output DTO
 @dataclass
@@ -62,11 +66,13 @@ class ClassificationLiftOutputDTO(OutputDTO):
         details (dict): 클래스/확률 열 순서·표·정의·집계·적용 설정.
         warnings (list): 정의 불가 지표 사유; 묶음은 NaN(JSON null)으로 보존.
     """
+
     metric_name: str
     value: Any
     n_samples: int
     details: dict
     warnings: list
+
 
 # 4. Input Validation
 def validate_inputs(profile):
@@ -79,7 +85,8 @@ def validate_inputs(profile):
     Raises:
         TypeError/ValueError: Profile 타입·필드 오류.
     """
-    validate_profile(profile, ClassificationLiftProfile, 'classification')
+    validate_profile(profile, ClassificationLiftProfile, "classification")
+
 
 # 5. Individual Model Runners
 def _run(y_true, y_pred, y_score, X, y_train, profile):
@@ -97,11 +104,25 @@ def _run(y_true, y_pred, y_score, X, y_train, profile):
     Raises:
         ValueError/TypeError: 입력 정의역·정의 불가 단일 메트릭.
     """
-    return ClassificationLiftOutputDTO(**evaluate('classification', 'lift', y_true, y_pred, y_score, X, y_train, profile))
+    return ClassificationLiftOutputDTO(
+        **evaluate(
+            "classification", "lift", y_true, y_pred, y_score, X, y_train, profile
+        )
+    )
+
 
 # 6. Public Runner
-def run_lift(y_true=None, y_pred=None, profile=None, *, y_score=None,
-              X=None, y_train=None, recipe_path=None, overrides=None):
+def run_lift(
+    y_true=None,
+    y_pred=None,
+    profile=None,
+    *,
+    y_score=None,
+    X=None,
+    y_train=None,
+    recipe_path=None,
+    overrides=None,
+):
     """JSON → overrides → Profile로 독립 평가를 실행합니다.
 
     Args:
@@ -119,10 +140,13 @@ def run_lift(y_true=None, y_pred=None, profile=None, *, y_score=None,
         ValueError/TypeError: 설정·입력 오류; 정의 불가 단일 지표.
         OSError: JSON 읽기 오류.
     """
-    p = resolve_profile('metric-classification-lift', profile, recipe_path, overrides=overrides)
+    p = resolve_profile(
+        "metric-classification-lift", profile, recipe_path, overrides=overrides
+    )
     validate_inputs(p)
     return _run(y_true, y_pred, y_score, X, y_train, p)
 
+
 # 7. Example Execution
-if __name__ == '__main__':
-    print(run_lift(**example_inputs('classification')).to_json(indent=2))
+if __name__ == "__main__":
+    print(run_lift(**example_inputs("classification")).to_json(indent=2))

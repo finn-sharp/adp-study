@@ -15,22 +15,30 @@ collinearity.py - VIF·tolerance·표준화 조건수·설계 rank
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
-from src.stats.regression._common import validate_profile,numeric_data,fit_ols,ols_result,test_row,vif_values
+from src.stats.regression._common import (
+    validate_profile,
+    numeric_data,
+    fit_ols,
+    ols_result,
+    test_row,
+    vif_values,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -43,7 +51,9 @@ class CollinearityProfile:
     Attributes:
         vif_threshold (float): 1 초과 VIF 검토 기준; 자동 삭제 아님. 기본 10.0.
     """
+
     vif_threshold: float = 10.0
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -59,15 +69,18 @@ class CollinearityOutputDTO(OutputDTO):
         parameters (Dict[str,Any]): 적용 설정.
         warnings (List[str]): 공선성·단위·구조적 rank 정보.
     """
+
     table: pd.DataFrame
     condition_number: float
     rank: int
-    parameters: Dict[str,Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -79,12 +92,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,CollinearityProfile)
-    if profile.vif_threshold<=1:raise ValueError('VIF 기준은 1 초과입니다.')
+    validate_profile(profile, CollinearityProfile)
+    if profile.vif_threshold <= 1:
+        raise ValueError("VIF 기준은 1 초과입니다.")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(X, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -97,16 +113,39 @@ def _run(X, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    raw,_=numeric_data(X);vif=vif_values(raw.values);table=pd.DataFrame({'feature':raw.columns,'vif':vif,'tolerance':1/vif,'flag':vif>profile.vif_threshold})
-    nonconstant=np.ptp(raw.values,axis=0)>0;Z=raw.values[:,nonconstant]
-    if Z.shape[1]:Z=(Z-Z.mean(axis=0))/Z.std(axis=0);condition=float(np.linalg.cond(np.column_stack([np.ones(len(Z)),Z])))
-    else:condition=np.inf
-    rank=int(np.linalg.matrix_rank(np.column_stack([np.ones(len(raw)),raw.values])))
-    return CollinearityOutputDTO(table,condition,rank,asdict(profile),['VIF는 Feature 간 선형 중복 진단입니다. Cook 영향도와 다른 문제이며 도메인상 필수 변수·더미 기준을 먼저 확인하세요.'])
+    raw, _ = numeric_data(X)
+    vif = vif_values(raw.values)
+    table = pd.DataFrame(
+        {
+            "feature": raw.columns,
+            "vif": vif,
+            "tolerance": 1 / vif,
+            "flag": vif > profile.vif_threshold,
+        }
+    )
+    nonconstant = np.ptp(raw.values, axis=0) > 0
+    Z = raw.values[:, nonconstant]
+    if Z.shape[1]:
+        Z = (Z - Z.mean(axis=0)) / Z.std(axis=0)
+        condition = float(np.linalg.cond(np.column_stack([np.ones(len(Z)), Z])))
+    else:
+        condition = np.inf
+    rank = int(np.linalg.matrix_rank(np.column_stack([np.ones(len(raw)), raw.values])))
+    return CollinearityOutputDTO(
+        table,
+        condition,
+        rank,
+        asdict(profile),
+        [
+            "VIF는 Feature 간 선형 중복 진단입니다. Cook 영향도와 다른 문제이며 도메인상 필수 변수·더미 기준을 먼저 확인하세요."
+        ],
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_collinearity(X, profile=None, *, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -121,9 +160,12 @@ def run_collinearity(X, profile=None, *, recipe_path=None, overrides=None):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('regression-collinearity',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "regression-collinearity", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X,profile)
+    return _run(X, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

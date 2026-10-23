@@ -15,22 +15,23 @@ poisson.py - poisson 이산 분포 전용 Q-Q 비교
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
-from src.Visualization._common import PlotOutputDTO,validate_profile,start,vector
+from src.Visualization._common import PlotOutputDTO, validate_profile, start, vector
 from src.Visualization.qq._common import render_qq
 
 
@@ -50,13 +51,15 @@ class QQPoissonProfile:
         loc (int): 명시 정수 지지 위치. 기본 0.
         mu (float): 비음수 평균 mu; fit에서 관측 평균. 기본 1.0.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    reference: str = 'identity'
+    reference: str = "identity"
     fit_parameters: bool = False
     loc: int = 0
     mu: float = 1.0
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -74,17 +77,20 @@ class QQPoissonOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): 전용 Profile 설정.
         warnings (List[str]): 분포·동률·같은 자료 fitting·해석 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -96,15 +102,19 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,QQPoissonProfile)
-    if profile.reference not in ('identity','quartile','none'):raise ValueError('QQ 기준선 오류')
-    if profile.mu<0:raise ValueError('Poisson mu는 비음수입니다.')
+    validate_profile(profile, QQPoissonProfile)
+    if profile.reference not in ("identity", "quartile", "none"):
+        raise ValueError("QQ 기준선 오류")
+    if profile.mu < 0:
+        raise ValueError("Poisson mu는 비음수입니다.")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _distribution(values,profile):
+
+def _distribution(values, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -115,12 +125,15 @@ def _distribution(values,profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    a,removed=vector(values,min_size=3)
-    if (a!=np.floor(a)).any():raise ValueError('이산 QQ는 정수 관측을 사용하세요.')
-    mu=float(a.mean()-profile.loc) if profile.fit_parameters else profile.mu
-    if mu<0:raise ValueError('Poisson fit 지지 범위 오류')
-    params={'mu':mu,'loc':profile.loc}
-    return stats.poisson(**params),params
+    a, removed = vector(values, min_size=3)
+    if (a != np.floor(a)).any():
+        raise ValueError("이산 QQ는 정수 관측을 사용하세요.")
+    mu = float(a.mean() - profile.loc) if profile.fit_parameters else profile.mu
+    if mu < 0:
+        raise ValueError("Poisson fit 지지 범위 오류")
+    params = {"mu": mu, "loc": profile.loc}
+    return stats.poisson(**params), params
+
 
 def _run(values, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -134,13 +147,17 @@ def _run(values, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    before=start(ax)
-    distribution,params=_distribution(values,profile)
-    return render_qq(values,distribution,params,profile,ax,before,QQPoissonOutputDTO,'poisson')
+    before = start(ax)
+    distribution, params = _distribution(values, profile)
+    return render_qq(
+        values, distribution, params, profile, ax, before, QQPoissonOutputDTO, "poisson"
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def plot_poisson(values, *, ax, profile=None, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -156,9 +173,12 @@ def plot_poisson(values, *, ax, profile=None, recipe_path=None, overrides=None):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-qq-poisson',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-qq-poisson", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(values, ax,profile)
+    return _run(values, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

@@ -41,42 +41,54 @@ from scipy import sparse
 def _json_value(value):
     if isinstance(value, OutputDTO):
         return value.to_dict(json_safe=True)
-    if value is None or isinstance(value,(str,bool,int)):
+    if value is None or isinstance(value, (str, bool, int)):
         return value
-    if isinstance(value,(float,np.floating)):
+    if isinstance(value, (float, np.floating)):
         return float(value) if math.isfinite(float(value)) else None
-    if isinstance(value,np.generic):
+    if isinstance(value, np.generic):
         return _json_value(value.item())
-    if isinstance(value,(datetime.datetime,datetime.date,pd.Timestamp)):
+    if isinstance(value, (datetime.datetime, datetime.date, pd.Timestamp)):
         return value.isoformat()
     if value is pd.NA or value is pd.NaT:
         return None
-    if isinstance(value,pd.DataFrame):
-        return {'columns':_json_value(value.columns.tolist()),'index':_json_value(value.index.tolist()),
-                'data':_json_value(value.to_numpy().tolist())}
-    if isinstance(value,pd.Series):
-        return {'name':_json_value(value.name),'index':_json_value(value.index.tolist()),'data':_json_value(value.tolist())}
+    if isinstance(value, pd.DataFrame):
+        return {
+            "columns": _json_value(value.columns.tolist()),
+            "index": _json_value(value.index.tolist()),
+            "data": _json_value(value.to_numpy().tolist()),
+        }
+    if isinstance(value, pd.Series):
+        return {
+            "name": _json_value(value.name),
+            "index": _json_value(value.index.tolist()),
+            "data": _json_value(value.tolist()),
+        }
     if sparse.issparse(value):
-        coo=value.tocoo()
-        return {'format':'coo','shape':list(coo.shape),'row':coo.row.tolist(),
-                'col':coo.col.tolist(),'data':_json_value(coo.data.tolist())}
-    if isinstance(value,np.ndarray):
+        coo = value.tocoo()
+        return {
+            "format": "coo",
+            "shape": list(coo.shape),
+            "row": coo.row.tolist(),
+            "col": coo.col.tolist(),
+            "data": _json_value(coo.data.tolist()),
+        }
+    if isinstance(value, np.ndarray):
         return _json_value(value.tolist())
-    if isinstance(value,pd.Index):
+    if isinstance(value, pd.Index):
         return _json_value(value.tolist())
-    if isinstance(value,Mapping):
-        result={}
-        for key,item in value.items():
-            text=str(key)
+    if isinstance(value, Mapping):
+        result = {}
+        for key, item in value.items():
+            text = str(key)
             if text in result:
-                raise ValueError('JSON 사전 키의 문자열 변환 충돌: '+text)
-            result[text]=_json_value(item)
+                raise ValueError("JSON 사전 키의 문자열 변환 충돌: " + text)
+            result[text] = _json_value(item)
         return result
-    if isinstance(value,(list,tuple)):
+    if isinstance(value, (list, tuple)):
         return [_json_value(item) for item in value]
-    if isinstance(value,(set,frozenset)):
-        return [_json_value(item) for item in sorted(value,key=repr)]
-    raise TypeError('JSON 변환 미지원 타입: '+type(value).__name__)
+    if isinstance(value, (set, frozenset)):
+        return [_json_value(item) for item in sorted(value, key=repr)]
+    raise TypeError("JSON 변환 미지원 타입: " + type(value).__name__)
 
 
 class OutputDTO:
@@ -86,10 +98,27 @@ class OutputDTO:
         runtime_fields: JSON/기본 사전에서 제외할 실행 객체 필드 이름.
             원 객체는 result.model 등으로 직접 접근하거나 include_runtime=True로 조회합니다.
     """
-    runtime_fields = frozenset(('model','encoder','transformer','vectorizer','selector','sampler','figure','axes','grid',
-                               'multivariate_test','decomposition','explanation'))
 
-    def to_dict(self, include_runtime: bool = False, json_safe: bool = False) -> Dict[str, Any]:
+    runtime_fields = frozenset(
+        (
+            "model",
+            "encoder",
+            "transformer",
+            "vectorizer",
+            "selector",
+            "sampler",
+            "figure",
+            "axes",
+            "grid",
+            "multivariate_test",
+            "decomposition",
+            "explanation",
+        )
+    )
+
+    def to_dict(
+        self, include_runtime: bool = False, json_safe: bool = False
+    ) -> Dict[str, Any]:
         """DTO 필드를 사전으로 변환합니다. 원본 배열·모델을 deep copy하지 않습니다.
 
         Args:
@@ -105,11 +134,14 @@ class OutputDTO:
             JSON은 모델 저장/복원 형식이 아니며 포함되지 않은 runtime 객체는 복원하지 못합니다.
         """
         if not is_dataclass(self):
-            raise TypeError('분석 결과는 dataclass여야 합니다.')
+            raise TypeError("분석 결과는 dataclass여야 합니다.")
         if json_safe and include_runtime:
-            raise ValueError('JSON에는 runtime 객체를 포함할 수 없습니다.')
-        result={f.name:getattr(self,f.name) for f in fields(self)
-                if include_runtime or f.name not in self.runtime_fields}
+            raise ValueError("JSON에는 runtime 객체를 포함할 수 없습니다.")
+        result = {
+            f.name: getattr(self, f.name)
+            for f in fields(self)
+            if include_runtime or f.name not in self.runtime_fields
+        }
         return _json_value(result) if json_safe else result
 
     def to_json(self, indent: int = None) -> str:
@@ -122,7 +154,12 @@ class OutputDTO:
         Raises:
             TypeError/ValueError: to_dict(json_safe=True)의 변환 오류.
         """
-        return json.dumps(self.to_dict(json_safe=True),ensure_ascii=False,allow_nan=False,indent=indent)
+        return json.dumps(
+            self.to_dict(json_safe=True),
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=indent,
+        )
 
     @classmethod
     def from_result(cls, result):
@@ -135,13 +172,13 @@ class OutputDTO:
         Raises:
             AttributeError: 필요한 원본 필드 누락.
         """
-        return cls(**{f.name:getattr(result,f.name) for f in fields(cls)})
+        return cls(**{f.name: getattr(result, f.name) for f in fields(cls)})
 
-    def __getitem__(self,key):
+    def __getitem__(self, key):
         """기존 result['field'] 접근을 지원합니다. 없는 키는 KeyError입니다."""
         if key not in self.keys():
             raise KeyError(key)
-        return getattr(self,key)
+        return getattr(self, key)
 
     def keys(self):
         """실행 객체를 포함한 전체 필드 이름을 반환합니다."""
@@ -149,8 +186,8 @@ class OutputDTO:
 
     def items(self):
         """실행 객체를 포함한 필드 이름/값 쌍을 반환합니다."""
-        return ((key,getattr(self,key)) for key in self.keys())
+        return ((key, getattr(self, key)) for key in self.keys())
 
-    def get(self,key,default=None):
+    def get(self, key, default=None):
         """기존 사전의 get 접근을 지원합니다."""
         return self[key] if key in self.keys() else default

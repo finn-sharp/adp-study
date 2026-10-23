@@ -15,6 +15,7 @@ grouped_distribution.py - 집단별 분포·중앙값·산포·소표본 차이�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -46,13 +59,15 @@ class CategoricalGroupedDistributionProfile:
         whisker (float): box의 IQR whisker 배율. 기본 1.5.
         random_state (int): strip jitter seed. 기본 1234.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    kind: str = 'box'
+    kind: str = "box"
     max_categories: int = 20
     whisker: float = 1.5
     random_state: int = 1234
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -70,6 +85,7 @@ class CategoricalGroupedDistributionOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -77,6 +93,7 @@ class CategoricalGroupedDistributionOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -92,6 +109,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, CategoricalGroupedDistributionProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -110,28 +128,84 @@ def _draw(values, categories, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw,removed=paired(value=values,category=categories);raw['value']=vector(raw.value,allow_missing=False)[0];raw['category']=levels(raw.category);names=list(pd.unique(raw.category));groups=[raw.loc[raw.category==name,'value'].to_numpy() for name in names]
-    if len(names)>profile.max_categories or profile.max_categories<1 or profile.whisker<=0 or profile.kind not in ('box','violin','strip'):raise ValueError('범주 한도/분포 방법 오류')
-    positions=np.arange(len(names))
-    if profile.kind=='box':
-        artist=ax.boxplot(groups,positions=positions,whis=profile.whisker,patch_artist=True)
-        for box in artist['boxes']:box.set_facecolor(profile.color);box.set_alpha(profile.alpha)
-    elif profile.kind=='violin':
-        if any(len(g)<2 or np.ptp(g)==0 for g in groups):raise ValueError('violin은 각 그룹에 2개 이상 비상수 관측이 필요합니다.')
-        artist=ax.violinplot(groups,positions=positions,showmedians=True)
-        for item in artist['bodies']:item.set_facecolor(profile.color);item.set_alpha(profile.alpha)
+    raw, removed = paired(value=values, category=categories)
+    raw["value"] = vector(raw.value, allow_missing=False)[0]
+    raw["category"] = levels(raw.category)
+    names = list(pd.unique(raw.category))
+    groups = [raw.loc[raw.category == name, "value"].to_numpy() for name in names]
+    if (
+        len(names) > profile.max_categories
+        or profile.max_categories < 1
+        or profile.whisker <= 0
+        or profile.kind not in ("box", "violin", "strip")
+    ):
+        raise ValueError("범주 한도/분포 방법 오류")
+    positions = np.arange(len(names))
+    if profile.kind == "box":
+        artist = ax.boxplot(
+            groups, positions=positions, whis=profile.whisker, patch_artist=True
+        )
+        for box in artist["boxes"]:
+            box.set_facecolor(profile.color)
+            box.set_alpha(profile.alpha)
+    elif profile.kind == "violin":
+        if any(len(g) < 2 or np.ptp(g) == 0 for g in groups):
+            raise ValueError("violin은 각 그룹에 2개 이상 비상수 관측이 필요합니다.")
+        artist = ax.violinplot(groups, positions=positions, showmedians=True)
+        for item in artist["bodies"]:
+            item.set_facecolor(profile.color)
+            item.set_alpha(profile.alpha)
     else:
-        rng=np.random.RandomState(profile.random_state)
-        for pos,g in zip(positions,groups):ax.scatter(pos+rng.uniform(-.15,.15,len(g)),g,s=10,color=profile.color,alpha=profile.alpha)
-    ax.set_xticks(positions);ax.set_xticklabels(names,rotation=45,ha='right');ax.set_xlabel('Category');ax.set_ylabel('Value')
-    data=pd.DataFrame([dict(category=n,n=len(g),median=float(np.median(g)),q25=float(np.quantile(g,.25)),q75=float(np.quantile(g,.75)),mean=float(g.mean())) for n,g in zip(names,groups)])
-    diagnostics={'n':len(raw),'missing_removed':removed,'outliers_are_not_errors':True};notes=['그룹 표본 수를 함께 확인하세요. box 이상치는 자동 삭제 기준이 아닙니다.']
-    return finish(ax, before, data, diagnostics, profile, CategoricalGroupedDistributionOutputDTO, 'Categorical — Grouped Distribution', notes)
+        rng = np.random.RandomState(profile.random_state)
+        for pos, g in zip(positions, groups):
+            ax.scatter(
+                pos + rng.uniform(-0.15, 0.15, len(g)),
+                g,
+                s=10,
+                color=profile.color,
+                alpha=profile.alpha,
+            )
+    ax.set_xticks(positions)
+    ax.set_xticklabels(names, rotation=45, ha="right")
+    ax.set_xlabel("Category")
+    ax.set_ylabel("Value")
+    data = pd.DataFrame(
+        [
+            dict(
+                category=n,
+                n=len(g),
+                median=float(np.median(g)),
+                q25=float(np.quantile(g, 0.25)),
+                q75=float(np.quantile(g, 0.75)),
+                mean=float(g.mean()),
+            )
+            for n, g in zip(names, groups)
+        ]
+    )
+    diagnostics = {
+        "n": len(raw),
+        "missing_removed": removed,
+        "outliers_are_not_errors": True,
+    }
+    notes = ["그룹 표본 수를 함께 확인하세요. box 이상치는 자동 삭제 기준이 아닙니다."]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        CategoricalGroupedDistributionOutputDTO,
+        "Categorical — Grouped Distribution",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_grouped_distribution(values, categories, *, ax, profile=None, recipe_path=None, overrides=None) -> CategoricalGroupedDistributionOutputDTO:
+def plot_grouped_distribution(
+    values, categories, *, ax, profile=None, recipe_path=None, overrides=None
+) -> CategoricalGroupedDistributionOutputDTO:
     """집단별 분포·중앙값·산포·소표본 차이를 비교합니다.
 
     Args:
@@ -146,10 +220,16 @@ def plot_grouped_distribution(values, categories, *, ax, profile=None, recipe_pa
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-categorical-grouped-distribution', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-categorical-grouped-distribution",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, categories, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

@@ -22,6 +22,7 @@ kmeans.py - K-means 군집화
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class KMeansProfile:
@@ -70,6 +76,7 @@ class KMeansProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class KMeansOutputDTO(OutputDTO):
@@ -102,6 +109,7 @@ class KMeansOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, profile: KMeansProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -122,13 +130,15 @@ def _validate_inputs(X: Any, profile: KMeansProfile) -> np.ndarray:
     positive_int(profile.n_clusters, "n_clusters", 2)
     positive_int(profile.n_init, "n_init")
     positive_int(profile.max_iter, "max_iter")
-    if profile.n_clusters > len(np.unique(arr, axis=0)): raise ValueError("서로 다른 행 수보다 군집 수가 많습니다.")
+    if profile.n_clusters > len(np.unique(arr, axis=0)):
+        raise ValueError("서로 다른 행 수보다 군집 수가 많습니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, profile: KMeansProfile) -> KMeansOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -143,25 +153,50 @@ def _run_model(X: Any, profile: KMeansProfile) -> KMeansOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     from sklearn.cluster import KMeans
-    estimator = KMeans(n_clusters=profile.n_clusters, n_init=profile.n_init,
-                      max_iter=profile.max_iter, random_state=profile.random_state)
+
+    estimator = KMeans(
+        n_clusters=profile.n_clusters,
+        n_init=profile.n_init,
+        max_iter=profile.max_iter,
+        random_state=profile.random_state,
+    )
     arr = validate_features(X)
     model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", estimator)])
     labels = model.fit_predict(arr)
     from src.MachineLearning.analysis_common import cluster_summary
-    summary = cluster_summary(model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr, labels)
+
+    summary = cluster_summary(
+        (
+            model.named_steps["scaler"].transform(arr)
+            if profile.scaling != "none"
+            else arr
+        ),
+        labels,
+    )
     fitted = model.named_steps["model"]
-    return KMeansOutputDTO(model=model, labels=labels, feature_names=feature_names(X), **summary,
-                          centers=fitted.cluster_centers_.copy(), inertia=float(fitted.inertia_), n_iter=int(fitted.n_iter_))
+    return KMeansOutputDTO(
+        model=model,
+        labels=labels,
+        feature_names=feature_names(X),
+        **summary,
+        centers=fitted.cluster_centers_.copy(),
+        inertia=float(fitted.inertia_),
+        n_iter=int(fitted.n_iter_),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_kmeans(X: Any, profile: Optional[KMeansProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> KMeansOutputDTO:
+
+def run_kmeans(
+    X: Any,
+    profile: Optional[KMeansProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> KMeansOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -177,7 +212,9 @@ def run_kmeans(X: Any, profile: Optional[KMeansProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("kmeans", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "kmeans", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, profile)
     return _run_model(X, profile)
 
@@ -188,6 +225,7 @@ def run_kmeans(X: Any, profile: Optional[KMeansProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import make_blobs
+
     X, _ = make_blobs(n_samples=90, centers=3, cluster_std=0.3, random_state=1234)
     result = run_kmeans(X, load_profile("kmeans"))
     print(result.to_json(indent=2)[:500])

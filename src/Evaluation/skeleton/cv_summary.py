@@ -20,7 +20,7 @@ cv_summary.py - UCI 자료·예측·독립 평가 skeleton
 
 import numpy as np
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler,LabelEncoder
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 from src.Recipes import load_profile
@@ -39,7 +39,7 @@ def load_data(cache_dir=None):
     Raises:
         OSError/ValueError.
     """
-    return load_tabular('classification',cache_dir=cache_dir)
+    return load_tabular("classification", cache_dir=cache_dir)
 
 
 def load_recipe(overrides=None):
@@ -52,10 +52,10 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/OSError.
     """
-    return load_profile('metric-cv-summary',overrides=overrides)
+    return load_profile("metric-cv-summary", overrides=overrides)
 
 
-def build_pipeline(profile=None,overrides=None):
+def build_pipeline(profile=None, overrides=None):
     """실행 계약.
 
     Args:
@@ -65,27 +65,48 @@ def build_pipeline(profile=None,overrides=None):
     Raises:
         ValueError.
     """
-    if profile is not None and overrides is not None:raise ValueError('Profile/overrides 동시 지정 불가')
-    p=load_recipe(overrides) if profile is None else profile
+    if profile is not None and overrides is not None:
+        raise ValueError("Profile/overrides 동시 지정 불가")
+    p = load_recipe(overrides) if profile is None else profile
+
     def execute(data):
         """실행 계약.
 
-    Args:
-        원 Iris 표.
-    Returns:
-        CV 요약 DTO.
-    Raises:
-        ValueError.
-    """
-        X=data.drop(columns='target');y=LabelEncoder().fit_transform(data.target);scores=[]
-        for train,test in StratifiedKFold(3,shuffle=True,random_state=1234).split(X,y):
-            model=Pipeline([('scale',StandardScaler()),('model',LogisticRegression(max_iter=500))]);model.fit(X.iloc[train],y[train])
-            scores.append(float(run_f1(y[test],model.predict(X.iloc[test]),overrides={'average':'macro'}).value))
-        return run_cv_summary({'f1_macro':scores},profile=p)
+        Args:
+            원 Iris 표.
+        Returns:
+            CV 요약 DTO.
+        Raises:
+            ValueError.
+        """
+        X = data.drop(columns="target")
+        y = LabelEncoder().fit_transform(data.target)
+        scores = []
+        for train, test in StratifiedKFold(3, shuffle=True, random_state=1234).split(
+            X, y
+        ):
+            model = Pipeline(
+                [
+                    ("scale", StandardScaler()),
+                    ("model", LogisticRegression(max_iter=500)),
+                ]
+            )
+            model.fit(X.iloc[train], y[train])
+            scores.append(
+                float(
+                    run_f1(
+                        y[test],
+                        model.predict(X.iloc[test]),
+                        overrides={"average": "macro"},
+                    ).value
+                )
+            )
+        return run_cv_summary({"f1_macro": scores}, profile=p)
+
     return execute
 
 
-def main(cache_dir=None,overrides=None,data=None):
+def main(cache_dir=None, overrides=None, data=None):
     """실행 계약.
 
     Args:
@@ -95,8 +116,12 @@ def main(cache_dir=None,overrides=None,data=None):
     Raises:
         OSError/ValueError.
     """
-    result=build_pipeline(overrides=overrides)(load_data(cache_dir) if data is None else data)
-    print(result.to_json(indent=2));return result
+    result = build_pipeline(overrides=overrides)(
+        load_data(cache_dir) if data is None else data
+    )
+    print(result.to_json(indent=2))
+    return result
 
 
-if __name__=='__main__':main()
+if __name__ == "__main__":
+    main()

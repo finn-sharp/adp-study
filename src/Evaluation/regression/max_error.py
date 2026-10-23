@@ -16,6 +16,7 @@ max_error.py - regression max_error 평가
     2026-10-13  김재현(Finn)      v1.0.0    독립 메트릭·JSON·Profile·Output DTO
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,6 +29,7 @@ from src.output import OutputDTO
 from src.Recipes.loader import resolve_profile
 from src.Evaluation._common import validate_profile, evaluate, example_inputs
 
+
 # 2. Input Profile
 @dataclass
 class RegressionMaxErrorProfile:
@@ -39,10 +41,12 @@ class RegressionMaxErrorProfile:
         n_features (int): adjusted R² 설명변수 수; n > p+1.
         quantile (float): pinball loss의 분위수 (0,1).
     """
-    multioutput: str = 'uniform_average'
-    zero_policy: str = 'raise'
+
+    multioutput: str = "uniform_average"
+    zero_policy: str = "raise"
     n_features: int = 0
     quantile: float = 0.5
+
 
 # 3. Output DTO
 @dataclass
@@ -56,11 +60,13 @@ class RegressionMaxErrorOutputDTO(OutputDTO):
         details (dict): 클래스/확률 열 순서·표·정의·집계·적용 설정.
         warnings (list): 정의 불가 지표 사유; 묶음은 NaN(JSON null)으로 보존.
     """
+
     metric_name: str
     value: Any
     n_samples: int
     details: dict
     warnings: list
+
 
 # 4. Input Validation
 def validate_inputs(profile):
@@ -73,7 +79,8 @@ def validate_inputs(profile):
     Raises:
         TypeError/ValueError: Profile 타입·필드 오류.
     """
-    validate_profile(profile, RegressionMaxErrorProfile, 'regression')
+    validate_profile(profile, RegressionMaxErrorProfile, "regression")
+
 
 # 5. Individual Model Runners
 def _run(y_true, y_pred, y_score, X, y_train, profile):
@@ -91,11 +98,25 @@ def _run(y_true, y_pred, y_score, X, y_train, profile):
     Raises:
         ValueError/TypeError: 입력 정의역·정의 불가 단일 메트릭.
     """
-    return RegressionMaxErrorOutputDTO(**evaluate('regression', 'max_error', y_true, y_pred, y_score, X, y_train, profile))
+    return RegressionMaxErrorOutputDTO(
+        **evaluate(
+            "regression", "max_error", y_true, y_pred, y_score, X, y_train, profile
+        )
+    )
+
 
 # 6. Public Runner
-def run_max_error(y_true=None, y_pred=None, profile=None, *, y_score=None,
-              X=None, y_train=None, recipe_path=None, overrides=None):
+def run_max_error(
+    y_true=None,
+    y_pred=None,
+    profile=None,
+    *,
+    y_score=None,
+    X=None,
+    y_train=None,
+    recipe_path=None,
+    overrides=None,
+):
     """JSON → overrides → Profile로 독립 평가를 실행합니다.
 
     Args:
@@ -113,10 +134,13 @@ def run_max_error(y_true=None, y_pred=None, profile=None, *, y_score=None,
         ValueError/TypeError: 설정·입력 오류; 정의 불가 단일 지표.
         OSError: JSON 읽기 오류.
     """
-    p = resolve_profile('metric-regression-max-error', profile, recipe_path, overrides=overrides)
+    p = resolve_profile(
+        "metric-regression-max-error", profile, recipe_path, overrides=overrides
+    )
     validate_inputs(p)
     return _run(y_true, y_pred, y_score, X, y_train, p)
 
+
 # 7. Example Execution
-if __name__ == '__main__':
-    print(run_max_error(**example_inputs('regression')).to_json(indent=2))
+if __name__ == "__main__":
+    print(run_max_error(**example_inputs("regression")).to_json(indent=2))

@@ -22,6 +22,7 @@ pca.py - PCA 주성분 분석
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PCAProfile:
@@ -68,6 +74,7 @@ class PCAProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PCAOutputDTO(OutputDTO):
@@ -96,6 +103,7 @@ class PCAOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, profile: PCAProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -114,14 +122,17 @@ def _validate_inputs(X: Any, profile: PCAProfile) -> np.ndarray:
     validate_scaling(profile.scaling, profile.random_state)
     positive_int(profile.random_state, "random_state", 0)
     positive_int(profile.n_components, "n_components")
-    if not isinstance(profile.whiten, bool): raise ValueError("whiten은 bool이어야 합니다.")
-    if profile.n_components > min(arr.shape): raise ValueError("n_components는 min(n_samples,n_features) 이하여야 합니다.")
+    if not isinstance(profile.whiten, bool):
+        raise ValueError("whiten은 bool이어야 합니다.")
+    if profile.n_components > min(arr.shape):
+        raise ValueError("n_components는 min(n_samples,n_features) 이하여야 합니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, profile: PCAProfile) -> PCAOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -136,27 +147,48 @@ def _run_model(X: Any, profile: PCAProfile) -> PCAOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     from sklearn.decomposition import PCA
-    estimator = PCA(n_components=profile.n_components, whiten=profile.whiten, svd_solver="full", random_state=profile.random_state)
+
+    estimator = PCA(
+        n_components=profile.n_components,
+        whiten=profile.whiten,
+        svd_solver="full",
+        random_state=profile.random_state,
+    )
     arr = validate_features(X)
     model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", estimator)])
     embedding = model.fit_transform(arr)
-    if not np.isfinite(embedding).all(): raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
+    if not np.isfinite(embedding).all():
+        raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
     fitted = model.named_steps["model"]
     if profile.whiten and np.any(fitted.explained_variance_ <= 0):
         raise ValueError("whiten은 선택한 모든 축의 양의 분산이 필요합니다.")
-    scaled = model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
+    scaled = (
+        model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
+    )
     error = float(np.mean((scaled - fitted.inverse_transform(embedding)) ** 2))
-    return PCAOutputDTO(model, embedding, feature_names(X), True, fitted.components_.copy(),
-                        fitted.explained_variance_ratio_.copy(), error)
+    return PCAOutputDTO(
+        model,
+        embedding,
+        feature_names(X),
+        True,
+        fitted.components_.copy(),
+        fitted.explained_variance_ratio_.copy(),
+        error,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_pca(X: Any, profile: Optional[PCAProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> PCAOutputDTO:
+
+def run_pca(
+    X: Any,
+    profile: Optional[PCAProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> PCAOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -172,7 +204,9 @@ def run_pca(X: Any, profile: Optional[PCAProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("pca", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "pca", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, profile)
     return _run_model(X, profile)
 
@@ -183,6 +217,7 @@ def run_pca(X: Any, profile: Optional[PCAProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_pca(X, load_profile("pca"))
     print(result.to_json(indent=2)[:500])

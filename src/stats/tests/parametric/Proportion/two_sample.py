@@ -16,6 +16,7 @@ two_sample - two 모비율 검정
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, integer, tail, result)
+from src.stats.tests._common import number, integer, tail, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TwoSampleProportionProfile:
@@ -48,6 +50,7 @@ class TwoSampleProportionProfile:
         alpha (float): 유한한 0<alpha<1 유의수준 기본 0.05.
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
     """
+
     alpha: float = 0.05
     alternative: str = "two-sided"
 
@@ -55,6 +58,7 @@ class TwoSampleProportionProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TwoSampleProportionOutputDTO(OutputDTO):
@@ -76,6 +80,7 @@ class TwoSampleProportionOutputDTO(OutputDTO):
         confidence_intervals (List[Tuple[float, float]]): 단일 exact Clopper–Pearson/score Wilson, 두 표본은 각 Wilson 구간.
         difference_interval (Optional[Tuple[float, float]]): 두 표본 독립 Newcombe 점수 차이 구간; 단일 None.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -96,6 +101,7 @@ class TwoSampleProportionOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -108,28 +114,31 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    pairs = [('successes1', 'n1'), ('successes2', 'n2')]
+    pairs = [("successes1", "n1"), ("successes2", "n2")]
     d = {}
     for s, n in pairs:
         d[s] = integer(args[s], s)
         d[n] = integer(args[n], n, 1)
         if d[s] > d[n]:
-            raise ValueError('성공 수는 시행 수 이하여야 합니다.')
+            raise ValueError("성공 수는 시행 수 이하여야 합니다.")
     return d
 
-def _validate_inputs(arguments: Dict[str, Any], profile: TwoSampleProportionProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: TwoSampleProportionProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -140,13 +149,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: TwoSampleProportionProf
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, TwoSampleProportionProfile): raise TypeError("TwoSampleProportionProfile이 필요합니다.")
+    if not isinstance(profile, TwoSampleProportionProfile):
+        raise TypeError("TwoSampleProportionProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -159,47 +170,75 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
+    alt = getattr(p, "alternative", "two-sided")
     from statsmodels.stats.proportion import proportion_confint
-    ia = p.alpha if alt == 'two-sided' else 2 * p.alpha
+
+    ia = p.alpha if alt == "two-sided" else 2 * p.alpha
     if ia >= 1:
-        raise ValueError('단측 비율 구간은 alpha<0.5가 필요합니다.')
+        raise ValueError("단측 비율 구간은 alpha<0.5가 필요합니다.")
     notes = []
 
     def ci(s, n, method):
         """ci의 공유 계산을 수행합니다.
 
-            Args:
-                s: 해당 계산의 검증된 자료/설정. 공개 모듈의 기법별 계약 참조.
-                n: 해당 계산의 검증된 자료/설정. 공개 모듈의 기법별 계약 참조.
-                method: 해당 계산의 검증된 자료/설정. 공개 모듈의 기법별 계약 참조.
-            Returns:
-                Any: 함수 설명에 해당하는 검증 자료·계산값·결과 사전.
-            Raises:
-                ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
-            """
+        Args:
+            s: 해당 계산의 검증된 자료/설정. 공개 모듈의 기법별 계약 참조.
+            n: 해당 계산의 검증된 자료/설정. 공개 모듈의 기법별 계약 참조.
+            method: 해당 계산의 검증된 자료/설정. 공개 모듈의 기법별 계약 참조.
+        Returns:
+            Any: 함수 설명에 해당하는 검증 자료·계산값·결과 사전.
+        Raises:
+            ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
+        """
         low, high = proportion_confint(s, n, alpha=ia, method=method)
-        return (float(low), 1.0) if alt == 'greater' else (0.0, float(high)) if alt == 'less' else (float(low), float(high))
-    s1, n1, s2, n2 = (d['successes1'], d['n1'], d['successes2'], d['n2'])
+        return (
+            (float(low), 1.0)
+            if alt == "greater"
+            else (0.0, float(high)) if alt == "less" else (float(low), float(high))
+        )
+
+    s1, n1, s2, n2 = (d["successes1"], d["n1"], d["successes2"], d["n2"])
     a = s1 / n1
     b = s2 / n2
     pool = (s1 + s2) / (n1 + n2)
     se = np.sqrt(pool * (1 - pool) * (1 / n1 + 1 / n2))
     if se <= 0:
-        raise ValueError('pooled 성공확률 0/1은 Z 검정 미정의입니다.')
+        raise ValueError("pooled 성공확률 0/1은 Z 검정 미정의입니다.")
     stat = (a - b) / se
-    c1 = ci(s1, n1, 'wilson')
-    c2 = ci(s2, n2, 'wilson')
-    raw1 = proportion_confint(s1, n1, alpha=ia, method='wilson')
-    raw2 = proportion_confint(s2, n2, alpha=ia, method='wilson')
+    c1 = ci(s1, n1, "wilson")
+    c2 = ci(s2, n2, "wilson")
+    raw1 = proportion_confint(s1, n1, alpha=ia, method="wilson")
+    raw2 = proportion_confint(s2, n2, alpha=ia, method="wilson")
     low = a - b - np.sqrt((a - raw1[0]) ** 2 + (raw2[1] - b) ** 2)
     high = a - b + np.sqrt((raw1[1] - a) ** 2 + (b - raw2[0]) ** 2)
-    diffci = (float(low), 1.0) if alt == 'greater' else (-1.0, float(high)) if alt == 'less' else (float(low), float(high))
+    diffci = (
+        (float(low), 1.0)
+        if alt == "greater"
+        else (-1.0, float(high)) if alt == "less" else (float(low), float(high))
+    )
     if min(n1 * pool, n1 * (1 - pool), n2 * pool, n2 * (1 - pool)) < 5:
-        notes.append('정규 근사 조건의 기대도수가 작습니다.')
-    return result('two-sample-proportion', p, stat, tail(stat, alt, stats.norm), '두 독립 모비율이 같다', 'pooled-z', dict(proportions=[a, b], difference=a - b, confidence_intervals=[c1, c2], difference_interval=diffci), {'successes': [s1, s2], 'n': [n1, n2], 'pooled_proportion': pool}, notes)
+        notes.append("정규 근사 조건의 기대도수가 작습니다.")
+    return result(
+        "two-sample-proportion",
+        p,
+        stat,
+        tail(stat, alt, stats.norm),
+        "두 독립 모비율이 같다",
+        "pooled-z",
+        dict(
+            proportions=[a, b],
+            difference=a - b,
+            confidence_intervals=[c1, c2],
+            difference_interval=diffci,
+        ),
+        {"successes": [s1, s2], "n": [n1, n2], "pooled_proportion": pool},
+        notes,
+    )
 
-def _run_test(data: Dict[str, Any], profile: TwoSampleProportionProfile) -> TwoSampleProportionOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: TwoSampleProportionProfile
+) -> TwoSampleProportionOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -217,7 +256,17 @@ def _run_test(data: Dict[str, Any], profile: TwoSampleProportionProfile) -> TwoS
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_two_sample_proportion(successes1: Any, n1: Any, successes2: Any, n2: Any, profile: Optional[TwoSampleProportionProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> TwoSampleProportionOutputDTO:
+
+def run_two_sample_proportion(
+    successes1: Any,
+    n1: Any,
+    successes2: Any,
+    n2: Any,
+    profile: Optional[TwoSampleProportionProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> TwoSampleProportionOutputDTO:
     """two 모비율 검정.
 
     Args:
@@ -234,8 +283,13 @@ def run_two_sample_proportion(successes1: Any, n1: Any, successes2: Any, n2: Any
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("two-sample-proportion", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'successes1': successes1, 'n1': n1, 'successes2': successes2, 'n2': n2}, profile)
+    profile = resolve_profile(
+        "two-sample-proportion", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs(
+        {"successes1": successes1, "n1": n1, "successes2": successes2, "n2": n2},
+        profile,
+    )
     return _run_test(data, profile)
 
 

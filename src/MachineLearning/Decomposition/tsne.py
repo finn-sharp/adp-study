@@ -22,6 +22,7 @@ tsne.py - t-SNE 시각화용 차원 축소
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TSNEProfile:
@@ -73,6 +79,7 @@ class TSNEProfile:
 # 3. Output DTO
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TSNEOutputDTO(OutputDTO):
     """t-SNE 시각화용 차원 축소 결과. 배열은 원 입력 행 순서.
@@ -96,6 +103,7 @@ class TSNEOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, profile: TSNEProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -117,13 +125,15 @@ def _validate_inputs(X: Any, profile: TSNEProfile) -> np.ndarray:
     finite_number(profile.perplexity, "perplexity", positive=True)
     finite_number(profile.learning_rate, "learning_rate", positive=True)
     positive_int(profile.max_iter, "max_iter", 250)
-    if profile.perplexity >= len(arr): raise ValueError("perplexity는 표본 수 미만이어야 합니다.")
+    if profile.perplexity >= len(arr):
+        raise ValueError("perplexity는 표본 수 미만이어야 합니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, profile: TSNEProfile) -> TSNEOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -139,24 +149,41 @@ def _run_model(X: Any, profile: TSNEProfile) -> TSNEOutputDTO:
     """
     import inspect
     from sklearn.manifold import TSNE
-    iteration_key = "max_iter" if "max_iter" in inspect.signature(TSNE).parameters else "n_iter"
-    estimator = TSNE(n_components=profile.n_components, perplexity=profile.perplexity,
-                     learning_rate=profile.learning_rate, init="random", method="exact",
-                     random_state=profile.random_state, **{iteration_key: profile.max_iter})
+
+    iteration_key = (
+        "max_iter" if "max_iter" in inspect.signature(TSNE).parameters else "n_iter"
+    )
+    estimator = TSNE(
+        n_components=profile.n_components,
+        perplexity=profile.perplexity,
+        learning_rate=profile.learning_rate,
+        init="random",
+        method="exact",
+        random_state=profile.random_state,
+        **{iteration_key: profile.max_iter},
+    )
     arr = validate_features(X)
     model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", estimator)])
     embedding = model.fit_transform(arr)
-    if not np.isfinite(embedding).all(): raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
-    return TSNEOutputDTO(model, embedding, feature_names(X), False, float(estimator.kl_divergence_))
+    if not np.isfinite(embedding).all():
+        raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
+    return TSNEOutputDTO(
+        model, embedding, feature_names(X), False, float(estimator.kl_divergence_)
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_tsne(X: Any, profile: Optional[TSNEProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> TSNEOutputDTO:
+
+def run_tsne(
+    X: Any,
+    profile: Optional[TSNEProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> TSNEOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -172,7 +199,9 @@ def run_tsne(X: Any, profile: Optional[TSNEProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("tsne", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "tsne", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, profile)
     return _run_model(X, profile)
 
@@ -183,6 +212,7 @@ def run_tsne(X: Any, profile: Optional[TSNEProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_tsne(X, load_profile("tsne"))
     print(result.to_json(indent=2)[:500])

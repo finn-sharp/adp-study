@@ -15,6 +15,7 @@ optdigits.py - 새 딥러닝 스켈레톤용 UCI Optdigits 공식 train/test 로
     2026-10-12  김재현(Finn)     v1.0.0    별도 알고리즘의 공통 계약 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -39,23 +40,51 @@ def load_optdigits(cache_dir=None):
     Raises:
         ValueError/OSError: UCI 스키마·픽셀 범위·ZIP·네트워크 오류.
     """
-    root=Path(cache_dir or os.environ.get('UCI_SKELETON_CACHE',Path(__file__).parents[2]/'.uci-cache'))
-    root.mkdir(parents=True,exist_ok=True);path=root/'optdigits.zip'
+    root = Path(
+        cache_dir
+        or os.environ.get(
+            "UCI_SKELETON_CACHE", Path(__file__).parents[2] / ".uci-cache"
+        )
+    )
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / "optdigits.zip"
     if not path.exists():
-        with urlopen('https://archive.ics.uci.edu/static/public/80/optical+recognition+of+handwritten+digits.zip',timeout=60) as response:payload=response.read()
+        with urlopen(
+            "https://archive.ics.uci.edu/static/public/80/optical+recognition+of+handwritten+digits.zip",
+            timeout=60,
+        ) as response:
+            payload = response.read()
         with ZipFile(BytesIO(payload)) as archive:
-            if archive.testzip() is not None:raise ValueError('UCI ZIP 오류')
-        with tempfile.NamedTemporaryFile(dir=root,delete=False) as temporary:
-            temporary.write(payload);temp_path=Path(temporary.name)
+            if archive.testzip() is not None:
+                raise ValueError("UCI ZIP 오류")
+        with tempfile.NamedTemporaryFile(dir=root, delete=False) as temporary:
+            temporary.write(payload)
+            temp_path = Path(temporary.name)
         temp_path.replace(path)
-    result=[]
+    result = []
     with ZipFile(path) as archive:
-        for name in ('optdigits.tra','optdigits.tes'):
-            matches=[n for n in archive.namelist() if Path(n).name==name]
-            if len(matches)!=1:raise ValueError('공식 파일 식별 오류: '+name)
-            frame=pd.read_csv(BytesIO(archive.read(matches[0])),header=None)
-            values=frame.to_numpy(dtype=float)
-            if values.shape[1]!=65 or not np.isfinite(values).all() or (values!=np.floor(values)).any():raise ValueError('Optdigits의 64 정수 픽셀·클래스 스키마 오류')
-            if (values[:,:64]<0).any() or (values[:,:64]>16).any() or not np.isin(values[:,64],np.arange(10)).all():raise ValueError('픽셀/클래스 범위 오류')
-            result.extend([values[:,:64].astype(np.float32).reshape(-1,8,8,1),values[:,64].astype(int)])
+        for name in ("optdigits.tra", "optdigits.tes"):
+            matches = [n for n in archive.namelist() if Path(n).name == name]
+            if len(matches) != 1:
+                raise ValueError("공식 파일 식별 오류: " + name)
+            frame = pd.read_csv(BytesIO(archive.read(matches[0])), header=None)
+            values = frame.to_numpy(dtype=float)
+            if (
+                values.shape[1] != 65
+                or not np.isfinite(values).all()
+                or (values != np.floor(values)).any()
+            ):
+                raise ValueError("Optdigits의 64 정수 픽셀·클래스 스키마 오류")
+            if (
+                (values[:, :64] < 0).any()
+                or (values[:, :64] > 16).any()
+                or not np.isin(values[:, 64], np.arange(10)).all()
+            ):
+                raise ValueError("픽셀/클래스 범위 오류")
+            result.extend(
+                [
+                    values[:, :64].astype(np.float32).reshape(-1, 8, 8, 1),
+                    values[:, 64].astype(int),
+                ]
+            )
     return tuple(result)

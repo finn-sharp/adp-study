@@ -38,7 +38,7 @@ def load_data(cache_dir=None):
     Raises:
         OSError/ValueError.
     """
-    return load_tabular('classification',binary=True,cache_dir=cache_dir)
+    return load_tabular("classification", binary=True, cache_dir=cache_dir)
 
 
 def load_recipe(overrides=None):
@@ -51,10 +51,10 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/OSError.
     """
-    return load_profile('metric-comparison',overrides=overrides)
+    return load_profile("metric-comparison", overrides=overrides)
 
 
-def build_pipeline(profile=None,overrides=None):
+def build_pipeline(profile=None, overrides=None):
     """실행 계약.
 
     Args:
@@ -64,28 +64,50 @@ def build_pipeline(profile=None,overrides=None):
     Raises:
         ValueError.
     """
-    if profile is not None and overrides is not None:raise ValueError('Profile/overrides 동시 지정 불가')
-    p=load_recipe(overrides) if profile is None else profile
+    if profile is not None and overrides is not None:
+        raise ValueError("Profile/overrides 동시 지정 불가")
+    p = load_recipe(overrides) if profile is None else profile
+
     def execute(data):
         """실행 계약.
 
-    Args:
-        원 Iris 표.
-    Returns:
-        비교 DTO.
-    Raises:
-        ValueError.
-    """
-        if p.evaluation_task!='classification':raise ValueError('이 예제는 분류 비교입니다.')
-        X=data.drop(columns='target'); y=LabelEncoder().fit_transform(data.target)
-        Xtr,Xte,ytr,yte=train_test_split(X,y,test_size=.3,stratify=y,random_state=1234)
-        models={'logistic':Pipeline([('scale',StandardScaler()),('model',LogisticRegression(max_iter=500))]),'dummy':DummyClassifier(strategy='prior')}
-        for model in models.values():model.fit(Xtr,ytr)
-        return run_comparison(yte,{k:m.predict(Xte) for k,m in models.items()},scores={k:m.predict_proba(Xte) for k,m in models.items()},classes={k:m.classes_ for k,m in models.items()},profile=p)
+        Args:
+            원 Iris 표.
+        Returns:
+            비교 DTO.
+        Raises:
+            ValueError.
+        """
+        if p.evaluation_task != "classification":
+            raise ValueError("이 예제는 분류 비교입니다.")
+        X = data.drop(columns="target")
+        y = LabelEncoder().fit_transform(data.target)
+        Xtr, Xte, ytr, yte = train_test_split(
+            X, y, test_size=0.3, stratify=y, random_state=1234
+        )
+        models = {
+            "logistic": Pipeline(
+                [
+                    ("scale", StandardScaler()),
+                    ("model", LogisticRegression(max_iter=500)),
+                ]
+            ),
+            "dummy": DummyClassifier(strategy="prior"),
+        }
+        for model in models.values():
+            model.fit(Xtr, ytr)
+        return run_comparison(
+            yte,
+            {k: m.predict(Xte) for k, m in models.items()},
+            scores={k: m.predict_proba(Xte) for k, m in models.items()},
+            classes={k: m.classes_ for k, m in models.items()},
+            profile=p,
+        )
+
     return execute
 
 
-def main(cache_dir=None,overrides=None,data=None):
+def main(cache_dir=None, overrides=None, data=None):
     """실행 계약.
 
     Args:
@@ -95,8 +117,12 @@ def main(cache_dir=None,overrides=None,data=None):
     Raises:
         OSError/ValueError.
     """
-    result=build_pipeline(overrides=overrides)(load_data(cache_dir) if data is None else data)
-    print(result.to_json(indent=2));return result
+    result = build_pipeline(overrides=overrides)(
+        load_data(cache_dir) if data is None else data
+    )
+    print(result.to_json(indent=2))
+    return result
 
 
-if __name__=='__main__':main()
+if __name__ == "__main__":
+    main()

@@ -15,6 +15,7 @@ qq.py - 꼬리·분포 가정의 이탈을 점검해 통계 검정과 변환을 
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class NumericQqProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         distribution (str): SciPy 연속분포 이름; 기본 norm. 기본 'norm'.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    distribution: str = 'norm'
+    distribution: str = "norm"
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class NumericQqOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class NumericQqOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, NumericQqProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -104,19 +122,47 @@ def _draw(values, ax, profile, before):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from scipy import stats
-    a,removed=vector(values,min_size=3)
-    distribution=getattr(stats,profile.distribution,None)
-    if not isinstance(distribution,stats.rv_continuous):raise ValueError('연속분포 이름이 필요합니다.')
-    (theoretical,ordered),(slope,intercept,r)=stats.probplot(a,dist=distribution,fit=True)
-    ax.scatter(theoretical,ordered,color=profile.color,alpha=profile.alpha,s=12);ax.plot(theoretical,slope*theoretical+intercept,color='C3',linestyle='--')
-    ax.set_xlabel('Theoretical quantile');ax.set_ylabel('Observed quantile')
-    data=pd.DataFrame({'theoretical':theoretical,'observed':ordered});diagnostics={'n':len(a),'missing_removed':removed,'reference_slope':float(slope),'reference_intercept':float(intercept),'quantile_r':float(r)};notes=['기준선은 분위수 비교용이며 회귀 모델 결과 또는 정규성 검정 p 값이 아닙니다.']
-    return finish(ax, before, data, diagnostics, profile, NumericQqOutputDTO, 'Numeric — Qq', notes)
+
+    a, removed = vector(values, min_size=3)
+    distribution = getattr(stats, profile.distribution, None)
+    if not isinstance(distribution, stats.rv_continuous):
+        raise ValueError("연속분포 이름이 필요합니다.")
+    (theoretical, ordered), (slope, intercept, r) = stats.probplot(
+        a, dist=distribution, fit=True
+    )
+    ax.scatter(theoretical, ordered, color=profile.color, alpha=profile.alpha, s=12)
+    ax.plot(theoretical, slope * theoretical + intercept, color="C3", linestyle="--")
+    ax.set_xlabel("Theoretical quantile")
+    ax.set_ylabel("Observed quantile")
+    data = pd.DataFrame({"theoretical": theoretical, "observed": ordered})
+    diagnostics = {
+        "n": len(a),
+        "missing_removed": removed,
+        "reference_slope": float(slope),
+        "reference_intercept": float(intercept),
+        "quantile_r": float(r),
+    }
+    notes = [
+        "기준선은 분위수 비교용이며 회귀 모델 결과 또는 정규성 검정 p 값이 아닙니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        NumericQqOutputDTO,
+        "Numeric — Qq",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_qq(values, *, ax, profile=None, recipe_path=None, overrides=None) -> NumericQqOutputDTO:
+def plot_qq(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> NumericQqOutputDTO:
     """꼬리·분포 가정의 이탈을 점검해 통계 검정과 변환을 선택합니다.
 
     Args:
@@ -130,10 +176,13 @@ def plot_qq(values, *, ax, profile=None, recipe_path=None, overrides=None) -> Nu
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-numeric-qq', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-numeric-qq", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

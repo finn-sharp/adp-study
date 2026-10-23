@@ -16,6 +16,7 @@ lightgbm.py - LightGBM UCI 스켈레톤
     2026-10-12  김재현(Finn)       v1.0.0    기존 파이프라인 기반 UCI 수치 예제
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -27,7 +28,7 @@ from src.datasets.uci import load_tabular
 from ._common import connect_pipeline, fit_evaluate, report
 
 
-def load_data(task='regression', cache_dir=None):
+def load_data(task="regression", cache_dir=None):
     """UCI 자료를 원 특성과 target 열로 불러옵니다.
 
     Args:
@@ -38,12 +39,12 @@ def load_data(task='regression', cache_dir=None):
     Raises:
         ValueError/OSError: 목적·자료·다운로드 오류.
     """
-    if task not in ('classification', 'regression'):
-        raise ValueError('이 모델 스켈레톤이 지원하지 않는 task입니다.')
+    if task not in ("classification", "regression"):
+        raise ValueError("이 모델 스켈레톤이 지원하지 않는 task입니다.")
     return load_tabular(task, binary=False, cache_dir=cache_dir)
 
 
-def load_recipe(task='regression', overrides=None):
+def load_recipe(task="regression", overrides=None):
     """기존 모델별 JSON을 검증하여 전용 Profile로 읽습니다.
 
     Args:
@@ -54,10 +55,10 @@ def load_recipe(task='regression', overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 필드·별칭·파일 오류.
     """
-    return load_profile('lightgbm', task=task, overrides=overrides)
+    return load_profile("lightgbm", task=task, overrides=overrides)
 
 
-def build_pipeline(feature_columns, task='regression', profile=None, overrides=None):
+def build_pipeline(feature_columns, task="regression", profile=None, overrides=None):
     """FeatureSpec 전처리와 기존 모델을 연결합니다.
 
     Args:
@@ -71,15 +72,15 @@ def build_pipeline(feature_columns, task='regression', profile=None, overrides=N
         ValueError/ImportError: 목적·전처리·모델 라이브러리 오류.
     """
     if profile is not None and overrides is not None:
-        raise ValueError('profile과 overrides를 동시에 지정하지 않습니다.')
+        raise ValueError("profile과 overrides를 동시에 지정하지 않습니다.")
     profile = load_recipe(task, overrides) if profile is None else profile
     if profile.task != task:
-        raise ValueError('Profile task와 요청 목적이 다릅니다.')
+        raise ValueError("Profile task와 요청 목적이 다릅니다.")
     estimator = _create_model(profile)
     return connect_pipeline(feature_columns, estimator, profile, scaling=None)
 
 
-def main(task='regression', cache_dir=None, overrides=None):
+def main(task="regression", cache_dir=None, overrides=None):
     """원 참고 코드의 순서로 학습·예측·수치 평가를 실행합니다.
 
     Args:
@@ -93,10 +94,10 @@ def main(task='regression', cache_dir=None, overrides=None):
     """
     data = load_data(task, cache_dir)
     profile = load_recipe(task, overrides)
-    feature_columns = [column for column in data.columns if column != 'target']
+    feature_columns = [column for column in data.columns if column != "target"]
     pipeline = build_pipeline(feature_columns, task=task, profile=profile)
-    return report(fit_evaluate(data, pipeline, 'LightGBM'))
+    return report(fit_evaluate(data, pipeline, "LightGBM"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
