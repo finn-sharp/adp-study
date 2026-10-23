@@ -2,6 +2,8 @@
 from pathlib import Path
 import ast
 import json
+import subprocess
+import sys
 import build_catalog
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -15,6 +17,7 @@ try:
 finally:
     (ROOT/'기출문제/전체목록.json').write_bytes(expected_json)
     (ROOT/'기출문제/전체목록.md').write_bytes(expected_md)
+subprocess.run([sys.executable,str(ROOT/'tools/docs/audit_docs.py')],check=True)
 counts=build_catalog.registry_counts()
 for bundle in result['bundles']:
     for q in bundle['questions']:

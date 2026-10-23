@@ -1,25 +1,11 @@
 # ADP 분석 모듈과 학습 자료
 
-ADP 실기 학습에 필요한 분석 기법을 재사용 가능한 Python 모듈로 구현하고, 기출 유형·모의고사의 문제지와 실행 풀이를 함께 관리합니다.
+ADP 실기 학습을 위한 재사용 분석 모듈과 문제지·실행 풀이를 관리합니다. 현재 표준 모듈은 **266개**, 모델·목적별 JSON은 **293개**이며 학습 자료는 **41묶음·393문항·434개 코드 셀·145개 그림·118쪽 문제지**입니다.
 
-현재 표준 분석·시각화 모듈은 **266개**, 모델·목적별 JSON 레시피는 **293개**입니다. 학습 자료는 **41묶음·393문항**이며, **434개 코드 셀·145개 그림·118쪽 문제지**를 포함합니다. 집계는 등록부와 회차별 명세를 기준으로 관리합니다.
-
-- [전체 학습 자료 목록](기출문제/전체목록.md): 회차·문항 수·실행 환경과 문항별 모듈 참조
-- [도메인 아키텍처](docs/DOMAIN_ARCHITECTURE.md): 역할 분리·신규 API·전체 Profile/DTO 필드
-- [분석 기법 카탈로그](docs/ANALYSIS_CATALOG.md): 기존 분석 모듈의 구현 범위
-- [레시피 사용법](docs/RECIPES.md): JSON 설정·사용자 레시피·일회성 재정의
-
-## 회귀·분포·생산 의사결정 확장
-
-- [회귀·분포 명세](docs/REGRESSION_DISTRIBUTION_MODULES.md): t/F·가정 진단·VIF/Cook·학습 CV 전처리·원 단위 평가, NB7·QQ13·회귀 Axes10.
-- [유전 알고리즘 명세](docs/GENETIC_OPTIMIZATION.md): 혼합 정수 GA·생산 설비 배분·호출자 Axes 경과도, 각 전용 JSON/DTO와 skeleton.
-- [모의고사5회](기출문제/모의고사/5회/README.md): 기존 공문서형 문제지·실행 풀이·코드·해설·데이터, 14문항100점.
-
-이번 확장은 47개 별도 모듈입니다. Cook은 기본 flag이고 제거는 명시 선택입니다. GA 결과와 전수 최적해를 구분하며 전처리로 성능 향상이 보장된다고 해석하지 않습니다.
-
-## 요청한 분석 과정을 적용한 신규 모의10회
-
-[응용 모의10회](기출문제/모의고사/응용10회/README.md)에 문제·실행 풀이·코드·해설·데이터를 추가했습니다. [보완 모듈8개 명세](docs/APPLIED_REGRESSION_WORKFLOWS.md)는 AIC/BIC 후진선택·FGLS·분포별GLM·rolling·회귀 전용 그림과 비선형CV factory를 설명합니다. 기존 튜닝/샘플링/진단 모듈을 재사용하며 새로운 시험 전용 모형을 중복 구현하지 않습니다.
+- [전체 분석 파이프라인](docs/ANALYSIS_PIPELINE.md): Dataset→Feature→학습/CV 전처리·sampling→모형→예측 후 처리→평가, Recipe/Profile/DTO의 역할
+- [전체 모듈 기능 카탈로그](docs/ANALYSIS_CATALOG.md): 266개 모듈의 단계별 기능·입력·대표 결과
+- [문서 안내](docs/README.md): 분야별 상세 명세·API·검증·학습 자료의 기준 문서
+- [전체 학습 자료](기출문제/전체목록.md), [응용 모의10회](기출문제/모의고사/응용10회/README.md): 회귀·분류·시간·sampling·튜닝을 적용한 문제와 실행 풀이
 
 ## 빠른 시작
 
@@ -192,15 +178,7 @@ python tools/exams/compare_answers.py --base 22d39e6e44074db666a528149a9e10120e5
 
 ## 상세 문서
 
-| 주제 | 문서 |
-| --- | --- |
-| 전체 API·도메인 경계 | [분석 카탈로그](docs/ANALYSIS_CATALOG.md), [도메인 확장 명세](docs/DOMAIN_ARCHITECTURE.md) |
-| 모듈 작성·설정 관리 | [모듈 컨벤션](docs/MODEL_MODULE_FORMAT.md), [레시피](docs/RECIPES.md) |
-| 통계·가정·지원 범위 | [통계 전체 명세](docs/STATISTICS_COMPLETE.md), [ANOVA](docs/ANOVA_MODULES.md), [검정·진단](docs/STATISTICAL_TESTS.md) |
-| 전처리·상관·최적화 | [전처리·상관분석](docs/PREPROCESSING_CORRELATION_MODULES.md), [파라미터 최적화](docs/PARAMETER_OPTIMIZATION.md) |
-| 예제·평가·시각화 | [UCI 스켈레톤](docs/UCI_SKELETONS.md), [평가 메트릭](docs/EVALUATION_METRICS.md), [Axes 기반 EDA](docs/EDA_VISUALIZATION_MODULES.md) |
-| 딥러닝·연관규칙 | [TensorFlow](docs/TENSORFLOW_MODULES.md), [딥러닝·연관 확장](docs/DEEP_ASSOCIATION_MODULES.md) |
-| 시험 설계·출처 | [상황형 설계](docs/SCENARIO_EXAM_DESIGN.md), [자료 대조·복원 가정](docs/EXAM_RECONSTRUCTION_AUDIT.md), [17~23회 대조](docs/ADP_17_23_SOURCE_AUDIT.md), [문제지 서식](docs/QUESTION_PAPER_STYLE.md) |
+[문서 안내](docs/README.md)에 기능별 기준 문서를 모았습니다. 분석 흐름은 [파이프라인](docs/ANALYSIS_PIPELINE.md), 구현 기능은 [카탈로그](docs/ANALYSIS_CATALOG.md), 설정은 [Recipe/Profile](docs/RECIPES.md), 새 모듈 작성은 [개발 컨벤션](docs/MODEL_MODULE_FORMAT.md)을 기준으로 확인합니다.
 
 ## 분석·해석의 경계
 

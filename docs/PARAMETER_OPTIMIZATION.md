@@ -8,7 +8,7 @@
 | `src/MachineLearning/Optimization/random_search.py` | RandomSearchProfile / RandomSearchOutputDTO | run_random_search | 후보 목록에서 n_iter개 무작위 추출 |
 | `src/MachineLearning/Optimization/optuna_search.py` | OptunaSearchProfile / OptunaSearchOutputDTO | run_optuna_search | categorical / int / float, seed 고정 TPE |
 
-RandomSearch는 첨부의 Grid/Optuna를 보완하는 추가 방법입니다. 모든 모듈은 기존 7개 섹션, Profile → JSON → 실행기 → 전용 Output DTO 컨벤션을 따릅니다.
+RandomSearch는 첨부의 Grid/Optuna를 보완하는 추가 방법입니다. 모든 모듈은 기존 7개 섹션, JSON → Profile → 실행기 → 전용 Output DTO 컨벤션을 따릅니다.
 
 ## 입력 및 평가 계약
 

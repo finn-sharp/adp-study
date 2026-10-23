@@ -1,9 +1,9 @@
 # Axes 기반 EDA·의사결정 시각화
 
-35개 단일 pane 모듈은 `Profile → JSON → plot 함수 → 전용 Output DTO`를 사용합니다.
+35개 단일 pane 모듈은 `JSON → Profile → plot 함수 → 전용 Output DTO`를 사용합니다.
 각 모듈은 기존 메타데이터·7개 섹션·전체 Attributes·Args/Returns/Raises 명세를 유지합니다.
 한 호출은 하나의 사용자가 전달한 `ax`에만 그립니다. 숫자 계산과 그림을 분리해 확인할 수
-있도록 data·diagnostics·parameters·warnings를 반환합니다. 회귀선/예측/잔차 시각화는 이번 범위에 없습니다.
+있도록 data·diagnostics·parameters·warnings를 반환합니다. 회귀 전용 예측·잔차·계수 그림과 분포별 QQ는 [회귀·분포 명세](REGRESSION_DISTRIBUTION_MODULES.md)에 따로 정리했습니다.
 QQ의 분위수 기준선, 시간 지연 scatter, 범주별 원 수치 분포는 EDA입니다.
 
 ## subplot 조합 계약
