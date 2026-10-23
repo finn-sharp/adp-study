@@ -1,0 +1,6 @@
+{
+  "alpha": 0.05,
+  "fit_intercept": true,
+  "cov_type": "nonrobust",
+  "hac_maxlags": 1
+}

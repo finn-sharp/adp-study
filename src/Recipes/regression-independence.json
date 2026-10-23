@@ -1,0 +1,6 @@
+{
+  "alpha": 0.05,
+  "ordered": false,
+  "method": "breusch_godfrey",
+  "nlags": 1
+}

@@ -31,7 +31,7 @@ class RecipesTest(unittest.TestCase):
                     aliases = {'alpha', 'lambda'} if name == 'xgboost' else set()
                     self.assertFalse(keys - {f.name for f in fields(profile)} - aliases)
                     count += 1
-        self.assertEqual(count, 145)
+        self.assertEqual(count, 189)
         self.assertIsInstance(load_profile('mlp').hidden_layer_sizes, tuple)
 
     def test_all_machine_learning_runners_use_default_recipes(self):
