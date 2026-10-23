@@ -52,6 +52,8 @@ def build():
         folder='유형연습/'+str(number)+'회';entries.append((folder,'recent_type_practice',read(ROOT/folder/'문항명세.json')))
     folder='모의고사/생존분석_통계';entries.append((folder,'survival_original_mock',read(ROOT/folder/'문항명세.json')))
     folder='모의고사/5회';entries.append((folder,'production_original_mock',read(ROOT/folder/'문항명세.json')))
+    for number in range(1,11):
+        folder='모의고사/응용10회/%02d회'%number;entries.append((folder,'applied_original_mock',read(ROOT/folder/'문항명세.json')))
     for folder,kind,spec in entries:
         dest=ROOT/folder
         notebooks=list(dest.glob('*풀이.ipynb'))+list(dest.glob('*해설.ipynb'))
@@ -68,7 +70,10 @@ def build():
                 if isinstance(q,dict):qid,text=q['id'],q['text']
                 else:qid,text=q[0],q[1]
                 code=next(codes)
-                if kind=='recent_type_practice':
+                if kind=='applied_original_mock':
+                    applied=source_graph([ROOT/'모의고사/응용10회/공통/analysis.py'])
+                    modules=applied(q['task']+'(ctx)'+('\n_reg_candidates(ctx)' if q['task']=='reg_tuning' else ''))
+                elif kind=='recent_type_practice':
                     task=q['task'];code=task+'(ctx)'
                 if kind in ('survival_original_mock','production_original_mock'):
                     # setup definitions and imports are part of the same notebook namespace.
@@ -76,7 +81,7 @@ def build():
                     direct={a.asname or a.name:n.module for n in ast.walk(temp) if isinstance(n,ast.ImportFrom) and n.module and n.module.startswith('src.') for a in n.names}
                     calls={n.func.id for n in ast.walk(ast.parse(code)) if isinstance(n,ast.Call) and isinstance(n.func,ast.Name)}
                     modules=sorted({direct[n] for n in calls if n in direct})
-                else:
+                elif kind!='applied_original_mock':
                     modules=resolver(code)
                     for n in ast.walk(setup):
                         if isinstance(n,ast.ImportFrom) and n.module and n.module.startswith('src.'):
@@ -96,7 +101,7 @@ def build():
         else:bundle['scope']='reconstructed_or_original_learning_material; see source audits'
         bundles.append(bundle)
     summary=dict(bundles=len(bundles),questions=sum(b['question_count'] for b in bundles),code_cells=sum(b['code_cells'] for b in bundles),figures=sum(b['figures'] for b in bundles))
-    assert summary['bundles']==31 and summary['questions']==243
+    assert summary['bundles']==41 and summary['questions']==393
     payload=dict(schema_version=1,analysis=registry_counts(),summary=summary,
                  mapping_method='conservative static references; dynamic calls and remaining direct library code are not asserted as migrated',bundles=bundles)
     (ROOT/'전체목록.json').write_text(json.dumps(payload,ensure_ascii=False,indent=2)+'\n')

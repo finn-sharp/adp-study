@@ -1,0 +1,19 @@
+{
+  "number": 5,
+  "seed": 20270005,
+  "regression_kind": "influence",
+  "features": [
+    "mileage",
+    "age",
+    "engine",
+    "maintenance"
+  ],
+  "unit": "거래 가격 점수",
+  "classification_event": "반품 발생",
+  "sampler": "random_over",
+  "classification_search": "optuna",
+  "ordered_regression": false,
+  "period": 7,
+  "horizon": 7,
+  "false_negative_cost": 8
+}

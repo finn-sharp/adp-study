@@ -1,0 +1,6 @@
+{
+  "criterion": "bic",
+  "min_features": 1,
+  "max_steps": 30,
+  "improvement": 1e-08
+}

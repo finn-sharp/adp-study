@@ -1,0 +1,24 @@
+{
+  "number": 2,
+  "status": "passed",
+  "questions": 15,
+  "points": 100,
+  "code_cells": 16,
+  "figures": 5,
+  "pdf_pages": 4,
+  "selected_regression": "log_target",
+  "baseline_r2": 0.538200411685934,
+  "selected_r2": 0.7128148940050474,
+  "classification_auc": 0.8856304985337243,
+  "selected_classifier": "smote",
+  "python": "3.12.14",
+  "pdf_sha256": "643d0e0b9635085c54db717fc1eea8c08c09fcc4d9e05c5038e92c019a904224",
+  "checks": [
+    "PDF/풀이 동일 지문·배점·A4 경계",
+    "기준OLS 직접 적합 대조",
+    "원단위 보류 R²/RMSE/MAE 직접 계산",
+    "CV/미래/삭제 원행 분리",
+    "AUC rank-U·Brier·비용 직접 계산",
+    "시계열 naive·MASE·rolling 경계"
+  ]
+}

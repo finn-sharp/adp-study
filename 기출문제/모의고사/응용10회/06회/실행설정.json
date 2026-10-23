@@ -1,0 +1,19 @@
+{
+  "number": 6,
+  "seed": 20270006,
+  "regression_kind": "ordered",
+  "features": [
+    "outdoor_temp",
+    "occupancy",
+    "insulation",
+    "equipment"
+  ],
+  "unit": "전력 사용량 점수",
+  "classification_event": "미납 발생",
+  "sampler": "random_under",
+  "classification_search": "grid",
+  "ordered_regression": true,
+  "period": 7,
+  "horizon": 7,
+  "false_negative_cost": 9
+}

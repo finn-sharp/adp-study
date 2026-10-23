@@ -1,0 +1,19 @@
+{
+  "number": 1,
+  "seed": 20270001,
+  "regression_kind": "power",
+  "features": [
+    "area",
+    "building_age",
+    "station_distance",
+    "rooms"
+  ],
+  "unit": "가격(천만원)",
+  "classification_event": "연체 발생",
+  "sampler": "random_over",
+  "classification_search": "grid",
+  "ordered_regression": false,
+  "period": 1,
+  "horizon": 7,
+  "false_negative_cost": 4
+}

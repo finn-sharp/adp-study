@@ -34,6 +34,14 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    'plot-regression-glm-residuals': ('src.Visualization.regression.glm_residuals', 'GLMResidualsProfile', None, (None,)),
+    'regression-information-selection': ('src.stats.regression.information_selection', 'InformationSelectionProfile', None, (None,)),
+    'glm-logistic': ('src.MachineLearning.GeneralizedLinearModels.logistic', 'LogisticGLMProfile', None, (None,)),
+    'glm-poisson': ('src.MachineLearning.GeneralizedLinearModels.poisson', 'PoissonGLMProfile', None, (None,)),
+    'glm-gamma': ('src.MachineLearning.GeneralizedLinearModels.gamma', 'GammaGLMProfile', None, (None,)),
+    'regression-weighted': ('src.MachineLearning.LinearModels.weighted_regression', 'WeightedRegressionProfile', None, (None,)),
+    'timeseries-rolling-selection': ('src.TimeSeries.rolling_selection', 'RollingSelectionProfile', None, (None,)),
+    'plot-regression-model-comparison': ('src.Visualization.regression.model_comparison', 'RegressionModelComparisonProfile', None, (None,)),
     'genetic-algorithm': ('src.Optimization.genetic_algorithm', 'GeneticAlgorithmProfile', None, (None,)),
     'production-allocation': ('src.Optimization.production_allocation', 'ProductionAllocationProfile', None, (None,)),
     'plot-optimization-convergence': ('src.Visualization.optimization.convergence', 'OptimizationConvergenceProfile', None, (None,)),

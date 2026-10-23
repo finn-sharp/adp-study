@@ -1,0 +1,19 @@
+{
+  "number": 2,
+  "seed": 20270002,
+  "regression_kind": "lognormal",
+  "features": [
+    "weight",
+    "distance",
+    "volume",
+    "handling"
+  ],
+  "unit": "배송비(천원)",
+  "classification_event": "파손 발생",
+  "sampler": "smote",
+  "classification_search": "optuna",
+  "ordered_regression": false,
+  "period": 1,
+  "horizon": 7,
+  "false_negative_cost": 5
+}
