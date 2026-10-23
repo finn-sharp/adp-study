@@ -25,7 +25,7 @@
 4. 자연 발생률 보류를 봉인하고 imblearn Pipeline 안에서만 샘플링·튜닝 → 별도 설명용 logit z/오즈비/LR·사양 → ROC/AUC·AP·Brier·고정 임계값 비용.
 5. 과거 rolling 차수 선택 → AIC/BIC·자유도 보정 잔차 자기상관 → 동일 미래 선택/naive·RMSE/MAE/R²/MASE·조건부 구간.
 
-새 공통 모듈8개와 비선형 CV factory는 [전체 명세](../../../docs/APPLIED_REGRESSION_WORKFLOWS.md)에 있습니다. [출처·생성 가정](출처및설계.md) 및 [검증 결과](검증결과.json)를 함께 읽으세요. 비기각·R² 증가·Cook flag·좋은 AUC만으로 가정 충족/인과/확률 보정/현장 성능을 증명하지 않습니다.
+새 공통 모듈8개와 비선형 CV factory는 [전체 명세](../../../docs/REGRESSION_DISTRIBUTION_MODULES.md)에 있습니다. [출처·생성 가정](출처및설계.md) 및 [검증 결과](검증결과.json)를 함께 읽으세요. 비기각·R² 증가·Cook flag·좋은 AUC만으로 가정 충족/인과/확률 보정/현장 성능을 증명하지 않습니다.
 
 ## 실행
 

@@ -1,17 +1,6 @@
-# 분석 도메인 공통화 명세
+# 생존·시계열·비선형·리샘플링 상세 명세
 
-승인된 데모를 바탕으로 19개 공개 모듈·19개 JSON·19개 skeleton을 추가했습니다. 모듈은 기존 작성 정보와 7개 섹션, Profile/Output DTO, Args/Returns/Raises 계약을 유지합니다. 전체 등록은 211개, JSON은 238개, 기본 레시피 로드 조합은 226개입니다.
-
-## 도메인과 의존 방향
-
-입력 데이터와 레시피 → Profile 검증 → 도메인 실행기 → 전용 Output DTO → 평가·시각화·시험 보고 순서입니다. src는 기출문제·tools를 import하지 않습니다. 문항별 가정·업무 해석·데이터 결합·PDF 서식은 시험 계층에 둡니다. JSON에는 실행 설정을 두며 관측값·적합 객체를 넣지 않습니다.
-
-| 기능 | 공개 모듈 | 지원 범위 |
-| --- | --- | --- |
-| 생존 추정 | stats.survival.kaplan_meier / rmst | 우측 절단·동시 사건·log-log Greenwood 점별 CI·중앙수명·관측 내 시점 조회·RMST |
-| 생존 검정·회귀 | stats.survival.logrank / cox | 다집단·모든 쌍 Holm, Cox HR/CI·생존예측·rank Schoenfeld/Holm |
-| 시계열 | TimeSeries.arima / sarima | 학습 AIC 차수 선택·수렴 기록·고정 horizon 예측구간·미래 외생변수 검증 |
-| 비선형 회귀 | MachineLearning.NonlinearModels.nonlinear_regression | 단일 설명변수 exponential/logistic/Michaelis-Menten, 초기값·경계·학습/보류 분리 |
+이 문서는 생존분석4개·ARIMA/SARIMA2개·비선형 회귀1개·리샘플링12개의 기능과 전체 Profile/DTO 필드를 다룹니다. 전체 분석 흐름과 단계별 책임은 [분석 파이프라인](ANALYSIS_PIPELINE.md), 모든 모듈의 목록은 [기능 카탈로그](ANALYSIS_CATALOG.md)를 사용합니다.
 
 ## 불균형 처리의 지원표
 
@@ -28,19 +17,11 @@
 
 `run_*()`는 전용 DTO를 반환합니다. CV에서는 `src.Preprocessing.resampling._common.load_resampler()`로 같은 JSON 설정의 네이티브 sampler를 구성하여 imblearn Pipeline 안에 넣습니다. 전처리·선택·보완 모두 학습 폴드 안에서 수행하고 보류 자료 분포는 유지합니다. sampler factory는 적합 결과를 반환하는 분석 API와 구분됩니다.
 
-## 시험 풀이 연결과 남은 경계
-
-- 기존 reconstruction 공통부의 SARIMA·KM 직접 계산을 src 호출로 이관했습니다(18·19·19 보충·25·28회 관련 문항).
-- 30·33회 표본 보완과 33회 ARMA 차수 비교는 새 공통 모듈을 사용합니다. 동일 시드·후보·평가 규칙을 유지합니다.
-- 생존분석 14문항의 KM/CI·RMST·로그순위·Cox/PH 계산은 src DTO를 사용합니다. 그림·표·문항 보고는 해설 계층에서 조합합니다.
-- 그 밖의 ML·통계에는 기존 src 호출과 sklearn/statsmodels/SciPy 직접 호출이 함께 남아 있습니다. 이들의 분할·후처리 계약을 바꾸어 억지로 단일 runner에 맞추지 않았습니다. 문항-모듈 정적 참조표는 남은 직접 계산을 별도로 표시합니다.
-- 비선형 회귀의 새로운 함수 모형과 모든 리샘플링 기법을 기출 출제 확인 유형으로 주장하지 않습니다. 기존 지문에 없던 기법을 임의로 정답에 추가하지 않았습니다.
-
 ## 환경과 검증
 
 일반 분석 환경과 분리한 `requirements-domain-py37.txt` / `requirements-domain-py312.txt`를 사용합니다. lifelines·imblearn은 실행 시 지연 import하므로 Profile/레시피 조회에 설치가 필수는 아닙니다. Python 3.7은 전용 CI에서 실제 실행하며, 로컬 검증 여부와 CI 성공 여부는 검증 기록에서 구분합니다.
 
-`tests/test_domain_extension.py`는 손계산·공식 구현 대조·경계값·학습/보류 분리·CV clone·모든 신규 레시피를 검사합니다. `tools/exams/build_catalog.py`는 30묶음·229문항과 등록부 수치를 생성하고 `tools/exams/audit_catalog.py`가 생성 결과·문서의 불일치를 검사합니다.
+`tests/test_domain_extension.py`는 손계산·공식 구현 대조·경계값·학습/보류 분리·CV clone·모든 신규 레시피를 검사합니다. `tools/exams/build_catalog.py`는 현재 학습 자료와 등록부 수치를 생성하고 `tools/exams/audit_catalog.py`가 생성 결과·문서의 불일치를 검사합니다.
 
 ## 기술 근거
 

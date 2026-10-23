@@ -1,8 +1,8 @@
-# 통계 PDF 전체 구현 명세
+# 통계 검정·확률분포 기능과 API 명세
 
-Statistics.pdf의 10쪽 전체: 분포16종, 본문검정1~28, 기타검정1~6, 4쪽 분류표/분산 설명과 8~9쪽 이미지 수식을 대조했습니다.
-단일 모비율·Wilcoxon·독립성의 중복은 합쳤습니다. 신규 검정/효과크기23개와 범주 동질성 API1개를 추가하고, 기존 평균 Z/t2개를 표준화했습니다.
-분포16개를 포함해 이번 신규/표준화 공개 모듈은42개, 전체 registry모듈79개·독립 JSON레시피87개입니다. 호환 경로는 중복 집계하지 않습니다.
+평균·비율·분산·순위·범주·다변량 검정과 확률분포의 입력·가설·결과·사용 조건을 정리합니다. 기초 검정·ANOVA·사후검정 안내도 이 문서에 통합했습니다. 전체 등록 수는 [기능 카탈로그](ANALYSIS_CATALOG.md)를 따릅니다.
+
+Statistics.pdf의 분포·검정·분류표·이미지 수식 대조와 오류 교정은 아래에 보존합니다. 기존 호환 경로는 구현 모듈로 중복 집계하지 않습니다.
 
 ## 도메인과 경로
 
@@ -1749,3 +1749,164 @@ Python3.7/3.12 고정requirements를 사용합니다. SciPy1.17 Anderson은 임�
 TensorFlow환경의 NumPy핀과 섞지 않습니다. 실제Python3.7.4시험서버·GPU는 검증범위 밖입니다.
 이번 복구 후 검증은 Apple Silicon의 Python 3.12.14에서 수행했습니다. Python 3.7 구문은 검사했으며 실제 3.7 실행은 GitHub Actions에서 확인합니다.
 공식근거: [SciPy통계API](https://docs.scipy.org/doc/scipy/reference/stats.html), [statsmodels통계API](https://www.statsmodels.org/stable/stats.html).
+
+## 기초 검정 선택과 결과 해석
+
+기존 평균 검정·ANOVA/MANOVA/사후검정에 다음 검정을 추가합니다. `src/stats/tests`는 분석 코드, 저장소 최상위 `tests`는 이를 검증하는 테스트 코드입니다.
+
+| 질문 | 경로 (`src/stats/tests` 아래) | 실행 API | 귀무가설 / 조건 |
+| --- | --- | --- | --- |
+| 관측 범주 빈도가 지정 분포와 같은가? | `nonParametric/chi_square.py` | `run_chi_square(observed, expected=None)` | 기대 분포와 같음; 독립 관측, 빈도 입력, 동일 총빈도 |
+| 두 범주 변수가 독립인가? | `nonParametric/independence.py` | `run_independence(table)` | 독립; 2×2 이상 교차 빈도표, 양의 주변합 |
+| 같은 사람의 전후 이진 비율이 같은가? | `nonParametric/mcnemar.py` | `run_mcnemar(table)` | 대응 주변 비율이 같음; 2×2 대응 빈도표 |
+| 두 정규 모집단의 분산비가 지정 값인가? | `parametric/Variance/f_test.py` | `run_f_test(x, y)` | var(x)/var(y)=ratio_0; 독립·정규 모집단 |
+| 표본이 정규 모집단에서 왔는가? | `diagnostics/normality.py` | `run_normality(x)` | 정규성; Shapiro / D’Agostino–Pearson / Jarque–Bera |
+| 여러 독립 집단의 분산이 같은가? | `diagnostics/homogeneity.py` | `run_homogeneity(*groups)` | 같은 모집단 분산; Levene / Bartlett / Fligner–Killeen |
+
+각 검정은 전용 Profile/Output DTO와 별도 JSON 레시피를 제공합니다. 아래 기초 검정의 전체 Profile/DTO 필드는 [핵심 API 참조](reference/CORE_API.md)에 있습니다. 결측은 자동 제거하지 않으며 빈도 입력은 비음수 정수입니다. `expected`만 양의 실수 기대도수를 허용합니다. `alpha`는 (0,1)이고 기각 규칙은 `p_value < alpha`입니다.
+
+```python
+from src.stats.tests.nonParametric.Categorical.chi_square import run_chi_square
+from src.stats.tests.nonParametric.Categorical.independence import run_independence
+from src.stats.tests.nonParametric.Categorical.mcnemar import run_mcnemar
+from src.stats.tests.parametric.Variance.f_test import run_f_test
+from src.stats.tests.diagnostics.normality import run_normality
+from src.stats.tests.diagnostics.homogeneity import run_homogeneity
+
+fit = run_chi_square([20, 30, 25, 25], expected=[25, 25, 25, 25])
+ind = run_independence([[30, 20], [10, 40]], overrides={"correction": False})
+paired = run_mcnemar([[20, 8], [2, 30]])  # exact=True 기본
+ratio = run_f_test([1, 2, 5, 8, 9], [2, 3, 4, 6, 7],
+                   overrides={"alternative": "greater", "ratio_0": 1.0})
+normal = run_normality([1, 2, 3, 4, 5, 6, 8, 10])
+equal = run_homogeneity([1, 2, 5, 8, 9], [2, 3, 4, 6, 7])
+print(ind.statistic, ind.p_value, ind.reject_h0, ind.details, ind.warnings)
+print(ind.to_json(indent=2))
+```
+
+## 해석 경계
+
+- 카이제곱 적합도 자유도는 범주 수−1−ddof입니다. 자료로부터 모수를 추정했다면 호출자가 ddof를 지정합니다. 작은 기대도수는 경고 필드로 반환합니다.
+- 독립성 검정은 자유도 1일 때만 Yates 보정이 적용됩니다. Cramér’s V는 보정 없는 Pearson 통계량으로 계산하며 편향 보정은 하지 않습니다. 2×2 소표본의 Fisher exact는 이 실행기에 포함하지 않습니다.
+- McNemar의 exact 통계량은 min(b,c), p 값은 이항 정확 검정입니다. 근사는 χ²(1)이며 correction은 근사에만 적용합니다. 불일치쌍이 0이면 정확 검정 p=1, 근사 검정은 오류입니다. 독립 표본 교차표와 대응 표를 혼용하지 않습니다.
+- F는 평균 차이를 검정하는 ANOVA의 F 통계량과 다른 **분산비 검정**입니다. 두 표본의 분산이 양수여야 합니다. two-sided는 두 꼬리 확률 중 작은 값의 2배이며 less/greater는 var(x)/var(y) 방향입니다.
+- Shapiro는 n≥3, D’Agostino는 n≥8이며 n>5000 Shapiro p 값은 경고합니다. Jarque–Bera의 작은 표본 점근 한계를 경고합니다. 상수 표본은 오류입니다.
+- median Levene는 Brown–Forsythe 변형입니다. Bartlett는 정규성에 민감합니다. trimmed 중심은 SciPy 기본 절사 비율(0.05)을 사용합니다. 중심 편차 분산이 퇴화해 통계량이 미정의이면 오류입니다.
+- 정규성/등분산 검정에서 기각하지 못했다는 결과는 가정이 참이라는 증명이 아닙니다. 관측의 독립성이나 대응 설계는 호출자가 보장해야 합니다.
+
+## 참조
+
+새 코드는 원문 복제가 아닌 프로젝트 계약에 맞춘 구현입니다.
+
+- [SciPy chisquare](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.chisquare.html)
+- [SciPy chi2_contingency](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.chi2_contingency.html)
+- [statsmodels McNemar](https://www.statsmodels.org/stable/generated/statsmodels.stats.contingency_tables.mcnemar.html)
+- [SciPy 정규성·분산 검정](https://docs.scipy.org/doc/scipy/reference/stats.html)
+
+## details 결과 키
+
+| 검정 | `details` 필드 |
+| --- | --- |
+| 적합도 | df(int), observed/expected(ndarray) |
+| 독립성 | df(int), observed/expected(ndarray), cramers_v(float, 보정 없는 Pearson 기준) |
+| McNemar | discordant_pairs(int), exact(bool), correction_applied(bool), df(None 또는 1) |
+| F | df_num/df_den(int), variance_ratio/ratio_0(float), alternative(str) |
+| 정규성 | n(int), method(str) |
+| 등분산 | group_sizes(list[int]), method(str), center(str 또는 Bartlett의 None) |
+
+## ANOVA·MANOVA·사후검정 사용 조건
+
+네 파일 모두 기존 모델과 동일하게 파일 첫머리 명세·메타데이터와 7개 섹션을 사용합니다.
+Profile·Output DTO의 모든 필드, 입력 검증 및 함수의 Args·Returns·Raises를 명시합니다.
+원래 ANOVA의 공개 실행 함수와 결과 클래스 이름은 유지하며 Result 이름은 전용 DTO의 별칭입니다.
+
+| 파일 | Profile / Output DTO | 공개 실행기 | 지원 |
+| --- | --- | --- | --- |
+| `one_way.py` | `OneWayANOVAProfile` / `OneWayANOVAOutputDTO` | `run_oneway_anova` | 고전 일원배치·Welch ANOVA |
+| `two_way.py` | `TwoWayANOVAProfile` / `TwoWayANOVAOutputDTO` | `run_twoway_anova` | 이원배치, 교호작용 선택, Type I·II·III |
+| `manova.py` | `MANOVAProfile` / `MANOVAOutputDTO` | `run_manova` | 일원 요인, 여러 종속변수의 공동 평균 검정 |
+| `posthoc.py` | `PostHocProfile` / `PostHocOutputDTO` | `run_posthoc` | Tukey HSD·Holm·Bonferroni |
+
+현재 ANOVA·사후검정 경로는 `src/stats/tests/parametric/Average/anova/`이며, MANOVA는 `src/stats/tests/parametric/Multivariate/manova.py`입니다. 이전 `Average/Multivariate/`의 대문자 파일은 호환 경로입니다.
+
+## 사용 예제
+
+저장소 루트에서 import합니다.
+
+```python
+from src.Recipes import load_profile
+from src.stats.tests.parametric.Average.Multivariate.OneWay import run_oneway_anova
+from src.stats.tests.parametric.Average.Multivariate.PostHoc import run_posthoc
+
+groups = [[1, 2, 3, 4], [4, 5, 6, 8], [8, 9, 10, 12]]
+anova = run_oneway_anova(groups)
+print(anova.statistic, anova.p_value, anova.reject_h0)
+print(anova.anova_table)
+
+posthoc = run_posthoc(groups, load_profile("posthoc"), ["A", "B", "C"])
+print(posthoc.comparisons)
+print(posthoc.to_json(indent=2))
+
+# 이분산: Welch ANOVA와 쌍별 Welch t + Holm 보정
+welch = run_oneway_anova(groups, load_profile("oneway-anova", overrides={"equal_var": False}))
+holm = run_posthoc(groups, load_profile("posthoc", overrides={"method": "holm", "equal_var": False}))
+```
+
+```python
+import numpy as np
+from src.Recipes import load_profile
+from src.stats.tests.parametric.Average.Multivariate.MANOVA import run_manova
+
+rng = np.random.RandomState(1234)
+Y = np.vstack([rng.normal(size=(20, 2)) + shift for shift in (0, 1, 2)])
+labels = ["A"] * 20 + ["B"] * 20 + ["C"] * 20
+result = run_manova(Y, labels, load_profile("manova"), ["Response1", "Response2"])
+print(result.test_table)
+print(result.p_value, result.reject_h0)
+```
+
+## 해석과 입력 계약
+
+- 모든 검정은 독립 관측을 대상으로 합니다. 반복측정·대응 자료는 지원하지 않습니다.
+- 정상적인 p-value 계산에 필요한 정규성·분산/공분산 가정은 각 파일 첫머리에 명시합니다.
+  입력 검증은 가정 검정이나 자동 결측 대체를 수행하지 않습니다.
+- 고전 ANOVA에는 양의 pooled 잔차 분산이 필요하고 Welch에는 모든 집단의 양의 분산이 필요합니다.
+  Welch 표의 SS·MS는 정의하지 않으며 NaN으로 표시합니다.
+- 이원배치의 Type I는 요인 1→요인 2 순차 검정입니다. Sum 코딩을 사용하며
+  Type III의 절편 행을 주효과로 읽지 않도록 효과 이름으로 추출합니다.
+  교호작용 모델은 모든 요인 조합에 최소 두 관측을 요구합니다.
+  교호작용이 유의하면 단순효과를 별도로 확인해야 합니다.
+- MANOVA는 일원 요인만 지원합니다. 다요인 MANOVA·MANCOVA는 포함하지 않습니다.
+  잔차 자유도는 반응 열 수보다 커야 하며 잔차 공분산의 rank가 부족하면 오류를 반환합니다.
+  Wilks·Pillai·Hotelling-Lawley·Roy를 모두 반환하고 기본 판단 지표는 Pillai입니다.
+- 사후검정은 모든 집단 쌍을 하나의 family로 보정하며 평균 차이는 **집단 2 − 집단 1**입니다.
+  현재 사후검정은 모든 집단에 양의 표본 분산을 요구합니다.
+  Tukey HSD는 등분산일 때 사용합니다. 이분산 비교는 `equal_var=False`와 Holm·Bonferroni를 사용합니다.
+- Tukey·Bonferroni의 신뢰구간은 family-wise 구간입니다. Holm 조정 신뢰구간은 제공하지 않아 NaN입니다.
+  Tukey의 raw p-value·t 통계량·t 자유도도 NaN이며 조정 p-value와 구간을 반환합니다.
+- 전체 검정의 유의성에 따라 사후검정을 자동 차단하지 않습니다. MANOVA 후 종속변수별 반복 비교에는
+  쌍별 보정 외에 종속변수 사이의 추가 다중검정 보정을 고려해야 합니다.
+- DTO의 `to_json()`은 DataFrame의 행·열 이름을 보존하고 NaN을 null로 변환합니다.
+
+## 실행 및 검증
+
+환경별 requirements 파일에 statsmodels·patsy를 추가했습니다.
+Python 3.7.17은 statsmodels 0.13.2, Python 3.12.14는 0.14.6 조합입니다.
+실제 시험 서버나 Python 3.7.4에서는 직접 검증하지 않았습니다.
+
+```bash
+python -m unittest discover -s tests -v
+python -m src.stats.tests.parametric.Average.Multivariate.OneWay
+python -m src.stats.tests.parametric.Average.Multivariate.TwoWay
+python -m src.stats.tests.parametric.Average.Multivariate.MANOVA
+python -m src.stats.tests.parametric.Average.Multivariate.PostHoc
+```
+
+통계 테스트는 SciPy·statsmodels 참조값과 고전/Welch F·p·자유도, 이원배치 6개 조건,
+MANOVA 네 지표, Tukey 및 Student/Welch t의 Holm·Bonferroni 보정, 구간·비교 방향,
+퇴화 설계·잘못된 입력·결과 직렬화·전체 명세를 검증합니다.
+
+## 검정별 설정 관리
+
+검정별 JSON의 기본값과 일회성 overrides는 [레시피 안내](RECIPES.md)를 따릅니다.
+모든 실행 예제는 해당 JSON에서 Profile을 구성하며, `.py`의 전체 명세 형식은 유지합니다.
