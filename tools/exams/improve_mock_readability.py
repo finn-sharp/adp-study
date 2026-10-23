@@ -1,4 +1,4 @@
-"""모의16묶음의 자료 안내·문제지·풀이·실행 해설을 같은 독자 기준으로 정리합니다.
+"""모의21묶음의 자료 안내·문제지·풀이·실행 해설을 같은 독자 기준으로 정리합니다.
 
 지문·수식·배점·데이터·수치 답안은 유지하며 표현과 배치만 다룹니다.
 생성기 뒤에서 호출하거나 python tools/exams/improve_mock_readability.py로 실행합니다.
@@ -42,7 +42,7 @@ ROOT = REPO / "기출문제/모의고사"
 
 
 def folders():
-    return [ROOT / (str(i) + "회") for i in range(1, 16)] + [ROOT / "생존분석_통계"]
+    return [ROOT / (str(i) + "회") for i in range(1, 21)] + [ROOT / "생존분석_통계"]
 
 
 def specification(folder):
@@ -66,6 +66,12 @@ def specification(folder):
             for q in sec["questions"]
         ]
         sections.append(sec)
+    if value.get("kind") == "researched_original_mock":
+        return (
+            "모의고사 %d회 | " % value["exam_number"] + value["title"],
+            sections,
+            None,
+        )
     number = value.get("number")
     title = (
         ("모의고사 %d회 | " % value["exam_number"] + value["title"])
@@ -138,6 +144,13 @@ def render(folder, title, sections, number):
         story.append(
             paper.p(
                 "15문항·100점·권장 180분: 회귀 36점 / 분류 40점 / 시계열 24점. 후보·분할·시드는 실행설정.json과 아래 지문을 따릅니다.",
+                "small",
+            )
+        )
+    if folder.name in [str(i) + "회" for i in range(16, 21)]:
+        story.append(
+            paper.p(
+                "12문항·100점·권장240분. 대문항별 배점은 지문을 따릅니다. 후기의 유형을 참고했으며 조건·합성 자료·평가 설계는 독립 창작입니다.",
                 "small",
             )
         )
@@ -324,6 +337,23 @@ def enrich_answers(folder, title, sections, number, book):
                             ),
                         ]
                     for key, val in payload.items():
+                        if folder.name in [
+                            str(i) + "회" for i in range(16, 21)
+                        ] and key in {
+                            "truth",
+                            "predictions",
+                            "baseline_predictions",
+                            "probabilities",
+                            "train_indices",
+                            "test_indices",
+                            "folds",
+                            "daily_rows",
+                            "interval_lower",
+                            "interval_upper",
+                            "scores",
+                            "calibration_residuals",
+                        }:
+                            continue
                         if isinstance(val, list) and val and isinstance(val[0], dict):
                             lines += [
                                 "",

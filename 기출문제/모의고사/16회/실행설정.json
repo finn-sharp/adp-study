@@ -1,0 +1,27 @@
+{
+  "seed": 20281016,
+  "sections": [
+    {
+      "family": "reg",
+      "settings": {
+        "interaction": false
+      },
+      "context": "x1=주거비 편차지수, x2=지원 접근성 점수, x3=고용 안정 점수, target=합성 출산 지표(표준화 지수 아님). 240행. x1에 결측이 있다. id를 제외하고 중앙값 대치 후 수치형은 학습 평균/표준편차(ddof0)로 표준화하고 집단은 one-hot(drop first) 처리한 뒤 OLS를 적합한다. x1,x2,x3의 단순/전체모형 비교는 같은 학습 행이다. random_state=20281016로 학습70%/평가30%를 나누고 학습3-fold shuffled CV를 사용한다. 다항식 차수2, RF60나무 깊이3/5는 사전 후보다."
+    },
+    {
+      "family": "text",
+      "settings": {
+        "pos": "ADJ"
+      },
+      "context": "영문 합성 영화평60건, id·group·text가 있다. lexicon의 token은 원형, pos는 NOUN/ADJ/STOP, polarity는 형용사에만 -1/0/1이다. 정규식 [a-z]+로 소문자 토큰화하고 ADJ만 빈도에 포함한다. 미등록 토큰은 보존해 일치율을 계산한다. 부정 범위·문맥 품사는 추론하지 않는다."
+    },
+    {
+      "family": "cls",
+      "settings": {
+        "classes": 2,
+        "sampling": true
+      },
+      "context": "학습360행과 정답 없는 제출24행은 별개다. target은 0=생존하지 못함,1=생존. id는 입력 제외. random_state=20281016로 층화70/30, 학습3-fold shuffled CV. 수치 중앙값 대치·표준화, group 최빈 대치·one-hot(handle_unknown=ignore)를 CV 안에서 적합한다. 후보는 LR C=0.3/1, RF60나무 깊이3/5, GB40단계 깊이2, LR/RF/GB 동일 가중 soft voting이다. 각 후보의 CV 학습 폴드에서만 RandomOverSampler를 적용한다."
+    }
+  ]
+}

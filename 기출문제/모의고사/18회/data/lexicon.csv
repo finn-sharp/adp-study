@@ -1,0 +1,14 @@
+token,pos,polarity
+movie,NOUN,
+story,NOUN,
+actor,NOUN,
+sound,NOUN,
+great,ADJ,1
+clear,ADJ,1
+dull,ADJ,-1
+weak,ADJ,-1
+average,ADJ,0
+the,STOP,
+is,STOP,
+and,STOP,
+not,STOP,
