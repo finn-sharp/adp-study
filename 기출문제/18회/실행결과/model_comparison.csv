@@ -1,0 +1,4 @@
+model,accuracy,f1_weighted,ROC_AUC
+logistic,1.0,1.0,1.0
+random_forest,1.0,1.0,1.0
+gradient_boosting,1.0,1.0,1.0

@@ -22,6 +22,7 @@ __version__ = "1.0.0"
 __status__ = "Development"
 
 import numpy as np
+from src.Evaluation.clustering.metrics import run_clustering_metrics
 from src.Recipes import load_profile
 from src.datasets.uci import load_tabular
 from ._common import AnalysisEstimator, SkeletonOutputDTO, connect_pipeline, report
@@ -94,7 +95,11 @@ def main(cache_dir=None, overrides=None):
         value = getattr(result, field, None)
         if value is not None:
             metrics[field] = float(value)
+    coordinates = pipeline.pipeline.named_steps['preprocessor'].transform(X)
+    evaluation = run_clustering_metrics(data.target.to_numpy(), result.labels, X=coordinates)
+    metrics.update({k: float(v) for k, v in evaluation.value.items()})
     details = {'preprocessor': pipeline.feature_specification.describe(), 'evaluation_scope': '전체 자료의 탐색/기술 분석; 보류 일반화 성능 아님'}
+    details['evaluation'] = evaluation.to_dict(json_safe=True)
     prediction = getattr(result, 'embedding', getattr(result, 'labels', getattr(result, 'distances', None)))
     if prediction is not None:
         details['output_shape'] = list(np.shape(prediction))

@@ -1,0 +1,451 @@
+"""출처 대조 manifest로 복원 연습 문제지·풀이를 빌드합니다. 원본 기출과 구분."""
+from pathlib import Path
+import json, re, textwrap, html
+import nbformat
+import pandas as pd
+from render_question_papers import render_paper, all_exams
+
+ROOT=Path(__file__).resolve().parents[2]/'기출문제'
+EXAMS={}
+
+def book(folder,title,source,note='원 데이터가 첨부되지 않아 동일 컬럼·분석 주제의 합성 연습 자료를 제공합니다. 수치 정답은 원 시험과 다릅니다.'):
+    EXAMS[folder]={'title':title,'source':source,'note':note,'sections':[]};return EXAMS[folder]
+
+def section(b,title,data,condition=''):
+    s={'title':title,'data':data,'condition':condition,'questions':[]};b['sections'].append(s);return s
+
+def q(s,num,text,code,reason,origin='주제는 첨부 자료, 세부 조건·수치는 복원 연습용 보완'):
+    s['questions'].append({'id':num,'text':text,'code':textwrap.dedent(code).strip(),'reason':reason,'origin':origin})
+
+# 모의 문항 원문은 사용자 notebook의 markdown 질문만 추출, 답안 markdown은 배제.
+SOURCE_JSON=Path(__file__).with_name('mock_source_questions.json')
+MOCK=json.loads(SOURCE_JSON.read_text())
+def mq(s,n,i,code,reason):
+    m=MOCK[str(n)][str(i)];q(s,m['id'],m['text'],code,reason,'첨부 모의고사 %d.ipynb markdown cell %d'%(n,i))
+
+b=book('모의고사/1회','ADP 모의고사 1회 - 복원 연습','모의고사 1.ipynb')
+s=section(b,'1. 로또 연관규칙','lotto.csv','합성 추첨 400회, 6개 번호. 계산 규모를 위해 후보 번호는 1~12로 제한. 실제 로또 확률 추론용 자료가 아님.')
+mq(s,1,2,"""
+lotto=load('lotto.csv'); transactions=[set(map(str,row)) for row in lotto.to_numpy()]
+assert all(len(t)==6 for t in transactions)
+from collections import Counter
+counts=Counter(x for t in transactions for x in t)
+top=pd.Series(counts).sort_values(ascending=False).head(10)
+print(top);top.plot.bar();plt.title('Top 10 synthetic lottery numbers');plt.show()
+""",'각 회차를 집합으로 바꿔 추첨 순서와 중복을 배제합니다. 많이 나온 번호가 다음 추첨에서 더 유리하다는 뜻은 아닙니다.')
+mq(s,1,9,"""
+from src.Association.apriori import run_apriori
+association=run_apriori([list(t) for t in transactions],overrides={'min_support':.002,'min_confidence':.8,'min_lift':0.,'max_length':6,'max_rules':300000,'max_candidates':300000})
+rules_1=association.rules.sort_values('lift',ascending=False).head(30)
+print(rules_1);rules_1.to_csv(OUT/'rules_1.csv',index=False)
+print('전체 규칙 수:',len(association.rules))
+""",'조건을 정확히 유지합니다. antecedent/consequent가 모두 비어 있지 않으므로 최소 합계 길이는 2입니다. 향상도가 커도 인과·예측력이 검증된 것은 아닙니다.')
+s=section(b,'2. 선수 가치 통계분석','FIFA.csv','Position: ST/LW=Forward, CM/CDM=Midfielder, CB/LB/RB=Defender, GK=GoalKeeper. 원문 Height 오타 정리. 환산은 문항 지시값 30,2.5 사용(실제 단위 환산 30.48,2.54와 구분).')
+mq(s,1,31,"""
+fifa=load('FIFA.csv');parts=fifa.Height.str.extract(r"(\\d+)'(\\d+)").astype(float)
+fifa['Height_cm']=parts[0]*30+parts[1]*2.5
+print(fifa[['Height','Height_cm']].head())
+""",'공식 단위 환산값보다 문제의 지시값을 따릅니다. 동일 자료로 실제 환산을 적용하면 값이 달라집니다.')
+mq(s,1,39,"""
+positions={'ST':'Forward','LW':'Forward','CM':'Midfielder','CDM':'Midfielder','CB':'Defender','LB':'Defender','RB':'Defender','GK':'GoalKeeper'}
+fifa['Position_Class']=pd.Categorical(fifa.Position.map(positions))
+assert not fifa.Position_Class.isna().any()
+print(fifa.Position_Class.value_counts())
+""",'Pandas category로 factor에 대응합니다. 매핑 표는 첨부 코드에서 복원한 범주 규칙입니다.')
+mq(s,1,44,"""anova(fifa,'Value','Position_Class')""",'H0: 네 포지션의 평균 시장가치가 같습니다. 가정을 확인하고 유의할 때 Tukey HSD로 다중 비교합니다.')
+mq(s,1,52,"""anova(fifa,'Value','Position_Class','Preferred_Foot')""",'주발·포지션의 주효과와 교호작용을 분리합니다. 교호작용이 크면 주효과만으로 평균을 해석하기 어렵습니다.')
+mq(s,1,56,"""fifa_ols=select_ols(fifa,'Value',['Age','Overall','Wage','Height_cm','Weight_lb'],'stepwise')""",'단계적 선택 기준을 AIC로 명시합니다. 첨부 답안의 임의 열 제거 대신 엄격한 AIC 개선을 반복합니다.')
+s=section(b,'3. 영화 리뷰 텍스트','reviews.csv + lexicon.csv','원문 TXT 대신 동일 주제 합성 CSV. 한국어 POS는 동봉 합성 사전의 Noun/Adjective만 사용. 일반 원문에는 Komoran 등 별도 형태소 분석기 필요.')
+mq(s,1,60,"""
+reviews=load('reviews.csv');lexicon=load('lexicon.csv');reviews['clean']=reviews.text.map(clean_text)
+print(reviews[['text','clean']].head());reviews.to_csv(OUT/'clean_reviews.csv',index=False)
+""",'숫자·특수 문자를 제거하고 각 문서를 보존합니다. 원문 “리뷰 파일을 사전에 등록”은 모호하므로 어휘 사전과 문서를 구분합니다.')
+mq(s,1,72,"""
+from sklearn.feature_extraction.text import CountVectorizer
+vocab=lexicon.loc[lexicon.pos=='Noun','word'].tolist()
+vectorizer=CountVectorizer(vocabulary=vocab,token_pattern=r'(?u)\\b\\w+\\b')
+tdm=pd.DataFrame(vectorizer.fit_transform(reviews.clean).toarray(),columns=vocab)
+print(tdm.head());tdm.to_csv(OUT/'TDM.csv',index=False)
+word_plot(lexical_pos(reviews.text,lexicon),10)
+""",'TDM은 문서별 행·사전 단어별 열의 원 빈도입니다. 희소 표현은 실제 대규모 텍스트에서 유지하는 것이 좋습니다.')
+
+b=book('모의고사/2회','ADP 모의고사 2회 - 복원 연습','모의고사 2.ipynb')
+s=section(b,'1. 대학원 입학 회귀','Admission.csv','원문 chance_of_admit 대소문자·LOR 공백은 Chance_of_Admit/LOR로 통일.')
+mq(s,2,2,"""admit=load('Admission.csv');numeric_correlations(admit,'Chance_of_Admit',['GRE','TOEFL','Univ_Rating','SOP','LOR','CGPA'])""",'선형 관계의 방향·크기를 r로, H0:rho=0의 증거를 p값으로 구분합니다. 다수 상관 검정은 탐색으로 보고합니다.')
+mq(s,2,16,"""admit_model=select_ols(admit,'Chance_of_Admit',['GRE','TOEFL','Univ_Rating','SOP','LOR','CGPA','Research'],'stepwise');residual_diagnostics(admit_model)""",'원문 Shapiro p=.09를 기각으로 해석한 오류를 수정합니다. p>=.05에서는 정규성 귀무가설을 기각하지 못합니다.')
+s=section(b,'2. 타이타닉 분류','titanic.csv','age_1: [0,10),[10,20),...,[80,90) → 0~8. cabib 오타는 cabin. 학습 대치값의 test 누출을 막기 위해 분할 후 train에 대치를 적합.')
+mq(s,2,33,"""
+titanic=load('titanic.csv').replace('',np.nan)
+titanic['pclass']=titanic.pclass.astype('category');titanic['sex']=titanic.sex.astype('category')
+ids_train,ids_test=train_test_split(np.arange(len(titanic)),test_size=.3,random_state=12345,stratify=titanic.survived)
+median_age=titanic.iloc[ids_train].age.median();titanic['age_imputed']=titanic.age.fillna(median_age)
+titanic['age_1']=pd.cut(titanic.age_imputed,bins=list(range(0,91,10)),labels=list(range(9)),right=False)
+print(titanic[['age','age_imputed','age_1']].head());print('train age median:',median_age)
+""",'문제의 전처리 완료 후 분할 순서를 그대로 쓰면 test 정보가 대치값에 들어갑니다. 빈문자·타입·구간은 유지하고 통계량 적합은 학습으로 한정합니다. 실제 분류 입력의 대치는 Pipeline에서 수행합니다.')
+mq(s,2,53,"""titanic_scores,titanic_models,train,test=classify(titanic,'survived',['pclass','sex','sibsp','parch','fare','embarked'],OUT,seed=12345)""",'R set.seed와 NumPy random_state는 같은 난수열을 보장하지 않습니다. Python 재현 시드만 12345로 유지합니다. Logistic/RF/GradientBoosting 세 모델의 동일 보류 예측 CSV를 저장합니다.')
+mq(s,2,69,"""print(titanic_scores);print('보류 최고 accuracy 모델:',titanic_scores.loc[titanic_scores.accuracy.idxmax(),'model'])""",'ROC는 이산 클래스가 아니라 predict_proba의 양성 확률로 계산했습니다. 위 셀의 동일 holdout 그래프와 AUC를 보고하며 test 최고를 새 튜닝의 근거로 쓰지 않습니다.')
+s=section(b,'3. 연설문 텍스트','speech.csv + lexicon.csv','원본 연설문이 없는 합성 예시. 추가 빈도 분석은 첨부 code 셀의 분석 맥락을 반영한 보충문항.')
+mq(s,2,80,"""speech=load('speech.csv');lexicon=load('lexicon.csv');speech['clean']=speech.text.map(clean_text);print(speech[['text','clean']].head())""",'문서별 구분을 유지해 숫자·특수 기호만 제거합니다. 합성 자료의 내용·빈도가 실제 취임사의 결과는 아닙니다.')
+q(s,'3-2(보충)','명시 POS 사전에서 명사를 추출하여 상위 10개 빈도를 시각화하시오.',"""word_plot(lexical_pos(speech.text,lexicon),10)""",'첨부 풀이 코드의 명사 추출·빈도 그래프에서 보충했습니다. 일반 원문 형태소 분석기 대체가 아닙니다.','첨부 모의고사 2 code cells 88~91에서 보충')
+
+b=book('모의고사/3회','ADP 모의고사 3회 - 복원 연습','모의고사 3.ipynb')
+s=section(b,'1. Carseats 통계','Carseats.csv')
+mq(s,3,2,"""
+car=load('Carseats.csv');a=car.loc[car.Urban=='Yes','Sales'];b_=car.loc[car.Urban=='No','Sales']
+print('Bartlett:',stats.bartlett(a,b_));print('Welch t-test:',stats.ttest_ind(a,b_,equal_var=False))
+""",'두 집단은 독립입니다. 정규성 가정 하 Bartlett을 보고, 등분산 여부와 무관하게 Welch를 사용한 선택 근거를 명시합니다. 귀무가설을 “채택/증명”하지 않습니다.')
+mq(s,3,11,"""numeric_correlations(car,'Sales',['CompPrice','Income','Advertising','Population','Price','Age','Education'])""",'전체 상관행렬과 Sales에 대한 개별 r·p값을 보고합니다. 피어슨 상관이 낮다고 비선형 관계까지 없다는 뜻은 아닙니다.')
+mq(s,3,24,"""car_model=select_ols(car,'Sales',['CompPrice','Income','Advertising','Population','Price','Age','Education'],'backward');print('회귀식 계수:',car_model.params.to_dict())""",'후진제거를 AIC 개선으로 정의합니다. 선택된 계수·절편으로 회귀식을 제시합니다.')
+s=section(b,'2. BlackFriday 군집','BlackFriday.csv','코드상 BlackFriday_1은 전처리 결과. Product_Category_2/3의 0은 미기재 코드이고 크기 해석에 주의.')
+mq(s,3,35,"""
+black=load('BlackFriday.csv');black[['Product_Category_2','Product_Category_3']]=black[['Product_Category_2','Product_Category_3']].fillna(0)
+black['Product_all']=black[['Product_Category_1','Product_Category_2','Product_Category_3']].sum(axis=1)
+black['User_ID']=black.User_ID.astype(str)
+for c in ['Occupation','Marital_Status','Product_Category_1','Product_Category_2','Product_Category_3']:black[c]=black[c].astype('category')
+black1=pd.concat([black,pd.get_dummies(black[['Gender','Age','City_Category','Stay_In_Current_City_Years']],prefix=['Gender','Age','City','Stay'])],axis=1)
+print(black1.head())
+""",'범주 코드의 합 Product_all은 문제 지시상 생성하며 거리 특성에서는 제외합니다. 고유 ID도 거리·의미를 갖지 않습니다.')
+mq(s,3,51,"""
+exclude=['User_ID','Product_ID','Gender','Age','City_Category','Stay_In_Current_City_Years','Product_all']
+cluster_X=black1.drop(columns=exclude).copy()
+for c in cluster_X.columns:cluster_X[c]=cluster_X[c].astype(float)
+black_cluster,k_table=cluster(cluster_X,OUT,original=black)
+""",'범주형의 수치 변환을 요청대로 코드값으로 수행하나 명목 코드 간 거리는 임의입니다. 원핫·혼합거리 대안도 설명합니다. 표준화 후 2~5개 k의 silhouette·inertia를 비교합니다.')
+mq(s,3,56,"""print(pd.crosstab(black_cluster.clust,black_cluster.Gender));print(pd.crosstab(black_cluster.clust,black_cluster.Age));print(black_cluster.groupby('clust').Purchase.agg(['count','mean','median']))""",'원 입력 행 순서를 유지해 clust를 붙이고 앞 셀에서 CSV를 저장했습니다. 군집 번호는 순위·타깃 라벨이 아닙니다.')
+s=section(b,'3. 블로그 댓글','comments.csv + lexicon.csv','2월 조건은 날짜 컬럼을 파싱해 월==2로 적용. 합성 사전의 형용사·명사를 구분.')
+mq(s,3,70,"""comments=load('comments.csv');lexicon=load('lexicon.csv');comments['clean']=comments.text.map(clean_text);print(comments.head())""",'숫자·특수 문자 제거 뒤 문서 ID와 날짜를 유지합니다.')
+mq(s,3,82,"""adjectives=lexical_pos(comments.text,lexicon,'Adjective');print(adjectives[:10]);word_plot(adjectives,10)""",'등록 단어와 POS의 대응을 명시합니다. 단순 토큰을 임의로 형용사라 부르지 않습니다.')
+mq(s,3,93,"""feb=comments[pd.to_datetime(comments.date).dt.month==2];assert len(feb)>0;word_plot(lexical_pos(feb.text,lexicon,'Noun'),20)""",'전체 댓글의 단어 빈도가 아니라 2월 댓글을 먼저 필터링합니다.')
+
+b=book('모의고사/4회','ADP 모의고사 4회 - 복원 연습','모의고사 4.ipynb')
+s=section(b,'1. 호주 날씨 분류','weatherAUS.csv','원자료 미첨부. 합성 10,520행과 NA 10,010개 열을 만들어 절대 10,000 조건을 그대로 연습.')
+mq(s,4,2,"""
+weather=load('weatherAUS.csv');print(weather.describe(include='all'));missing=weather.isna().sum();dropped=missing[missing>=10000].index.tolist()
+weather=weather.drop(columns=dropped).dropna().copy();weather['Date']=pd.to_datetime(weather.Date)
+print('제외 열:',dropped,'남은 행:',len(weather))
+train,test=train_test_split(np.arange(len(weather)),test_size=.3,random_state=6789,stratify=weather.RainTomorrow)
+print(len(train),len(test))
+""",'고정 열명 삭제 대신 결측 개수 조건을 검사합니다. 날짜 변환을 확인하고 Python 시드 6789로 7:3 분할합니다.')
+mq(s,4,17,"""weather_scores,weather_models,train,test=classify(weather,'RainTomorrow',[c for c in weather if c!='RainTomorrow'],OUT,seed=6789)""",'세 모델에서 같은 holdout을 사용해 예측 CSV를 각각 출력합니다. 다음날 강수 운영에는 미래 시간 분할로 추가 검증해야 합니다.')
+q(s,'1-3(보충)','세 모델의 accuracy와 확률 기반 ROC-AUC를 비교하시오.',"""print(weather_scores);print('시간 순 운영에서는 랜덤분할 지표가 낙관적일 수 있습니다.')""",'원본 질문 셀에는 없지만 첨부 code 29~46의 성과 분석을 보충문항으로 구분했습니다.','모의고사 4 code cells 29~46')
+s=section(b,'2. 자전거 마케팅 회귀','bike_marketing.csv','marketing_total=세 채널 합계. 완전 공선성 때문에 4개 변수의 동시 투입 후보는 제외하고 식별 가능한 모델을 비교.')
+mq(s,4,48,"""bike=load('bike_marketing.csv');bike['pop_density']=bike.pop_density.astype('category');anova(bike,'revenues','pop_density')""",'H0: 인구밀집 범주별 평균 매출이 같습니다. p>=.05면 귀무가설을 기각하지 못합니다. 원문 “대립가설 기각” 표현을 바로잡습니다.')
+mq(s,4,54,"""bike_model=select_ols(bike,'revenues',['google_adwords','facebook','twitter','marketing_total','employees'],'forward')""",'후보 추가로 AIC가 엄격하게 낮아질 때 전진합니다. 설계행렬 rank가 부족한 조합은 선택하지 않습니다.')
+mq(s,4,58,"""residual_diagnostics(bike_model)""",'정규성은 원 y가 아니라 잔차를 진단합니다. DW가 2에 가깝다는 사실만으로 관측 독립성을 입증하지 않습니다.')
+s=section(b,'3. 태교여행 텍스트','instagram.csv + lexicon.csv')
+mq(s,4,79,"""instagram=load('instagram.csv');lexicon=load('lexicon.csv');instagram['clean']=instagram.text.map(clean_text);print(instagram.head())""",'텍스트 정제 뒤 원 문서와 대응을 유지합니다.')
+mq(s,4,89,"""assert '태교여행' in lexicon.word.tolist();word_plot(lexical_pos(instagram.text,lexicon),10)""",'태교여행은 합성 사전에 하나의 Noun 단위로 등록해 분리하지 않습니다. 실제 원문은 별도 형태소 사전 등록이 필요합니다.')
+
+b=book('18회','ADP 18회 - 출제 주제 기반 복원 연습','기출문제 모음 PDF p.1: 분류·SOM, 텍스트, 정상성·시계열, 전사 분석')
+s=section(b,'1. 분류 및 SOM 고객군','segments.csv','원문은 상세 조건이 없어 합성 세 수치 특성으로 보완. 군집 변수와 분류용 파생 라벨은 별도 과제이며 분류는 예시만 수행.')
+q(s,'1-1','고객 데이터를 탐색하고 2~5개 KMeans 군집을 비교하시오.',"""seg=load('segments.csv');print(seg.describe());seg_cluster,k_table=cluster(seg,OUT)""",'군집 수는 내부 적합성의 근거로 선택하며 실제 고객군의 외적 타당성은 별도로 확인합니다.')
+q(s,'1-2','SOM으로 3×3 맵을 학습해 고객의 BMU와 양자화 오차를 제시하시오.',"""
+from src.MachineLearning.Decomposition.som import run_som
+som=run_som(seg,overrides={'rows':3,'columns':3,'n_iter':200})
+print(som.to_json(indent=2)[:1800])
+""",'격자 셀은 바로 확정 고객군이 아닙니다. 인접 셀·특성을 함께 해석합니다. 설정 필드는 기존 SOM Profile과 연결합니다.')
+q(s,'1-3','spend>60인 고객을 high 클래스로 두어 세 분류 모형을 비교하시오.',"""
+# 보완 과제의 target은 spend 절대 기준 60으로 고정; spend는 입력에서 제외.
+seg_class=seg.copy();seg_class['high']=(seg_class.spend>60).astype(int)
+seg_scores,_,_,_=classify(seg_class,'high',['age','income'],OUT)
+""",'원문에 없는 라벨을 cutoff=60으로 보완합니다. 타깃 생성에 쓰인 spend 자체를 특성에서 제외합니다.')
+s=section(b,'2. 텍스트 및 전사 분석','documents.csv + lexicon.csv','합성 문서·사전. 전사는 전사 문서(document transcription)로 해석해 빈도·단어 간 관계를 설명하는 보완 문제.')
+q(s,'2-1','문서의 숫자·특수 기호를 제거하고 명사 상위 빈도를 막대그래프로 나타내시오.',"""docs=load('documents.csv');lex=load('lexicon.csv');word_plot(lexical_pos(docs.text,lex),15)""",'원자료가 없으므로 원문 빈도나 워드클라우드를 재현했다고 주장하지 않습니다. 빈도 정보를 정확히 전달하는 막대그래프를 사용합니다.')
+q(s,'2-2','문서별 단어 공기(co-occurrence) 표를 작성하고 전사 텍스트 분석의 한계를 설명하시오.',"""
+from sklearn.feature_extraction.text import CountVectorizer
+cv=CountVectorizer(vocabulary=lex.loc[lex.pos=='Noun','word'].tolist(),binary=True)
+M=cv.fit_transform(docs.text).toarray();co=M.T@M;np.fill_diagonal(co,0)
+print(pd.DataFrame(co,index=cv.get_feature_names_out() if hasattr(cv,'get_feature_names_out') else cv.get_feature_names(),columns=cv.get_feature_names_out() if hasattr(cv,'get_feature_names_out') else cv.get_feature_names()))
+""",'PDF의 “전사 분석”만으로 세부 원문을 알 수 없어 전사 텍스트 분석을 임시 해석했습니다. 문항 추정 신뢰도는 낮고 원 출제 의도 확인이 필요합니다.')
+s=section(b,'3. 정상성과 시계열','series.csv','월별 144개, 계절 주기 12. 누락값은 학습 구간 안에서만 보간.')
+q(s,'3-1','추세·계절성·결측과 정상성을 탐색하시오.',"""ts=load('series.csv');print(ts.isna().sum());ts.plot(x='date',y='value');plt.show();print('학습 ADF와 SARIMA는 다음 셀에서 계산합니다.')""",'그래프와 ADF 귀무가설(단위근 존재)을 함께 설명합니다. 계절성·분산 패턴과 단위근은 같은 개념이 아닙니다.')
+q(s,'3-2','시간 순 8:2 분할로 SARIMA 후보를 비교하고 보류 예측 오차와 잔차를 분석하시오.',"""ts_model,ts_metrics=seasonal_forecast(ts,OUT);sm.graphics.tsa.plot_acf(ts_model.resid,lags=24);plt.show()""",'후보의 차수 선정은 train AIC로, test는 고정 horizon 평가로만 사용합니다. ADF p값이 높다면 차분과 잔차 진단을 추가합니다.')
+
+b=book('19회','ADP 19회 - 출제 주제 기반 복원 연습','기출문제 모음 PDF pp.1~2: credit 이탈 분류·앙상블, Traffic EPS SARIMA')
+s=section(b,'1. 고객 이탈 분류','credit.csv','gender/age/credit_grade/income/churn, 450행 합성. 외부 credit_test.csv는 미첨부라 별도 보류를 제출용으로 사용.')
+q(s,'1-1','자료를 탐색하고 연속형·범주형 변수를 구분해 학습에만 적합할 전처리를 구성하시오.',"""credit=load('credit.csv');credit['credit_grade']=credit.credit_grade.astype('category');print(credit.describe(include='all'));print(credit.isna().sum())""",'타깃·ID를 원핫 입력에 포함하지 않습니다. credit_grade는 코드 명목형으로 보완했으며 순서 의미가 있으면 별도 검토합니다.')
+q(s,'1-2','7:3 층화 분할하여 Logistic, RandomForest, SVM 세 모델을 비교하고 혼동행렬을 제시하시오.',"""
+credit_alg={'logistic':LogisticRegression(max_iter=1000),'random_forest':RandomForestClassifier(n_estimators=50,random_state=1234),'svm':SVC(probability=True,random_state=1234)}
+credit_scores,credit_models,train,test=classify(credit,'churn',['gender','age','credit_grade','income'],OUT,algorithms=credit_alg)
+from sklearn.metrics import confusion_matrix
+for name,model in credit_models.items():print(name,confusion_matrix(credit.churn.iloc[test],model.predict(credit[['gender','age','credit_grade','income']].iloc[test])))
+""",'모든 전처리는 모델 Pipeline 내부이며 같은 test를 평가합니다.')
+q(s,'1-3','세 기본 모형으로 soft voting 앙상블을 구축하고 result.csv를 제출하시오.',"""
+from sklearn.ensemble import VotingClassifier
+X=credit[['gender','age','credit_grade','income']];y=credit.churn
+vote=VotingClassifier([(name,tabular_pipeline(X,est)) for name,est in credit_alg.items()],voting='soft')
+vote.fit(X.iloc[train],y.iloc[train]);pred=vote.predict(X.iloc[test])
+print('voting accuracy:',accuracy_score(y.iloc[test],pred));pd.DataFrame({'row_id':test,'credit':pred}).to_csv(OUT/'result.csv',index=False)
+""",'확률 평균은 클래스 열을 정렬하는 sklearn VotingClassifier에 맡깁니다. 상관된 오류·확률 보정·test 선정 편향을 설명합니다.')
+s=section(b,'2. Traffic EPS 계절 시계열','traffic.csv','원자료의 분기별 20년 주제 → 합성 월별 240행. 주기를 임의로 혼동하지 않도록 연습 자료는 월별/12로 명시.')
+q(s,'2-1','월별 시계열의 정상성·이분산·추세·계절성을 탐색하시오.',"""traffic=load('traffic.csv');traffic.plot(x='date',y='value');plt.show();print(traffic.value.rolling(12).agg(['mean','std']).tail())""",'원 출제는 분기별 자료이며 이 합성 변형은 월별입니다. 분기별 원자료에는 period=4로 설정해야 합니다.')
+q(s,'2-2','비정상성을 고려한 SARIMA 후보를 학습 AIC로 선택하고 잔차·잡음을 시각화하시오.',"""traffic_model,traffic_metrics=seasonal_forecast(traffic,OUT,period=12);sm.graphics.tsa.plot_acf(traffic_model.resid,lags=24);plt.show();print(sm.stats.acorr_ljungbox(traffic_model.resid,lags=[12],return_df=True))""",'모형이 복잡할수록 자동으로 좋지 않습니다. 잔차 ACF·Ljung-Box와 고정 test 오차를 구분합니다.')
+
+b=book('21회','ADP 21회 - 출제 주제 기반 복원 연습','기출문제 모음 PDF p.2: 학생 성적·결측·분할·3분류, 선형/Ridge/Lasso, 다항회귀, 이원 ANOVA')
+s=section(b,'1. 학생 성적 분석','student.csv','성적 수치를 <10,10~14,>=15 세 범주로 고정해 분류 주제 보완. 원 PDF는 grade의 상세 코딩이 없음.')
+q(s,'1-1','결측·분포를 탐색하고 두 결측 처리 방법 및 범주 인코딩의 근거를 설명하시오.',"""student=load('student.csv');print(student.isna().sum());print(student.describe(include='all'));student.grade.hist();plt.show()""",'수치 median과 범주 mode 대치 또는 완전 사례 제거를 비교합니다. 합성 자료에는 결측이 없으므로 존재하지 않는 결측 개선을 주장하지 않습니다.')
+q(s,'1-2','랜덤 층화/그룹·시간 분할의 차이를 설명하고 7:3 층화 후 SVM·RF·Boosting 분류 모형을 비교하시오.',"""
+student['grade_class']=pd.cut(student.grade,[-np.inf,10,15,np.inf],labels=['low','middle','high'],right=False)
+student_features=[c for c in student if c not in ['grade','grade_class']]
+from xgboost import XGBClassifier
+student['grade_class']=student['grade_class'].cat.codes
+student_scores,_,_,_=classify(student,'grade_class',student_features,OUT,algorithms={'svm':SVC(probability=True,random_state=1234),'random_forest':RandomForestClassifier(n_estimators=50,random_state=1234),'xgboost':XGBClassifier(n_estimators=50,max_depth=3,random_state=1234,n_jobs=1)})
+""",'원문 요구 SVM·RandomForest·XGBoost를 모두 실제 실행합니다. XGBoost를 위해 클래스 코드를 0부터 연속 정수로 지정합니다.')
+q(s,'1-3','성능·한계·개선 방향과 운영 중 주의할 점을 설명하시오.',"""print(student_scores);print('학교·학생 반복 자료는 Group CV, 미래 예측은 시간 CV를 사용. 정확도 외 macro F1/오류비용을 확인. test로 반복 튜닝하지 않음.')""",'편향·일반화·학습 전처리 재사용·데이터 변화 감시가 핵심입니다.')
+s=section(b,'2. 선형·Ridge·Lasso','regression.csv','x1~x10, y. 8:2 분할. alpha=0은 OLS로 처리, 0.1~1.0은 train CV 최적화.')
+q(s,'2-1','8:2 분할 후 OLS의 R²·RMSE를 계산하시오.',"""
+from sklearn.linear_model import LinearRegression,Ridge,Lasso
+reg=load('regression.csv');X=reg.drop(columns='y');y=reg.y
+train,test=train_test_split(np.arange(len(reg)),test_size=.2,random_state=1234)
+ols=Pipeline([('scaler',StandardScaler()),('model',LinearRegression())]).fit(X.iloc[train],y.iloc[train])
+print({'R2':r2_score(y.iloc[test],ols.predict(X.iloc[test])),'RMSE':np.sqrt(mean_squared_error(y.iloc[test],ols.predict(X.iloc[test])))})
+""",'특성 표준화도 train에서만 적합합니다.')
+q(s,'2-2','Ridge/Lasso alpha 0~1을 0.1 간격으로 비교하되 train CV로 설정을 고르고 보류 R²·RMSE를 보고하시오.',"""
+from src.MachineLearning.Optimization.grid_search import run_grid_search
+from sklearn.model_selection import KFold,cross_val_score
+folds_reg=list(KFold(n_splits=3,shuffle=True,random_state=1234).split(X.iloc[train]))
+ols_cv=cross_val_score(Pipeline([('scaler',StandardScaler()),('model',LinearRegression())]),X.iloc[train],y.iloc[train],cv=folds_reg,scoring='r2').mean()
+regularized=[]
+for name,est in [('ridge',Ridge()),('lasso',Lasso(max_iter=5000))]:
+    pipe=Pipeline([('scaler',StandardScaler()),('model',est)])
+    result=run_grid_search(X.iloc[train],y.iloc[train],pipe,task='regression',overrides={'scoring':'r2','search_space':{'model__alpha':np.arange(.1,1.01,.1).tolist()}})
+    assert [(a.tolist(),b.tolist()) for a,b in folds_reg]==[(f['train_indices'].tolist(),f['validation_indices'].tolist()) for f in result.folds]
+    selected_model=ols if ols_cv>=result.best_score else result.model
+    selected_alpha=0. if ols_cv>=result.best_score else result.best_params['model__alpha']
+    pred=selected_model.predict(X.iloc[test]);regularized.append({'model':name,'best_alpha':selected_alpha,'test_R2':r2_score(y.iloc[test],pred),'test_RMSE':np.sqrt(mean_squared_error(y.iloc[test],pred))})
+print(pd.DataFrame(regularized));print('alpha=0 OLS의 동일 train CV R2:',ols_cv)
+""",'원문 test R²로 alpha를 고르는 흐름은 test 선정 누출이므로 CV로 보완합니다. alpha=0 OLS도 동일 CV에서 비교해 높은 쪽으로 최종 선택합니다.')
+s=section(b,'3. 다항회귀','polynomial.csv')
+q(s,'3-1','1·2·3차 회귀의 산점도·계수·회귀선을 비교하시오.',"""
+from sklearn.preprocessing import PolynomialFeatures
+poly=load('polynomial.csv');fig,ax=plt.subplots(figsize=(7,4));ax.scatter(poly.x,poly.y,s=10)
+for degree in [1,2,3]:
+    m=Pipeline([('poly',PolynomialFeatures(degree=degree,include_bias=False)),('model',LinearRegression())]).fit(poly[['x']],poly.y)
+    print(degree,m.named_steps['model'].coef_,m.named_steps['model'].intercept_);ax.plot(poly.x,m.predict(poly[['x']]),label=str(degree))
+ax.legend();plt.show()
+""",'이 문항은 관계 탐색의 적합선입니다. 최적 예측 차수 선정에는 학습 CV와 별도 test가 필요합니다.')
+s=section(b,'4. 이원 분산분석','anova.csv','group=a/b/c/d, x/y 수치. 연습용 두 번째 범주 band는 x>=0으로 보완.')
+q(s,'4-1','group×band에 따른 y 이원 ANOVA 표를 작성하고 효과·교호작용을 해석하시오.',"""aov=load('anova.csv');aov['band']=np.where(aov.x>=0,'high','low');anova(aov,'y','group','band')""",'PDF는 수치 두 변수와 범주 한 변수만 명시하여 두 번째 요인을 보완했습니다. 실제 문항이 ANCOVA일 가능성도 있어 복원 가정을 분리합니다.')
+
+b=book('22회/보충','ADP 22회 - 추가 복원 통계 문제','기출문제 모음 PDF p.3: 생산 조합 확률·이항 패턴 연관성')
+s=section(b,'1. 제품 생산 확률','데이터 없음','제품1: a,b,c 각 1개, 제품2: a,b,c 각 2개. 재료량 a=12,b=12,c=18. 생산순서 추출 확률은 원문 미정이라 각 단계 가능한 제품 중 균등 선택으로 보완.')
+q(s,'3-1','재료 제약 하 제품1·제품2의 가능한 수량 조합과 최대 생산량을 구하시오. 제시한 확률 모형에서 제품1의 기대 개수·최대 가능 개수를 계산하시오.',"""
+from functools import lru_cache
+feasible=[(x,y) for x in range(13) for y in range(7) if x+2*y<=12]
+print('가능 조합:',feasible,'최대 총 제품:',max(x+y for x,y in feasible))
+@lru_cache(None)
+def expected(a,b,c):
+    options=[]
+    if min(a,b,c)>=1:options.append(1+expected(a-1,b-1,c-1))
+    if min(a,b,c)>=2:options.append(expected(a-2,b-2,c-2))
+    return float(np.mean(options)) if options else 0.
+print('보완 확률하 제품1 기대개수:',expected(12,12,18),'최대 제품1:',12)
+""",'가능한 수량 범위와 확률을 혼동하지 않습니다. 원문 확률 생성 규칙이 없어 단일 정답은 정의되지 않으며 조건부 예시 기대값만 계산합니다.')
+s=section(b,'2. 이항 상태 순서 연관성','데이터 없음','명시 보완 순서: aabbbaaabbbabaaabbab. runs 검정으로 연속 상태의 무작위성을 검정.')
+q(s,'4-1','a/b 패턴의 연속 발생이 무작위인지 검정하고, 일반적인 a/b 비율 비교와 어떻게 다른지 설명하시오.',"""
+from statsmodels.sandbox.stats.runs import runstest_1samp
+pattern='aabbbaaabbbabaaabbab';values=np.array([x=='a' for x in pattern],dtype=int)
+z,p=runstest_1samp(values,cutoff=.5,correction=True)
+print({'runs':1+np.sum(values[1:]!=values[:-1]),'z':z,'p_value':p})
+""",'자료의 시간 순서를 검사합니다. a/b 발생 개수만 가진 chi-square는 이 연속성 귀무가설을 검사하지 않습니다.')
+
+b=book('24회','ADP 24회 - 출제 주제 기반 복원 연습','기출문제 모음 PDF pp.3~4: 학생 결석 예측, 광고 회귀, 두 공정, Bayes, 평균 CI')
+s=section(b,'1. 학생 결석 회귀','student_absence.csv','395명·12특성 합성. count 타깃 absences. 7:3 분할, train CV RMSE로 모델 선택.')
+q(s,'1-1','결측·분포·범주형 변수를 탐색하고 적합 전처리 근거를 제시하시오.',"""absent=load('student_absence.csv');print(absent.describe(include='all'));print(absent.isna().sum());absent.absences.hist();plt.show()""",'count 특성의 과산포·0 집중·타깃 범위를 점검합니다. 결측이 없는데 대치 성과가 생겼다고 주장하지 않습니다.')
+q(s,'1-2','LinearRegression·RandomForest·SVR를 train CV RMSE로 비교해 선택하고 test RMSE·R²를 보고하시오.',"""
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
+from sklearn.model_selection import cross_val_score
+X=absent.drop(columns='absences');y=absent.absences;train,test=train_test_split(np.arange(len(y)),test_size=.3,random_state=1234)
+rows=[];models={}
+for name,est in [('linear',LinearRegression()),('rf',RandomForestRegressor(n_estimators=50,random_state=1234)),('svr',SVR())]:
+    pipe=tabular_pipeline(X,est);scores=cross_val_score(pipe,X.iloc[train],y.iloc[train],cv=3,scoring='neg_mean_squared_error');rows.append({'model':name,'CV_RMSE':np.sqrt(-scores).mean()});models[name]=pipe
+ranking=pd.DataFrame(rows);print(ranking);winner=ranking.loc[ranking.CV_RMSE.idxmin(),'model'];chosen=models[winner].fit(X.iloc[train],y.iloc[train]);pred=chosen.predict(X.iloc[test]);print(winner,{'RMSE':np.sqrt(mean_squared_error(y.iloc[test],pred)),'R2':r2_score(y.iloc[test],pred)})
+""",'선정 지표는 오차 크기에 민감한 RMSE, test는 선정 후 한 번만 평가합니다. count 예측에 음수가 나오는 모델은 Poisson 등과 비교해야 합니다.')
+q(s,'1-3','개선 방법 및 실제 시스템 적용의 제한을 설명하시오.',"""print('누락 패턴·학교 간 분포 차이·count 제약·학생 반복 그룹 분할 검토. Pipeline 버전 저장, 사용자별 접근제어, 재학습 전 보류 평가와 오류비용 검토.')""",'예측은 개입 효과의 인과 추정이 아닙니다. 학습 데이터에서의 상관으로 징계·지원 정책을 직접 결정하지 않습니다.')
+s=section(b,'2. 광고 다중회귀','advertising.csv','광고비/R&D/sales 수치 10행. 설명 회귀, 표본이 매우 작아 추론 불안정.')
+q(s,'2-1','광고비와 연구개발비로 sales를 설명하는 회귀식을 추정하고 전체 회귀 유의성을 검정하시오.',"""ad=load('advertising.csv');ad_model=sm.OLS(ad.sales,sm.add_constant(ad[['advertising','rd']])).fit();print(ad_model.summary());print({'F':ad_model.fvalue,'F_p':ad_model.f_pvalue,'coefficients':ad_model.params.to_dict()})""",'H0: 두 설명변수 계수가 모두 0입니다. 개별 t검정과 전체 F검정을 구분합니다.')
+s=section(b,'3. 알려진 분산 두 공정 평균','데이터 없음','자료가 원 시험 숫자와 다를 수 있다고 원문이 명시. n_A=n_B=30, 평균 5.7/5.6, 모표준편차 .03/.04, alpha=.05 양측으로 보완.')
+q(s,'3-1','두 공정 평균이 같은지 알려진 모분산 Z검정을 수행하시오.',"""z=(5.7-5.6)/np.sqrt(.03**2/30+.04**2/30);p=2*stats.norm.sf(abs(z));print({'z':z,'p_value':p,'reject_H0':p<.05})""",'H0:mu_A=mu_B. 원 PDF 표본수·표준편차 표현이 불명확해 독립 표본수와 알려진 모표준편차를 보완했습니다. .03/.04가 표본 SD면 Welch가 필요합니다.')
+s=section(b,'4. 감염 Bayes','데이터 없음','예측+ 행: 실제+370, 실제-10; 예측- 행: 실제+15, 실제-690. 원문 표 보존.')
+q(s,'4-1','양성 예측을 받은 사람이 실제 감염자일 확률을 Bayes 공식으로 계산하시오.',"""TP,FP,FN,TN=370,10,15,690;prevalence=(TP+FN)/(TP+FP+FN+TN);sensitivity=TP/(TP+FN);fpr=FP/(FP+TN);ppv=sensitivity*prevalence/(sensitivity*prevalence+fpr*(1-prevalence));print({'P(infected|positive)':ppv,'direct':TP/(TP+FP)})""",'민감도 P(예측+|실제+)와 양성예측도 P(실제+|예측+)를 뒤바꾸지 않습니다. 유병률이 달라지면 PPV도 달라집니다.')
+s=section(b,'5. 소표본 평균 신뢰구간','sample.csv','9개 합성 관측. 정규 모형 가정, 95% 양측 CI. 모 SD 알려진 경우 .4.')
+q(s,'5-1','모분산 미지/모 SD=.4일 때 각각 평균의 95% 신뢰구간을 계산하시오.',"""sample=load('sample.csv').value;n=len(sample);mean=sample.mean();t_ci=stats.t.interval(.95,n-1,loc=mean,scale=sample.std(ddof=1)/np.sqrt(n));z_ci=stats.norm.interval(.95,loc=mean,scale=.4/np.sqrt(n));print({'t_CI':t_ci,'known_sigma_Z_CI':z_ci})""",'표본 SD를 모 SD처럼 취급하지 않습니다. 신뢰구간은 반복 표집에서의 포함률이며 고정 모수의 사후 확률이 아닙니다.')
+
+b=book('25회','ADP 25회 - 출제 주제 기반 복원 연습','기출문제 모음 PDF pp.4~5: F/M 군집, 계절 시계열, 평균·확률·분산 CI, paired t, Kruskal, NPV')
+s=section(b,'1. 구매 F/M 군집','retail.csv','주문번호·고객ID·일시·단가·수량. F=고유 InvoiceNo 수, M=sum(Quantity×UnitPrice).')
+q(s,'1-1','고객별 구매빈도 F와 총 구매액 M을 생성하고 탐색하시오.',"""retail=load('retail.csv');retail['amount']=retail.Quantity*retail.UnitPrice;fm=retail.groupby('CustomerID').agg(F=('InvoiceNo','nunique'),M=('amount','sum'));print(fm.describe());fm.plot.scatter('F','M');plt.show()""",'상품 행 수와 주문 빈도를 혼동하지 않도록 F는 고유 InvoiceNo입니다.')
+q(s,'1-2','F/M의 이상값과 스케일을 점검하고 군집 수를 선택하시오.',"""fm_cluster,fm_choices=cluster(np.log1p(fm),OUT,original=fm.reset_index())""",'긴 꼬리에는 log1p 후 표준화를 적용합니다. silhouette/inertia는 상대 적합성 근거이며 자동 정답이 아닙니다.')
+q(s,'1-3','군집 내 응집도·군집 간 분리도로 적합성을 평가하시오.',"""print(fm_choices);print('표준화된 log F/M silhouette가 클수록 내부 응집·분리가 상대적으로 좋음. 군집 수·초기화에 민감합니다.')""",'군집 대표값·분포와 내부 점수의 방향을 함께 설명합니다.')
+q(s,'1-4','군집별 특성을 요약하고 실행 가능한 비즈니스 제안을 제시하시오.',"""print(fm_cluster.groupby('clust')[['F','M']].agg(['count','mean','median']));print('높은 F/M 고객: 유지·서비스, 낮은 F/높은 M 고객: 재구매 실험. 합성 그룹이므로 실제 효과는 A/B 검증 필요.')""",'군집 번호 자체에 우수/불량 의미를 붙이지 않습니다.')
+s=section(b,'2. 계절 시계열','series.csv','합성 월별 자료로 8:2 시간 분할. 원문 약 200개 관측과 동일 값이 아님.')
+q(s,'2-1','시계열 EDA·결측 처리를 수행하고 계절 모형의 필요성을 설명하시오.',"""demand=load('series.csv');print(demand.isna().sum());demand.plot(x='date',y='value');plt.show()""",'누락은 시간 격자를 유지하며 보간합니다. 미래 관측을 학습 보간에 사용하지 않습니다.')
+q(s,'2-2','계절 모형을 적합하고 보류 평가를 수행하시오.',"""demand_model,demand_metrics=seasonal_forecast(demand,OUT,12)""",'학습 AIC 후보 선택과 보류 RMSE/MAE를 구분합니다.')
+s=section(b,'3. 평균·조건부 확률·분산 CI','데이터 없음','등산 남20/여15, 수영 남10/여30. variance=90, n=10, alpha=.05.')
+q(s,'3-1','같은 거리 왕복에 4km/h와 5km/h일 때 평균 속력을 구하시오.',"""speed=2/(1/4+1/5);print('harmonic mean speed:',speed)""",'거리 가중 시간이 같지 않으므로 산술평균 4.5가 아니라 조화평균을 사용합니다.')
+q(s,'3-2','연 매출 3000,4000,5000의 두 해 연평균 성장률을 구하시오.',"""growth=(5000/3000)**(1/2)-1;print('CAGR:',growth,'factor:',1+growth)""",'두 기간의 성장계수 기하평균입니다. 세 관측값 자체의 기하평균을 성장률이라 부르지 않습니다.')
+q(s,'3-3','남성 중 등산을 선호할 조건부 확률을 계산하시오.',"""print('P(hiking|male):',20/(20+10))""",'분모는 전체가 아니라 남성 30명입니다.')
+q(s,'3-4','n=10, 표본분산 90일 때 정규 모집단 분산의 95% CI를 구하시오.',"""variance_ci=(9*90/stats.chi2.ppf(.975,9),9*90/stats.chi2.ppf(.025,9));print(variance_ci)""",'chi-square 자유도 n-1, 큰 분위수는 하한 분모입니다. 정규성 가정이 필요합니다.')
+s=section(b,'4. 혈압 paired t','paired_bp.csv','동일 20명 전후, 차이=after-before. 감소 단측 alpha=.05.')
+q(s,'4-1','복용 후 혈압이 낮아지는지 가설과 차이 변수·검정을 제시하시오.',"""bp=load('paired_bp.csv');diff=bp.after-bp.before;t=diff.mean()/(diff.std(ddof=1)/np.sqrt(len(diff)));p=stats.t.cdf(t,len(diff)-1);print({'H0':'mean(after-before)>=0','H1':'mean(after-before)<0','t':t,'one_sided_p':p,'reject':p<.05});print('차이 정규성:',stats.shapiro(diff))""",'독립 두 표본 검정 대신 동일 대상의 paired 차이를 사용합니다. 양측 p/2는 t 부호 확인 없이 적용하지 않습니다.')
+s=section(b,'5. 공장 Kruskal-Wallis','production.csv')
+q(s,'5-1','세 공장 생산량 분포가 동일한지 비모수 검정을 수행하시오.',"""production=load('production.csv');groups=[g.output.to_numpy() for _,g in production.groupby('factory')];h,p=stats.kruskal(*groups);print({'H':h,'p_value':p,'reject':p<.05})""",'독립 표본의 순위 분포 차이를 검사합니다. 중앙값 차이로만 해석하려면 분포 형태 유사성이 추가로 필요합니다.')
+s=section(b,'6. 투자 NPV','npv.csv','원 표 연도별 현금흐름을 보존. 표의 예산이 편익인지 투자비인지 모호하여 모두 순 유입, 초기비용 0, 할인율 5%로 보완.')
+q(s,'6-1','다섯 안의 NPV를 계산하고 보완 조건에서 최대안을 선택하시오.',"""cash=load('npv.csv');rate=.05;npv={c:float(np.sum(cash[c]/(1+rate)**cash.year)) for c in cash if c!='year'};print(npv,'max:',max(npv,key=npv.get));print('동일 금액이 비용이면 최소 현재비용을 선택해야 합니다.')""",'PDF의 예산을 실제 순편익으로 단정할 수 없습니다. 가정·초기투자·할인율 변경에 따라 판단이 바뀝니다.')
+
+b=book('26회','ADP 26회 - 출제 주제 기반 복원 연습','기출문제 모음 PDF pp.5~6: 구매 군집, 표본수·지역 비율·혈압·은 가격·Bayesian 회귀')
+s=section(b,'1. 구매 군집 및 추천','retail.csv','원문 Quantity 결측 보존한 합성 자료, KMeans/DBSCAN. 구매고객 1241 포함.')
+q(s,'1-1','결측을 확인·대치하고 이상값 보정 전후 통계를 제시하시오.',"""retail26=load('retail.csv');print(retail26.isna().sum());before=retail26.Quantity.describe();retail26.Quantity=retail26.Quantity.fillna(retail26.Quantity.median());retail26.Country=retail26.Country.fillna('Unknown');upper=retail26.Quantity.quantile(.99);retail26.Quantity=retail26.Quantity.clip(upper=upper);print(pd.DataFrame({'before':before,'after':retail26.Quantity.describe()}))""",'탐색 군집 자료 전체 기준 대치·winsorization을 명시합니다. 유효 대량 주문을 이상치로 지울 수 있어 정책으로 확정하지 않습니다.')
+q(s,'1-2','고객별 구매 F/M을 구성하여 KMeans 및 DBSCAN 군집을 비교하시오.',"""
+retail26['amount']=retail26.Quantity*retail26.UnitPrice;fm26=retail26.groupby('CustomerID').agg(F=('InvoiceNo','nunique'),M=('amount','sum'))
+cluster26,k26=cluster(np.log1p(fm26),OUT,original=fm26.reset_index())
+z26=StandardScaler().fit_transform(np.log1p(fm26));db=DBSCAN(eps=.5,min_samples=4).fit_predict(z26);print(pd.Series(db).value_counts());print('DBSCAN -1은 잡음, 군집과 따로 해석.')
+""",'군집 단위는 고객으로 보완합니다. 명목형 Country/StockCode의 정수 거리 사용을 피합니다.')
+q(s,'2-1','군집별 특성과 대표 상품을 도출하시오.',"""joined=retail26.merge(cluster26[['CustomerID','clust']],on='CustomerID',validate='many_to_one');print(cluster26.groupby('clust')[['F','M']].mean());representatives=joined.groupby(['clust','StockCode']).Quantity.sum().reset_index().sort_values('Quantity',ascending=False).groupby('clust').head(1);print(representatives)""",'대표 상품 기준을 총 구매 수량으로 명시했습니다.')
+q(s,'2-2','CustomerID=1241에게 같은 군집의 미구매 인기 상품을 추천하시오.',"""
+customer=1241;row=cluster26[cluster26.CustomerID==customer];assert len(row)==1
+label=row.clust.iloc[0];seen=set(retail26.loc[retail26.CustomerID==customer,'StockCode'])
+recommend=joined[(joined.clust==label)&(~joined.StockCode.isin(seen))].groupby('StockCode').Quantity.sum().sort_values(ascending=False)
+print(recommend.head(3));print('미구매 후보가 없으면 신규 상품/전체 인기 대체 정책이 필요합니다.')
+""",'이미 구매한 상품을 제외합니다. 합성 자료에서 후보가 없을 수 있으며 억지 추천을 만들지 않습니다.')
+s=section(b,'3. 최소 표본수','데이터 없음','불량률 p=.9, 양측 95% 신뢰수준·오차한계 .05의 정규 근사, 비복원 유한모집단 보정 없음.')
+q(s,'3-1','비율 오차한계 .05를 만족할 최소 표본수를 계산하시오.',"""n_min=int(np.ceil(stats.norm.ppf(.975)**2*.9*.1/.05**2));print(n_min)""",'ceil로 올림합니다. 원문 신뢰수준이 없어 95%를 보완했으며 보수적 p=.5를 쓰면 더 커집니다.')
+s=section(b,'4. 지역 지지도','regional_support.csv','원 PDF 자체도 수치를 임의 예시라고 명시: yes=100,200,300; no=150,130,180.')
+q(s,'4-1','세 지역의 지지 비율이 같은지 chi-square 동질성 검정을 수행하시오.',"""support=load('regional_support.csv');chi,p,df_,expected=stats.chi2_contingency(support[['yes','no']],correction=False);print({'chi2':chi,'df':df_,'p':p,'reject':p<.05});print(expected)""",'표본 행은 지역, 열은 지지 여부. 기대도수가 작으면 근사 검정 적용을 재검토합니다.')
+s=section(b,'5. 남녀 혈압 평균','blood_pressure.csv','독립 남16·여9 합성, 양측 Welch, 정규성 진단과 95% 평균차 CI.')
+q(s,'5-1','두 집단 평균 차이를 검정하고 동일 가정의 평균차 CI와 결론을 대조하시오.',"""
+blood=load('blood_pressure.csv');m=blood.loc[blood.sex=='M','value'];f=blood.loc[blood.sex=='F','value'];test_b=stats.ttest_ind(m,f,equal_var=False)
+a=m.var(ddof=1)/len(m);b_=f.var(ddof=1)/len(f);se=np.sqrt(a+b_);df_=(a+b_)**2/(a*a/(len(m)-1)+b_*b_/(len(f)-1));ci=stats.t.interval(.95,df_,loc=m.mean()-f.mean(),scale=se)
+print({'t':test_b.statistic,'p':test_b.pvalue,'difference_CI':ci,'reject':test_b.pvalue<.05});print(stats.shapiro(m),stats.shapiro(f));assert (ci[0]>0 or ci[1]<0)==(test_b.pvalue<.05)
+""",'각 집단 평균 CI의 겹침으로 평균차 검정을 대신하지 않습니다. 같은 Welch 차이 CI에 0이 포함되는지 확인합니다.')
+s=section(b,'6. 은 가격 rolling/trend','silver.csv','9개월 합성. 누락 가격은 그래프·rolling에 보간, 추론은 관측된 월만 사용.')
+q(s,'6-1','3개 관측 rolling 평균을 표시하고 월별 증가 추세를 검정하시오.',"""
+silver=load('silver.csv');silver['rolling3']=silver.value.interpolate().rolling(3).mean();print(silver)
+silver.plot(x='date',y=['value','rolling3']);plt.show();silver['month']=np.arange(1,len(silver)+1)
+observed=silver.dropna(subset=['value']);trend=sm.OLS(observed.value,sm.add_constant(observed[['month']])).fit();print(trend.summary())
+print('양의 추세 단측 p:',stats.t.sf(trend.tvalues['month'],trend.df_resid))
+""",'9개는 작은 시계열이라 잔차 자기상관·검정 가정에 취약합니다. 보간값을 새 독립 관측으로 추론에 넣지 않습니다.')
+s=section(b,'7. Bayesian 회귀','body.csv','Weight/Height→Waist 수치. 표준화 특성, 알려진 noise SD=4, 기울기 독립 N(0,10²), 절편 N(100,10²) 사전.')
+q(s,'7-1','알려진 잡음 분산의 정규 선형 모형에서 사후 계수 평균·95% credible interval을 구하고 80kg/170cm의 허리를 예측하시오.',"""
+body=load('body.csv');scaler=StandardScaler().fit(body[['Weight','Height']]);design=np.column_stack([np.ones(len(body)),scaler.transform(body[['Weight','Height']])]);prior_mean=np.array([100.,0.,0.]);prior_precision=np.eye(3)/100;sigma2=16
+cov=np.linalg.inv(prior_precision+design.T@design/sigma2);mean=cov@(prior_precision@prior_mean+design.T@body.Waist.to_numpy()/sigma2)
+print(pd.DataFrame({'term':['intercept','weight_z','height_z'],'posterior_mean':mean,'low':mean-1.96*np.sqrt(np.diag(cov)),'high':mean+1.96*np.sqrt(np.diag(cov))}))
+new=np.r_[1.,scaler.transform(pd.DataFrame({'Weight':[80],'Height':[170]}))[0]];point=float(new@mean);predictive_sd=np.sqrt(sigma2+new@cov@new);print({'predicted_waist':point,'posterior_predictive_95':(point-1.96*predictive_sd,point+1.96*predictive_sd)})
+""",'절편 사전 평균=100, 나머지=0, 모두 사전 SD=10으로 자료 적합 전에 고정합니다. 잡음 SD는 연습용 알려진 값. BayesianRidge의 추정 hyperparameter와 이 고정 사전 모형은 다릅니다.')
+
+b=book('28회','ADP 28회 - 응시 후기 기반 복원 연습','28회.pdf pp.2~3: 5클래스·ROS/SMOTE/PCA·NN/RF/LGBM·voting, KM, 학교 분포, McNemar, 편상관')
+s=section(b,'1. 다중 분류·불균형·앙상블','student.csv','target=1~5, 연속 age/score·순서 ordinal·명목 guardian·상수 constant. 첨부 후기의 신경망은 sklearn MLP로 보완.')
+q(s,'1-1','연속·순서·명목·상수 특성을 탐색하고 학습/검증/test를 분할하시오.',"""
+stu28=load('student.csv');print(stu28.describe(include='all'));print(stu28.target.value_counts());stu28=stu28.drop(columns=['constant'])
+X28=stu28.drop(columns='target');y28=stu28.target;train28,test28=train_test_split(np.arange(len(y28)),test_size=.3,random_state=1234,stratify=y28)
+fit28,valid28=train_test_split(train28,test_size=.25,random_state=1234,stratify=y28.iloc[train28])
+print(len(fit28),len(valid28),len(test28))
+""",'동일 상수는 정보가 없어 제거합니다. target 생성의 score가 연습용 강한 특성이므로 실제 후기 결과와 비교하지 않습니다.')
+q(s,'1-2','ROS와 SMOTE를 학습에만 적용하고 train 적합 PCA 좌표로 비교하시오.',"""
+from imblearn.over_sampling import RandomOverSampler,SMOTENC
+from sklearn.decomposition import PCA
+# 명목 guardian은 SMOTENC로 원 category를 보존. 일반 SMOTE로 원핫 중간값을 생성하지 않음.
+num28=['age','score','ordinal'];sc28=StandardScaler().fit(X28.iloc[fit28][num28]);cat28=pd.Categorical(X28.guardian).codes
+Z28=np.column_stack([sc28.transform(X28.iloc[fit28][num28]),cat28[fit28]])
+small=int(y28.iloc[fit28].value_counts().min());neighbors=min(5,small-1);assert neighbors>=1
+ros28=RandomOverSampler(random_state=1234);smote28=SMOTENC(categorical_features=[3],k_neighbors=neighbors,random_state=1234)
+rosX,rosY=ros28.fit_resample(Z28,y28.iloc[fit28]);smX,smY=smote28.fit_resample(Z28,y28.iloc[fit28])
+pca28=PCA(n_components=2,random_state=1234).fit(Z28)
+fig,ax=plt.subplots(1,2,figsize=(10,4))
+for a,xx,yy,title in [(ax[0],rosX,rosY,'ROS'),(ax[1],smX,smY,'SMOTENC')]:
+    coords=pca28.transform(xx);a.scatter(coords[:,0],coords[:,1],c=yy,s=8);a.set_title(title)
+plt.show();print(pd.Series(rosY).value_counts(),pd.Series(smY).value_counts())
+""",'후기는 SMOTE이나 명목 특성이 있어 SMOTENC로 보완했습니다. ordinal 또한 소수 합성될 수 있어 수치 좌표 가정의 한계를 명시합니다. test/validation에는 합성행을 넣지 않습니다.')
+q(s,'1-3','같은 학습 구간에서 MLP·RF·LightGBM을 CV 최적화하고 validation accuracy·학습 시간을 비교하시오.',"""
+import time
+from sklearn.neural_network import MLPClassifier
+from src.MachineLearning.Optimization.grid_search import run_grid_search
+from lightgbm import LGBMClassifier
+models28={};table28=[]
+for name,est,space in [('mlp',MLPClassifier(max_iter=350,random_state=1234),{'model__hidden_layer_sizes':[(16,),(32,)]}),('rf',RandomForestClassifier(n_estimators=50,random_state=1234),{'model__max_depth':[3,5]}),('lightgbm',LGBMClassifier(n_estimators=50,random_state=1234,verbosity=-1),{'model__num_leaves':[7,15]})]:
+    begin=time.perf_counter();r=run_grid_search(X28.iloc[fit28],y28.iloc[fit28],tabular_pipeline(X28,est),overrides={'search_space':space,'cv':3})
+    models28[name]=r.model;table28.append({'model':name,'CV_score':r.best_score,'validation_accuracy':accuracy_score(y28.iloc[valid28],r.model.predict(X28.iloc[valid28])),'fit_seconds':time.perf_counter()-begin})
+comparison28=pd.DataFrame(table28);print(comparison28)
+""",'신경망은 softmax 다중 분류를 지원하는 sklearn MLP로 구성해 보팅과 호환합니다. ROS/SMOTENC 비교는 앞 셀 학습 시각화이며 이 CV 실험은 원 학습 분포에서 수행한 별도 실험입니다. 리샘플링 모형 비교는 폴드 내부 imblearn Pipeline에 sampler를 넣어야 합니다.')
+q(s,'1-4','세 분류기의 hard/soft voting을 validation에서 비교하고 선정 모델을 test에서 한 번 평가하시오.',"""
+from sklearn.ensemble import VotingClassifier
+from sklearn.base import clone
+votes28={};vote_rows=[]
+for method in ['hard','soft']:
+    vote=VotingClassifier([(name,clone(model)) for name,model in models28.items()],voting=method)
+    vote.fit(X28.iloc[fit28],y28.iloc[fit28]);votes28[method]=vote;vote_rows.append({'voting':method,'validation_accuracy':accuracy_score(y28.iloc[valid28],vote.predict(X28.iloc[valid28]))})
+vr=pd.DataFrame(vote_rows);print(vr);which=vr.loc[vr.validation_accuracy.idxmax(),'voting'];final_vote=clone(votes28[which]).fit(X28.iloc[train28],y28.iloc[train28]);final_pred=final_vote.predict(X28.iloc[test28]);print(which,{'test_accuracy':accuracy_score(y28.iloc[test28],final_pred),'test_macro_f1':f1_score(y28.iloc[test28],final_pred,average='macro')})
+""",'validation으로 보팅 선택 후 train+validation 재적합, test 단일 평가입니다. 확률 보정과 다수 클래스 우세에 주의합니다.')
+q(s,'1-5','학교 시스템 적용 시 전처리 재사용·지연·재학습·평가 조건을 설명하시오.',"""print('전처리+모형 버전 및 클래스 순서 저장, 요청 스키마 검증, 추론 p95 지연 측정, 드리프트/클래스 recall 감시, 승인된 새 모델을 별도 평가 후 교체. 합성 학습 시간은 운영 지연의 대체 지표가 아님.')""",'데이터가 들어온다는 이유만으로 즉시 가중치를 갱신하지 않습니다. 검증·롤백 기준을 정합니다.')
+s=section(b,'2. Kaplan-Meier 생존','survival.csv','time>=1, event=1 사건/0 오른쪽 검열, 합성 36명. 검열은 사건이 아님.')
+q(s,'2-1','KM 생존곡선·위험집합·Greenwood 95% CI를 제시하시오.',"""surv=load('survival.csv');km=kaplan_meier(surv);km.to_csv(OUT/'kaplan_meier.csv',index=False);assert np.all(np.diff(km.survival)<=1e-12)""",'사건 직전 위험집합에서 사건만 분자로 계산합니다. 동일 시각 사건·검열 처리와 독립 검열 가정을 명시합니다.')
+s=section(b,'3. 두 학교 분포','school_scores.csv','A12명/B24명 독립 표본. 원 후기의 wilcoxon은 독립 자료에는 Mann-Whitney로 바로잡음.')
+q(s,'3-1','정규성을 탐색하고 두 학교 성적 분포의 비모수 차이를 검정하시오.',"""school=load('school_scores.csv');a=school.loc[school.school=='A','score'];b_=school.loc[school.school=='B','score'];print(stats.shapiro(a),stats.shapiro(b_));print(stats.mannwhitneyu(a,b_,alternative='two-sided'))""",'같은 대상 전후의 signed-rank와 독립 두 학교 rank-sum은 다른 설계입니다. 작은 n만으로 비모수 검정이 자동 결정되지는 않습니다.')
+s=section(b,'4. 시식 전후','tasting.csv','동일 60명 before/after 이진 상태. discordant 2셀로 exact McNemar.')
+q(s,'4-1','2×2 대응 표를 만들고 시식 전후 선호율이 같은지 McNemar 검정을 수행하시오.',"""
+from statsmodels.stats.contingency_tables import mcnemar
+tasting=load('tasting.csv');table=pd.crosstab(tasting.before,tasting.after).reindex(index=[0,1],columns=[0,1],fill_value=0);print(table);result=mcnemar(table,exact=True);print({'statistic':result.statistic,'p_value':result.pvalue})
+""",'같은 사람의 두 시점이므로 독립성 chi-square가 아닙니다. 불일치 셀 합이 작아도 exact 이항 검정을 적용합니다.')
+s=section(b,'5. 편상관','partial.csv','연속 x/y와 보정변수 z, 100개 독립 표본. 선형 보정 및 정규 잔차 추론.')
+q(s,'5-1','z를 선형 보정한 x/y의 편상관과 p값을 계산하고 단순 상관과 비교하시오.',"""
+partial=load('partial.csv');D=sm.add_constant(partial[['z']]);rx=sm.OLS(partial.x,D).fit().resid;ry=sm.OLS(partial.y,D).fit().resid;r=stats.pearsonr(rx,ry)[0];df_=len(partial)-3;t=r*np.sqrt(df_/(1-r*r));p=2*stats.t.sf(abs(t),df_);print({'simple_r':stats.pearsonr(partial.x,partial.y)[0],'partial_r':r,'df':df_,'t':t,'p':p})
+""",'잔차를 상관 분석하며 자유도 n-k-2(n-3)를 사용합니다. 잔차 pearsonr의 n-2 p값을 편상관 p값으로 그대로 사용하지 않습니다.')
+
+# 회차별 상세 후기에서 확인된 조건은 기존 복원과 별도 폴더로 보존.
+from summary_supplements import register
+register(book, section, q, EXAMS)
+
+# Write source-grounded manifests, notebook cells and exam-only PDFs.
+for folder,exam in EXAMS.items():
+ dest=ROOT/folder;dest.mkdir(exist_ok=True,parents=True);stem=('ADP_'+folder.replace('/','_')) if '모의고사' not in folder else folder.replace('/','_')
+ cells=[nbformat.v4.new_markdown_cell('# '+exam['title']+'\n\n출처: '+exam['source']+'\n\n**복원 연습 자료·예시 풀이이며 공식 정답이 아닙니다.** '+exam['note']+'\n\n동봉 data를 사용하며 원 질문·보완 조건·풀이를 분리합니다. 입력 파일은 UTF-8. 저장소 루트 또는 현재 회차 폴더에서 실행할 수 있습니다.')]
+ setup='''from pathlib import Path
+import sys, numpy as np, pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from scipy import stats
+import statsmodels.api as sm
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier,GradientBoostingClassifier
+from sklearn.svm import SVC
+from IPython.display import display
+# repository root 또는 회차 폴더에서 탐색; 경로를 하드코딩하지 않음.
+ROOT=next(p for p in [Path.cwd()]+list(Path.cwd().parents) if (p/'기출문제/공통/reconstruction.py').exists())
+sys.path.insert(0,str(ROOT));sys.path.insert(0,str(ROOT/'기출문제/공통'))
+from reconstruction import *
+from matplotlib import font_manager
+font_path=ROOT/'기출문제/공통/NanumGothic-Regular.ttf'
+font_manager.fontManager.addfont(str(font_path))
+plt.rcParams['font.family']='NanumGothic';plt.rcParams['axes.unicode_minus']=False
+HERE=ROOT/'기출문제'/'FOLDER';DATA=HERE/'data';OUT=HERE/'실행결과';OUT.mkdir(exist_ok=True)
+def load(name):return pd.read_csv(DATA/name)
+print('데이터 종류: 합성 복원 연습 자료, 원 시험 데이터가 아님')
+'''.replace('FOLDER',folder)
+ cells.append(nbformat.v4.new_code_cell(setup))
+ for s in exam['sections']:
+  cells.append(nbformat.v4.new_markdown_cell('## '+s['title']+'\n\n자료: '+s['data']+'\n\n'+s['condition']))
+  for item in s['questions']:
+   cells.extend([nbformat.v4.new_markdown_cell('### '+item['id']+'\n\n'+item['text']+'\n\n**출처/보완:** '+item['origin']+'\n\n**풀이 근거:** '+item['reason']),nbformat.v4.new_code_cell(item['code'])])
+
+ nb=nbformat.v4.new_notebook(cells=cells,metadata={'kernelspec':{'name':'python3','display_name':'Python 3','language':'python'},'language_info':{'name':'python','version':'3.7'},'adp':{'type':'reconstructed_practice','source':exam['source'],'subquestions':[x['id'] for s in exam['sections'] for x in s['questions']]}})
+ path=dest/(stem+'_풀이.ipynb')
+ if path.exists():
+  old=nbformat.read(path,4)
+  if [c.source for c in old.cells if c.cell_type=='code']==[c.source for c in nb.cells if c.cell_type=='code']:
+   old_code=iter(c for c in old.cells if c.cell_type=='code')
+   for c in nb.cells:
+    if c.cell_type=='code':
+     prev=next(old_code);c.outputs=prev.outputs;c.execution_count=prev.execution_count
+   if 'execution_validation' in old.metadata:nb.metadata['execution_validation']=old.metadata.execution_validation
+ nbformat.write(nb,path)
+
+ print(folder,len(nb.metadata.adp.subquestions))
+(ROOT/'추가_문항명세.json').write_text(json.dumps(EXAMS,ensure_ascii=False,indent=2)+'\n')
+
+# Apply the situation-based contract to every round, including legacy notebooks.
+from apply_scenario_style import apply
+apply()

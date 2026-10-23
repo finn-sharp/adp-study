@@ -1,0 +1,8 @@
+{
+  "duration_col": "time",
+  "event_col": "event",
+  "alpha": 0.05,
+  "penalizer": 0.0,
+  "ph_diagnostics": true,
+  "prediction_times": null
+}

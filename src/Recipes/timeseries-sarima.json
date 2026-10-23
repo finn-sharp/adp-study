@@ -1,0 +1,21 @@
+{
+  "order": [
+    1,
+    0,
+    0
+  ],
+  "candidate_orders": null,
+  "steps": 12,
+  "alpha": 0.05,
+  "trend": null,
+  "maxiter": 100,
+  "enforce_stationarity": true,
+  "enforce_invertibility": true,
+  "require_convergence": true,
+  "seasonal_order": [
+    1,
+    0,
+    0,
+    12
+  ]
+}

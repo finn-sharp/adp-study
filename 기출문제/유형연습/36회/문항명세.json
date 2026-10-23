@@ -1,0 +1,80 @@
+{
+  "round": 36,
+  "kind": "source_inspired_original_practice",
+  "scope": "confirmed_topics_only",
+  "sources": [
+    "https://story55851.tistory.com/entry/36%ED%9A%8C-ADP-%ED%95%A9%EA%B2%A9%ED%9B%84%EA%B8%B0"
+  ],
+  "questions": 8,
+  "sections": [
+    {
+      "title": "1. 연속형 예측을 이용한 후속 분류",
+      "context": "cascade.csv는 x1~x4, 연속 target와 이진 label이다. id mod 5=0은 최종 시험이다. 두 단계 예측 유형만 참고한 창작 설정이다. label 예측 시 target 실측값은 제공되지 않으므로 학습에서도 out-of-fold 예측값만 후속 특성으로 사용한다.",
+      "data": "cascade.csv",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "연속 target 예측에 학습 내부 전진 변수 선택을 적용하시오. 3-fold CV RMSE가 0.01 이상 개선될 때만 변수를 추가하고 이력·선택 변수·보류 RMSE를 제시하시오.",
+          "answer": "후보 평가는 폴드 내부 대치·표준화를 포함한다. 이 절차는 CV 예측 기준이며 p-value 기반 stepwise와 구분한다. 시험 값은 선택에서 제외한다.",
+          "task": "cascade_select"
+        },
+        {
+          "id": "1-2",
+          "text": "선택한 회귀기에 대해 학습 out-of-fold 연속 예측값과 최종 시험 예측값을 생성하시오. 자기 정답이나 in-sample 적합값을 후속 분류에 넣는 것과 비교해 누출 위험을 설명하시오.",
+          "answer": "선택은 훈련 전체를 사용했으므로 OOF 값이 선택까지 완전 중첩된 무편향 성능 추정은 아니다. 최종 시험을 독립으로 두며 실제 목표 변수의 실측값은 후속 입력에서 제외한다.",
+          "task": "cascade_oof"
+        },
+        {
+          "id": "1-3",
+          "text": "x1~x4와 예측 연속값으로 분류 파이프라인을 적합하고 최종 시험 F1·AUC·중요도와 전체 두 단계 오류 전파의 한계를 제시하시오.",
+          "answer": "모형은 고정 RF로 학습하며 시험은 평가에만 쓴다. 후속 특성이 원입력에서 파생되므로 새로운 정보가 늘었다고 단정하지 않는다. 중요도는 대체 가능한 상관 특성 사이에 나뉠 수 있다.",
+          "task": "cascade_classify"
+        }
+      ]
+    },
+    {
+      "title": "2. 중첩 응답 전처리",
+      "context": "records.json은 일자별 records 배열과 meta.source를 가진 응답이다. 각 records 행에는 entity와 sensors(temp,load)가 있다. 모든 객체는 예제 파일에 설명된 같은 스키마를 따른다. 회고에서 JSON 전처리 유형만 확인해 내용은 새로 구성했다.",
+      "data": "records.json",
+      "questions": [
+        {
+          "id": "2-1",
+          "text": "중첩 JSON을 행과 열로 평탄화하고 date·source·entity·temperature·load를 갖는 표를 저장하시오. 객체 수·행 수·키·타입을 검증하시오.",
+          "answer": "json_normalize의 record_path와 meta를 명시한다. 리스트 펼침과 사전 열 펼침을 구분하며 단순 문자열 eval을 쓰지 않는다.",
+          "task": "json_flatten"
+        },
+        {
+          "id": "2-2",
+          "text": "entity별 평균 온도와 일자별 총 load를 요약하시오. 중복 또는 빈 records 배열이 있을 때 집계 의미·검사 방법을 설명하시오.",
+          "answer": "평탄화 전후 행 수와 키를 확인한다. 빈 배열이면 해당 날짜의 0 관측과 결측을 구분해야 하고, 중복 행은 근거 없이 합산하지 않는다.",
+          "task": "json_aggregate"
+        }
+      ]
+    },
+    {
+      "title": "3. 설문 잠재 구조",
+      "context": "survey.csv는 독립 응답자 240명의 연속 근사 점수 item1~item6다. 공통 잠재 요인으로 문항 관계를 설명하려 하며 전체 자료는 탐색용이다. 정규 다변량 작업 가정을 둔다. 유지 차원 수를 정하는 두 타당한 방법을 제시하라는 유형만 확인됐고 세부 수치는 새로 만들었다.",
+      "data": "survey.csv",
+      "questions": [
+        {
+          "id": "3-1",
+          "text": "변수 간 상관과 표본 적합성을 점검하고, 상관행렬이 단위행렬인지 검정하시오. 가설·통계량·자유도·p-value·기각 여부와 표본 적합성 지표를 제시하시오.",
+          "answer": "Bartlett 구형성 H0:R=I를 검정하고 KMO를 함께 본다. 유의성 하나만으로 원하는 요인 수나 구조의 적합성이 확정되지 않는다.",
+          "task": "factor_suitability"
+        },
+        {
+          "id": "3-2",
+          "text": "상관행렬 고유값·scree 그림과 200회 독립 열 순열의 95% 기준(seed=36)을 비교해 유지할 차원 수를 제안하시오. 두 판단 기준의 차이와 탐색적 선택의 한계를 설명하시오.",
+          "answer": "scree의 꺾임과 Horn 형태의 permutation parallel analysis를 함께 본다. 고유값>1은 보조 휴리스틱이며 병렬분석의 기준 차원과 요인 수를 그대로 동일시하지 않는다.",
+          "task": "factor_count"
+        },
+        {
+          "id": "3-3",
+          "text": "선택 차원으로 공통요인 모형을 적합해 적재량·고유분산·공통성을 제시하고 회전 후 해석하시오. 주성분 분석과의 목적·오차 모형 차이를 설명하시오.",
+          "answer": "FactorAnalysis(varimax)로 공통요인+문항별 고유오차를 모델링한다. PCA의 총분산 설명과 다르다. 부호·순서·회전은 유일하지 않으며 외부 표본 검증을 주장하지 않는다.",
+          "task": "factor_fit"
+        }
+      ]
+    }
+  ]
+}

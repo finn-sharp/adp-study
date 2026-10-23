@@ -1,0 +1,2 @@
+# 기본 sklearn은 requirements-models-py312.txt 사용.
+optuna==4.5.0

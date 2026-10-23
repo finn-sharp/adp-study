@@ -1,0 +1,12 @@
+{
+  "model_name": "exponential",
+  "initial_parameters": [
+    1.0,
+    0.1,
+    0.0
+  ],
+  "lower_bounds": null,
+  "upper_bounds": null,
+  "maxfev": 10000,
+  "absolute_sigma": false
+}

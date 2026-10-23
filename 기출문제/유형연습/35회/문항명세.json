@@ -1,0 +1,36 @@
+{
+  "round": 35,
+  "kind": "source_inspired_original_practice",
+  "scope": "partial",
+  "sources": [
+    "https://story55851.tistory.com/entry/36%ED%9A%8C-ADP-%ED%95%A9%EA%B2%A9%ED%9B%84%EA%B8%B0"
+  ],
+  "questions": 3,
+  "sections": [
+    {
+      "title": "1. 위치를 이용한 관측소 자료 연결",
+      "context": "확인 근거가 제한되어 35회 전체가 아닌 공간 전처리 유형만 재구성했다. rides.csv는 날짜·station_id·rides, stations.csv는 역 위경도, weather_geo.csv는 date·sensor_id·위경도·temp다. 좌표 단위는 도, 구면 반지름은 6371km다. 같은 거리면 sensor_id 사전순을 택한다.",
+      "data": "rides.csv + stations.csv + weather_geo.csv",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "위경도 범위·날짜·키 중복·관측소 날짜 커버리지를 확인하시오. 역과 관측소가 서로 다른 키를 가질 때 필요한 연결 기준을 설명하시오.",
+          "answer": "위도 [-90,90],경도 [-180,180]과 중복을 검증한다. 날짜만으로 many-to-many 결합하면 행이 증식하므로 공간 매핑을 먼저 고정한다.",
+          "task": "geo_validate"
+        },
+        {
+          "id": "1-2",
+          "text": "두 위경도 사이 구면 거리를 계산해 각 역의 가장 가까운 관측소를 찾으시오. 도/라디안·단위·동률 처리와 동일 좌표 거리 0을 검증하시오.",
+          "answer": "Haversine을 radian으로 계산하고 구면반지름을 km로 둔다. 부동소수 때문에 삼각함수 입력을 [0,1]로 제한한다. 가까운 좌표 검색을 무조건 직교 거리로 대체하지 않는다.",
+          "task": "geo_map"
+        },
+        {
+          "id": "1-3",
+          "text": "매핑을 이용해 역별 일별 이용량에 기상을 연결하시오. 일대일 키·원래 행 수 보존·미매칭 여부를 검증하고 관측소 변경·기상 가용 시점·공간 대표성의 한계를 설명하시오.",
+          "answer": "고정 station→sensor 매핑 후 date,sensor_id로 결합한다. 더 가까워도 해당 날짜 관측이 없을 수 있어 결합 지시자로 누락을 확인한다. 예측 모형·통계 문제를 확인하지 못했으므로 덧붙여 복원하지 않는다.",
+          "task": "geo_join"
+        }
+      ]
+    }
+  ]
+}

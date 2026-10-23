@@ -1,8 +1,6 @@
 """
-================================================================================
-loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
-================================================================================
-설명:
+=========================================================================loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
+=========================================================================설명:
     - src/Recipes의 평면 JSON 설정을 모델별 Profile로 변환합니다.
     - 레시피 → 명시적 overrides → Profile → 실행기 순서로 설정을 적용합니다.
 
@@ -20,8 +18,7 @@ loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
     DATE        AUTHOR          VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피와 실행기 연결
-================================================================================
-"""
+========================================================================="""
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -81,6 +78,87 @@ _REGISTRY = {
     'plot-regression-prediction-interval': ('src.Visualization.regression.prediction_interval', 'PredictionIntervalProfile', None, (None,)),
     'plot-regression-partial-residual': ('src.Visualization.regression.partial_residual', 'PartialResidualProfile', None, (None,)),
     'plot-regression-vif': ('src.Visualization.regression.vif', 'VIFPlotProfile', None, (None,)),
+    # Domain architecture extension (2026-10-20)
+    'survival-kaplan-meier': ('src.stats.survival.kaplan_meier', 'KaplanMeierProfile', None, (None,)),
+    'survival-rmst': ('src.stats.survival.rmst', 'RMSTProfile', None, (None,)),
+    'survival-logrank': ('src.stats.survival.logrank', 'LogrankProfile', None, (None,)),
+    'survival-cox': ('src.stats.survival.cox', 'CoxProfile', None, (None,)),
+    'timeseries-arima': ('src.TimeSeries.arima', 'ARIMAProfile', None, (None,)),
+    'timeseries-sarima': ('src.TimeSeries.sarima', 'SARIMAProfile', None, (None,)),
+    'nonlinear-regression': ('src.MachineLearning.NonlinearModels.nonlinear_regression', 'NonlinearRegressionProfile', None, (None,)),
+    'resampling-random-over': ('src.Preprocessing.resampling.random_over', 'RandomOverProfile', None, (None,)),
+    'resampling-smote': ('src.Preprocessing.resampling.smote', 'SMOTEProfile', None, (None,)),
+    'resampling-adasyn': ('src.Preprocessing.resampling.adasyn', 'ADASYNProfile', None, (None,)),
+    'resampling-borderline-smote': ('src.Preprocessing.resampling.borderline_smote', 'BorderlineSMOTEProfile', None, (None,)),
+    'resampling-svm-smote': ('src.Preprocessing.resampling.svm_smote', 'SVMSMOTEProfile', None, (None,)),
+    'resampling-smotenc': ('src.Preprocessing.resampling.smotenc', 'SMOTENCProfile', None, (None,)),
+    'resampling-smoten': ('src.Preprocessing.resampling.smoten', 'SMOTENProfile', None, (None,)),
+    'resampling-random-under': ('src.Preprocessing.resampling.random_under', 'RandomUnderProfile', None, (None,)),
+    'resampling-tomek-links': ('src.Preprocessing.resampling.tomek_links', 'TomekLinksProfile', None, (None,)),
+    'resampling-edited-nearest-neighbours': ('src.Preprocessing.resampling.edited_nearest_neighbours', 'EditedNearestNeighboursProfile', None, (None,)),
+    'resampling-near-miss': ('src.Preprocessing.resampling.near_miss', 'NearMissProfile', None, (None,)),
+    'resampling-cluster-centroids': ('src.Preprocessing.resampling.cluster_centroids', 'ClusterCentroidsProfile', None, (None,)),
+
+    'optimization-grid-search': ('src.MachineLearning.Optimization.grid_search', 'GridSearchProfile', 'classification', ('classification', 'regression')),
+    'optimization-random-search': ('src.MachineLearning.Optimization.random_search', 'RandomSearchProfile', 'classification', ('classification', 'regression')),
+    'optimization-optuna-search': ('src.MachineLearning.Optimization.optuna_search', 'OptunaSearchProfile', 'classification', ('classification', 'regression')),
+
+    'metric-comparison': ('src.Evaluation.comparison', 'ComparisonProfile', None, (None,)),
+    'metric-cv-summary': ('src.Evaluation.cv_summary', 'CVSummaryProfile', None, (None,)),
+    'metric-classification-accuracy': ('src.Evaluation.classification.accuracy', 'ClassificationAccuracyProfile', None, (None,)),
+    'metric-classification-precision': ('src.Evaluation.classification.precision', 'ClassificationPrecisionProfile', None, (None,)),
+    'metric-classification-recall': ('src.Evaluation.classification.recall', 'ClassificationRecallProfile', None, (None,)),
+    'metric-classification-f1': ('src.Evaluation.classification.f1', 'ClassificationF1Profile', None, (None,)),
+    'metric-classification-fbeta': ('src.Evaluation.classification.fbeta', 'ClassificationFbetaProfile', None, (None,)),
+    'metric-classification-specificity': ('src.Evaluation.classification.specificity', 'ClassificationSpecificityProfile', None, (None,)),
+    'metric-classification-balanced-accuracy': ('src.Evaluation.classification.balanced_accuracy', 'ClassificationBalancedAccuracyProfile', None, (None,)),
+    'metric-classification-mcc': ('src.Evaluation.classification.mcc', 'ClassificationMccProfile', None, (None,)),
+    'metric-classification-cohen-kappa': ('src.Evaluation.classification.cohen_kappa', 'ClassificationCohenKappaProfile', None, (None,)),
+    'metric-classification-confusion-matrix': ('src.Evaluation.classification.confusion_matrix', 'ClassificationConfusionMatrixProfile', None, (None,)),
+    'metric-classification-roc-auc': ('src.Evaluation.classification.roc_auc', 'ClassificationRocAucProfile', None, (None,)),
+    'metric-classification-average-precision': ('src.Evaluation.classification.average_precision', 'ClassificationAveragePrecisionProfile', None, (None,)),
+    'metric-classification-pr-auc': ('src.Evaluation.classification.pr_auc', 'ClassificationPrAucProfile', None, (None,)),
+    'metric-classification-log-loss': ('src.Evaluation.classification.log_loss', 'ClassificationLogLossProfile', None, (None,)),
+    'metric-classification-brier-score': ('src.Evaluation.classification.brier_score', 'ClassificationBrierScoreProfile', None, (None,)),
+    'metric-classification-gini': ('src.Evaluation.classification.gini', 'ClassificationGiniProfile', None, (None,)),
+    'metric-classification-ks': ('src.Evaluation.classification.ks', 'ClassificationKsProfile', None, (None,)),
+    'metric-classification-lift': ('src.Evaluation.classification.lift', 'ClassificationLiftProfile', None, (None,)),
+    'metric-classification-gain': ('src.Evaluation.classification.gain', 'ClassificationGainProfile', None, (None,)),
+    'metric-classification-lift-curve': ('src.Evaluation.classification.lift_curve', 'ClassificationLiftCurveProfile', None, (None,)),
+    'metric-classification-gain-curve': ('src.Evaluation.classification.gain_curve', 'ClassificationGainCurveProfile', None, (None,)),
+    'metric-classification-roc-curve': ('src.Evaluation.classification.roc_curve', 'ClassificationRocCurveProfile', None, (None,)),
+    'metric-classification-precision-recall-curve': ('src.Evaluation.classification.precision_recall_curve', 'ClassificationPrecisionRecallCurveProfile', None, (None,)),
+    'metric-classification-calibration': ('src.Evaluation.classification.calibration', 'ClassificationCalibrationProfile', None, (None,)),
+    'metric-classification-metrics': ('src.Evaluation.classification.metrics', 'ClassificationMetricsProfile', None, (None,)),
+    'metric-regression-mae': ('src.Evaluation.regression.mae', 'RegressionMaeProfile', None, (None,)),
+    'metric-regression-mse': ('src.Evaluation.regression.mse', 'RegressionMseProfile', None, (None,)),
+    'metric-regression-rmse': ('src.Evaluation.regression.rmse', 'RegressionRmseProfile', None, (None,)),
+    'metric-regression-r2': ('src.Evaluation.regression.r2', 'RegressionR2Profile', None, (None,)),
+    'metric-regression-adjusted-r2': ('src.Evaluation.regression.adjusted_r2', 'RegressionAdjustedR2Profile', None, (None,)),
+    'metric-regression-median-absolute-error': ('src.Evaluation.regression.median_absolute_error', 'RegressionMedianAbsoluteErrorProfile', None, (None,)),
+    'metric-regression-mape': ('src.Evaluation.regression.mape', 'RegressionMapeProfile', None, (None,)),
+    'metric-regression-smape': ('src.Evaluation.regression.smape', 'RegressionSmapeProfile', None, (None,)),
+    'metric-regression-wape': ('src.Evaluation.regression.wape', 'RegressionWapeProfile', None, (None,)),
+    'metric-regression-msle': ('src.Evaluation.regression.msle', 'RegressionMsleProfile', None, (None,)),
+    'metric-regression-rmsle': ('src.Evaluation.regression.rmsle', 'RegressionRmsleProfile', None, (None,)),
+    'metric-regression-explained-variance': ('src.Evaluation.regression.explained_variance', 'RegressionExplainedVarianceProfile', None, (None,)),
+    'metric-regression-max-error': ('src.Evaluation.regression.max_error', 'RegressionMaxErrorProfile', None, (None,)),
+    'metric-regression-pinball-loss': ('src.Evaluation.regression.pinball_loss', 'RegressionPinballLossProfile', None, (None,)),
+    'metric-regression-metrics': ('src.Evaluation.regression.metrics', 'RegressionMetricsProfile', None, (None,)),
+    'metric-clustering-silhouette': ('src.Evaluation.clustering.silhouette', 'ClusteringSilhouetteProfile', None, (None,)),
+    'metric-clustering-davies-bouldin': ('src.Evaluation.clustering.davies_bouldin', 'ClusteringDaviesBouldinProfile', None, (None,)),
+    'metric-clustering-calinski-harabasz': ('src.Evaluation.clustering.calinski_harabasz', 'ClusteringCalinskiHarabaszProfile', None, (None,)),
+    'metric-clustering-ari': ('src.Evaluation.clustering.ari', 'ClusteringAriProfile', None, (None,)),
+    'metric-clustering-ami': ('src.Evaluation.clustering.ami', 'ClusteringAmiProfile', None, (None,)),
+    'metric-clustering-nmi': ('src.Evaluation.clustering.nmi', 'ClusteringNmiProfile', None, (None,)),
+    'metric-clustering-homogeneity': ('src.Evaluation.clustering.homogeneity', 'ClusteringHomogeneityProfile', None, (None,)),
+    'metric-clustering-completeness': ('src.Evaluation.clustering.completeness', 'ClusteringCompletenessProfile', None, (None,)),
+    'metric-clustering-v-measure': ('src.Evaluation.clustering.v_measure', 'ClusteringVMeasureProfile', None, (None,)),
+    'metric-clustering-metrics': ('src.Evaluation.clustering.metrics', 'ClusteringMetricsProfile', None, (None,)),
+    'metric-time-series-mase': ('src.Evaluation.time_series.mase', 'TimeSeriesMaseProfile', None, (None,)),
+    'metric-time-series-rmsse': ('src.Evaluation.time_series.rmsse', 'TimeSeriesRmsseProfile', None, (None,)),
+    'metric-time-series-horizon-errors': ('src.Evaluation.time_series.horizon_errors', 'TimeSeriesHorizonErrorsProfile', None, (None,)),
+    'metric-time-series-metrics': ('src.Evaluation.time_series.metrics', 'TimeSeriesMetricsProfile', None, (None,)),
 
     'plot-selection-feature-importance': ('src.Visualization.selection.feature_importance', 'SelectionFeatureImportanceProfile', None, (None,)),
     'plot-selection-validation-curve': ('src.Visualization.selection.validation_curve', 'SelectionValidationCurveProfile', None, (None,)),

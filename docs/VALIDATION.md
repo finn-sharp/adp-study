@@ -113,3 +113,43 @@ Python 3.12 로컬 전체 단위 검사 113개 중 106개 통과, 선택 TensorF
 Axes 동일 객체/추가 figure·show 없음/명시적 cax/다른 pane 불변/입력 불변,
 ECDF·분모·Wilson·linkage·silhouette·AUC/AP·모든 임계값 비용·PACF·후행 평균을 검증합니다.
 명세와 공개 함수 계약 및 Python 3.7 구문 검사도 통과했습니다.
+
+## 2026-10-13: 독립 평가 메트릭과 skeleton
+
+개별 지표 50개·분야별 묶음 4개·동일 정답 모델 비교/CV 요약 2개를 추가했습니다.
+각 전용 Profile·Output DTO·JSON과 평가 skeleton 56개, 기존 ML/DL·군집 skeleton 연결을 제공합니다.
+전체 registry 189개, JSON 201개입니다.
+
+- Python 3.12.14 일반 분석 환경 전체 unittest 129개: 122개 통과, 선택 TensorFlow 실제 학습 7개 skip.
+- 신규 평가 검사 16개: sklearn 참조값·Lift/Gain 손계산·동률/ceil·AP와 PR-AUC 구분·확률 열 순서·다중 클래스·분모 0·잡음 마스크·학습 naive 기준·horizon 축·CV 요약·입력 불변·JSON/레시피 계약.
+- 오프라인 모듈 실행 56개와 각 평가 skeleton의 오프라인 실행 계약이 통과했습니다.
+- 실제 UCI 이진 Iris 100행의 평가 25개, Wine Quality 1,599행의 평가 15개, Iris 150행 군집 평가 10개, Bike 731시점의 평가 4개 실행 및 DTO JSON을 검증했습니다.
+- 실제 UCI 모델 비교와 폴드 내부 scaler/모델 적합 후 macro F1 CV 요약도 실행했습니다.
+- 기존 선형회귀/군집 skeleton 연결, Python 3.7 구문·문서 링크·git diff 공백을 검사했습니다.
+- 일반 환경 로컬 실행은 TensorFlow 실제 학습을 검증하지 않습니다. 실제 Python 3.7 및 양 버전 TensorFlow 학습은 기존 GitHub Actions 네 환경에서 별도로 실행합니다.
+
+다중 타깃 RMSE는 독립 회귀 모듈과 동일하게 타깃별 sqrt(MSE)의 평균으로 통일했습니다.
+모든 경계와 전체 입력/출력은 [평가 전체 명세](EVALUATION_METRICS.md)에 있습니다.
+
+### PR #12 확률 정밀도 CI 수정
+
+TensorFlow 3.12의 float32 softmax 행 합이 1에서 약 1.19e-7 벗어나 기존 절대 오차 1e-7 검증에 실패했습니다. 원 dtype epsilon의 4배를 반영하되 허용 오차를 [1e-7, 1e-6] 범위로 제한하고, 통과한 반올림 오차만 새 배열에서 정규화합니다. [0,1] 범위 밖·비유한 값·실제 합 오류는 계속 거부합니다.
+
+- float32 반올림 허용·같은 값의 float64 엄격 검증·잘못된 확률 합/음수 거부·입력 불변/지표 참조값의 회귀 검사 추가.
+- Python 3.12.14 일반 분석 전체 130개 검사: 123개 통과, 선택 TensorFlow 실제 학습 7개 skip.
+- 별도 requirements-tensorflow-py312.txt 환경에서 기존 TensorFlow 검사 6개 및 CNN/전용 순환 모델 검사 5개 모두 실제 학습 포함 통과.
+- CI matrix fail-fast를 꺼 한 환경의 실패가 다른 Python 환경의 검증을 취소하지 않도록 변경.
+
+
+## 기출 복원 및 파라미터 최적화 검증 (2026-10-14)
+
+- Python 3.12.14 전체 unittest 138개: 오류 없음, 선택 의존성 관련 7개 skip. Optuna 4.5.0 포함 최적화 전용 8개 테스트를 실행했습니다.
+- 최적화 skeleton: Grid/Random/Optuna × RF/LightGBM × classification/regression = 12조합, cv=2 및 random/Optuna n_iter=2로 실제 보류 평가까지 완료.
+- 21개 풀이 노트북: 158문항, 179개 코드 셀, 72개 그림 출력 실제 실행·보존. `기출문제/검증결과.json`과 회차별 기록 참고.
+- 문제지 21개/47페이지 렌더링 검수. 노트북 스키마·오류 출력 없음·문항 메타데이터 및 출력 보존 확인.
+- 새 Optimization 모듈 및 복원 생성 도구 Python 3.7 문법 AST 통과. 이 작업에서 로컬 Python 3.7 런타임을 실행하지 않았으며 실제 3.7 모듈 실행은 GitHub CI matrix에서 검증합니다. 복원 노트북 실행 job은 Python 3.12로 구성했습니다.
+
+
+## 17~23회 재대조 검증
+
+변경 후 전체 풀이를 실제 재실행하고, 마지막 18/19회 문항 분리 수정은 해당 3개 노트북을 재실행했습니다. 최종 22개 노트북/162문항/184코드 셀/80그래프/48페이지, 스키마·오류 출력·Python 3.7 구문·원자료 16개 해시·PDF 경계·모의 원문 질문 보존 검사 통과. 최적화·레시피·skeleton 관련 24개 테스트 통과. 18/19/21회 보충의 최종 PDF 5페이지를 렌더링해 시각 검수했습니다.
