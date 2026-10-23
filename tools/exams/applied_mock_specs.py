@@ -342,6 +342,7 @@ def specification(number):
             )
         )
     return dict(
+        exam_number=number + 5,
         number=number,
         title=title,
         kind="original_applied_mock",

@@ -6,7 +6,7 @@ import pandas as pd
 from scipy import stats
 import statsmodels.api as sm
 import nbformat,fitz
-ROOT=Path(__file__).resolve().parents[2];DEST=ROOT/'기출문제/모의고사/응용10회'
+ROOT=Path(__file__).resolve().parents[2];DEST=ROOT/'기출문제/모의고사'
 
 def frame(value):return pd.DataFrame(value['data'],columns=value['columns'],index=value['index'])
 def metric(y,p):
@@ -17,13 +17,18 @@ def close(a,b):assert np.isclose(a,b,rtol=1e-7,atol=1e-9),(a,b)
 def audit():
     reports=[];hashes=[]
     for number in range(1,11):
-        folder=DEST/('%02d회'%number);spec=json.loads((folder/'문항명세.json').read_text());plan=spec['plan'];q=[q for s in spec['sections'] for q in s['questions']];ids=[r['id'] for r in q];assert len(q)==len(set(ids))==15 and sum(r['points'] for r in q)==100
-        book=nbformat.read(folder/('응용모의_%02d회_풀이.ipynb'%number),4);nbformat.validate(book);code=[c for c in book.cells if c.cell_type=='code'];assert len(code)==16 and book.metadata.adp.subquestions==ids
+        folder=DEST/('%d회'%(number+5));spec=json.loads((folder/'문항명세.json').read_text());plan=spec['plan'];q=[q for s in spec['sections'] for q in s['questions']];ids=[r['id'] for r in q];assert len(q)==len(set(ids))==15 and sum(r['points'] for r in q)==100
+        assert spec['exam_number']==number+5 and spec['number']==plan['number']==number
+        assert plan['seed']==20270000+number
+        assert ('# 모의고사 %d회'%(number+5)) in (folder/'README.md').read_text()
+        book=nbformat.read(folder/('모의고사_%d회_풀이.ipynb'%(number+5)),4);nbformat.validate(book);code=[c for c in book.cells if c.cell_type=='code'];assert len(code)==16 and book.metadata.adp.subquestions==ids
         script=(folder/'분석코드.py').read_text();md='\n'.join(c.source for c in book.cells if c.cell_type=='markdown')
         for c in code:
             assert c.execution_count is not None and not any(o.output_type=='error' for o in c.outputs);assert c.source in script
             if sys.version_info>=(3,8):ast.parse(c.source,feature_version=(3,7))
-        pdfpath=folder/('응용모의_%02d회_문제지.pdf'%number);pdf=fitz.open(pdfpath);compact=lambda s:re.sub(r'\s+','',s);pdftext=compact(''.join(p.get_text() for p in pdf))
+        pdfpath=folder/('모의고사_%d회_문제지.pdf'%(number+5));pdf=fitz.open(pdfpath);compact=lambda s:re.sub(r'\s+','',s);pdftext=compact(''.join(p.get_text() for p in pdf))
+        assert compact('모의고사 %d회'%(number+5)) in pdftext
+        assert ('# 모의고사 %d회'%(number+5)) in book.cells[0].source
         for s in spec['sections']:
             assert compact(s['context']) in pdftext
             for row in s['questions']:assert row['text'] in md and compact(row['text']) in pdftext,row['id']
@@ -57,10 +62,10 @@ def audit():
             for k,v in metric(np.asarray(future['truth']),np.asarray(values)).items():close(v,future['test_metrics'][name][k])
         denom=np.mean(np.abs(np.diff(ts.target.to_numpy()[:-h],n=1))) if plan['period']==1 else np.mean(np.abs(ts.target.to_numpy()[plan['period']:-h]-ts.target.to_numpy()[:-h-plan['period']]))
         close(denom,future['test_metrics']['mase_denominator']);close(future['test_metrics']['selected']['mae']/denom,future['test_metrics']['mase']);assert np.all(np.asarray(future['interval_lower'])<=np.asarray(future['interval_upper']))
-        report=dict(number=number,status='passed',questions=15,points=100,code_cells=16,figures=sum('image/png' in o.get('data',{}) for c in code for o in c.get('outputs',[])),pdf_pages=len(pdf),selected_regression=final['selected_name'],baseline_r2=final['baseline_test']['r2'],selected_r2=final['selected_test']['r2'],classification_auc=cl['roc_auc'],selected_classifier=cl['selected'],python=sys.version.split()[0],pdf_sha256=hashlib.sha256(pdfpath.read_bytes()).hexdigest(),checks=['PDF/풀이 동일 지문·배점·A4 경계','기준OLS 직접 적합 대조','원단위 보류 R²/RMSE/MAE 직접 계산','CV/미래/삭제 원행 분리','AUC rank-U·Brier·비용 직접 계산','시계열 naive·MASE·rolling 경계'])
+        report=dict(number=number+5,case_number=number,status='passed',questions=15,points=100,code_cells=16,figures=sum('image/png' in o.get('data',{}) for c in code for o in c.get('outputs',[])),pdf_pages=len(pdf),selected_regression=final['selected_name'],baseline_r2=final['baseline_test']['r2'],selected_r2=final['selected_test']['r2'],classification_auc=cl['roc_auc'],selected_classifier=cl['selected'],python=sys.version.split()[0],pdf_sha256=hashlib.sha256(pdfpath.read_bytes()).hexdigest(),checks=['PDF/풀이 동일 지문·배점·A4 경계','기준OLS 직접 적합 대조','원단위 보류 R²/RMSE/MAE 직접 계산','CV/미래/삭제 원행 분리','AUC rank-U·Brier·비용 직접 계산','시계열 naive·MASE·rolling 경계'])
         (folder/'검증결과.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n');reports.append(report)
     assert len(set(hashes))==10
     output=dict(status='passed',exams=10,questions=150,code_cells=160,figures=sum(r['figures'] for r in reports),pdf_pages=sum(r['pdf_pages'] for r in reports),examination_data='independent fixed synthetic datasets, not official exam or empirical business data',reports=reports)
-    (DEST/'검증결과.json').write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n');return output
+    (DEST/'공통/응용_검증결과.json').write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n');return output
 if __name__=='__main__':
     report=audit();print(json.dumps({k:v for k,v in report.items() if k!='reports'},ensure_ascii=False))

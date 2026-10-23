@@ -15,7 +15,7 @@
 
 ## 모의고사의 읽는 순서
 
-현재 모의 자료는 기존1~5회·생존분석 모의·응용10회, 총16묶음211문항입니다. 각 묶음에는 다음 자료가 있습니다.
+현재 모의 자료는 종합 모의1~15회·생존분석 모의, 총16묶음211문항입니다. 각 묶음에는 다음 자료가 있습니다.
 
 | 자료 | 제공 내용 | 읽는 기준 |
 | --- | --- | --- |
@@ -47,7 +47,7 @@ python tools/exams/improve_mock_readability.py
 # 실제 풀이 실행 이후 수치 해설만 갱신
 python tools/exams/improve_mock_readability.py --answers-only
 python tools/exams/audit_mock_readability.py
-python -m black --check --workers 1 src 기출문제/모의고사/응용10회/공통
+python -m black --check --workers 1 src 기출문제/모의고사/공통
 ```
 
 생존분석의 실제 실행에는 해당 폴더 또는 도메인 requirements도 필요합니다. 실행기를 사용할 때는 `python tools/exams/execute_notebooks.py <노트북 경로>`로 각 노트북을 독립 실행합니다. PDF·자료 사전 생성은 같은 입력에서 같은 파일을 만들며, 해설은 실제 실행 후 갱신합니다. 기존 생성기의 후처리에도 같은 편집 규칙을 연결했습니다.

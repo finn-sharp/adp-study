@@ -1,0 +1,25 @@
+{
+  "number": 11,
+  "case_number": 6,
+  "status": "passed",
+  "questions": 15,
+  "points": 100,
+  "code_cells": 16,
+  "figures": 5,
+  "pdf_pages": 7,
+  "selected_regression": "aic",
+  "baseline_r2": 0.7238431316876541,
+  "selected_r2": 0.7272335083872685,
+  "classification_auc": 0.7252136752136752,
+  "selected_classifier": "none",
+  "python": "3.12.14",
+  "pdf_sha256": "e419d284945a277ce3d89f96d024ffb73a7a8b1fb493988d2ef4127e4a3a7a20",
+  "checks": [
+    "PDF/풀이 동일 지문·배점·A4 경계",
+    "기준OLS 직접 적합 대조",
+    "원단위 보류 R²/RMSE/MAE 직접 계산",
+    "CV/미래/삭제 원행 분리",
+    "AUC rank-U·Brier·비용 직접 계산",
+    "시계열 naive·MASE·rolling 경계"
+  ]
+}
