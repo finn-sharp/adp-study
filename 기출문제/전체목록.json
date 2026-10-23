@@ -6,10 +6,10 @@
     "default_recipe_combinations": 281
   },
   "summary": {
-    "bundles": 41,
-    "questions": 393,
-    "code_cells": 434,
-    "figures": 145
+    "bundles": 46,
+    "questions": 453,
+    "code_cells": 499,
+    "figures": 175
   },
   "mapping_method": "conservative static references; dynamic calls and remaining direct library code are not asserted as migrated",
   "bundles": [
@@ -3793,6 +3793,496 @@
       "question_paper": "기출문제/모의고사/15회/모의고사_15회_문제지.pdf",
       "execution": "기출문제/모의고사/15회/실행검증.json",
       "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/16회",
+      "kind": "researched_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·입력·반응·누출 위험과 결측을 정리하고 지정한 학습/평가 원행을 기록하시오. 학습 입력의 분포와 변수 관계를 ax 두 개에 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "학습 자료에 지정 OLS를 적합하고 계수 t 검정·전체 F 검정·R²·수정 R²·AIC·BIC를 보고하시오. 단순모형과 전체모형의 비교에서 같은 행과 반응을 유지하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "RESET·잔차 정규성·Breusch-Pagan·VIF·Cook을 계산하고 Q-Q·잔차/적합값을 subplots로 제시하시오. 명시하지 않은 관측 제거를 수행하지 말고 진단별 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 CV에서 기준 선형모형·다항식·랜덤포레스트를 RMSE로 비교해 하나를 선택하시오. 봉인한 같은 평가 행에서 원단위 RMSE·MAE·R²와 관측-예측 그림을 제시하고 기준 대비 차이를 해석하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "문서 식별자·집단·공백 문서·중복을 확인하고 소문자화·영문 토큰 분리를 수행하시오. 제공 사전의 품사·극성·불용어 역할을 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 품사만 남기고 단어별 출현 횟수·문서빈도를 구하시오. 상위 단어 빈도를 ax에 그리고 둘의 분모가 다른 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "문서별 사전 일치율과 형용사 극성 평균을 계산하시오. 일치 단어가 없는 문서의 점수는 결측으로 유지하고 미등록·부정 표현에 대한 규칙의 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "문서별 결과와 집단별 유효 문서 수·평균 점수를 저장하고 그림으로 비교하시오. 명사 중심 과제에서도 형용사 기반 감성은 별도 보충으로 구분하고 집단의 실제 만족도로 일반화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "사건/클래스 정의·시점·식별자·결측·클래스 비율을 정리하고 층화 학습/평가 분리 원행을 제시하시오. 범주별 목표 분포를 ax에 표시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정한 여러 분류기와 soft voting을 같은 학습 CV로 비교하시오. 학습 폴드 내부 전처리·지정 sampling·GridSearchCV를 사용하고 macro F1로 선택한 설정과 CV 결과를 기록하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 후보를 전체 학습 자료에 적합하고 평가 혼동행렬·클래스별 재현율·macro F1·클래스 순서를 제시하시오. 이진 또는 one-vs-rest ROC와 AUC를 ax별로 그리고 확률 보정·임계값 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "라벨 없는 별도 제출 자료를 예측해 id·prediction 열의 submission.csv를 저장하시오. 행 순서·식별자·라벨 정의역·중복·누락을 검사하고 평가 점수와 실제 제출 자료의 성능을 구분하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 12,
+      "notebook": "기출문제/모의고사/16회/모의고사_16회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/16회/모의고사_16회_문제지.pdf",
+      "execution": "기출문제/모의고사/16회/실행검증.json",
+      "code_cells": 13,
+      "figures": 7,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/17회",
+      "kind": "researched_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·입력·반응·누출 위험과 결측을 정리하고 지정한 학습/평가 원행을 기록하시오. 학습 입력의 분포와 변수 관계를 ax 두 개에 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "학습 자료에 지정 OLS를 적합하고 계수 t 검정·전체 F 검정·R²·수정 R²·AIC·BIC를 보고하시오. 단순모형과 전체모형의 비교에서 같은 행과 반응을 유지하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "RESET·잔차 정규성·Breusch-Pagan·VIF·Cook을 계산하고 Q-Q·잔차/적합값을 subplots로 제시하시오. 명시하지 않은 관측 제거를 수행하지 말고 진단별 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 CV에서 기준 선형모형·다항식·랜덤포레스트를 RMSE로 비교해 하나를 선택하시오. 봉인한 같은 평가 행에서 원단위 RMSE·MAE·R²와 관측-예측 그림을 제시하고 기준 대비 차이를 해석하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "사건/클래스 정의·시점·식별자·결측·클래스 비율을 정리하고 층화 학습/평가 분리 원행을 제시하시오. 범주별 목표 분포를 ax에 표시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정한 여러 분류기와 soft voting을 같은 학습 CV로 비교하시오. 학습 폴드 내부 전처리·지정 sampling·GridSearchCV를 사용하고 macro F1로 선택한 설정과 CV 결과를 기록하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "선택 후보를 전체 학습 자료에 적합하고 평가 혼동행렬·클래스별 재현율·macro F1·클래스 순서를 제시하시오. 이진 또는 one-vs-rest ROC와 AUC를 ax별로 그리고 확률 보정·임계값 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "라벨 없는 별도 제출 자료를 예측해 id·prediction 열의 submission.csv를 저장하시오. 행 순서·식별자·라벨 정의역·중복·누락을 검사하고 평가 점수와 실제 제출 자료의 성능을 구분하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "거래 식별자와 항목 목록을 분리하고 거래 안 중복 항목을 제거하시오. 빈 거래 포함 지지도 분모와 추천 목적을 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "최소 지지도0.15·신뢰도0.5·lift1·최대 길이3으로 Apriori를 실행하고 빈발 항목집합·규칙 표를 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "출력 규칙 하나를 원 거래에서 직접 세어 지지도·신뢰도·lift를 검산하시오. 빈 규칙일 때는 없음으로 보고하고 구매의 인과라고 해석하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "관심 장바구니에 적용 가능한 미구매 추천을 만들고 규칙이 없을 때의 동작과 인기 편향·새 고객·운영 검증 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 12,
+      "notebook": "기출문제/모의고사/17회/모의고사_17회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/17회/모의고사_17회_문제지.pdf",
+      "execution": "기출문제/모의고사/17회/실행검증.json",
+      "code_cells": 13,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/18회",
+      "kind": "researched_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "사건/클래스 정의·시점·식별자·결측·클래스 비율을 정리하고 층화 학습/평가 분리 원행을 제시하시오. 범주별 목표 분포를 ax에 표시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "지정한 여러 분류기와 soft voting을 같은 학습 CV로 비교하시오. 학습 폴드 내부 전처리·지정 sampling·GridSearchCV를 사용하고 macro F1로 선택한 설정과 CV 결과를 기록하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "선택 후보를 전체 학습 자료에 적합하고 평가 혼동행렬·클래스별 재현율·macro F1·클래스 순서를 제시하시오. 이진 또는 one-vs-rest ROC와 AUC를 ax별로 그리고 확률 보정·임계값 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "라벨 없는 별도 제출 자료를 예측해 id·prediction 열의 submission.csv를 저장하시오. 행 순서·식별자·라벨 정의역·중복·누락을 검사하고 평가 점수와 실제 제출 자료의 성능을 구분하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "날짜 파싱·간격·중복·결측을 점검하고 마지막8시점을 평가로 봉인하시오. 학습 수준/차분 그림과 ADF 결과를 제시하며 정상성·정규성을 구분하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "최종평가 이전의 두 rolling 검증 구간에서 지정 SARIMA 후보를 같은 horizon으로 비교하시오. 평균 RMSE로 후보를 선택하고 각 학습·검증 경계와 실패/수렴 기록을 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "선택 차수를 과거 전체에 재적합하고 AIC·BIC·수렴·초기화 구간을 제외한 Ljung-Box 결과를 제시하시오. 잔차 시계열·Q-Q를 ax별로 그리고 남은 가정을 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "같은 미래8시점에서 선택 모형과 계절 naive의 RMSE·MAE·R²·학습 계절차분 분모 MASE를 계산하시오. 95% 조건부 예측구간·관측 포함률을 제시하고 모수/선택 불확실성의 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "문서 식별자·집단·공백 문서·중복을 확인하고 소문자화·영문 토큰 분리를 수행하시오. 제공 사전의 품사·극성·불용어 역할을 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 품사만 남기고 단어별 출현 횟수·문서빈도를 구하시오. 상위 단어 빈도를 ax에 그리고 둘의 분모가 다른 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "문서별 사전 일치율과 형용사 극성 평균을 계산하시오. 일치 단어가 없는 문서의 점수는 결측으로 유지하고 미등록·부정 표현에 대한 규칙의 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "문서별 결과와 집단별 유효 문서 수·평균 점수를 저장하고 그림으로 비교하시오. 명사 중심 과제에서도 형용사 기반 감성은 별도 보충으로 구분하고 집단의 실제 만족도로 일반화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 12,
+      "notebook": "기출문제/모의고사/18회/모의고사_18회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/18회/모의고사_18회_문제지.pdf",
+      "execution": "기출문제/모의고사/18회/실행검증.json",
+      "code_cells": 13,
+      "figures": 7,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/19회",
+      "kind": "researched_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "1~5 척도 범위·결측을 확인하고 역문항 q2·q4를6-x로 변환하시오. id는 제외하고 집단별 평균·표준편차·왜도·첨도를 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "역변환 전후의 공분산 기반 Cronbach alpha와 평균 문항 간 상관 기반 표준화 alpha를 구하시오. 공식·문항 수·분모를 표시하고 신뢰도와 타당도·단일차원의 차이를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "방향을 맞춘 문항을 표준화한 PCA를 수행하고 축별 설명분산·적재 방향·재구성 오차를 보고하시오. PCA를 공통요인분석으로 부르지 말고 2축 그림을 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "완전 관측 응답자의 평균 점수를 집단 간 Welch t 검정으로 비교하시오. H0/H1·통계량·자유도·p값·95% 차이 CI·기각 여부·효과와 표본 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "국가·날짜 key 중복과 누적수치·인구를 검증하고 국가별 누적 추이를 ax에 표시하시오. 가상 국가 자료이며 실제 방역 의사결정용이 아님을 명시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "국가별 정렬 후 누적 확진·사망을 차분해 일별 값을 구하시오. 첫날 기저값0과 음수 정정치를 보존하고 그 위치를 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "마지막 날의 누적확진/인구×10000과 누적사망/인구×100000을 각각 구하고 두 지표 합을 학습용 위험점수로 정의해 순위표·그림을 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "가상 국가 A의 일별 확진 마지막7일을 봉인하고 ARIMA(1,0,0) 및 직전7일 평균 기준을 같은 날짜에서 비교하시오. RMSE·MAE와 음수 예측·정정 자료의 한계를 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "관측 단위·입력·반응·누출 위험과 결측을 정리하고 지정한 학습/평가 원행을 기록하시오. 학습 입력의 분포와 변수 관계를 ax 두 개에 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "학습 자료에 지정 OLS를 적합하고 계수 t 검정·전체 F 검정·R²·수정 R²·AIC·BIC를 보고하시오. 단순모형과 전체모형의 비교에서 같은 행과 반응을 유지하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "RESET·잔차 정규성·Breusch-Pagan·VIF·Cook을 계산하고 Q-Q·잔차/적합값을 subplots로 제시하시오. 명시하지 않은 관측 제거를 수행하지 말고 진단별 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "동일 학습 CV에서 기준 선형모형·다항식·랜덤포레스트를 RMSE로 비교해 하나를 선택하시오. 봉인한 같은 평가 행에서 원단위 RMSE·MAE·R²와 관측-예측 그림을 제시하고 기준 대비 차이를 해석하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 12,
+      "notebook": "기출문제/모의고사/19회/모의고사_19회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/19회/모의고사_19회_문제지.pdf",
+      "execution": "기출문제/모의고사/19회/실행검증.json",
+      "code_cells": 13,
+      "figures": 6,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/20회",
+      "kind": "researched_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "날짜·target·제공lag1/lag2를 점검하고 원 target의 shift와 다른 지연값 위치를 찾으시오. 지연값을 다시 만들고 사후 audit 열을 입력에서 제외하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "시간순 앞70%의 앞80% proper 학습 구간 안에서 gap2의 TimeSeriesSplit 3개로 RF와 SVR의 지정 후보를 비교하시오. 학습 폴드에서만 대치·스케일을 적합하고 CV RMSE로 선택하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "학습 마지막20%를 별도 calibration으로 떼고 앞부분만 적합한 선택 후보의 절대 잔차 90% 유한표본 분위수로 구간 반폭을 정하시오. 시간 의존성 아래 보장 한계를 명시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "같은 최종30%의 매일 1-step 예측을 수행하여 원단위 RMSE·MAE·R²·경험 구간 포함률·평균 폭을 구하시오. 선택 모형은 calibration 후 다시 적합하지 말고 naive lag1과 비교하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "household×timestamp key·시간 간격·전력량 단위를 점검하시오. 하루/가구별 총 kWh와 시간대 평균 프로필을 각각 만들어 집계 분모를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "가구별24차원 평균 프로필의 시간열을 가구 간 표준화하고 k=2·3·4 KMeans를 비교해 silhouette 최대로 선택하시오. 이 자료 전체가 탐색 모집단이며 예측 평가가 아님을 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "가구별 군집을 원 관측에 many-to-one으로 연결하고 군집×요일×시간 평균 히트맵을 ax별로 제시하시오. 라벨 결합으로 행 수가 늘거나 빠지지 않는지 검증하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "군집별 가구 수·일평균 사용량·피크 시간·야간 비율을 비교하고 수요관리 제안을 하시오. 집계 평균의 한계와 실험/미래 운영 검증 필요성을 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "관측 단위·입력·반응·누출 위험과 결측을 정리하고 지정한 학습/평가 원행을 기록하시오. 학습 입력의 분포와 변수 관계를 ax 두 개에 제시하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "학습 자료에 지정 OLS를 적합하고 계수 t 검정·전체 F 검정·R²·수정 R²·AIC·BIC를 보고하시오. 단순모형과 전체모형의 비교에서 같은 행과 반응을 유지하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "RESET·잔차 정규성·Breusch-Pagan·VIF·Cook을 계산하고 Q-Q·잔차/적합값을 subplots로 제시하시오. 명시하지 않은 관측 제거를 수행하지 말고 진단별 한계를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "동일 학습 CV에서 기준 선형모형·다항식·랜덤포레스트를 RMSE로 비교해 하나를 선택하시오. 봉인한 같은 평가 행에서 원단위 RMSE·MAE·R²와 관측-예측 그림을 제시하고 기준 대비 차이를 해석하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 12,
+      "notebook": "기출문제/모의고사/20회/모의고사_20회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/20회/모의고사_20회_문제지.pdf",
+      "execution": "기출문제/모의고사/20회/실행검증.json",
+      "code_cells": 13,
       "figures": 5,
       "verified_python": "3.12.14",
       "scope": "reconstructed_or_original_learning_material; see source audits"

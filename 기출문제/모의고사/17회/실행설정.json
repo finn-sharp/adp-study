@@ -1,0 +1,25 @@
+{
+  "seed": 20281017,
+  "sections": [
+    {
+      "family": "reg",
+      "settings": {
+        "interaction": false
+      },
+      "context": "x1=면적 편차지수, x2=노후도 편차지수, x3=교통 접근 점수, target=가격(천만원). 240행. x1에 결측이 있다. id를 제외하고 중앙값 대치 후 수치형은 학습 평균/표준편차(ddof0)로 표준화하고 집단은 one-hot(drop first) 처리한 뒤 OLS를 적합한다. x1,x2,x3의 단순/전체모형 비교는 같은 학습 행이다. random_state=20281017로 학습70%/평가30%를 나누고 학습3-fold shuffled CV를 사용한다. 다항식 차수2, RF60나무 깊이3/5는 사전 후보다."
+    },
+    {
+      "family": "cls",
+      "settings": {
+        "classes": 3,
+        "sampling": false
+      },
+      "context": "학습360행과 정답 없는 제출24행은 별개다. target은 0=기본,1=일반,2=우수 서비스 등급; 등급은 관측 후 확정된 결과다. id는 입력 제외. random_state=20281017로 층화70/30, 학습3-fold shuffled CV. 수치 중앙값 대치·표준화, group 최빈 대치·one-hot(handle_unknown=ignore)를 CV 안에서 적합한다. 후보는 LR C=0.3/1, RF60나무 깊이3/5, GB40단계 깊이2, LR/RF/GB 동일 가중 soft voting이다. 추가 sampling은 적용하지 않는다."
+    },
+    {
+      "family": "assoc",
+      "settings": {},
+      "context": "거래100건. items는 | 구분 문자열이며 공백 거래도 하나의 거래다. 추천 대상 장바구니는 [bread]다. 전체 자료의 기술 연관분석이며 별도 미래 성능은 없다."
+    }
+  ]
+}

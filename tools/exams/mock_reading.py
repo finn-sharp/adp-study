@@ -287,6 +287,8 @@ LEGACY = {
 
 def reading(folder, section, number=None):
     """배경·자료 사전·분석 목적을 계산 결과와 독립적으로 반환합니다."""
+    if "reader_guide" in section:
+        return dict(section["reader_guide"])
     data = section.get("data", "").split(" + ")
     rows = []
     if number:

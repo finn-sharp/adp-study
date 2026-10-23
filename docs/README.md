@@ -29,7 +29,7 @@
 | 새 모듈 작성 규약 | [7개 섹션·메타데이터·필드·함수 명세](MODEL_MODULE_FORMAT.md) |
 | 검증 근거·이력 | [실행 검증 기록](VALIDATION.md), [도메인 수치/API 검증](DOMAIN_VALIDATION.json), [기존 답안 비교](DOMAIN_ANSWER_REGRESSION.json) |
 | 기법별 필드의 기계 참조 | [도메인19개 API 스냅샷](DOMAIN_EXTENSION_API.json); 전체 등록부를 대신하지 않음 |
-| 전체 학습 자료 | [통합 목록](../기출문제/전체목록.md), [종합 모의1~15회](../기출문제/모의고사/README.md) |
+| 전체 학습 자료 | [통합 목록](../기출문제/전체목록.md), [종합 모의1~20회](../기출문제/모의고사/README.md) |
 | 문제 설계·출처·공문서 서식 | [상황형 설계](SCENARIO_EXAM_DESIGN.md), [자료 대조](EXAM_RECONSTRUCTION_AUDIT.md), [17~23회 출처](ADP_17_23_SOURCE_AUDIT.md), [서식](QUESTION_PAPER_STYLE.md) |
 | 원 스켈레톤 근거 | [참고 XGBoost](reference-skeleton/xgboost.py); 실행 기능은 src의 현행 모듈 기준 |
 
