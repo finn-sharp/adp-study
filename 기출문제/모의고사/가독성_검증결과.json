@@ -1,0 +1,111 @@
+{
+  "status": "passed",
+  "bundles": 16,
+  "questions": 211,
+  "pdf_pages": 112,
+  "checks": [
+    "전수 변수 사전",
+    "관측·도메인 설명",
+    "문제/풀이 지문 보존",
+    "실행 오류·독립 코드 정합성",
+    "A4 좌표 경계"
+  ],
+  "records": [
+    {
+      "folder": "기출문제/모의고사/1회",
+      "questions": 9,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/2회",
+      "questions": 7,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/3회",
+      "questions": 9,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/4회",
+      "questions": 8,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/5회",
+      "questions": 14,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/생존분석_통계",
+      "questions": 14,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/01회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/02회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/03회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/04회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/05회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/06회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/07회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/08회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/09회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/응용10회/10회",
+      "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    }
+  ]
+}

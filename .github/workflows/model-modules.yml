@@ -170,6 +170,8 @@ jobs:
           for notebook in sorted(Path('기출문제').rglob('*풀이.ipynb')):
               subprocess.run([sys.executable, 'tools/exams/execute_notebooks.py', str(notebook)], check=True)
           PY
+      - name: Audit domain-readable mock materials
+        run: python tools/exams/audit_mock_readability.py
       - name: Audit scenario questions and executed hypothesis answers
         run: python tools/exams/audit_scenarios.py
   tensorflow:

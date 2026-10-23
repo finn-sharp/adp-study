@@ -4,7 +4,7 @@
   "questions": 14,
   "points": 100,
   "code_cells": 15,
-  "pages": 5,
+  "pages": 7,
   "figures": 3,
   "checks": [
     "PDF/노트북 동일 지문",
@@ -15,5 +15,5 @@
     "정규성/동시상한",
     "노트북/분석코드 동일"
   ],
-  "pdf_sha256": "49688d28f407cfdb861f5421dc82fc7ca8304c1279952a6f8cff3042e51e295e"
+  "pdf_sha256": "f476a999d431c90793d0060ea3e838fb99f8e219ac5ec98d024737d2ed2779b9"
 }
