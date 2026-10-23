@@ -1,0 +1,19 @@
+{
+  "number": 3,
+  "seed": 20270003,
+  "regression_kind": "quadratic",
+  "features": [
+    "irradiance",
+    "temperature",
+    "voltage",
+    "cloud"
+  ],
+  "unit": "출력(kW)",
+  "classification_event": "고장 경보",
+  "sampler": "random_under",
+  "classification_search": "grid",
+  "ordered_regression": false,
+  "period": 7,
+  "horizon": 7,
+  "false_negative_cost": 6
+}

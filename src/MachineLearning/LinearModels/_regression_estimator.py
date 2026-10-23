@@ -18,7 +18,7 @@ from src.stats.regression.ols import run_ols,OLSProfile
 
 class RegressionEstimator(RegressorMixin,BaseEstimator):
     """CV가 clone해서 폴드 내부에서 모든 선택·통계 적합을 수행합니다."""
-    def __init__(self,preprocessor=None,power='none',degree=1,target_method='none',vif_threshold=None,influence_action='flag',cook_threshold=None,max_remove_fraction=.1,cov_type='nonrobust',hac_maxlags=1,smearing=False,alpha=.05):
+    def __init__(self,preprocessor=None,power='none',degree=1,target_method='none',vif_threshold=None,influence_action='flag',cook_threshold=None,max_remove_fraction=.1,cov_type='nonrobust',hac_maxlags=1,smearing=False,alpha=.05,information_criterion=None):
         """미적합 설정을 보존합니다.
 
         Args:
@@ -34,12 +34,13 @@ class RegressionEstimator(RegressorMixin,BaseEstimator):
             hac_maxlags: HAC 최대 지연.
             smearing: log/log1p 예측의 학습 잔차 Duan 보정.
             alpha: 계수/구간 유의수준.
+            information_criterion: None/aic/bic 학습 설계의 후진 선택.
         Returns:
             None: 미적합 설정.
         Raises:
             None: fit에서 검증.
         """
-        self.preprocessor=preprocessor;self.power=power;self.degree=degree;self.target_method=target_method;self.vif_threshold=vif_threshold;self.influence_action=influence_action;self.cook_threshold=cook_threshold;self.max_remove_fraction=max_remove_fraction;self.cov_type=cov_type;self.hac_maxlags=hac_maxlags;self.smearing=smearing;self.alpha=alpha
+        self.preprocessor=preprocessor;self.power=power;self.degree=degree;self.target_method=target_method;self.vif_threshold=vif_threshold;self.influence_action=influence_action;self.cook_threshold=cook_threshold;self.max_remove_fraction=max_remove_fraction;self.cov_type=cov_type;self.hac_maxlags=hac_maxlags;self.smearing=smearing;self.alpha=alpha;self.information_criterion=information_criterion
 
     def _raw(self,X):
         """원 Feature와 열 순서를 확인합니다.
@@ -81,6 +82,12 @@ class RegressionEstimator(RegressorMixin,BaseEstimator):
         names=self.preprocessor_.get_feature_names_out().tolist();expanded=pd.DataFrame(matrix,index=raw.index,columns=names)
         self.selector_=build_vif_selector(VIFSelectionProfile(threshold=self.vif_threshold)).fit(expanded)
         selected=self.selector_.transform(expanded);self.output_features_=self.selector_.get_feature_names_out().tolist()
+        self.information_selector_=None
+        if self.information_criterion is not None:
+            from src.stats.regression.information_selection import InformationSelector
+            frame=pd.DataFrame(selected,index=raw.index,columns=self.output_features_)
+            self.information_selector_=InformationSelector(criterion=self.information_criterion).fit(frame,target)
+            selected=self.information_selector_.transform(frame);self.output_features_=self.information_selector_.get_feature_names_out().tolist()
         self.target_transformer_=build_target_transformer(TargetTransformProfile(method=self.target_method)).fit(target)
         return pd.DataFrame(selected,index=raw.index,columns=self.output_features_),self.target_transformer_.transform(target)
 
@@ -101,6 +108,7 @@ class RegressionEstimator(RegressorMixin,BaseEstimator):
         if target.ndim!=1 or len(target)!=len(raw) or not np.isfinite(target).all() or np.ptp(target)==0:raise ValueError('대응 비상수 타깃이 필요합니다.')
         if self.power not in ('none','yeo-johnson','box-cox') or self.influence_action not in ('flag','drop') or not isinstance(self.smearing,bool):raise ValueError('모형 처리 설정 오류')
         if self.smearing and self.target_method not in ('log','log1p'):raise ValueError('smearing은 log/log1p에서만 지원합니다.')
+        if self.information_criterion is not None and self.target_method!='none':raise ValueError('AIC/BIC 선택은 원 반응 척도에서만 지원합니다. 목표 변환 후보는 CV로 비교하세요.')
         self.feature_names_in_=np.asarray(raw.columns,dtype=object);self.n_features_in_=raw.shape[1]
         design,transformed=self._prepare(raw,target);self.kept_positions_=np.arange(len(raw));self.removed_positions_=np.array([],dtype=int);self.influence_review_=None
         if self.influence_action=='drop':
@@ -129,7 +137,9 @@ class RegressionEstimator(RegressorMixin,BaseEstimator):
         matrix=self.preprocessor_.transform(raw)
         if hasattr(matrix,'toarray'):matrix=matrix.toarray()
         names=self.preprocessor_.get_feature_names_out().tolist();expanded=pd.DataFrame(matrix,index=raw.index,columns=names)
-        return pd.DataFrame(self.selector_.transform(expanded),index=raw.index,columns=self.output_features_)
+        selected=pd.DataFrame(self.selector_.transform(expanded),index=raw.index,columns=self.selector_.get_feature_names_out())
+        if self.information_selector_ is not None:selected=pd.DataFrame(self.information_selector_.transform(selected),index=raw.index,columns=self.output_features_)
+        return selected
 
     def predict(self,X):
         """새 행의 예측을 원 y 단위로 반환합니다.

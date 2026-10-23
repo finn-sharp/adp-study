@@ -1,0 +1,9 @@
+{
+  "horizon": 7,
+  "validation_size": 7,
+  "folds": 3,
+  "period": 1,
+  "candidate_orders": null,
+  "maxiter": 100,
+  "alpha": 0.05
+}

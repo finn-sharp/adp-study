@@ -1,0 +1,19 @@
+{
+  "number": 4,
+  "seed": 20270004,
+  "regression_kind": "heteroscedastic",
+  "features": [
+    "load",
+    "pressure",
+    "temperature",
+    "speed"
+  ],
+  "unit": "수율 점수",
+  "classification_event": "불량 발생",
+  "sampler": "smote",
+  "classification_search": "grid",
+  "ordered_regression": false,
+  "period": 1,
+  "horizon": 7,
+  "false_negative_cost": 7
+}

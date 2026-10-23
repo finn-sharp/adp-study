@@ -1,0 +1,19 @@
+{
+  "number": 7,
+  "seed": 20270007,
+  "regression_kind": "exponential",
+  "features": [
+    "concentration",
+    "temperature",
+    "stirring",
+    "impurity"
+  ],
+  "unit": "반응량(mg)",
+  "classification_event": "실험 실패",
+  "sampler": "smote",
+  "classification_search": "grid",
+  "ordered_regression": false,
+  "period": 1,
+  "horizon": 7,
+  "false_negative_cost": 10
+}

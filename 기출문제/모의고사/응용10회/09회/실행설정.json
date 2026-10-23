@@ -1,0 +1,19 @@
+{
+  "number": 9,
+  "seed": 20270009,
+  "regression_kind": "poisson",
+  "features": [
+    "users",
+    "release_change",
+    "usage",
+    "complexity"
+  ],
+  "unit": "일별 문의 횟수",
+  "classification_event": "고객 이탈",
+  "sampler": "random_under",
+  "classification_search": "grid",
+  "ordered_regression": false,
+  "period": 1,
+  "horizon": 7,
+  "false_negative_cost": 12
+}

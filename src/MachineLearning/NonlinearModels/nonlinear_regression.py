@@ -139,6 +139,24 @@ def _function(name):
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+def build_nonlinear_regressor(profile=None, *, recipe_path=None, overrides=None):
+    """미적합 CV adapter를 기존 비선형 Profile/JSON으로 구성합니다.
+
+    Args:
+        profile: NonlinearRegressionProfile 또는 None.
+        recipe_path: 선택 사용자 JSON.
+        overrides: Profile 생략 시 일회성 재정의.
+    Returns:
+        NonlinearRegressor: 단일 Feature의 미적합 sklearn 추정기.
+    Raises:
+        ValueError/TypeError/OSError: Profile/레시피 오류. fit에서 정의역 검증.
+    """
+    from ._estimator import NonlinearRegressor
+    p=resolve_profile('nonlinear-regression',profile,recipe_path=recipe_path,overrides=overrides)
+    if p.absolute_sigma:raise ValueError('CV adapter에는 알려진 sigma를 전달하지 않습니다.')
+    return NonlinearRegressor(p.model_name,p.initial_parameters,p.lower_bounds,p.upper_bounds,p.maxfev)
+
+
 def run_nonlinear_regression(x, y, profile: Optional[NonlinearRegressionProfile] = None,
                              recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None,
                              sigma=None, x_test=None, y_test=None) -> NonlinearRegressionOutputDTO:

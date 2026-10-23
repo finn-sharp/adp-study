@@ -70,7 +70,7 @@ class RegressionDistributionVisualizationsTest(unittest.TestCase):
 
     def test_new_profiles_dtos_seven_sections_and_all_function_contracts(self):
         keys=[key for key in _REGISTRY if key.startswith(('regression-','naive-bayes-','plot-qq-','plot-regression-'))]
-        self.assertEqual(len(keys),44)
+        self.assertEqual(len(keys),48)
         for key in keys:
             path,profile_name,_,_=_REGISTRY[key];module=importlib.import_module(path);source=Path(module.__file__).read_text();profile=load_profile(key)
             self.assertIsInstance(profile,getattr(module,profile_name))

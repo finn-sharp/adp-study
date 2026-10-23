@@ -1,6 +1,6 @@
 # 전체 분석 모듈 명세
 
-현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 258개, 모델·목적별 JSON 레시피는 285개입니다.
+현재 main의 기존 구현과 이번 추가 구현을 기준으로 작성했습니다. 표준 명세의 모듈은 266개, 모델·목적별 JSON 레시피는 293개입니다.
 기존 단일·독립 두 표본 Z·t 검정 파일 2개도 아래에 별도로 명세합니다.
 비모수 검정의 빈 파일은 구현 완료로 집계하지 않습니다.
 
@@ -1841,3 +1841,7 @@ ANOVA/사후검정은 parametric/Average/anova, MANOVA는 parametric/Multivariat
 ## 회귀·분포별 모형·유전 알고리즘 확장
 
 44개 회귀/전처리/NB/QQ/Axes 모듈의 전체 필드·함수 명세는 [회귀·분포 명세](REGRESSION_DISTRIBUTION_MODULES.md), GA·생산·경과도3개는 [유전 알고리즘 명세](GENETIC_OPTIMIZATION.md)에 있습니다. 기존 분야 폴더 및 JSON/Profile/DTO 규약을 유지합니다.
+
+## 응용 모의10회 연결 모듈
+
+AIC/BIC 선택·FGLS·Logit/Poisson/Gamma GLM·rolling 검증·회귀 비교/GLM 잔차8개를 추가하고 기존 비선형회귀의 CV factory를 보완했습니다. [전체 입력·출력·조건 명세](APPLIED_REGRESSION_WORKFLOWS.md)를 참고하세요.

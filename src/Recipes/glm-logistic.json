@@ -1,0 +1,5 @@
+{
+  "alpha": 0.05,
+  "maxiter": 100,
+  "cov_type": "nonrobust"
+}

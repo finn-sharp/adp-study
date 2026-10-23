@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "analysis": {
-    "modules": 258,
-    "recipe_files": 285,
-    "default_recipe_combinations": 273
+    "modules": 266,
+    "recipe_files": 293,
+    "default_recipe_combinations": 281
   },
   "summary": {
-    "bundles": 31,
-    "questions": 243,
-    "code_cells": 274,
-    "figures": 95
+    "bundles": 41,
+    "questions": 393,
+    "code_cells": 434,
+    "figures": 145
   },
   "mapping_method": "conservative static references; dynamic calls and remaining direct library code are not asserted as migrated",
   "bundles": [
@@ -2232,6 +2232,1696 @@
       "execution": "기출문제/모의고사/5회/실행검증.json",
       "code_cells": 15,
       "figures": 3,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/01회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 특성의 Yeo-Johnson 변환 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. 변환은 학습 폴드에서만 적합한다. 이미 같은 열공간인 OLS를 표준화하는 것만으로 R²가 증가하지 않는다. 변환 필요성은 CV와 진단을 함께 해석한다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/01회/응용모의_01회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/01회/응용모의_01회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/01회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/02회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 양수 목표의 log 변환과 학습 잔차 smearing 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. log(y)의 잔차 진단과 원 y 단위 예측 성능은 서로 다른 좌표계다. 단순 exp(예측)은 원 반응 조건부 평균이 아니며 학습 잔차 보정도 오차 사양에 의존한다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/02회/응용모의_02회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/02회/응용모의_02회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/02회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/03회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 차수1·2의 다항식 확장 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. 곱항·제곱항 생성 뒤 공선성을 다시 점검한다. 학습 R²의 단조 증가가 CV/보류 개선을 보장하지 않으며 선택 후 t/F 해석은 조건부다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/03회/응용모의_03회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/03회/응용모의_03회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/03회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/04회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 학습 분산 추정의 가중 회귀1·2회 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. 가중치는 참 분산을 알고 지정한 값이 아니다. 추정 역분산·가중 잔차·원단위 R²를 구분하고 조건부 표준오차가 분산 추정 불확실성을 반영하지 않음을 밝힌다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/04회/응용모의_04회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/04회/응용모의_04회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/04회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/05회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 명시적 학습 Cook 제거 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. 기본 영향도는 검토 flag다. 제거 후보만 학습에서4/n·최대20% 가드를 적용하며 유지 원행에서 대치·변환·변수선택을 다시 적합한다. 최종 평가 행은 제거하지 않는다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/05회/응용모의_05회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/05회/응용모의_05회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/05회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/06회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 학습 시계열 분할 및 HAC 공분산 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. HAC는 오차 자기상관에 대한 공분산 보정이며 평균 예측이나 R²를 바꾸는 전처리가 아니다. 자기상관이 남으면 후속 시계열/동적 평균 사양을 검토하고 모든 가정이 해결됐다고 주장하지 않는다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/06회/응용모의_06회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/06회/응용모의_06회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/06회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/07회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 단일 농도의 지수 평균함수 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. 비선형 최소제곱은 초기값·계수 경계·식별성에 의존한다. 계수 공분산은 국소 근사이며 OLS의 계수 t/F나 VIF를 파라미터에 그대로 적용하지 않는다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/07회/응용모의_07회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/07회/응용모의_07회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/07회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/08회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 양수 연속 반응의 Gamma log-mean 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. log 평균 링크와 Var(Y|X)=phi mu²를 확인한다. Pearson/deviance 잔차·분산 사양을 사용하며 반응 또는 잔차 정규성·보통 R²를 분포 조건으로 강요하지 않는다. 예측 비교는 원단위 R²다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/08회/응용모의_08회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/08회/응용모의_08회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/08회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/09회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 정수 횟수 반응의 Poisson log-mean 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. 동일 노출의 횟수와 평균=분산 조건을 점검한다. 과산포·과도한0을 검토하며 서로 다른 노출에는 알려진 log exposure가 필요하다. pseudo R²와 원 단위 보류 R²는 별개다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/09회/응용모의_09회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/09회/응용모의_09회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/09회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
+      "verified_python": "3.12.14",
+      "scope": "reconstructed_or_original_learning_material; see source audits"
+    },
+    {
+      "folder": "모의고사/응용10회/10회",
+      "kind": "applied_original_mock",
+      "questions": [
+        {
+          "id": "1-1",
+          "text": "관측 단위·목표 척도·예측 시점과 입력의 역할을 정리하고 결측·분포·공선성 후보를 탐색하시오. 지정 분할의 원행 위치를 남기고 전체 자료 대치나 식별자 입력이 왜 부적절한지 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-2",
+          "text": "기본 전처리와 선형 기준 모형을 학습에 적합하고 학습/CV R², 계수 t 검정·전체 F 검정·AIC·BIC를 제시하시오. 계수·설명력·일반화 성능의 의미와 기본 추론 가정을 구분하시오. 최종평가는 아직 사용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-3",
+          "text": "기준 모형의 선형 사양·잔차 정규성·등분산성과 관측 설계에 맞는 독립성/자기상관을 진단하시오. 가설·통계량·p값·가정·판정과 잔차/분위수/영향도 그림을 보고하시오. VIF와 Cook 영향도의 대상을 구분하고 이상 관측을 자동으로 오류라고 단정하지 마시오.",
+          "module_paths": [
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.coefficient_intervals",
+            "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
+            "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
+            "src.stats.regression.collinearity",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.influence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-4",
+          "text": "동일 학습 행·동일 원반응에서 AIC와 BIC로 후진 변수선택을 수행하고 제거 경로·남은 특성을 비교하시오. VIF 제거와의 차이, 서로 다른 y변환·관측 행의 정보량을 직접 비교하는 오류, 변수선택 후 추론의 한계를 설명하시오.",
+          "module_paths": [
+            "src.stats.regression.information_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-5",
+          "text": "사전 지정 전처리·변수선택·대안 모형을 학습 CV 내부에서 튜닝하시오. 후보별 원단위 CV R²·선택 파라미터·실패 여부와 분할을 보고하고 하나를 선택하시오. 특히 연속 반응의 포화 S자 평균함수 후보의 적용 조건과 처리 단위를 설명하시오.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels._regression_estimator",
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.MachineLearning.NonlinearModels.nonlinear_regression",
+            "src.MachineLearning.Optimization.grid_search",
+            "src.Visualization.regression.model_comparison"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "1-6",
+          "text": "선택 이후에만 기준/선택 모형을 동일 최종평가 행으로 평가하여 R²·RMSE·MAE와 R² 차이를 보고하시오. 진단 전후 또는 대안 분포의 적절한 잔차·분산·영향도 근거를 해석하고, 개선이 없거나 가정 위반이 남아도 그대로 보고하시오. 성장곡선의 L,k,x0는 연속 평균함수 파라미터다. 이진 타깃의 로지스틱 분류 계수와 구분하며 국소 공분산·초기값·경계·정의역·외삽 한계를 보고한다.",
+          "module_paths": [
+            "src.MachineLearning.LinearModels.weighted_regression",
+            "src.Visualization.qq.normal",
+            "src.Visualization.regression.glm_residuals",
+            "src.Visualization.regression.observed_predicted",
+            "src.stats.regression.heteroscedasticity",
+            "src.stats.regression.independence",
+            "src.stats.regression.linearity",
+            "src.stats.regression.normality"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-1",
+          "text": "목표 사건·양성 라벨·클래스 불균형과 층화 분할을 정리하시오. 데이터 분리 전에 샘플을 보완하면 발생하는 누출과 최종평가의 자연 발생률을 유지해야 하는 이유를 설명하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-2",
+          "text": "지정 탐색과 샘플링 모듈을 연결하고 동일 학습 폴드에서 무보완/보완 후보를 비교하시오. 파라미터·CV ROC AUC·선택 후보·폴드 위치를 제시하고 검증/최종평가에는 샘플링을 수행하지 않았음을 확인하시오.",
+          "module_paths": [
+            "src.MachineLearning.Optimization.grid_search",
+            "src.MachineLearning.Optimization.optuna_search",
+            "src.Preprocessing.regression.vif_selection",
+            "src.Preprocessing.resampling._common"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-3",
+          "text": "원 학습 분포의 설명용 이진 모형에서 계수·오즈비·구간·z 검정·우도 비교·AIC/BIC를 보고하시오. 첫 선택 특성의 제곱항 추가에 대한 log-odds 사양 검토를 수행하고 가설·자유도·p값·한계를 제시하시오. OLS 잔차 정규성·보통 R²·t/F를 일괄 적용하지 마시오.",
+          "module_paths": [
+            "src.MachineLearning.GeneralizedLinearModels.logistic",
+            "src.Preprocessing.regression.vif_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-4",
+          "text": "CV 선택 뒤 최종평가의 ROC 곡선·ROC AUC·precision-recall·평균정밀도·확률 보정 그림과 Brier 점수, 고정0.5 혼동행렬을 제시하시오. 불균형에서 정확도 하나만으로 판단하는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.classification.calibration",
+            "src.Visualization.classification.precision_recall",
+            "src.Visualization.classification.roc"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "2-5",
+          "text": "사전 지정 비용과 임계값으로 최종평가 오분류 비용을 계산하고 운영 의사결정을 제안하시오. AUC·확률 보정·분류 임계값의 차이, 샘플링에 따른 발생률 변화와 별도 학습 검증 필요성을 설명하시오. 최종평가를 보고 새 임계값을 최적화하지 마시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-1",
+          "text": "시간 간격·순서·목표·예측 horizon을 확인하고 과거/최종 미래를 나누시오. 학습의 정상성 진단 가설·통계량·p값과 추세·계절성의 한계를 설명하시오. 무작위 CV가 부적절한 이유를 서술하시오.",
+          "module_paths": [
+            "src.stats.tests.TimeSeries.adf"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-2",
+          "text": "지정 expanding rolling 검증을 구현하여 후보별 RMSE·MAE·수렴/실패, 각 과거/검증 구간을 제시하고 차수를 선택하시오. 최종 미래값을 차수·전처리 선택에 사용하지 마시오.",
+          "module_paths": [
+            "src.TimeSeries.rolling_selection"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-3",
+          "text": "선택 모형의 학습 AIC·BIC와 초기화 구간을 제외한 잔차 자기상관 진단을 보고하시오. 추정한 AR/MA 자유도를 반영하고 가설·통계량·p값·판정·해석을 제시하시오. 차분이나 우도 정의가 다른 모형의 정보량 단순 비교를 경계하시오.",
+          "module_paths": [],
+          "mapping": "exam_specific_or_direct_library",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        },
+        {
+          "id": "3-4",
+          "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
+          "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
+        }
+      ],
+      "question_count": 15,
+      "notebook": "기출문제/모의고사/응용10회/10회/응용모의_10회_풀이.ipynb",
+      "question_paper": "기출문제/모의고사/응용10회/10회/응용모의_10회_문제지.pdf",
+      "execution": "기출문제/모의고사/응용10회/10회/실행검증.json",
+      "code_cells": 16,
+      "figures": 5,
       "verified_python": "3.12.14",
       "scope": "reconstructed_or_original_learning_material; see source audits"
     }

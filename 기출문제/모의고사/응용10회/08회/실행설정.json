@@ -1,0 +1,19 @@
+{
+  "number": 8,
+  "seed": 20270008,
+  "regression_kind": "gamma",
+  "features": [
+    "severity",
+    "delay",
+    "exposure",
+    "complexity"
+  ],
+  "unit": "지급액(백만원)",
+  "classification_event": "청구 이상",
+  "sampler": "random_over",
+  "classification_search": "optuna",
+  "ordered_regression": false,
+  "period": 7,
+  "horizon": 7,
+  "false_negative_cost": 11
+}

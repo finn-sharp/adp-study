@@ -1,0 +1,19 @@
+{
+  "number": 10,
+  "seed": 20270010,
+  "regression_kind": "growth",
+  "features": [
+    "promotion",
+    "price",
+    "visits",
+    "engagement"
+  ],
+  "unit": "누적 가입량 점수",
+  "classification_event": "유료 전환",
+  "sampler": "smote",
+  "classification_search": "grid",
+  "ordered_regression": false,
+  "period": 7,
+  "horizon": 7,
+  "false_negative_cost": 13
+}
