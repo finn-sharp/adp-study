@@ -2544,7 +2544,7 @@ AIC는 backend 정의, BIC는 -2llf+log(n)k(k=평균계수 개수)로 반환합�
 
 ## 적용·실행·검증
 
-[응용 모의10회](../기출문제/모의고사/응용10회/README.md)는 회귀36점·분류40점·시계열24점, 각15문항100점입니다. 모두 창작 합성 자료이며 기준/선택 보류 ΔR²가 음수여도 그대로 보고합니다. 검정 비기각을 가정의 증명으로 표시하지 않습니다. 기존 추론 가정과 조건부/선택 후 한계는 [회귀·분포 명세](REGRESSION_DISTRIBUTION_MODULES.md)에 있습니다.
+[종합 모의6~15회](../기출문제/모의고사/README.md)는 회귀36점·분류40점·시계열24점, 각15문항100점입니다. 모두 창작 합성 자료이며 기준/선택 보류 ΔR²가 음수여도 그대로 보고합니다. 검정 비기각을 가정의 증명으로 표시하지 않습니다. 기존 추론 가정과 조건부/선택 후 한계는 [회귀·분포 명세](REGRESSION_DISTRIBUTION_MODULES.md)에 있습니다.
 
 오프라인8개 모듈 실행: `python -m examples.applied_model_examples`. 실제 UCI6개 skeleton은 각 분야 skeleton/information_selection·weighted_regression·logistic·poisson·gamma·rolling_selection입니다. Wine 품질 OLS/WLS, Wine 양성 기준6 binary logit, Wine의양수 fixed acidity Gamma, Bike의날씨 설명 Poisson, 날짜순 Bike rolling을 사용하며 분포의 완벽 적합이나 실제 미래 운영 성능을 보장하지 않습니다. import에서 다운로드·적합하지 않습니다.
 

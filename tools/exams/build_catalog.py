@@ -92,7 +92,7 @@ def build():
         (folder, "production_original_mock", read(ROOT / folder / "문항명세.json"))
     )
     for number in range(1, 11):
-        folder = "모의고사/응용10회/%02d회" % number
+        folder = "모의고사/%d회" % (number + 5)
         entries.append(
             (folder, "applied_original_mock", read(ROOT / folder / "문항명세.json"))
         )
@@ -119,7 +119,7 @@ def build():
                 code = next(codes)
                 if kind == "applied_original_mock":
                     applied = source_graph(
-                        sorted((ROOT / "모의고사/응용10회/공통").glob("*.py"))
+                        sorted((ROOT / "모의고사/공통").glob("*.py"))
                     )
                     modules = applied(
                         q["task"]
@@ -203,6 +203,15 @@ def build():
                 "reconstructed_or_original_learning_material; see source audits"
             )
         bundles.append(bundle)
+    # Keep comprehensive mock exams in numerical order, followed by the supplement.
+    bundles.sort(
+        key=lambda b: (
+            (1, int(b["folder"].split("/")[-1][:-1]))
+            if b["folder"].startswith("모의고사/")
+            and b["folder"].split("/")[-1][:-1].isdigit()
+            else ((2, 0) if b["folder"].startswith("모의고사/") else (0, 0))
+        )
+    )
     summary = dict(
         bundles=len(bundles),
         questions=sum(b["question_count"] for b in bundles),

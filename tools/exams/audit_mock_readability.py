@@ -14,11 +14,15 @@ ROOT = REPO / "기출문제/모의고사"
 
 
 def audit():
-    folders = (
-        [ROOT / (str(i) + "회") for i in range(1, 6)]
-        + [ROOT / "생존분석_통계"]
-        + sorted((ROOT / "응용10회").glob("[0-9][0-9]회"))
-    )
+    assert not (ROOT / "응용10회").exists(), "종합 모의는 1~15회로 통합합니다."
+    for readme in (REPO / "README.md", ROOT / "README.md"):
+        listed = re.findall(r"^\| \[(\d+)회\]\(", readme.read_text(), re.M)
+        assert listed == [str(i) for i in range(1, 16)], readme
+    for i in range(1, 16):
+        folder = ROOT / (str(i) + "회")
+        assert (folder / ("모의고사_%d회_문제지.pdf" % i)).is_file()
+        assert (folder / ("모의고사_%d회_풀이.ipynb" % i)).is_file()
+    folders = [ROOT / (str(i) + "회") for i in range(1, 16)] + [ROOT / "생존분석_통계"]
     legacy = json.loads((REPO / "기출문제/상황형_문항명세.json").read_text())
     records = []
     for folder in folders:

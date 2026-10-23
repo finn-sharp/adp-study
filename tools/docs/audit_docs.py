@@ -14,7 +14,7 @@ assert len(keys)==len(set(keys))==count and set(keys)==set(reg),'모듈 누락/�
 for key,(module,profile,_,_) in reg.items():
     tree=ast.parse((ROOT/(module.replace('.','/')+'.py')).read_text())
     assert any(isinstance(n,ast.ClassDef) and n.name==profile for n in tree.body),(key,profile)
-paths=[ROOT/'README.md',*sorted((ROOT/'docs').rglob('*.md')),ROOT/'기출문제/모의고사/응용10회/README.md']
+paths=[ROOT/'README.md',*sorted((ROOT/'docs').rglob('*.md')),*sorted((ROOT/'기출문제/모의고사').rglob('*.md'))]
 links=0
 for path in paths:
     text=path.read_text()

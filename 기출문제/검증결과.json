@@ -536,6 +536,114 @@
       "uncompressed_sha256": "cbfa805a6bc4224a820cb071e38ff1d8890d75db16d1788fa82203373d5f0bd2"
     },
     {
+      "path": "모의고사/10회/data/classification.csv",
+      "bytes": 21401,
+      "sha256": "a18f48b71679af60ac8fc19bfd3acb1bbd2a446520fd3b33d51a4b81df29826b",
+      "uncompressed_sha256": "a18f48b71679af60ac8fc19bfd3acb1bbd2a446520fd3b33d51a4b81df29826b"
+    },
+    {
+      "path": "모의고사/10회/data/regression.csv",
+      "bytes": 16836,
+      "sha256": "37a56196e139b868ab5053e37d561ff475af00503ee084e75655c3ebc429e4eb",
+      "uncompressed_sha256": "37a56196e139b868ab5053e37d561ff475af00503ee084e75655c3ebc429e4eb"
+    },
+    {
+      "path": "모의고사/10회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "2e4db9d36ff336c02d5e2c2bd6b113fa8c31599b34d11bf19965b3bec43035c3",
+      "uncompressed_sha256": "2e4db9d36ff336c02d5e2c2bd6b113fa8c31599b34d11bf19965b3bec43035c3"
+    },
+    {
+      "path": "모의고사/11회/data/classification.csv",
+      "bytes": 21396,
+      "sha256": "f13f060f6e953df3073a02e0c01061dc909279e8d907d1362b8e5710469cb85b",
+      "uncompressed_sha256": "f13f060f6e953df3073a02e0c01061dc909279e8d907d1362b8e5710469cb85b"
+    },
+    {
+      "path": "모의고사/11회/data/regression.csv",
+      "bytes": 16918,
+      "sha256": "31a82a2513fe0d0437c4d8ebf81bbeb329d8ba10017b064917ff1ea990b378ba",
+      "uncompressed_sha256": "31a82a2513fe0d0437c4d8ebf81bbeb329d8ba10017b064917ff1ea990b378ba"
+    },
+    {
+      "path": "모의고사/11회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "023c61251b16f3ef51ea8c8e27230bad758fefa81e232ac54385b1be65f2b7f7",
+      "uncompressed_sha256": "023c61251b16f3ef51ea8c8e27230bad758fefa81e232ac54385b1be65f2b7f7"
+    },
+    {
+      "path": "모의고사/12회/data/classification.csv",
+      "bytes": 21410,
+      "sha256": "23797c078936acf4806204e631ce14026e2af3601163d5735098c1c6e369300f",
+      "uncompressed_sha256": "23797c078936acf4806204e631ce14026e2af3601163d5735098c1c6e369300f"
+    },
+    {
+      "path": "모의고사/12회/data/regression.csv",
+      "bytes": 16816,
+      "sha256": "d1acdded5993074fdc86e0ea990ea97789d55ce435a86576b1bf488b99fca29f",
+      "uncompressed_sha256": "d1acdded5993074fdc86e0ea990ea97789d55ce435a86576b1bf488b99fca29f"
+    },
+    {
+      "path": "모의고사/12회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "57977a60a2fa9d017e8ff4b81c10cc4bca07f7ae7c50eacb9a6310ea455d0b3a",
+      "uncompressed_sha256": "57977a60a2fa9d017e8ff4b81c10cc4bca07f7ae7c50eacb9a6310ea455d0b3a"
+    },
+    {
+      "path": "모의고사/13회/data/classification.csv",
+      "bytes": 21386,
+      "sha256": "244ef9b4a4a41c29a9ae1334bbd55d1863da00c011e2f69a4473518968413b14",
+      "uncompressed_sha256": "244ef9b4a4a41c29a9ae1334bbd55d1863da00c011e2f69a4473518968413b14"
+    },
+    {
+      "path": "모의고사/13회/data/regression.csv",
+      "bytes": 16859,
+      "sha256": "b8bc4a5789a5ff3ce49615f71ffadf33e5b52dbd27c88ecdee491cb12eeb2f58",
+      "uncompressed_sha256": "b8bc4a5789a5ff3ce49615f71ffadf33e5b52dbd27c88ecdee491cb12eeb2f58"
+    },
+    {
+      "path": "모의고사/13회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "24e2fc7d7cc09398a1f07838bc8ec581fb66cf629b7871b930b846ee1d449cdf",
+      "uncompressed_sha256": "24e2fc7d7cc09398a1f07838bc8ec581fb66cf629b7871b930b846ee1d449cdf"
+    },
+    {
+      "path": "모의고사/14회/data/classification.csv",
+      "bytes": 21408,
+      "sha256": "ee44d8d40039c4e18132274ecec44726b2a806f505559ff43443941bd2460e23",
+      "uncompressed_sha256": "ee44d8d40039c4e18132274ecec44726b2a806f505559ff43443941bd2460e23"
+    },
+    {
+      "path": "모의고사/14회/data/regression.csv",
+      "bytes": 14253,
+      "sha256": "ec6e86ad616d2e298f5a0aa9ae06ef3ad21aea294dfd98a37ae2398bf1c30dc0",
+      "uncompressed_sha256": "ec6e86ad616d2e298f5a0aa9ae06ef3ad21aea294dfd98a37ae2398bf1c30dc0"
+    },
+    {
+      "path": "모의고사/14회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "2838a1ee6f25f01c914c959194fe0168f2c4fa729ef844975293b009453971c5",
+      "uncompressed_sha256": "2838a1ee6f25f01c914c959194fe0168f2c4fa729ef844975293b009453971c5"
+    },
+    {
+      "path": "모의고사/15회/data/classification.csv",
+      "bytes": 21396,
+      "sha256": "0e6ee4f69b00539db213c3219b67ac35d5df61e676229977c2d34cf265e2f9cd",
+      "uncompressed_sha256": "0e6ee4f69b00539db213c3219b67ac35d5df61e676229977c2d34cf265e2f9cd"
+    },
+    {
+      "path": "모의고사/15회/data/regression.csv",
+      "bytes": 16737,
+      "sha256": "dc00113c4495643658cef2017f22c54d8207486061de03cba3b581c41667e759",
+      "uncompressed_sha256": "dc00113c4495643658cef2017f22c54d8207486061de03cba3b581c41667e759"
+    },
+    {
+      "path": "모의고사/15회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "22282d6c050d018246cb61dad0333f677dd4264d75a8d11a52c2cbded80cdd0c",
+      "uncompressed_sha256": "22282d6c050d018246cb61dad0333f677dd4264d75a8d11a52c2cbded80cdd0c"
+    },
+    {
       "path": "모의고사/1회/data/FIFA.csv",
       "bytes": 23770,
       "sha256": "60cb4216bc38115928bff836d7434ffbd909840b6fa0bf65b136591b19b3e6f2",
@@ -650,6 +758,78 @@
       "uncompressed_sha256": "9865f9b77a6b46f411584ddfaa7852c04094434d7db801b436fcd617426e32a5"
     },
     {
+      "path": "모의고사/6회/data/classification.csv",
+      "bytes": 21404,
+      "sha256": "5231564954f3d59bf5f69dd3c441e01562e72af250db78e70c6711e3fd239aaa",
+      "uncompressed_sha256": "5231564954f3d59bf5f69dd3c441e01562e72af250db78e70c6711e3fd239aaa"
+    },
+    {
+      "path": "모의고사/6회/data/regression.csv",
+      "bytes": 17118,
+      "sha256": "93c6aeaa29b8bffd777685f7b3eebf6b40d8b157bd31765a1b2525495161e344",
+      "uncompressed_sha256": "93c6aeaa29b8bffd777685f7b3eebf6b40d8b157bd31765a1b2525495161e344"
+    },
+    {
+      "path": "모의고사/6회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "42f7b150f77068db151170a194174462e4543d780b2dd274dd8d3a9727a793f9",
+      "uncompressed_sha256": "42f7b150f77068db151170a194174462e4543d780b2dd274dd8d3a9727a793f9"
+    },
+    {
+      "path": "모의고사/7회/data/classification.csv",
+      "bytes": 21396,
+      "sha256": "dfbb1fb21f0edb8b831fe6cb2c278aba8ce044817a3d0022a91b35b82e9da28d",
+      "uncompressed_sha256": "dfbb1fb21f0edb8b831fe6cb2c278aba8ce044817a3d0022a91b35b82e9da28d"
+    },
+    {
+      "path": "모의고사/7회/data/regression.csv",
+      "bytes": 16880,
+      "sha256": "7748e9995c7cf3d8a6134dc677504229df675fa603f95568690a71d8ce19692a",
+      "uncompressed_sha256": "7748e9995c7cf3d8a6134dc677504229df675fa603f95568690a71d8ce19692a"
+    },
+    {
+      "path": "모의고사/7회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "6575133f5625350f6de6ac3acff0febc766612316f47689f0b8ac70dbdf971cc",
+      "uncompressed_sha256": "6575133f5625350f6de6ac3acff0febc766612316f47689f0b8ac70dbdf971cc"
+    },
+    {
+      "path": "모의고사/8회/data/classification.csv",
+      "bytes": 21379,
+      "sha256": "dae163ec870a7f53df752d2ad5491fc5b9bd18bd1f2b753082af40d8b602049e",
+      "uncompressed_sha256": "dae163ec870a7f53df752d2ad5491fc5b9bd18bd1f2b753082af40d8b602049e"
+    },
+    {
+      "path": "모의고사/8회/data/regression.csv",
+      "bytes": 16880,
+      "sha256": "8803c4c131d1f9b431382533f9059fcc9cfa2166e6121b92d20362375aa5a8f4",
+      "uncompressed_sha256": "8803c4c131d1f9b431382533f9059fcc9cfa2166e6121b92d20362375aa5a8f4"
+    },
+    {
+      "path": "모의고사/8회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "cc4a2ce1c21cb977fdccd29362307331c55497a1053f27f787da36ed5e1be659",
+      "uncompressed_sha256": "cc4a2ce1c21cb977fdccd29362307331c55497a1053f27f787da36ed5e1be659"
+    },
+    {
+      "path": "모의고사/9회/data/classification.csv",
+      "bytes": 21380,
+      "sha256": "53de068ab4480df09ba1260f72de3609b41584c9890cb441cf0d6fc8adb2be7a",
+      "uncompressed_sha256": "53de068ab4480df09ba1260f72de3609b41584c9890cb441cf0d6fc8adb2be7a"
+    },
+    {
+      "path": "모의고사/9회/data/regression.csv",
+      "bytes": 16867,
+      "sha256": "fd8b0a3530b2fcfa14562acb9db589e9360145abd201a5df900e9e94ee14032e",
+      "uncompressed_sha256": "fd8b0a3530b2fcfa14562acb9db589e9360145abd201a5df900e9e94ee14032e"
+    },
+    {
+      "path": "모의고사/9회/data/timeseries.csv",
+      "bytes": 3512,
+      "sha256": "b80085e7d103052e76e01db44d035ca9c98fc6acf21e33a06575cc244da868a6",
+      "uncompressed_sha256": "b80085e7d103052e76e01db44d035ca9c98fc6acf21e33a06575cc244da868a6"
+    },
+    {
       "path": "모의고사/생존분석_통계/data/equipment.csv",
       "bytes": 15323,
       "sha256": "7ddef495c83251a48f0f41e35022363eb8a8e7c51be9e96caa2273dfb3f0fdf3",
@@ -666,186 +846,6 @@
       "bytes": 330,
       "sha256": "91fef25f7f0167febd9fdd517c6f2aa4c1de5da1c750f97615bf2f766eb3ae20",
       "uncompressed_sha256": "91fef25f7f0167febd9fdd517c6f2aa4c1de5da1c750f97615bf2f766eb3ae20"
-    },
-    {
-      "path": "모의고사/응용10회/01회/data/classification.csv",
-      "bytes": 21404,
-      "sha256": "5231564954f3d59bf5f69dd3c441e01562e72af250db78e70c6711e3fd239aaa",
-      "uncompressed_sha256": "5231564954f3d59bf5f69dd3c441e01562e72af250db78e70c6711e3fd239aaa"
-    },
-    {
-      "path": "모의고사/응용10회/01회/data/regression.csv",
-      "bytes": 17118,
-      "sha256": "93c6aeaa29b8bffd777685f7b3eebf6b40d8b157bd31765a1b2525495161e344",
-      "uncompressed_sha256": "93c6aeaa29b8bffd777685f7b3eebf6b40d8b157bd31765a1b2525495161e344"
-    },
-    {
-      "path": "모의고사/응용10회/01회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "42f7b150f77068db151170a194174462e4543d780b2dd274dd8d3a9727a793f9",
-      "uncompressed_sha256": "42f7b150f77068db151170a194174462e4543d780b2dd274dd8d3a9727a793f9"
-    },
-    {
-      "path": "모의고사/응용10회/02회/data/classification.csv",
-      "bytes": 21396,
-      "sha256": "dfbb1fb21f0edb8b831fe6cb2c278aba8ce044817a3d0022a91b35b82e9da28d",
-      "uncompressed_sha256": "dfbb1fb21f0edb8b831fe6cb2c278aba8ce044817a3d0022a91b35b82e9da28d"
-    },
-    {
-      "path": "모의고사/응용10회/02회/data/regression.csv",
-      "bytes": 16880,
-      "sha256": "7748e9995c7cf3d8a6134dc677504229df675fa603f95568690a71d8ce19692a",
-      "uncompressed_sha256": "7748e9995c7cf3d8a6134dc677504229df675fa603f95568690a71d8ce19692a"
-    },
-    {
-      "path": "모의고사/응용10회/02회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "6575133f5625350f6de6ac3acff0febc766612316f47689f0b8ac70dbdf971cc",
-      "uncompressed_sha256": "6575133f5625350f6de6ac3acff0febc766612316f47689f0b8ac70dbdf971cc"
-    },
-    {
-      "path": "모의고사/응용10회/03회/data/classification.csv",
-      "bytes": 21379,
-      "sha256": "dae163ec870a7f53df752d2ad5491fc5b9bd18bd1f2b753082af40d8b602049e",
-      "uncompressed_sha256": "dae163ec870a7f53df752d2ad5491fc5b9bd18bd1f2b753082af40d8b602049e"
-    },
-    {
-      "path": "모의고사/응용10회/03회/data/regression.csv",
-      "bytes": 16880,
-      "sha256": "8803c4c131d1f9b431382533f9059fcc9cfa2166e6121b92d20362375aa5a8f4",
-      "uncompressed_sha256": "8803c4c131d1f9b431382533f9059fcc9cfa2166e6121b92d20362375aa5a8f4"
-    },
-    {
-      "path": "모의고사/응용10회/03회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "cc4a2ce1c21cb977fdccd29362307331c55497a1053f27f787da36ed5e1be659",
-      "uncompressed_sha256": "cc4a2ce1c21cb977fdccd29362307331c55497a1053f27f787da36ed5e1be659"
-    },
-    {
-      "path": "모의고사/응용10회/04회/data/classification.csv",
-      "bytes": 21380,
-      "sha256": "53de068ab4480df09ba1260f72de3609b41584c9890cb441cf0d6fc8adb2be7a",
-      "uncompressed_sha256": "53de068ab4480df09ba1260f72de3609b41584c9890cb441cf0d6fc8adb2be7a"
-    },
-    {
-      "path": "모의고사/응용10회/04회/data/regression.csv",
-      "bytes": 16867,
-      "sha256": "fd8b0a3530b2fcfa14562acb9db589e9360145abd201a5df900e9e94ee14032e",
-      "uncompressed_sha256": "fd8b0a3530b2fcfa14562acb9db589e9360145abd201a5df900e9e94ee14032e"
-    },
-    {
-      "path": "모의고사/응용10회/04회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "b80085e7d103052e76e01db44d035ca9c98fc6acf21e33a06575cc244da868a6",
-      "uncompressed_sha256": "b80085e7d103052e76e01db44d035ca9c98fc6acf21e33a06575cc244da868a6"
-    },
-    {
-      "path": "모의고사/응용10회/05회/data/classification.csv",
-      "bytes": 21401,
-      "sha256": "a18f48b71679af60ac8fc19bfd3acb1bbd2a446520fd3b33d51a4b81df29826b",
-      "uncompressed_sha256": "a18f48b71679af60ac8fc19bfd3acb1bbd2a446520fd3b33d51a4b81df29826b"
-    },
-    {
-      "path": "모의고사/응용10회/05회/data/regression.csv",
-      "bytes": 16836,
-      "sha256": "37a56196e139b868ab5053e37d561ff475af00503ee084e75655c3ebc429e4eb",
-      "uncompressed_sha256": "37a56196e139b868ab5053e37d561ff475af00503ee084e75655c3ebc429e4eb"
-    },
-    {
-      "path": "모의고사/응용10회/05회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "2e4db9d36ff336c02d5e2c2bd6b113fa8c31599b34d11bf19965b3bec43035c3",
-      "uncompressed_sha256": "2e4db9d36ff336c02d5e2c2bd6b113fa8c31599b34d11bf19965b3bec43035c3"
-    },
-    {
-      "path": "모의고사/응용10회/06회/data/classification.csv",
-      "bytes": 21396,
-      "sha256": "f13f060f6e953df3073a02e0c01061dc909279e8d907d1362b8e5710469cb85b",
-      "uncompressed_sha256": "f13f060f6e953df3073a02e0c01061dc909279e8d907d1362b8e5710469cb85b"
-    },
-    {
-      "path": "모의고사/응용10회/06회/data/regression.csv",
-      "bytes": 16918,
-      "sha256": "31a82a2513fe0d0437c4d8ebf81bbeb329d8ba10017b064917ff1ea990b378ba",
-      "uncompressed_sha256": "31a82a2513fe0d0437c4d8ebf81bbeb329d8ba10017b064917ff1ea990b378ba"
-    },
-    {
-      "path": "모의고사/응용10회/06회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "023c61251b16f3ef51ea8c8e27230bad758fefa81e232ac54385b1be65f2b7f7",
-      "uncompressed_sha256": "023c61251b16f3ef51ea8c8e27230bad758fefa81e232ac54385b1be65f2b7f7"
-    },
-    {
-      "path": "모의고사/응용10회/07회/data/classification.csv",
-      "bytes": 21410,
-      "sha256": "23797c078936acf4806204e631ce14026e2af3601163d5735098c1c6e369300f",
-      "uncompressed_sha256": "23797c078936acf4806204e631ce14026e2af3601163d5735098c1c6e369300f"
-    },
-    {
-      "path": "모의고사/응용10회/07회/data/regression.csv",
-      "bytes": 16816,
-      "sha256": "d1acdded5993074fdc86e0ea990ea97789d55ce435a86576b1bf488b99fca29f",
-      "uncompressed_sha256": "d1acdded5993074fdc86e0ea990ea97789d55ce435a86576b1bf488b99fca29f"
-    },
-    {
-      "path": "모의고사/응용10회/07회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "57977a60a2fa9d017e8ff4b81c10cc4bca07f7ae7c50eacb9a6310ea455d0b3a",
-      "uncompressed_sha256": "57977a60a2fa9d017e8ff4b81c10cc4bca07f7ae7c50eacb9a6310ea455d0b3a"
-    },
-    {
-      "path": "모의고사/응용10회/08회/data/classification.csv",
-      "bytes": 21386,
-      "sha256": "244ef9b4a4a41c29a9ae1334bbd55d1863da00c011e2f69a4473518968413b14",
-      "uncompressed_sha256": "244ef9b4a4a41c29a9ae1334bbd55d1863da00c011e2f69a4473518968413b14"
-    },
-    {
-      "path": "모의고사/응용10회/08회/data/regression.csv",
-      "bytes": 16859,
-      "sha256": "b8bc4a5789a5ff3ce49615f71ffadf33e5b52dbd27c88ecdee491cb12eeb2f58",
-      "uncompressed_sha256": "b8bc4a5789a5ff3ce49615f71ffadf33e5b52dbd27c88ecdee491cb12eeb2f58"
-    },
-    {
-      "path": "모의고사/응용10회/08회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "24e2fc7d7cc09398a1f07838bc8ec581fb66cf629b7871b930b846ee1d449cdf",
-      "uncompressed_sha256": "24e2fc7d7cc09398a1f07838bc8ec581fb66cf629b7871b930b846ee1d449cdf"
-    },
-    {
-      "path": "모의고사/응용10회/09회/data/classification.csv",
-      "bytes": 21408,
-      "sha256": "ee44d8d40039c4e18132274ecec44726b2a806f505559ff43443941bd2460e23",
-      "uncompressed_sha256": "ee44d8d40039c4e18132274ecec44726b2a806f505559ff43443941bd2460e23"
-    },
-    {
-      "path": "모의고사/응용10회/09회/data/regression.csv",
-      "bytes": 14253,
-      "sha256": "ec6e86ad616d2e298f5a0aa9ae06ef3ad21aea294dfd98a37ae2398bf1c30dc0",
-      "uncompressed_sha256": "ec6e86ad616d2e298f5a0aa9ae06ef3ad21aea294dfd98a37ae2398bf1c30dc0"
-    },
-    {
-      "path": "모의고사/응용10회/09회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "2838a1ee6f25f01c914c959194fe0168f2c4fa729ef844975293b009453971c5",
-      "uncompressed_sha256": "2838a1ee6f25f01c914c959194fe0168f2c4fa729ef844975293b009453971c5"
-    },
-    {
-      "path": "모의고사/응용10회/10회/data/classification.csv",
-      "bytes": 21396,
-      "sha256": "0e6ee4f69b00539db213c3219b67ac35d5df61e676229977c2d34cf265e2f9cd",
-      "uncompressed_sha256": "0e6ee4f69b00539db213c3219b67ac35d5df61e676229977c2d34cf265e2f9cd"
-    },
-    {
-      "path": "모의고사/응용10회/10회/data/regression.csv",
-      "bytes": 16737,
-      "sha256": "dc00113c4495643658cef2017f22c54d8207486061de03cba3b581c41667e759",
-      "uncompressed_sha256": "dc00113c4495643658cef2017f22c54d8207486061de03cba3b581c41667e759"
-    },
-    {
-      "path": "모의고사/응용10회/10회/data/timeseries.csv",
-      "bytes": 3512,
-      "sha256": "22282d6c050d018246cb61dad0333f677dd4264d75a8d11a52c2cbded80cdd0c",
-      "uncompressed_sha256": "22282d6c050d018246cb61dad0333f677dd4264d75a8d11a52c2cbded80cdd0c"
     },
     {
       "path": "유형연습/30회/data/accident.csv",

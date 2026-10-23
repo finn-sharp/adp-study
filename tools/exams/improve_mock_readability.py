@@ -42,11 +42,7 @@ ROOT = REPO / "기출문제/모의고사"
 
 
 def folders():
-    return (
-        [ROOT / (str(i) + "회") for i in range(1, 6)]
-        + [ROOT / "생존분석_통계"]
-        + [ROOT / "응용10회" / ("%02d회" % i) for i in range(1, 11)]
-    )
+    return [ROOT / (str(i) + "회") for i in range(1, 16)] + [ROOT / "생존분석_통계"]
 
 
 def specification(folder):
@@ -72,7 +68,7 @@ def specification(folder):
         sections.append(sec)
     number = value.get("number")
     title = (
-        ("응용 모의 제%d회 | " % number + value["title"])
+        ("모의고사 %d회 | " % value["exam_number"] + value["title"])
         if number
         else (
             "생존분석 통계 모의"
@@ -270,7 +266,7 @@ def enrich_answers(folder, title, sections, number, book):
         if c.cell_type == "markdown" and c.source.startswith("### ")
     }
     if number:
-        common = ROOT / "응용10회/공통"
+        common = ROOT / "공통"
         sys.path.insert(0, str(common))
         from presentation import tables, READING, conclusion
     for sec in sections:

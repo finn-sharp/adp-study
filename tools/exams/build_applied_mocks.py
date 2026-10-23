@@ -11,7 +11,7 @@ from applied_mock_data import generate
 import render_question_papers as paper
 
 REPO = Path(__file__).resolve().parents[2]
-ROOT = REPO / "기출문제/모의고사/응용10회"
+ROOT = REPO / "기출문제/모의고사"
 SETUP = """from pathlib import Path
 import sys
 FOLDER=Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
@@ -23,7 +23,7 @@ ctx=Context(FOLDER)
 
 def render(folder, spec):
     paper.ST = paper.styles()
-    title = "응용 모의 제" + str(spec["number"]) + "회"
+    title = "모의고사 " + str(spec["exam_number"]) + "회"
     story = [
         paper.p("분석전문가(ADP) 실기", "title"),
         paper.p(title + " | " + spec["title"], "subtitle"),
@@ -43,7 +43,7 @@ def render(folder, spec):
             "body",
         ),
         paper.p(
-            "자료: 고정 합성 관측이며 실제 기업·고객 데이터가 아닙니다. 기법의 기술 근거·범위는 동봉 출처및설계.md와 저장소 명세를 참고하십시오. 각 대문항은 별도 자료입니다.",
+            "자료: 고정 합성 관측이며 실제 기업·고객 데이터가 아닙니다. 기법의 기술 근거·범위는 공통/응용_출처및설계.md와 저장소 명세를 참고하십시오. 각 대문항은 별도 자료입니다.",
             "small",
         ),
     ]
@@ -75,7 +75,7 @@ def render(folder, spec):
         c.restoreState()
 
     SimpleDocTemplate(
-        str(folder / ("응용모의_%02d회_문제지.pdf" % spec["number"])),
+        str(folder / ("모의고사_%d회_문제지.pdf" % spec["exam_number"])),
         pagesize=A4,
         leftMargin=paper.MARGIN,
         rightMargin=paper.MARGIN,
@@ -89,7 +89,7 @@ def render(folder, spec):
 def build():
     for number in range(1, 11):
         spec = specification(number)
-        folder = ROOT / ("%02d회" % number)
+        folder = ROOT / ("%d회" % spec["exam_number"])
         generate(folder, spec["plan"])
         (folder / "문항명세.json").write_text(
             json.dumps(spec, ensure_ascii=False, indent=2) + "\n"
@@ -99,8 +99,8 @@ def build():
         )
         cells = [
             nbformat.v4.new_markdown_cell(
-                "# 응용 모의 제"
-                + str(number)
+                "# 모의고사 "
+                + str(spec["exam_number"])
                 + "회 풀이\n\n"
                 + spec["title"]
                 + "\n\n공식 정답이 아닌 실제 실행 예시 답안입니다. PDF와 지문이 동일합니다. 각 문항의 가정·가설·실제 수치·판단을 함께 읽고 src 모듈 및 공통 analysis.py를 참조하십시오."
@@ -109,7 +109,7 @@ def build():
         ]
         codes = [SETUP]
         explanations = [
-            "# 응용 모의 제" + str(number) + "회 해설",
+            "# 모의고사 " + str(spec["exam_number"]) + "회 해설",
             "",
             spec["title"],
             "",
@@ -150,7 +150,9 @@ def build():
                 ),
             ),
         )
-        nbformat.write(book, folder / ("응용모의_%02d회_풀이.ipynb" % number))
+        nbformat.write(
+            book, folder / ("모의고사_%d회_풀이.ipynb" % spec["exam_number"])
+        )
         (folder / "분석코드.py").write_text(
             '"""해당 파일 폴더 또는 임의 cwd에서 실행 가능한 실제 모의 풀이."""\n'
             + "\n\n".join(codes)
@@ -158,8 +160,8 @@ def build():
         )
         (folder / "해설.md").write_text("\n".join(explanations) + "\n")
         (folder / "README.md").write_text(
-            "# 응용 모의 제"
-            + str(number)
+            "# 모의고사 "
+            + str(spec["exam_number"])
             + "회\n\n"
             + spec["title"]
             + "\n\n15문항·100점·권장180분. 회귀36/분류40/시계열24점. 문제지 PDF·실행 풀이·분석코드·해설·세 CSV·실행 설정·수치 답안·검증을 포함합니다.\n\n이 폴더와 상위 공통 코드·저장소 src를 함께 사용합니다. 의존성·출처·생성 원리·실행법은 [상위 안내](../README.md)를 참고하세요. 이 회차의 특별 회귀 조건은 `"
