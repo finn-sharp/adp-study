@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "python": "3.12.14",
+  "questions": 14,
+  "points": 100,
+  "code_cells": 15,
+  "pages": 5,
+  "figures": 3,
+  "checks": [
+    "PDF/노트북 동일 지문",
+    "A4/본문 경계",
+    "정수1000조합 독립 전수",
+    "목표/예산 민감도",
+    "Welch SciPy 대조",
+    "정규성/동시상한",
+    "노트북/분석코드 동일"
+  ],
+  "pdf_sha256": "49688d28f407cfdb861f5421dc82fc7ca8304c1279952a6f8cff3042e51e295e"
+}

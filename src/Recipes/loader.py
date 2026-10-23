@@ -34,6 +34,9 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    'genetic-algorithm': ('src.Optimization.genetic_algorithm', 'GeneticAlgorithmProfile', None, (None,)),
+    'production-allocation': ('src.Optimization.production_allocation', 'ProductionAllocationProfile', None, (None,)),
+    'plot-optimization-convergence': ('src.Visualization.optimization.convergence', 'OptimizationConvergenceProfile', None, (None,)),
     'regression-ols': ('src.stats.regression.ols', 'OLSProfile', None, (None,)),
     'regression-joint-f': ('src.stats.regression.joint_f', 'JointFProfile', None, (None,)),
     'regression-nested-f': ('src.stats.regression.nested_f', 'NestedFProfile', None, (None,)),

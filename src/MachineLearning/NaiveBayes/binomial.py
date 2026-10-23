@@ -182,6 +182,11 @@ class BinomialNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         from src.MachineLearning.analysis_common import finite_number,positive_int
         positive_int(self.n_trials,'n_trials');finite_number(self.alpha,'alpha',True);finite_number(self.beta,'beta',True)
         a=numeric_counts(X,self.n_trials);self.classes_,index,self.class_count_=labels_for_fit(y,len(a));self.n_features_in_=a.shape[1];self.class_log_prior_=log_priors(self.class_count_,self.fit_prior);self.feature_count_=np.vstack([a[index==i].sum(axis=0) for i in range(len(self.classes_))]);self.success_prob_=(self.feature_count_+self.alpha)/(self.class_count_[:,None]*self.n_trials+self.alpha+self.beta)
+        success=self.feature_count_+self.alpha
+        failure=self.class_count_[:,None]*self.n_trials-self.feature_count_+self.beta
+        log_den=np.logaddexp(np.log(success),np.log(failure))
+        self.feature_log_success_=np.log(success)-log_den
+        self.feature_log_failure_=np.log(failure)-log_den
         return self
 
     def _joint_log_likelihood(self,X):
@@ -198,7 +203,7 @@ class BinomialNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         a=numeric_counts(X,self.n_trials)
         if a.shape[1]!=self.n_features_in_:raise ValueError('Feature 수 불일치')
         coefficient=gammaln(self.n_trials+1)-gammaln(a+1)-gammaln(self.n_trials-a+1)
-        return a@np.log(self.success_prob_).T+(self.n_trials-a)@np.log1p(-self.success_prob_).T+coefficient.sum(axis=1)[:,None]+self.class_log_prior_[None,:]
+        return a@self.feature_log_success_.T+(self.n_trials-a)@self.feature_log_failure_.T+coefficient.sum(axis=1)[:,None]+self.class_log_prior_[None,:]
 
 def _run(X, y, test_indices, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.

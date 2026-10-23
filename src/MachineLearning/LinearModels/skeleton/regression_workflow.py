@@ -52,7 +52,7 @@ def load_data(cache_dir=None):
     Args:
         cache_dir: 전용 명세의 cache_dir 입력.
     Returns:
-        tuple: Wine 원 Feature 6개, quality 타깃.
+        tuple: Wine 원 Feature 11개, quality 타깃.
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """

@@ -147,9 +147,13 @@ TensorFlow는 `tf-classification.json`, `tf-regression.json`, `tf-rnn-classifica
 
 ## 파라미터 최적화 레시피 (2026-10-14)
 
-optimization-grid-search, optimization-random-search, optimization-optuna-search를 추가했습니다. 각 분류/회귀 기본 6개 및 RF/LightGBM 전용 12개 JSON으로 검색 공간을 관리합니다. 전체 JSON 238개이며 기본 registry 로드 조합은 226개입니다. 모델별 후보는 skeleton이 명시 recipe_path로 로드합니다. [최적화 명세](PARAMETER_OPTIMIZATION.md)를 참고하세요.
+optimization-grid-search, optimization-random-search, optimization-optuna-search를 추가했습니다. 각 분류/회귀 기본 6개 및 RF/LightGBM 전용 12개 JSON으로 검색 공간을 관리합니다. 전체 JSON 285개이며 기본 registry 로드 조합은 273개입니다. 모델별 후보는 skeleton이 명시 recipe_path로 로드합니다. [최적화 명세](PARAMETER_OPTIMIZATION.md)를 참고하세요.
 
 
 ## 도메인 통합 확장 (2026-10-20)
 
 생존분석·시계열·비선형 회귀·표본 보완 19개 모듈은 [도메인 전체 명세](DOMAIN_ARCHITECTURE.md)에 Profile·DTO 필드와 지원 경계를 정리했습니다. 등록부와 문서 집계는 `tools/exams/audit_catalog.py`로 검사합니다.
+
+## 회귀·분포·일반 최적화
+
+회귀14·NB7·QQ13·회귀 그림10·GA/생산/경과도3개의 전용 JSON을 추가했습니다. 전체 Profile/DTO와 우선순위·검증 경계는 [회귀·분포](REGRESSION_DISTRIBUTION_MODULES.md) 및 [유전 알고리즘](GENETIC_OPTIMIZATION.md)을 참고하세요.
