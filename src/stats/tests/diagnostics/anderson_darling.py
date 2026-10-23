@@ -16,6 +16,7 @@ anderson_darling - Anderson–Darling 적합도
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, result)
+from src.stats.tests._common import number, numeric, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AndersonDarlingProfile:
@@ -49,6 +51,7 @@ class AndersonDarlingProfile:
         distribution (str): 검정할 지원 분포. 모수는 표본으로 적합 기본 "norm".
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     distribution: str = "norm"
     nan_policy: str = "raise"
@@ -57,6 +60,7 @@ class AndersonDarlingProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AndersonDarlingOutputDTO(OutputDTO):
@@ -78,6 +82,7 @@ class AndersonDarlingOutputDTO(OutputDTO):
         critical_value (float): 요청 alpha에 대응하는 임계값.
         decision_basis (str): critical_value; p를 임의 생성하지 않음.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -98,6 +103,7 @@ class AndersonDarlingOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -110,26 +116,29 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = numeric(args['x'], 1, 8, policy)
+    a = numeric(args["x"], 1, 8, policy)
     if np.ptp(a) == 0:
-        raise ValueError('상수 자료의 검정은 정의되지 않습니다.')
-    if p.distribution not in ('norm', 'expon', 'logistic', 'gumbel_l', 'gumbel_r'):
-        raise ValueError('AD 지원 분포 오류')
-    return {'x': a}
+        raise ValueError("상수 자료의 검정은 정의되지 않습니다.")
+    if p.distribution not in ("norm", "expon", "logistic", "gumbel_l", "gumbel_r"):
+        raise ValueError("AD 지원 분포 오류")
+    return {"x": a}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: AndersonDarlingProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: AndersonDarlingProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -140,13 +149,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: AndersonDarlingProfile)
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, AndersonDarlingProfile): raise TypeError("AndersonDarlingProfile이 필요합니다.")
+    if not isinstance(profile, AndersonDarlingProfile):
+        raise TypeError("AndersonDarlingProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -159,16 +170,35 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    r = stats.anderson(d['x'], dist=p.distribution)
+    alt = getattr(p, "alternative", "two-sided")
+    r = stats.anderson(d["x"], dist=p.distribution)
     levels = np.asarray(r.significance_level) / 100
     idx = np.flatnonzero(np.isclose(levels, p.alpha, rtol=0, atol=1e-10))
     if len(idx) != 1:
-        raise ValueError('해당 분포에서 지원하는 alpha만 사용하세요: ' + str(levels.tolist()))
+        raise ValueError(
+            "해당 분포에서 지원하는 alpha만 사용하세요: " + str(levels.tolist())
+        )
     critical = float(r.critical_values[idx[0]])
-    return result('anderson-darling', p, r.statistic, None, '표본이 지정 분포 가족을 따른다', 'critical-values', dict(critical_values=r.critical_values, significance_levels=levels, critical_value=critical, decision_basis='critical_value'), reject=r.statistic > critical)
+    return result(
+        "anderson-darling",
+        p,
+        r.statistic,
+        None,
+        "표본이 지정 분포 가족을 따른다",
+        "critical-values",
+        dict(
+            critical_values=r.critical_values,
+            significance_levels=levels,
+            critical_value=critical,
+            decision_basis="critical_value",
+        ),
+        reject=r.statistic > critical,
+    )
 
-def _run_test(data: Dict[str, Any], profile: AndersonDarlingProfile) -> AndersonDarlingOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: AndersonDarlingProfile
+) -> AndersonDarlingOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -186,7 +216,14 @@ def _run_test(data: Dict[str, Any], profile: AndersonDarlingProfile) -> Anderson
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_anderson_darling(x: Any, profile: Optional[AndersonDarlingProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> AndersonDarlingOutputDTO:
+
+def run_anderson_darling(
+    x: Any,
+    profile: Optional[AndersonDarlingProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> AndersonDarlingOutputDTO:
     """Anderson–Darling 적합도.
 
     Args:
@@ -200,8 +237,10 @@ def run_anderson_darling(x: Any, profile: Optional[AndersonDarlingProfile] = Non
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("anderson-darling", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x}, profile)
+    profile = resolve_profile(
+        "anderson-darling", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x}, profile)
     return _run_test(data, profile)
 
 
@@ -210,5 +249,5 @@ def run_anderson_darling(x: Any, profile: Optional[AndersonDarlingProfile] = Non
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_anderson_darling([1,2,3,4,6,9,10,13])
+    result = run_anderson_darling([1, 2, 3, 4, 6, 9, 10, 13])
     print(result.to_json(indent=2))

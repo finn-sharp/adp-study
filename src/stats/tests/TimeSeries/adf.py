@@ -16,6 +16,7 @@ adf - ADF 단위근 검정
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, integer, numeric, result)
+from src.stats.tests._common import number, integer, numeric, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ADFProfile:
@@ -51,6 +53,7 @@ class ADFProfile:
         autolag (Optional[str]): AIC/BIC/t-stat/None 기본 "AIC".
         nan_policy (str): raise만 허용. 시점 간격 보존을 위해 결측 제거 금지 기본 "raise".
     """
+
     alpha: float = 0.05
     regression: str = "c"
     max_lag: Optional[int] = None
@@ -61,6 +64,7 @@ class ADFProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ADFOutputDTO(OutputDTO):
@@ -82,6 +86,7 @@ class ADFOutputDTO(OutputDTO):
         critical_values (Dict[str, float]): 1%/5%/10% 임계값.
         information_criterion (Optional[float]): autolag 최적 지표, 고정lag None.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -102,6 +107,7 @@ class ADFOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -114,28 +120,36 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = numeric(args['x'], 1, 3, policy)
+    a = numeric(args["x"], 1, 3, policy)
     if np.ptp(a) == 0:
-        raise ValueError('상수 자료의 검정은 정의되지 않습니다.')
-    if policy != 'raise':
-        raise ValueError('ADF에서는 시점 간격을 보존하기 위해 nan_policy=raise만 허용합니다.')
-    if p.regression not in ('c', 'ct', 'ctt', 'n') or p.autolag not in ('AIC', 'BIC', 't-stat', None):
-        raise ValueError('regression/autolag 오류')
+        raise ValueError("상수 자료의 검정은 정의되지 않습니다.")
+    if policy != "raise":
+        raise ValueError(
+            "ADF에서는 시점 간격을 보존하기 위해 nan_policy=raise만 허용합니다."
+        )
+    if p.regression not in ("c", "ct", "ctt", "n") or p.autolag not in (
+        "AIC",
+        "BIC",
+        "t-stat",
+        None,
+    ):
+        raise ValueError("regression/autolag 오류")
     if p.max_lag is not None:
-        integer(p.max_lag, 'max_lag')
-    return {'x': a}
+        integer(p.max_lag, "max_lag")
+    return {"x": a}
+
 
 def _validate_inputs(arguments: Dict[str, Any], profile: ADFProfile) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
@@ -148,13 +162,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: ADFProfile) -> Dict[str
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, ADFProfile): raise TypeError("ADFProfile이 필요합니다.")
+    if not isinstance(profile, ADFProfile):
+        raise TypeError("ADFProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -167,10 +183,27 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
+    alt = getattr(p, "alternative", "two-sided")
     from statsmodels.tsa.stattools import adfuller
-    r = adfuller(d['x'], maxlag=p.max_lag, regression=p.regression, autolag=p.autolag)
-    return result('adf', p, r[0], r[1], '시계열에 단위근이 존재한다', 'augmented-dickey-fuller', dict(used_lag=int(r[2]), nobs=int(r[3]), critical_values={k: float(v) for k, v in r[4].items()}, information_criterion=float(r[5]) if len(r) > 5 else None), {'regression': p.regression, 'autolag': p.autolag}, ['단위근 기각은 모든 형태의 정상성 증명이 아닙니다.'])
+
+    r = adfuller(d["x"], maxlag=p.max_lag, regression=p.regression, autolag=p.autolag)
+    return result(
+        "adf",
+        p,
+        r[0],
+        r[1],
+        "시계열에 단위근이 존재한다",
+        "augmented-dickey-fuller",
+        dict(
+            used_lag=int(r[2]),
+            nobs=int(r[3]),
+            critical_values={k: float(v) for k, v in r[4].items()},
+            information_criterion=float(r[5]) if len(r) > 5 else None,
+        ),
+        {"regression": p.regression, "autolag": p.autolag},
+        ["단위근 기각은 모든 형태의 정상성 증명이 아닙니다."],
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: ADFProfile) -> ADFOutputDTO:
     """검증된 자료를 계산합니다.
@@ -190,7 +223,14 @@ def _run_test(data: Dict[str, Any], profile: ADFProfile) -> ADFOutputDTO:
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_adf(x: Any, profile: Optional[ADFProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> ADFOutputDTO:
+
+def run_adf(
+    x: Any,
+    profile: Optional[ADFProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> ADFOutputDTO:
     """ADF 단위근 검정.
 
     Args:
@@ -204,8 +244,10 @@ def run_adf(x: Any, profile: Optional[ADFProfile] = None, *, recipe_path: Option
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("adf", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x}, profile)
+    profile = resolve_profile(
+        "adf", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x}, profile)
     return _run_test(data, profile)
 
 

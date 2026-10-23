@@ -15,6 +15,7 @@ pearson.py - Pearson 전용 상관분석
     2026-10-12  김재현(Finn)     v1.0.0    상관분석·명세·레시피 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -26,20 +27,25 @@ __status__ = "Development"
 # ---------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Any,Dict,List,Optional,Tuple
-import inspect,warnings as pywarnings
+from typing import Any, Dict, List, Optional, Tuple
+import inspect, warnings as pywarnings
 import numpy as np
 import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from src.MachineLearning.analysis_common import positive_int
-from src.stats.correlation._common import validate_profile,numeric_pair,correlation_matrix
+from src.stats.correlation._common import (
+    validate_profile,
+    numeric_pair,
+    correlation_matrix,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PearsonProfile:
@@ -54,18 +60,20 @@ class PearsonProfile:
         p_adjust (str): 행렬 다중비교 none/bonferroni/holm/fdr_bh; 기본 'holm'.
         confidence_interval (bool): n>3에서 Fisher 근사 신뢰구간; 기본 True.
     """
+
     alpha: float = 0.05
-    alternative: str = 'two-sided'
-    nan_policy: str = 'raise'
+    alternative: str = "two-sided"
+    nan_policy: str = "raise"
     min_samples: int = 3
     max_pairs: int = 10000
-    p_adjust: str = 'holm'
+    p_adjust: str = "holm"
     confidence_interval: bool = True
 
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class PearsonOutputDTO(OutputDTO):
@@ -82,6 +90,7 @@ class PearsonOutputDTO(OutputDTO):
         confidence_interval (Optional[Tuple[float, float]]): Pearson Fisher 근사 양측 구간; 다른 기법 None.
         warnings (List[str]): 제거·추론 가정·수치 경고.
     """
+
     method: str
     coefficient: float
     p_value: float
@@ -89,7 +98,7 @@ class PearsonOutputDTO(OutputDTO):
     alpha: float
     alternative: str
     n_samples: int
-    confidence_interval: Optional[Tuple[float,float]]
+    confidence_interval: Optional[Tuple[float, float]]
     warnings: List[str]
 
 
@@ -108,6 +117,7 @@ class PearsonMatrixOutputDTO(OutputDTO):
         alpha (float): 유의수준.
         warnings (List[str]): 미정의 쌍·결측·추론 경고.
     """
+
     method: str
     correlation_matrix: pd.DataFrame
     p_value_matrix: pd.DataFrame
@@ -123,6 +133,7 @@ class PearsonMatrixOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_profile(profile):
     """전용 Profile 및 기법 조건을 확인합니다.
 
@@ -133,16 +144,19 @@ def _validate_profile(profile):
     Raises:
         ValueError/TypeError: Profile·설정 오류.
     """
-    if not isinstance(profile,PearsonProfile):raise TypeError('PearsonProfile이 필요합니다.')
+    if not isinstance(profile, PearsonProfile):
+        raise TypeError("PearsonProfile이 필요합니다.")
     validate_profile(profile)
-    if not isinstance(profile.confidence_interval,bool):raise TypeError('confidence_interval은 bool입니다.')
+    if not isinstance(profile.confidence_interval, bool):
+        raise TypeError("confidence_interval은 bool입니다.")
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _run_pair(a,b,removed,profile):
+
+def _run_pair(a, b, removed, profile):
     """해당 기법의 계수와 추론을 계산합니다.
 
     Args:
@@ -155,29 +169,64 @@ def _run_pair(a,b,removed,profile):
     Raises:
         ValueError: 퇴화 자료·수치 오류·미지원 exact 동률.
     """
-    notes=[]
-    if removed:notes.append(str(removed)+'개 대응 결측 쌍을 제거했습니다.')
-    kwargs={'alternative':profile.alternative} if 'alternative' in inspect.signature(stats.pearsonr).parameters else {}
-    coefficient,p=stats.pearsonr(a,b,**kwargs);coefficient=float(coefficient);p=float(p)
-    if not kwargs and profile.alternative!='two-sided':p=p/2 if (coefficient>0)==(profile.alternative=='greater') else 1-p/2
-    interval=None
+    notes = []
+    if removed:
+        notes.append(str(removed) + "개 대응 결측 쌍을 제거했습니다.")
+    kwargs = (
+        {"alternative": profile.alternative}
+        if "alternative" in inspect.signature(stats.pearsonr).parameters
+        else {}
+    )
+    coefficient, p = stats.pearsonr(a, b, **kwargs)
+    coefficient = float(coefficient)
+    p = float(p)
+    if not kwargs and profile.alternative != "two-sided":
+        p = (
+            p / 2
+            if (coefficient > 0) == (profile.alternative == "greater")
+            else 1 - p / 2
+        )
+    interval = None
     if profile.confidence_interval:
-        if len(a)>3:
-            if abs(coefficient)==1:interval=(coefficient,coefficient)
+        if len(a) > 3:
+            if abs(coefficient) == 1:
+                interval = (coefficient, coefficient)
             else:
-                z=np.arctanh(coefficient);critical=stats.norm.ppf(1-profile.alpha/2);width=critical/np.sqrt(len(a)-3)
-                interval=(float(np.tanh(z-width)),float(np.tanh(z+width)))
-        else:notes.append('Fisher 근사 신뢰구간은 n>3에서만 반환합니다.')
-    method='pearson-exact-beta'
-    if not np.isfinite(coefficient) or not np.isfinite(p):raise ValueError('비유한 상관 결과')
-    return PearsonOutputDTO(method,coefficient,p,bool(p<profile.alpha),profile.alpha,profile.alternative,len(a),interval,notes)
+                z = np.arctanh(coefficient)
+                critical = stats.norm.ppf(1 - profile.alpha / 2)
+                width = critical / np.sqrt(len(a) - 3)
+                interval = (float(np.tanh(z - width)), float(np.tanh(z + width)))
+        else:
+            notes.append("Fisher 근사 신뢰구간은 n>3에서만 반환합니다.")
+    method = "pearson-exact-beta"
+    if not np.isfinite(coefficient) or not np.isfinite(p):
+        raise ValueError("비유한 상관 결과")
+    return PearsonOutputDTO(
+        method,
+        coefficient,
+        p,
+        bool(p < profile.alpha),
+        profile.alpha,
+        profile.alternative,
+        len(a),
+        interval,
+        notes,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_pearson(x: Any,y: Any,profile: Optional[PearsonProfile] = None,*,recipe_path: Optional[str] = None,overrides: Optional[Dict[str,Any]] = None) -> PearsonOutputDTO:
+
+def run_pearson(
+    x: Any,
+    y: Any,
+    profile: Optional[PearsonProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> PearsonOutputDTO:
     """단일 대응 수치 쌍의 상관분석을 실행합니다.
 
     Args:
@@ -191,15 +240,24 @@ def run_pearson(x: Any,y: Any,profile: Optional[PearsonProfile] = None,*,recipe_
     Raises:
         ValueError/TypeError/OSError: 자료·설정·레시피 오류.
     """
-    profile=resolve_profile('correlation-pearson',profile,recipe_path=recipe_path,overrides=overrides);_validate_profile(profile)
-    a,b,removed=numeric_pair(x,y,profile)
+    profile = resolve_profile(
+        "correlation-pearson", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    _validate_profile(profile)
+    a, b, removed = numeric_pair(x, y, profile)
     with pywarnings.catch_warnings(record=True) as caught:
-        result=_run_pair(a,b,removed,profile)
+        result = _run_pair(a, b, removed, profile)
     result.warnings.extend(str(w.message) for w in caught)
     return result
 
 
-def run_pearson_matrix(X: Any,profile: Optional[PearsonProfile] = None,*,recipe_path: Optional[str] = None,overrides: Optional[Dict[str,Any]] = None) -> PearsonMatrixOutputDTO:
+def run_pearson_matrix(
+    X: Any,
+    profile: Optional[PearsonProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> PearsonMatrixOutputDTO:
     """열별 상관·유효 표본·상삼각 다중검정을 함께 반환합니다.
 
     Args:
@@ -212,13 +270,18 @@ def run_pearson_matrix(X: Any,profile: Optional[PearsonProfile] = None,*,recipe_
     Raises:
         ValueError/TypeError/OSError: shape·한도·설정·레시피 오류.
     """
-    profile=resolve_profile('correlation-pearson',profile,recipe_path=recipe_path,overrides=overrides);_validate_profile(profile)
-    return correlation_matrix(X,profile,run_pearson,PearsonMatrixOutputDTO,'pearson')
+    profile = resolve_profile(
+        "correlation-pearson", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    _validate_profile(profile)
+    return correlation_matrix(
+        X, profile, run_pearson, PearsonMatrixOutputDTO, "pearson"
+    )
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__=='__main__':
-    print(run_pearson([1,2,4,5,6],[2,5,3,7,8]).to_json(indent=2))
+if __name__ == "__main__":
+    print(run_pearson([1, 2, 4, 5, 6], [2, 5, 3, 7, 8]).to_json(indent=2))

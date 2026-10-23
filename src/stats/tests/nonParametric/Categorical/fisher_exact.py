@@ -16,6 +16,7 @@ fisher_exact - Fisher 정확·RxC 조건부 검정
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -34,12 +35,21 @@ from src.Recipes import resolve_profile
 import math
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, integer, table_data, result, log_table_probability, enumerate_tables, sample_table)
+from src.stats.tests._common import (
+    number,
+    integer,
+    table_data,
+    result,
+    log_table_probability,
+    enumerate_tables,
+    sample_table,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class FisherExactProfile:
@@ -53,6 +63,7 @@ class FisherExactProfile:
         random_state (int): Monte Carlo seed, 0 이상 기본 1234.
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
     """
+
     alpha: float = 0.05
     method: str = "auto"
     max_tables: int = 100000
@@ -64,6 +75,7 @@ class FisherExactProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class FisherExactOutputDTO(OutputDTO):
@@ -85,6 +97,7 @@ class FisherExactOutputDTO(OutputDTO):
         mc_standard_error (Optional[float]): Monte Carlo p 추정 SE, 정확 모드 None.
         table_probability (float): 관측표의 고정 주변합 조건부 확률.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -105,6 +118,7 @@ class FisherExactOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -117,31 +131,34 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = table_data(args['table'], False)
-    if p.method not in ('auto', 'exact', 'enumeration', 'monte_carlo'):
-        raise ValueError('method 오류')
-    integer(p.max_tables, 'max_tables', 1)
-    integer(p.n_resamples, 'n_resamples', 1)
-    integer(p.random_state, 'random_state')
-    if a.shape != (2, 2) and alt != 'two-sided':
-        raise ValueError('RxC는 확률 순서의 양측 검정만 지원합니다.')
-    if a.shape != (2, 2) and p.method == 'exact':
-        raise ValueError('RxC는 enumeration/monte_carlo를 지정하세요.')
-    return {'table': a}
+    a = table_data(args["table"], False)
+    if p.method not in ("auto", "exact", "enumeration", "monte_carlo"):
+        raise ValueError("method 오류")
+    integer(p.max_tables, "max_tables", 1)
+    integer(p.n_resamples, "n_resamples", 1)
+    integer(p.random_state, "random_state")
+    if a.shape != (2, 2) and alt != "two-sided":
+        raise ValueError("RxC는 확률 순서의 양측 검정만 지원합니다.")
+    if a.shape != (2, 2) and p.method == "exact":
+        raise ValueError("RxC는 enumeration/monte_carlo를 지정하세요.")
+    return {"table": a}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: FisherExactProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: FisherExactProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -152,13 +169,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: FisherExactProfile) -> 
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, FisherExactProfile): raise TypeError("FisherExactProfile이 필요합니다.")
+    if not isinstance(profile, FisherExactProfile):
+        raise TypeError("FisherExactProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -171,24 +190,28 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    t = d['table']
+    alt = getattr(p, "alternative", "two-sided")
+    t = d["table"]
     logobs = log_table_probability(t)
     shape = t.shape
     method = p.method
-    if method == 'auto':
-        method = 'exact' if shape == (2, 2) else 'enumeration'
-    odds = float(t[0, 0] * float(t[1, 1]) / (float(t[0, 1]) * t[1, 0])) if shape == (2, 2) and float(t[0, 1]) * float(t[1, 0]) > 0 else float('inf') if shape == (2, 2) else None
+    if method == "auto":
+        method = "exact" if shape == (2, 2) else "enumeration"
+    odds = (
+        float(t[0, 0] * float(t[1, 1]) / (float(t[0, 1]) * t[1, 0]))
+        if shape == (2, 2) and float(t[0, 1]) * float(t[1, 0]) > 0
+        else float("inf") if shape == (2, 2) else None
+    )
     se = None
     n = 0
-    if method == 'exact':
+    if method == "exact":
         s, pv = stats.fisher_exact(t, alternative=alt)
     else:
-        if alt != 'two-sided':
-            raise ValueError('확률 순서 검정은 양측만 지원합니다.')
+        if alt != "two-sided":
+            raise ValueError("확률 순서 검정은 양측만 지원합니다.")
         rows = t.sum(axis=1)
         cols = t.sum(axis=0)
-        if method == 'enumeration':
+        if method == "enumeration":
             mass = []
             total = []
             for candidate in enumerate_tables(rows, cols, p.max_tables):
@@ -199,20 +222,48 @@ def _calculate(d, p):
                 if lp <= logobs + 1e-12:
                     mass.append(v)
             if not np.isclose(math.fsum(total), 1.0, atol=1e-07, rtol=1e-07):
-                raise ValueError('정확 열거의 확률 질량 검증 실패')
+                raise ValueError("정확 열거의 확률 질량 검증 실패")
             pv = min(1.0, math.fsum(mass))
         else:
             rng = np.random.RandomState(p.random_state)
             hits = 0
             n = p.n_resamples
             for _ in range(n):
-                hits += log_table_probability(sample_table(rows, cols, rng)) <= logobs + 1e-12
+                hits += (
+                    log_table_probability(sample_table(rows, cols, rng))
+                    <= logobs + 1e-12
+                )
             pv = (hits + 1) / (n + 1)
             se = float(np.sqrt(pv * (1 - pv) / (n + 1)))
         s = math.exp(logobs)
-    return result('fisher-exact', p, s, pv, '고정 주변합 하에서 행과 열 변수가 독립이다', method, dict(odds_ratio=odds, n_tables=n, mc_standard_error=se, table_probability=math.exp(logobs)), {'statistic_definition': 'cross-product OR' if method == 'exact' else 'conditional table probability', 'random_state': p.random_state if method == 'monte_carlo' else None}, ['Monte Carlo p는 +1 보정한 추정값입니다.'] if se is not None else [])
+    return result(
+        "fisher-exact",
+        p,
+        s,
+        pv,
+        "고정 주변합 하에서 행과 열 변수가 독립이다",
+        method,
+        dict(
+            odds_ratio=odds,
+            n_tables=n,
+            mc_standard_error=se,
+            table_probability=math.exp(logobs),
+        ),
+        {
+            "statistic_definition": (
+                "cross-product OR"
+                if method == "exact"
+                else "conditional table probability"
+            ),
+            "random_state": p.random_state if method == "monte_carlo" else None,
+        },
+        ["Monte Carlo p는 +1 보정한 추정값입니다."] if se is not None else [],
+    )
 
-def _run_test(data: Dict[str, Any], profile: FisherExactProfile) -> FisherExactOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: FisherExactProfile
+) -> FisherExactOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -230,7 +281,14 @@ def _run_test(data: Dict[str, Any], profile: FisherExactProfile) -> FisherExactO
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_fisher_exact(table: Any, profile: Optional[FisherExactProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> FisherExactOutputDTO:
+
+def run_fisher_exact(
+    table: Any,
+    profile: Optional[FisherExactProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> FisherExactOutputDTO:
     """Fisher 정확·RxC 조건부 검정.
 
     Args:
@@ -244,8 +302,10 @@ def run_fisher_exact(table: Any, profile: Optional[FisherExactProfile] = None, *
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("fisher-exact", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'table': table}, profile)
+    profile = resolve_profile(
+        "fisher-exact", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"table": table}, profile)
     return _run_test(data, profile)
 
 
@@ -254,5 +314,5 @@ def run_fisher_exact(table: Any, profile: Optional[FisherExactProfile] = None, *
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_fisher_exact([[2,8],[7,3]])
+    result = run_fisher_exact([[2, 8], [7, 3]])
     print(result.to_json(indent=2))

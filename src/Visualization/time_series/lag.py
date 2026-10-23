@@ -15,6 +15,7 @@ lag.py - 지연 관계·비선형 반복 패턴을 확인합니다.
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class TimeSeriesLagProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         lag (int): 양의 행 지연; 날짜 간격은 호출자가 검증. 기본 1.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     lag: int = 1
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class TimeSeriesLagOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class TimeSeriesLagOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, TimeSeriesLagProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -103,15 +121,37 @@ def _draw(values, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    a,removed=vector(values,allow_missing=False)
-    if not 1<=profile.lag<len(a):raise ValueError('lag는 양수이고 자료보다 짧아야 합니다.')
-    x=a[:-profile.lag];y=a[profile.lag:];ax.scatter(x,y,s=12,color=profile.color,alpha=profile.alpha);ax.set_xlabel('Value at t-lag');ax.set_ylabel('Value at t');data=pd.DataFrame({'previous':x,'current':y});diagnostics={'lag_rows':profile.lag,'n_pairs':len(x)};notes=['입력 행은 시간 순이며 일정 간격이어야 합니다. 결측을 제거해 시간축을 압축하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, TimeSeriesLagOutputDTO, 'Time Series — Lag', notes)
+    a, removed = vector(values, allow_missing=False)
+    if not 1 <= profile.lag < len(a):
+        raise ValueError("lag는 양수이고 자료보다 짧아야 합니다.")
+    x = a[: -profile.lag]
+    y = a[profile.lag :]
+    ax.scatter(x, y, s=12, color=profile.color, alpha=profile.alpha)
+    ax.set_xlabel("Value at t-lag")
+    ax.set_ylabel("Value at t")
+    data = pd.DataFrame({"previous": x, "current": y})
+    diagnostics = {"lag_rows": profile.lag, "n_pairs": len(x)}
+    notes = [
+        "입력 행은 시간 순이며 일정 간격이어야 합니다. 결측을 제거해 시간축을 압축하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        TimeSeriesLagOutputDTO,
+        "Time Series — Lag",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_lag(values, *, ax, profile=None, recipe_path=None, overrides=None) -> TimeSeriesLagOutputDTO:
+def plot_lag(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> TimeSeriesLagOutputDTO:
     """지연 관계·비선형 반복 패턴을 확인합니다.
 
     Args:
@@ -125,10 +165,13 @@ def plot_lag(values, *, ax, profile=None, recipe_path=None, overrides=None) -> T
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-time-series-lag', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-time-series-lag", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

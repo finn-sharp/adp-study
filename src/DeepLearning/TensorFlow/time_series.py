@@ -16,6 +16,7 @@ time_series.py - TensorFlow LSTM 시계열 예측
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -38,6 +39,7 @@ from .common import validate_profile, run_supervised, run_forecast
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TFTimeSeriesProfile:
     """TFTimeSeriesProfile 필드 계약.
@@ -58,6 +60,7 @@ class TFTimeSeriesProfile:
         horizon (int): 미래 예측 타임스텝 수. 기본 1.
         target_columns (Optional[Tuple[int, ...]]): 예측할 열 위치; None은 모든 입력 열. 기본 None.
     """
+
     random_state: int = 1234
     epochs: int = 30
     batch_size: int = 32
@@ -77,6 +80,7 @@ class TFTimeSeriesProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TFTimeSeriesOutputDTO(OutputDTO):
@@ -100,6 +104,7 @@ class TFTimeSeriesOutputDTO(OutputDTO):
         epochs_trained (int): 실제 실행한 epoch 수.
         best_epoch (int): 최저 val_loss epoch, 1부터 시작. 최적 weights 복원.
     """
+
     task: str
     parameters: Dict[str, Any]
     model: Any
@@ -122,6 +127,7 @@ class TFTimeSeriesOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(profile: Optional[TFTimeSeriesProfile]) -> None:
     """설정을 검증합니다.
 
@@ -132,7 +138,8 @@ def _validate_inputs(profile: Optional[TFTimeSeriesProfile]) -> None:
     Raises:
         TypeError/ValueError: 잘못된 타입·범위.
     """
-    if not isinstance(profile, TFTimeSeriesProfile): raise TypeError("TFTimeSeriesProfile이 필요합니다.")
+    if not isinstance(profile, TFTimeSeriesProfile):
+        raise TypeError("TFTimeSeriesProfile이 필요합니다.")
     validate_profile(profile, "time_series")
 
 
@@ -140,7 +147,10 @@ def _validate_inputs(profile: Optional[TFTimeSeriesProfile]) -> None:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _run_model(series: Any, profile: Optional[TFTimeSeriesProfile]) -> TFTimeSeriesOutputDTO:
+
+def _run_model(
+    series: Any, profile: Optional[TFTimeSeriesProfile]
+) -> TFTimeSeriesOutputDTO:
     """검증된 모델을 적합합니다.
 
     Args:
@@ -159,7 +169,14 @@ def _run_model(series: Any, profile: Optional[TFTimeSeriesProfile]) -> TFTimeSer
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_tf_time_series(series: Any, profile: Optional[TFTimeSeriesProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> TFTimeSeriesOutputDTO:
+
+def run_tf_time_series(
+    series: Any,
+    profile: Optional[TFTimeSeriesProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> TFTimeSeriesOutputDTO:
     """TensorFlow LSTM 시계열 예측 실행.
 
     Args:
@@ -174,7 +191,9 @@ def run_tf_time_series(series: Any, profile: Optional[TFTimeSeriesProfile] = Non
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: TensorFlow 미설치.
     """
-    profile = resolve_profile("tf-time-series", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "tf-time-series", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(profile)
     return _run_model(series, profile)
 
@@ -185,6 +204,6 @@ def run_tf_time_series(series: Any, profile: Optional[TFTimeSeriesProfile] = Non
 
 if __name__ == "__main__":
     rng = np.random.RandomState(1234)
-    series = np.sin(np.arange(160)/8.)[:, None]
+    series = np.sin(np.arange(160) / 8.0)[:, None]
     result = run_tf_time_series(series, overrides={"epochs": 2, "input_width": 6})
     print(result.test_metrics, result.epochs_trained)

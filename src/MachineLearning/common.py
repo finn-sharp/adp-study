@@ -32,10 +32,23 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
-                             mean_absolute_error, mean_squared_error,
-                             precision_score, r2_score, recall_score, roc_auc_score)
-from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold, train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+    roc_auc_score,
+)
+from sklearn.model_selection import (
+    GridSearchCV,
+    KFold,
+    StratifiedKFold,
+    train_test_split,
+)
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.utils.multiclass import type_of_target
@@ -126,7 +139,9 @@ def validate_features(X: Any, min_samples: int = 2) -> np.ndarray:
     """
     arr = np.asarray(X, dtype=float)
     if arr.ndim != 2 or arr.shape[0] < min_samples or arr.shape[1] < 1:
-        raise ValueError("X는 최소 {}행, 1열의 2차원 수치 행렬이어야 합니다.".format(min_samples))
+        raise ValueError(
+            "X는 최소 {}행, 1열의 2차원 수치 행렬이어야 합니다.".format(min_samples)
+        )
     if not np.isfinite(arr).all():
         raise ValueError("X의 결측값과 무한대를 먼저 처리해야 합니다.")
     return arr
@@ -144,15 +159,22 @@ def make_scaler(scaling: str) -> Any:
     """
     if scaling not in ("none", "standard", "minmax"):
         raise ValueError("scaling은 none, standard, minmax 중 하나여야 합니다.")
-    return {"none": "passthrough", "standard": StandardScaler(), "minmax": MinMaxScaler()}[scaling]
+    return {
+        "none": "passthrough",
+        "standard": StandardScaler(),
+        "minmax": MinMaxScaler(),
+    }[scaling]
 
 
 def _metrics(y: np.ndarray, prediction: np.ndarray, task: str) -> Dict[str, float]:
     from src.Evaluation.adapters import evaluate_predictions
+
     return evaluate_predictions(y, prediction, task)
 
 
-def validate_supervised_inputs(X: Any, y: Any, profile: SupervisedProfile) -> Tuple[np.ndarray, np.ndarray]:
+def validate_supervised_inputs(
+    X: Any, y: Any, profile: SupervisedProfile
+) -> Tuple[np.ndarray, np.ndarray]:
     """공통 학습 조건과 입력을 검증합니다.
 
     Args:
@@ -168,11 +190,21 @@ def validate_supervised_inputs(X: Any, y: Any, profile: SupervisedProfile) -> Tu
         raise ValueError("profile.task는 regression 또는 classification이어야 합니다.")
     if not isinstance(profile.test_size, (float, int)) or not 0 < profile.test_size < 1:
         raise ValueError("test_size는 0과 1 사이의 비율이어야 합니다.")
-    if not isinstance(profile.random_state, int) or isinstance(profile.random_state, bool):
+    if not isinstance(profile.random_state, int) or isinstance(
+        profile.random_state, bool
+    ):
         raise ValueError("random_state는 정수여야 합니다.")
-    if not isinstance(profile.cv, int) or isinstance(profile.cv, bool) or profile.cv < 2:
+    if (
+        not isinstance(profile.cv, int)
+        or isinstance(profile.cv, bool)
+        or profile.cv < 2
+    ):
         raise ValueError("cv는 2 이상의 정수여야 합니다.")
-    if not isinstance(profile.n_jobs, int) or isinstance(profile.n_jobs, bool) or profile.n_jobs == 0:
+    if (
+        not isinstance(profile.n_jobs, int)
+        or isinstance(profile.n_jobs, bool)
+        or profile.n_jobs == 0
+    ):
         raise ValueError("n_jobs는 0이 아닌 정수여야 합니다.")
     if not isinstance(profile.stratify, bool):
         raise ValueError("stratify는 bool이어야 합니다.")
@@ -181,19 +213,30 @@ def validate_supervised_inputs(X: Any, y: Any, profile: SupervisedProfile) -> Tu
     target = np.asarray(y)
     if target.ndim != 1 or len(target) != len(arr):
         raise ValueError("y는 X와 길이가 같은 1차원 타깃이어야 합니다.")
-    if any(v is None or (isinstance(v, (float, np.floating)) and not np.isfinite(v)) for v in target):
+    if any(
+        v is None or (isinstance(v, (float, np.floating)) and not np.isfinite(v))
+        for v in target
+    ):
         raise ValueError("y에 결측값이나 무한대를 포함할 수 없습니다.")
     if profile.task == "regression":
         target = target.astype(float)
         if not np.isfinite(target).all():
             raise ValueError("회귀 타깃은 유한한 수치여야 합니다.")
-    elif type_of_target(target) not in ("binary", "multiclass") or len(np.unique(target)) < 2:
+    elif (
+        type_of_target(target) not in ("binary", "multiclass")
+        or len(np.unique(target)) < 2
+    ):
         raise ValueError("분류 타깃에는 최소 두 클래스의 이산 라벨이 필요합니다.")
     return arr, target
 
 
-def run_supervised(X: Any, y: Any, estimator: Any, profile: SupervisedProfile,
-                   extra_steps: Optional[List[Tuple[str, Any]]] = None) -> SupervisedOutputDTO:
+def run_supervised(
+    X: Any,
+    y: Any,
+    estimator: Any,
+    profile: SupervisedProfile,
+    extra_steps: Optional[List[Tuple[str, Any]]] = None,
+) -> SupervisedOutputDTO:
     """분할 → Pipeline 적합/학습 데이터 CV → 테스트 평가를 수행합니다.
 
     Args:
@@ -214,15 +257,23 @@ def run_supervised(X: Any, y: Any, estimator: Any, profile: SupervisedProfile,
     """
     arr, target = validate_supervised_inputs(X, y, profile)
     stratify = target if profile.task == "classification" and profile.stratify else None
-    train_idx, test_idx = train_test_split(np.arange(len(arr)), test_size=profile.test_size,
-                                          random_state=profile.random_state, stratify=stratify)
+    train_idx, test_idx = train_test_split(
+        np.arange(len(arr)),
+        test_size=profile.test_size,
+        random_state=profile.random_state,
+        stratify=stratify,
+    )
     if min(len(train_idx), len(test_idx)) < 2:
         raise ValueError("학습·테스트 데이터는 각각 최소 2행이어야 합니다.")
     X_train, X_test = arr[train_idx], arr[test_idx]
     y_train, y_test = target[train_idx], target[test_idx]
     if profile.task == "classification" and len(np.unique(y_train)) < 2:
         raise ValueError("학습 데이터에 최소 두 클래스가 필요합니다.")
-    steps = [("scaler", make_scaler(profile.scaling))] + (extra_steps or []) + [("model", estimator)]
+    steps = (
+        [("scaler", make_scaler(profile.scaling))]
+        + (extra_steps or [])
+        + [("model", estimator)]
+    )
     pipeline = Pipeline(steps)
     best_params, best_score, cv_results = {}, None, None
     if profile.param_grid is not None:
@@ -232,15 +283,28 @@ def run_supervised(X: Any, y: Any, estimator: Any, profile: SupervisedProfile,
             counts = np.unique(y_train, return_counts=True)[1]
             if counts.min() < profile.cv:
                 raise ValueError("각 학습 클래스의 표본 수는 cv 이상이어야 합니다.")
-            cv = StratifiedKFold(profile.cv, shuffle=True, random_state=profile.random_state)
+            cv = StratifiedKFold(
+                profile.cv, shuffle=True, random_state=profile.random_state
+            )
         else:
             if len(y_train) < profile.cv:
                 raise ValueError("학습 표본 수는 cv 이상이어야 합니다.")
             cv = KFold(profile.cv, shuffle=True, random_state=profile.random_state)
-        grid = {k if "__" in k else "model__" + k: v for k, v in profile.param_grid.items()}
-        scoring = profile.scoring or ("accuracy" if profile.task == "classification" else "neg_mean_squared_error")
-        search = GridSearchCV(pipeline, grid, cv=cv, scoring=scoring, n_jobs=profile.n_jobs,
-                              refit=True, error_score="raise")
+        grid = {
+            k if "__" in k else "model__" + k: v for k, v in profile.param_grid.items()
+        }
+        scoring = profile.scoring or (
+            "accuracy" if profile.task == "classification" else "neg_mean_squared_error"
+        )
+        search = GridSearchCV(
+            pipeline,
+            grid,
+            cv=cv,
+            scoring=scoring,
+            n_jobs=profile.n_jobs,
+            refit=True,
+            error_score="raise",
+        )
         search.fit(X_train, y_train)
         pipeline, best_params = search.best_estimator_, search.best_params_
         best_score, cv_results = float(search.best_score_), search.cv_results_
@@ -248,18 +312,44 @@ def run_supervised(X: Any, y: Any, estimator: Any, profile: SupervisedProfile,
         pipeline.fit(X_train, y_train)
     prediction = pipeline.predict(X_test)
     # sklearn 0.23의 일부 회귀 추정기도 classes_ 속성을 노출하므로 task로 먼저 구분합니다.
-    classes = getattr(pipeline.named_steps["model"], "classes_", None) if profile.task == "classification" else None
+    classes = (
+        getattr(pipeline.named_steps["model"], "classes_", None)
+        if profile.task == "classification"
+        else None
+    )
     probabilities = None
     if profile.task == "classification" and hasattr(pipeline, "predict_proba"):
         probabilities = pipeline.predict_proba(X_test)
 
     from src.Evaluation.adapters import evaluate_predictions
-    test_metrics = evaluate_predictions(y_test, prediction, profile.task, probabilities, classes)
-    feature_names = [str(c) for c in X.columns] if hasattr(X, "columns") else ["feature_{}".format(i) for i in range(arr.shape[1])]
+
+    test_metrics = evaluate_predictions(
+        y_test, prediction, profile.task, probabilities, classes
+    )
+    feature_names = (
+        [str(c) for c in X.columns]
+        if hasattr(X, "columns")
+        else ["feature_{}".format(i) for i in range(arr.shape[1])]
+    )
     return SupervisedOutputDTO(
-        model_name=type(pipeline.named_steps["model"]).__name__, task=profile.task, model=pipeline,
-        train_metrics=_metrics(y_train, pipeline.predict(X_train), profile.task), test_metrics=test_metrics,
-        y_test=y_test, predictions=prediction, train_indices=train_idx, test_indices=test_idx,
-        feature_names=feature_names, classes=classes, probabilities=probabilities,
-        confusion=confusion_matrix(y_test, prediction, labels=classes) if classes is not None else None,
-        best_params=best_params, best_cv_score=best_score, cv_results=cv_results)
+        model_name=type(pipeline.named_steps["model"]).__name__,
+        task=profile.task,
+        model=pipeline,
+        train_metrics=_metrics(y_train, pipeline.predict(X_train), profile.task),
+        test_metrics=test_metrics,
+        y_test=y_test,
+        predictions=prediction,
+        train_indices=train_idx,
+        test_indices=test_idx,
+        feature_names=feature_names,
+        classes=classes,
+        probabilities=probabilities,
+        confusion=(
+            confusion_matrix(y_test, prediction, labels=classes)
+            if classes is not None
+            else None
+        ),
+        best_params=best_params,
+        best_cv_score=best_score,
+        cv_results=cv_results,
+    )

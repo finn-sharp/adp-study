@@ -15,21 +15,28 @@ convergence.py - 유전 알고리즘 실행가능 최우수 목적값의 세대�
     2026-10-23  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO,start,finish,validate_profile as validate_plot_profile
+from src.Visualization._common import (
+    PlotOutputDTO,
+    start,
+    finish,
+    validate_profile as validate_plot_profile,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,9 +50,11 @@ class OptimizationConvergenceProfile:
         color (str): 곡선 색상 기본 'C0'.
         alpha (float): 투명도 [0,1] 기본 0.8.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -63,17 +72,20 @@ class OptimizationConvergenceOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): Profile 전체.
         warnings (List[str]): 정체는 최적성 증명이 아님.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -85,11 +97,13 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_plot_profile(profile,OptimizationConvergenceProfile)
+    validate_plot_profile(profile, OptimizationConvergenceProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(result, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -103,17 +117,53 @@ def _run(result, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    if not hasattr(result,'history') or not hasattr(result,'feasible'):raise TypeError('GeneticAlgorithmOutputDTO가 필요합니다.')
-    data=result.history.copy()
-    if not {'generation','best_objective','best_violation','feasible_fraction'}.issubset(data.columns):raise ValueError('탐색 이력 열 누락')
-    before=start(ax)
-    ax.plot(data.generation,data.best_objective,color=profile.color,alpha=profile.alpha,label='Best feasible objective')
-    ax.set(xlabel='Generation',ylabel='Objective (original units)',title=profile.title or 'Genetic algorithm search');ax.legend()
-    return finish(ax,before,data,dict(feasible=result.feasible,maximize=result.parameters['maximize'],best_objective=result.best_objective,stop_reason=result.stop_reason),profile,OptimizationConvergenceOutputDTO,'Genetic algorithm search',['실행가능 후보가 없는 세대는 목적값 곡선을 그리지 않습니다. 곡선 정체는 전역 최적성 증명이 아닙니다.'])
+    if not hasattr(result, "history") or not hasattr(result, "feasible"):
+        raise TypeError("GeneticAlgorithmOutputDTO가 필요합니다.")
+    data = result.history.copy()
+    if not {
+        "generation",
+        "best_objective",
+        "best_violation",
+        "feasible_fraction",
+    }.issubset(data.columns):
+        raise ValueError("탐색 이력 열 누락")
+    before = start(ax)
+    ax.plot(
+        data.generation,
+        data.best_objective,
+        color=profile.color,
+        alpha=profile.alpha,
+        label="Best feasible objective",
+    )
+    ax.set(
+        xlabel="Generation",
+        ylabel="Objective (original units)",
+        title=profile.title or "Genetic algorithm search",
+    )
+    ax.legend()
+    return finish(
+        ax,
+        before,
+        data,
+        dict(
+            feasible=result.feasible,
+            maximize=result.parameters["maximize"],
+            best_objective=result.best_objective,
+            stop_reason=result.stop_reason,
+        ),
+        profile,
+        OptimizationConvergenceOutputDTO,
+        "Genetic algorithm search",
+        [
+            "실행가능 후보가 없는 세대는 목적값 곡선을 그리지 않습니다. 곡선 정체는 전역 최적성 증명이 아닙니다."
+        ],
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def plot_convergence(result, *, ax, profile=None, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -129,9 +179,15 @@ def plot_convergence(result, *, ax, profile=None, recipe_path=None, overrides=No
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-optimization-convergence',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-optimization-convergence",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    return _run(result, ax,profile)
+    return _run(result, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

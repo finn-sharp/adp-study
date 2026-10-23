@@ -4,17 +4,21 @@
 작성자: 김재현(Finn), 2026-10-12. 변경 이력: v1.0.0 최초 추가.
 라이선스: Proprietary; UCI 원본은 CC BY 4.0. import에서 다운로드·학습·그림 생성 없음.
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 from dataclasses import dataclass
-from typing import Any,Dict
+from typing import Any, Dict
 import numpy as np
 from src.output import OutputDTO
 from src.Recipes import load_profile
 from src.datasets.uci import load_tabular
-from src.MachineLearning.LinearModels.regression_workflow import run_regression_workflow,build_regression_estimator
+from src.MachineLearning.LinearModels.regression_workflow import (
+    run_regression_workflow,
+    build_regression_estimator,
+)
 from src.stats.regression.joint_f import run_joint_f
 from src.stats.regression.nested_f import run_nested_f
 from src.stats.regression.ols import run_ols
@@ -24,6 +28,7 @@ from src.stats.regression.heteroscedasticity import run_heteroscedasticity
 from src.stats.regression.independence import run_independence
 from src.stats.regression.collinearity import run_collinearity
 from src.stats.regression.influence import run_influence
+
 
 @dataclass
 class RegressionStudyOutputDTO(OutputDTO):
@@ -38,13 +43,15 @@ class RegressionStudyOutputDTO(OutputDTO):
         axes (Any): 사용자/예제 Axes 배열 또는 None; JSON 제외.
         plots (Dict[str,Any]): 이름별 개별 Plot DTO; JSON은 수치만.
     """
+
     workflow: Any
-    diagnostics: Dict[str,Any]
+    diagnostics: Dict[str, Any]
     observation_mapping: Any
     feature_selection: Any
     figure: Any
     axes: Any
-    plots: Dict[str,Any]
+    plots: Dict[str, Any]
+
 
 def load_data(cache_dir=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -56,8 +63,9 @@ def load_data(cache_dir=None):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    data=load_tabular('regression',cache_dir=cache_dir)
-    return data.drop(columns='target').copy(),data.target.copy()
+    data = load_tabular("regression", cache_dir=cache_dir)
+    return data.drop(columns="target").copy(), data.target.copy()
+
 
 def load_recipe(overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -69,7 +77,8 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    return load_profile('regression-workflow',overrides=overrides)
+    return load_profile("regression-workflow", overrides=overrides)
+
 
 def build_pipeline(preprocessor=None, **options):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -82,7 +91,8 @@ def build_pipeline(preprocessor=None, **options):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    return build_regression_estimator(preprocessor=preprocessor,**options)
+    return build_regression_estimator(preprocessor=preprocessor, **options)
+
 
 def main(cache_dir=None, overrides=None, axes=None, draw=False):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -98,37 +108,107 @@ def main(cache_dir=None, overrides=None, axes=None, draw=False):
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
     import pandas as pd
-    X,y=load_data(cache_dir);profile=load_recipe(overrides);workflow=run_regression_workflow(X,y,profile=profile);inference=workflow.inference;model=workflow.model
-    final_design=inference.design.drop(columns='Intercept')
-    diagnostics={'joint_f':run_joint_f(inference),'linearity':run_linearity(inference),'normality':run_normality(inference),'heteroscedasticity':run_heteroscedasticity(inference),'independence':run_independence(inference),'collinearity':run_collinearity(final_design),'influence':run_influence(inference)}
-    if final_design.shape[1]>1 and inference.model.cov_type=='nonrobust':
-        restricted=run_ols(final_design.iloc[:,:-1],inference.model.model.endog)
-        diagnostics['nested_f']=run_nested_f(restricted,inference)
-    kept_original=workflow.train_indices[model.kept_positions_];mapping=diagnostics['influence'].table.copy();mapping['original_position']=kept_original
-    removed=workflow.train_indices[model.removed_positions_]
+
+    X, y = load_data(cache_dir)
+    profile = load_recipe(overrides)
+    workflow = run_regression_workflow(X, y, profile=profile)
+    inference = workflow.inference
+    model = workflow.model
+    final_design = inference.design.drop(columns="Intercept")
+    diagnostics = {
+        "joint_f": run_joint_f(inference),
+        "linearity": run_linearity(inference),
+        "normality": run_normality(inference),
+        "heteroscedasticity": run_heteroscedasticity(inference),
+        "independence": run_independence(inference),
+        "collinearity": run_collinearity(final_design),
+        "influence": run_influence(inference),
+    }
+    if final_design.shape[1] > 1 and inference.model.cov_type == "nonrobust":
+        restricted = run_ols(final_design.iloc[:, :-1], inference.model.model.endog)
+        diagnostics["nested_f"] = run_nested_f(restricted, inference)
+    kept_original = workflow.train_indices[model.kept_positions_]
+    mapping = diagnostics["influence"].table.copy()
+    mapping["original_position"] = kept_original
+    removed = workflow.train_indices[model.removed_positions_]
     if len(removed):
-        extra=pd.DataFrame({'position':np.nan,'original_position':removed,'removed_during_training':True});mapping['removed_during_training']=False;mapping=pd.concat([mapping,extra],ignore_index=True,sort=False)
-    else:mapping['removed_during_training']=False
-    figure=None;grid=None;plots={}
+        extra = pd.DataFrame(
+            {
+                "position": np.nan,
+                "original_position": removed,
+                "removed_during_training": True,
+            }
+        )
+        mapping["removed_during_training"] = False
+        mapping = pd.concat([mapping, extra], ignore_index=True, sort=False)
+    else:
+        mapping["removed_during_training"] = False
+    figure = None
+    grid = None
+    plots = {}
     if draw or axes is not None:
         from src.Visualization.skeleton._common import render_panels
-        from src.Visualization.regression.coefficient_intervals import plot_coefficient_intervals
+        from src.Visualization.regression.coefficient_intervals import (
+            plot_coefficient_intervals,
+        )
         from src.Visualization.regression.residual_fitted import plot_residual_fitted
         from src.Visualization.regression.scale_location import plot_scale_location
         from src.Visualization.regression.cooks_distance import plot_cooks_distance
         from src.Visualization.regression.leverage import plot_leverage
-        from src.Visualization.regression.observed_predicted import plot_observed_predicted
+        from src.Visualization.regression.observed_predicted import (
+            plot_observed_predicted,
+        )
         from src.Visualization.regression.vif import plot_vif
-        from src.Visualization.regression.prediction_interval import plot_prediction_interval
+        from src.Visualization.regression.prediction_interval import (
+            plot_prediction_interval,
+        )
         from src.Visualization.regression.partial_residual import plot_partial_residual
         from src.Visualization.regression.residual_order import plot_residual_order
         from src.Visualization.qq.normal import plot_normal
-        future=model.transform_features(X.iloc[workflow.test_indices]);model_y=model.target_transformer_.transform(workflow.y_test)
-        calls=[('coefficients',lambda ax:plot_coefficient_intervals(inference,ax=ax)),('residual_fitted',lambda ax:plot_residual_fitted(inference,ax=ax)),('qq_normal',lambda ax:plot_normal(inference.residuals,ax=ax,overrides={'fit_parameters':True})),('scale_location',lambda ax:plot_scale_location(inference,ax=ax)),('cooks_distance',lambda ax:plot_cooks_distance(inference,ax=ax)),('leverage',lambda ax:plot_leverage(inference,ax=ax)),('observed_predicted',lambda ax:plot_observed_predicted(workflow.y_test,workflow.predictions,ax=ax)),('vif',lambda ax:plot_vif(diagnostics['collinearity'],ax=ax)),('prediction_interval',lambda ax:plot_prediction_interval(inference,future,model_y,ax=ax)),('partial_residual',lambda ax:plot_partial_residual(inference,final_design.columns[0],ax=ax)),('residual_order',lambda ax:plot_residual_order(inference,ax=ax))]
-        dashboard=render_panels(calls,axes=axes,ncols=3);figure=dashboard.figure;grid=dashboard.axes;plots=dashboard.panels
-    return RegressionStudyOutputDTO(workflow,diagnostics,mapping,model.selector_.history_,figure,grid,plots)
 
-if __name__=='__main__':
-    result=main()
+        future = model.transform_features(X.iloc[workflow.test_indices])
+        model_y = model.target_transformer_.transform(workflow.y_test)
+        calls = [
+            ("coefficients", lambda ax: plot_coefficient_intervals(inference, ax=ax)),
+            ("residual_fitted", lambda ax: plot_residual_fitted(inference, ax=ax)),
+            (
+                "qq_normal",
+                lambda ax: plot_normal(
+                    inference.residuals, ax=ax, overrides={"fit_parameters": True}
+                ),
+            ),
+            ("scale_location", lambda ax: plot_scale_location(inference, ax=ax)),
+            ("cooks_distance", lambda ax: plot_cooks_distance(inference, ax=ax)),
+            ("leverage", lambda ax: plot_leverage(inference, ax=ax)),
+            (
+                "observed_predicted",
+                lambda ax: plot_observed_predicted(
+                    workflow.y_test, workflow.predictions, ax=ax
+                ),
+            ),
+            ("vif", lambda ax: plot_vif(diagnostics["collinearity"], ax=ax)),
+            (
+                "prediction_interval",
+                lambda ax: plot_prediction_interval(inference, future, model_y, ax=ax),
+            ),
+            (
+                "partial_residual",
+                lambda ax: plot_partial_residual(
+                    inference, final_design.columns[0], ax=ax
+                ),
+            ),
+            ("residual_order", lambda ax: plot_residual_order(inference, ax=ax)),
+        ]
+        dashboard = render_panels(calls, axes=axes, ncols=3)
+        figure = dashboard.figure
+        grid = dashboard.axes
+        plots = dashboard.panels
+    return RegressionStudyOutputDTO(
+        workflow, diagnostics, mapping, model.selector_.history_, figure, grid, plots
+    )
+
+
+if __name__ == "__main__":
+    result = main()
     print(result.workflow.comparison)
     print(result.workflow.selected_metrics)

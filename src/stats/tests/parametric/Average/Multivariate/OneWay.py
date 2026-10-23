@@ -16,6 +16,7 @@ OneWay.py - 기존 import·실행 예제 호환 경로
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -25,7 +26,13 @@ import importlib
 import runpy
 
 if __name__ == "__main__":
-    runpy.run_module('src.stats.tests.parametric.Average.anova.one_way', run_name="__main__", alter_sys=True)
+    runpy.run_module(
+        "src.stats.tests.parametric.Average.anova.one_way",
+        run_name="__main__",
+        alter_sys=True,
+    )
 else:
-    _module = importlib.import_module('src.stats.tests.parametric.Average.anova.one_way')
+    _module = importlib.import_module(
+        "src.stats.tests.parametric.Average.anova.one_way"
+    )
     globals().update({k: v for k, v in vars(_module).items() if not k.startswith("__")})

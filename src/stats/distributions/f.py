@@ -16,6 +16,7 @@ f.py - F 분포 확률·분위수·모멘트
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,6 +41,7 @@ from ._common import evaluate_distribution
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class FDistributionProfile:
     """FDistributionProfile 전체 필드 계약.
@@ -49,6 +51,7 @@ class FDistributionProfile:
         df_den (float): 양의 분모 자유도 기본 10.0.
         random_state (int): 난수 시드, 0 이상 기본 1234.
     """
+
     df_num: float = 5.0
     df_den: float = 10.0
     random_state: int = 1234
@@ -57,6 +60,7 @@ class FDistributionProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class FDistributionOutputDTO(OutputDTO):
@@ -83,6 +87,7 @@ class FDistributionOutputDTO(OutputDTO):
         distribution (Any): SciPy frozen distribution. 기본 사전/JSON에서 제외.
         warnings (List[str]): 정의역/모멘트/예제 해석 경고.
     """
+
     distribution_name: str
     distribution_kind: str
     parameters: Dict[str, Any]
@@ -110,6 +115,7 @@ class FDistributionOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_parameters(p):
     """해당 분포 모수의 타입과 정의역을 확인합니다.
 
@@ -120,9 +126,9 @@ def _validate_parameters(p):
     Raises:
         ValueError/TypeError: 정수·유한값·모수 정의역 오류.
     """
-    integer(p.random_state, 'random_state')
-    number(p.df_num, 'df_num', True)
-    number(p.df_den, 'df_den', True)
+    integer(p.random_state, "random_state")
+    number(p.df_num, "df_num", True)
+    number(p.df_den, "df_den", True)
 
 
 def _validate_inputs(profile: FDistributionProfile) -> None:
@@ -135,13 +141,15 @@ def _validate_inputs(profile: FDistributionProfile) -> None:
     Raises:
         TypeError/ValueError: 모수 타입·범위 오류.
     """
-    if not isinstance(profile, FDistributionProfile): raise TypeError("FDistributionProfile이 필요합니다.")
+    if not isinstance(profile, FDistributionProfile):
+        raise TypeError("FDistributionProfile이 필요합니다.")
     _validate_parameters(profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _make_distribution(p):
     """해당 분포의 모수를 SciPy 객체로 변환합니다.
@@ -156,7 +164,9 @@ def _make_distribution(p):
     return (stats.f(p.df_num, p.df_den), False)
 
 
-def _run_distribution(profile: FDistributionProfile, queries: Dict[str, Any]) -> FDistributionOutputDTO:
+def _run_distribution(
+    profile: FDistributionProfile, queries: Dict[str, Any]
+) -> FDistributionOutputDTO:
     """검증한 분포와 조회 연산을 실행합니다.
 
     Args:
@@ -167,14 +177,26 @@ def _run_distribution(profile: FDistributionProfile, queries: Dict[str, Any]) ->
     Raises:
         ValueError: 조회 구간·확률·난수 크기 오류.
     """
-    return FDistributionOutputDTO(**evaluate_distribution("f", profile, queries, *_make_distribution(profile)))
+    return FDistributionOutputDTO(
+        **evaluate_distribution("f", profile, queries, *_make_distribution(profile))
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_f(profile: Optional[FDistributionProfile] = None, *, x: Any = None, interval: Any = None, q: Any = None, n_samples: int = 0, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> FDistributionOutputDTO:
+
+def run_f(
+    profile: Optional[FDistributionProfile] = None,
+    *,
+    x: Any = None,
+    interval: Any = None,
+    q: Any = None,
+    n_samples: int = 0,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> FDistributionOutputDTO:
     """F 분포 조회.
 
     Args:
@@ -191,9 +213,13 @@ def run_f(profile: Optional[FDistributionProfile] = None, *, x: Any = None, inte
         TypeError/ValueError: 모수·조회·동시 Profile/레시피 오류.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("distribution-f", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "distribution-f", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(profile)
-    return _run_distribution(profile, {"x":x, "interval":interval, "q":q, "n_samples":n_samples})
+    return _run_distribution(
+        profile, {"x": x, "interval": interval, "q": q, "n_samples": n_samples}
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -201,4 +227,8 @@ def run_f(profile: Optional[FDistributionProfile] = None, *, x: Any = None, inte
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    print(run_f(x=[0,1,2], interval=(0,2), q=[0.25,0.5,0.75], n_samples=3).to_json(indent=2))
+    print(
+        run_f(x=[0, 1, 2], interval=(0, 2), q=[0.25, 0.5, 0.75], n_samples=3).to_json(
+            indent=2
+        )
+    )

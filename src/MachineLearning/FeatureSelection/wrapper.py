@@ -22,6 +22,7 @@ wrapper.py - CV 기반 Wrapper 변수 선택
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,7 +41,12 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
@@ -48,6 +54,7 @@ from sklearn.utils.validation import check_is_fitted
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class WrapperSelectionProfile:
@@ -71,10 +78,10 @@ class WrapperSelectionProfile:
         max_iter (int): 분류 LogisticRegression 최대 반복. 양의 정수. 기본 2000.
     """
 
-    task: str = 'classification'
+    task: str = "classification"
     test_size: float = 0.3
     random_state: int = 1234
-    scaling: str = 'standard'
+    scaling: str = "standard"
     stratify: bool = True
     param_grid: Optional[Dict[str, Any]] = None
     cv: int = 3
@@ -91,6 +98,7 @@ class WrapperSelectionProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class WrapperSelectionOutputDTO(OutputDTO):
@@ -155,6 +163,7 @@ class WrapperSelectionOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, y: Any, profile: WrapperSelectionProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -172,13 +181,16 @@ def _validate_inputs(X: Any, y: Any, profile: WrapperSelectionProfile) -> np.nda
         raise TypeError("WrapperSelectionProfile이 필요합니다.")
     arr = validate_features(X)
     from src.MachineLearning.common import validate_supervised_inputs
+
     arr, target = validate_supervised_inputs(X, y, profile)
     validate_scaling(profile.scaling, profile.random_state)
     feature_names(X)
     if profile.n_features_to_select is not None:
         positive_int(profile.n_features_to_select, "n_features_to_select")
-        if profile.n_features_to_select > arr.shape[1]: raise ValueError("선택 변수 수는 입력 열 수 이하여야 합니다.")
-    if profile.method not in ("forward", "backward", "stepwise"): raise ValueError("method를 확인하세요.")
+        if profile.n_features_to_select > arr.shape[1]:
+            raise ValueError("선택 변수 수는 입력 열 수 이하여야 합니다.")
+    if profile.method not in ("forward", "backward", "stepwise"):
+        raise ValueError("method를 확인하세요.")
     finite_number(profile.min_improvement, "min_improvement")
     finite_number(profile.C, "C", positive=True)
     positive_int(profile.max_iter, "max_iter")
@@ -189,6 +201,7 @@ def _validate_inputs(X: Any, y: Any, profile: WrapperSelectionProfile) -> np.nda
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _base_estimator(task: str, C: float, max_iter: int) -> Any:
     """선택 평가와 최종 예측에 사용할 선형 모델을 생성합니다.
@@ -203,17 +216,32 @@ def _base_estimator(task: str, C: float, max_iter: int) -> Any:
         ValueError: 잘못된 목적.
     """
     from sklearn.linear_model import LinearRegression, LogisticRegression
-    if task == "classification": return LogisticRegression(C=C, max_iter=max_iter)
-    if task == "regression": return LinearRegression()
+
+    if task == "classification":
+        return LogisticRegression(C=C, max_iter=max_iter)
+    if task == "regression":
+        return LinearRegression()
     raise ValueError("지원하지 않는 task입니다.")
 
 
 class WrapperSelector(TransformerMixin, BaseEstimator):
     """폴드 내부 전처리를 사용하는 greedy 변수 선택 변환기."""
 
-    def __init__(self, task="classification", method="forward", n_features_to_select=2,
-                 min_improvement=0.0001, max_steps=100, scaling="standard", cv=3,
-                 scoring=None, random_state=1234, n_jobs=1, C=1.0, max_iter=2000):
+    def __init__(
+        self,
+        task="classification",
+        method="forward",
+        n_features_to_select=2,
+        min_improvement=0.0001,
+        max_steps=100,
+        scaling="standard",
+        cv=3,
+        scoring=None,
+        random_state=1234,
+        n_jobs=1,
+        C=1.0,
+        max_iter=2000,
+    ):
         """탐색 설정을 저장합니다.
 
         Args:
@@ -259,18 +287,25 @@ class WrapperSelector(TransformerMixin, BaseEstimator):
             ValueError: 조건 오류, CV 표본 부족 또는 모델 적합 실패.
         """
         from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
+
         arr = _validate_inputs(X, y, WrapperSelectionProfile(**self.get_params()))
         target = np.asarray(y)
         if self.task == "classification":
             if np.unique(target, return_counts=True)[1].min() < self.cv:
                 raise ValueError("각 학습 클래스에 cv개 이상의 관측이 필요합니다.")
-            splitter = StratifiedKFold(self.cv, shuffle=True, random_state=self.random_state)
+            splitter = StratifiedKFold(
+                self.cv, shuffle=True, random_state=self.random_state
+            )
         else:
-            if len(arr) // self.cv < 2: raise ValueError("회귀 CV 평가 폴드별 최소 2행이 필요합니다.")
+            if len(arr) // self.cv < 2:
+                raise ValueError("회귀 CV 평가 폴드별 최소 2행이 필요합니다.")
             splitter = KFold(self.cv, shuffle=True, random_state=self.random_state)
         splits = list(splitter.split(arr, target))
-        scoring = self.scoring or ("accuracy" if self.task == "classification" else "neg_mean_squared_error")
+        scoring = self.scoring or (
+            "accuracy" if self.task == "classification" else "neg_mean_squared_error"
+        )
         cache = {}
+
         def evaluate(columns):
             """선택 집합의 폴드별 평균 점수를 캐시합니다.
 
@@ -283,13 +318,26 @@ class WrapperSelector(TransformerMixin, BaseEstimator):
             """
             key = tuple(sorted(columns))
             if key not in cache:
-                pipeline = Pipeline([("scaler", make_scaler(self.scaling)),
-                                     ("model", _base_estimator(self.task, self.C, self.max_iter))])
-                score = cross_val_score(pipeline, arr[:, key], target, cv=splits,
-                                        scoring=scoring, n_jobs=self.n_jobs, error_score="raise")
-                if not np.isfinite(score).all(): raise ValueError("CV 점수는 유한해야 합니다.")
+                pipeline = Pipeline(
+                    [
+                        ("scaler", make_scaler(self.scaling)),
+                        ("model", _base_estimator(self.task, self.C, self.max_iter)),
+                    ]
+                )
+                score = cross_val_score(
+                    pipeline,
+                    arr[:, key],
+                    target,
+                    cv=splits,
+                    scoring=scoring,
+                    n_jobs=self.n_jobs,
+                    error_score="raise",
+                )
+                if not np.isfinite(score).all():
+                    raise ValueError("CV 점수는 유한해야 합니다.")
                 cache[key] = float(score.mean())
             return cache[key]
+
         self.n_features_in_ = arr.shape[1]
         selected = list(range(self.n_features_in_)) if self.method == "backward" else []
         score = evaluate(selected) if selected else -np.inf
@@ -298,19 +346,36 @@ class WrapperSelector(TransformerMixin, BaseEstimator):
         self.stopped_reason_ = "max_steps"
         cap = self.n_features_to_select or self.n_features_in_
         for step in range(self.max_steps):
-            if self.method != "stepwise" and self.n_features_to_select is not None and len(selected) == cap:
+            if (
+                self.method != "stepwise"
+                and self.n_features_to_select is not None
+                and len(selected) == cap
+            ):
                 self.stopped_reason_ = "target"
                 break
             candidates = []
             if self.method in ("forward", "stepwise") and len(selected) < cap:
-                candidates.extend(("add", sorted(selected + [i])) for i in range(self.n_features_in_) if i not in selected)
+                candidates.extend(
+                    ("add", sorted(selected + [i]))
+                    for i in range(self.n_features_in_)
+                    if i not in selected
+                )
             if self.method in ("backward", "stepwise") and len(selected) > 1:
-                candidates.extend(("remove", [i for i in selected if i != j]) for j in selected)
-            candidates = [(action, cols) for action, cols in candidates if tuple(cols) not in visited]
+                candidates.extend(
+                    ("remove", [i for i in selected if i != j]) for j in selected
+                )
+            candidates = [
+                (action, cols)
+                for action, cols in candidates
+                if tuple(cols) not in visited
+            ]
             if not candidates:
                 self.stopped_reason_ = "no_candidates"
                 break
-            ranked = sorted([(evaluate(cols), tuple(cols), action) for action, cols in candidates], key=lambda v: (-v[0], v[1]))
+            ranked = sorted(
+                [(evaluate(cols), tuple(cols), action) for action, cols in candidates],
+                key=lambda v: (-v[0], v[1]),
+            )
             best_score, columns, action = ranked[0]
             automatic = self.n_features_to_select is None or self.method == "stepwise"
             if automatic and selected and best_score <= score + self.min_improvement:
@@ -318,8 +383,19 @@ class WrapperSelector(TransformerMixin, BaseEstimator):
                 break
             selected, score = list(columns), best_score
             visited.add(columns)
-            self.history_.append(dict(step=step+1, action=action, indices=selected.copy(), cv_score=score))
-        if self.method != "stepwise" and self.n_features_to_select is not None and len(selected) == cap:
+            self.history_.append(
+                dict(
+                    step=step + 1,
+                    action=action,
+                    indices=selected.copy(),
+                    cv_score=score,
+                )
+            )
+        if (
+            self.method != "stepwise"
+            and self.n_features_to_select is not None
+            and len(selected) == cap
+        ):
             self.stopped_reason_ = "target"
         self.support_ = np.zeros(self.n_features_in_, dtype=bool)
         self.support_[selected] = True
@@ -351,11 +427,14 @@ class WrapperSelector(TransformerMixin, BaseEstimator):
         """
         mask = self.get_support()
         arr = validate_features(X, min_samples=1)
-        if arr.shape[1] != len(mask): raise ValueError("학습 특성 수와 다릅니다.")
+        if arr.shape[1] != len(mask):
+            raise ValueError("학습 특성 수와 다릅니다.")
         return arr[:, mask]
 
 
-def _run_model(X: Any, y: Any, profile: WrapperSelectionProfile) -> WrapperSelectionOutputDTO:
+def _run_model(
+    X: Any, y: Any, profile: WrapperSelectionProfile
+) -> WrapperSelectionOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
 
     Args:
@@ -368,34 +447,67 @@ def _run_model(X: Any, y: Any, profile: WrapperSelectionProfile) -> WrapperSelec
         ValueError: 적합 실패 또는 알고리즘 자료 조건 불충족.
         ImportError: 선택적 라이브러리 미설치.
     """
-    selector = WrapperSelector(task=profile.task, method=profile.method, n_features_to_select=profile.n_features_to_select,
-                                min_improvement=profile.min_improvement, max_steps=profile.max_steps,
-                                scaling=profile.scaling, cv=profile.cv, scoring=profile.scoring,
-                                random_state=profile.random_state, n_jobs=profile.n_jobs, C=profile.C, max_iter=profile.max_iter)
+    selector = WrapperSelector(
+        task=profile.task,
+        method=profile.method,
+        n_features_to_select=profile.n_features_to_select,
+        min_improvement=profile.min_improvement,
+        max_steps=profile.max_steps,
+        scaling=profile.scaling,
+        cv=profile.cv,
+        scoring=profile.scoring,
+        random_state=profile.random_state,
+        n_jobs=profile.n_jobs,
+        C=profile.C,
+        max_iter=profile.max_iter,
+    )
     from dataclasses import replace
     from src.MachineLearning.common import run_supervised
+
     # 선택기의 내부 CV가 원 입력에서 스케일러를 폴드별 적합하도록 외부 선행 스케일러를 비활성화합니다.
     outer = replace(profile, scaling="none")
-    result = run_supervised(X, y, _base_estimator(profile.task, profile.C, profile.max_iter), outer,
-                            extra_steps=[("selector", selector), ("selected_scaler", make_scaler(profile.scaling))])
+    result = run_supervised(
+        X,
+        y,
+        _base_estimator(profile.task, profile.C, profile.max_iter),
+        outer,
+        extra_steps=[
+            ("selector", selector),
+            ("selected_scaler", make_scaler(profile.scaling)),
+        ],
+    )
     fitted = result.model.named_steps["selector"]
     indices = np.flatnonzero(fitted.get_support())
     arr = validate_features(X)
     names = feature_names(X)
-    return WrapperSelectionOutputDTO(**result.to_dict(include_runtime=True), selector=fitted,
-        selected_indices=indices, selected_features=[names[i] for i in indices], support_mask=fitted.get_support(),
-        transformed_train=fitted.transform(arr[result.train_indices]), transformed_test=fitted.transform(arr[result.test_indices]),
-        history=fitted.history_, selection_cv_score=fitted.best_score_, stopped_reason=fitted.stopped_reason_)
+    return WrapperSelectionOutputDTO(
+        **result.to_dict(include_runtime=True),
+        selector=fitted,
+        selected_indices=indices,
+        selected_features=[names[i] for i in indices],
+        support_mask=fitted.get_support(),
+        transformed_train=fitted.transform(arr[result.train_indices]),
+        transformed_test=fitted.transform(arr[result.test_indices]),
+        history=fitted.history_,
+        selection_cv_score=fitted.best_score_,
+        stopped_reason=fitted.stopped_reason_,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_wrapper_selection(X: Any, y: Any, profile: Optional[WrapperSelectionProfile] = None, *,
-              task: Optional[str] = None,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> WrapperSelectionOutputDTO:
+
+def run_wrapper_selection(
+    X: Any,
+    y: Any,
+    profile: Optional[WrapperSelectionProfile] = None,
+    *,
+    task: Optional[str] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> WrapperSelectionOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -413,7 +525,13 @@ def run_wrapper_selection(X: Any, y: Any, profile: Optional[WrapperSelectionProf
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("wrapper-selection", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "wrapper-selection",
+        profile,
+        recipe_path=recipe_path,
+        task=task,
+        overrides=overrides,
+    )
     _validate_inputs(X, y, profile)
     return _run_model(X, y, profile)
 
@@ -424,6 +542,7 @@ def run_wrapper_selection(X: Any, y: Any, profile: Optional[WrapperSelectionProf
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_wrapper_selection(X, y, load_profile("wrapper-selection"))
     print(result.to_json(indent=2)[:500])

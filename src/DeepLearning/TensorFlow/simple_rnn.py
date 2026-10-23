@@ -16,12 +16,11 @@ simple_rnn.py - TensorFlow SimpleRNN 전용 분류·회귀
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -41,6 +40,7 @@ from ._deep_common import validate_training, target_array, fit_supervised
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TFSimpleRNNProfile:
@@ -63,6 +63,7 @@ class TFSimpleRNNProfile:
         dropout (float): 순환 층 입력 dropout [0,1); 기본 0.
         recurrent_dropout (float): 순환 상태 dropout [0,1); 기본 0.
     """
+
     random_state: int = 1234
     epochs: int = 30
     batch_size: int = 32
@@ -83,6 +84,7 @@ class TFSimpleRNNProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TFSimpleRNNOutputDTO(OutputDTO):
@@ -107,6 +109,7 @@ class TFSimpleRNNOutputDTO(OutputDTO):
         epochs_trained (int): 실제 실행한 epoch 수.
         best_epoch (int): 최저 val_loss epoch, 1부터 시작. 최적 weights 복원.
     """
+
     task: str
     parameters: Dict[str, Any]
     model: Any
@@ -130,6 +133,7 @@ class TFSimpleRNNOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, y: Any, profile: TFSimpleRNNProfile) -> tuple:
     """전용 설정과 모델의 rank·축·타깃을 검증합니다.
 
@@ -142,20 +146,26 @@ def _validate_inputs(X: Any, y: Any, profile: TFSimpleRNNProfile) -> tuple:
     Raises:
         ValueError/TypeError: Profile·설정·shape·타깃 오류.
     """
-    if not isinstance(profile,TFSimpleRNNProfile):raise TypeError('TFSimpleRNNProfile이 필요합니다.')
+    if not isinstance(profile, TFSimpleRNNProfile):
+        raise TypeError("TFSimpleRNNProfile이 필요합니다.")
     validate_training(profile)
-    if np.iscomplexobj(X):raise ValueError('실수 입력이 필요합니다.')
-    positive_int(profile.units,'units');positive_int(profile.num_layers,'num_layers')
-    if not isinstance(profile.bidirectional,bool):raise ValueError('bidirectional은 bool입니다.')
-    finite_number(profile.recurrent_dropout,'recurrent_dropout')
-    if not 0<=profile.recurrent_dropout<1:raise ValueError('recurrent_dropout은 [0,1)입니다.')
-    arr=numeric_X(X,3)
-    return arr,target_array(y,len(arr),profile.task)
+    if np.iscomplexobj(X):
+        raise ValueError("실수 입력이 필요합니다.")
+    positive_int(profile.units, "units")
+    positive_int(profile.num_layers, "num_layers")
+    if not isinstance(profile.bidirectional, bool):
+        raise ValueError("bidirectional은 bool입니다.")
+    finite_number(profile.recurrent_dropout, "recurrent_dropout")
+    if not 0 <= profile.recurrent_dropout < 1:
+        raise ValueError("recurrent_dropout은 [0,1)입니다.")
+    arr = numeric_X(X, 3)
+    return arr, target_array(y, len(arr), profile.task)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _build_model(tf, input_shape, output_shape, classification, profile):
     """해당 파일의 전용 TFSimpleRNN 아키텍처를 구성합니다.
@@ -171,13 +181,24 @@ def _build_model(tf, input_shape, output_shape, classification, profile):
     Raises:
         ValueError: 아키텍처 shape·층 조건 오류.
     """
-    layers=[tf.keras.layers.Input(shape=input_shape)]
+    layers = [tf.keras.layers.Input(shape=input_shape)]
     for index in range(profile.num_layers):
-        layer=tf.keras.layers.SimpleRNN(profile.units,return_sequences=index+1<profile.num_layers,
-                                     dropout=profile.dropout,recurrent_dropout=profile.recurrent_dropout)
-        layers.append(tf.keras.layers.Bidirectional(layer) if profile.bidirectional else layer)
-    layers.append(tf.keras.layers.Dense(int(np.prod(output_shape)),activation='softmax' if classification else None))
-    if len(output_shape)>1:layers.append(tf.keras.layers.Reshape(output_shape))
+        layer = tf.keras.layers.SimpleRNN(
+            profile.units,
+            return_sequences=index + 1 < profile.num_layers,
+            dropout=profile.dropout,
+            recurrent_dropout=profile.recurrent_dropout,
+        )
+        layers.append(
+            tf.keras.layers.Bidirectional(layer) if profile.bidirectional else layer
+        )
+    layers.append(
+        tf.keras.layers.Dense(
+            int(np.prod(output_shape)), activation="softmax" if classification else None
+        )
+    )
+    if len(output_shape) > 1:
+        layers.append(tf.keras.layers.Reshape(output_shape))
     return tf.keras.Sequential(layers)
 
 
@@ -194,15 +215,27 @@ def _run_model(X, y, profile, test_data=None):
     Raises:
         ValueError/ImportError: 학습·분할 오류 또는 TensorFlow 미설치.
     """
-    builder=lambda tf,shape,output,classification:_build_model(tf,shape,output,classification,profile)
-    return TFSimpleRNNOutputDTO(**fit_supervised(X,y,profile,builder,test_data))
+    builder = lambda tf, shape, output, classification: _build_model(
+        tf, shape, output, classification, profile
+    )
+    return TFSimpleRNNOutputDTO(**fit_supervised(X, y, profile, builder, test_data))
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_tf_simple_rnn(X: Any, y: Any, profile: Optional[TFSimpleRNNProfile] = None, *, task: Optional[str] = None, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None, test_data: Any = None) -> TFSimpleRNNOutputDTO:
+
+def run_tf_simple_rnn(
+    X: Any,
+    y: Any,
+    profile: Optional[TFSimpleRNNProfile] = None,
+    *,
+    task: Optional[str] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+    test_data: Any = None,
+) -> TFSimpleRNNOutputDTO:
     """TFSimpleRNN 분류·회귀를 전용 JSON/Profile로 실행합니다.
 
     Args:
@@ -218,17 +251,24 @@ def run_tf_simple_rnn(X: Any, y: Any, profile: Optional[TFSimpleRNNProfile] = No
     Raises:
         ValueError/TypeError/OSError/ImportError: 자료·설정·레시피·TensorFlow 오류.
     """
-    profile=resolve_profile('tf-simple-rnn',profile,task=task,recipe_path=recipe_path,overrides=overrides)
-    X,y=_validate_inputs(X,y,profile)
-    return _run_model(X,y,profile,test_data)
+    profile = resolve_profile(
+        "tf-simple-rnn",
+        profile,
+        task=task,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
+    X, y = _validate_inputs(X, y, profile)
+    return _run_model(X, y, profile, test_data)
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__ == '__main__':
-    rng=np.random.RandomState(4)
-    X=rng.normal(size=(80,12,2));y=np.where(X[:,:,0].sum(axis=1)>0,'high','low')
-    result=run_tf_simple_rnn(X,y,overrides={'epochs':2,'patience':1})
+if __name__ == "__main__":
+    rng = np.random.RandomState(4)
+    X = rng.normal(size=(80, 12, 2))
+    y = np.where(X[:, :, 0].sum(axis=1) > 0, "high", "low")
+    result = run_tf_simple_rnn(X, y, overrides={"epochs": 2, "patience": 1})
     print(result.test_metrics, result.input_shape)

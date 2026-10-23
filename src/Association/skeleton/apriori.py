@@ -16,6 +16,7 @@ apriori.py - apriori UCI 스켈레톤
     2026-10-12  김재현(Finn)       v1.0.0    기존 파이프라인 기반 UCI 수치 예제
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -27,7 +28,7 @@ from src.Recipes import load_profile
 from src.Association.apriori import run_apriori
 from src.datasets.uci import load_baskets
 
-UCI_DEFAULT_OVERRIDES = {'min_support': 0.05}
+UCI_DEFAULT_OVERRIDES = {"min_support": 0.05}
 
 
 def load_data(cache_dir=None, max_transactions=1000, max_items=30):
@@ -57,7 +58,7 @@ def load_recipe(overrides=None):
     """
     settings = dict(UCI_DEFAULT_OVERRIDES)
     settings.update(overrides or {})
-    return load_profile('apriori', overrides=settings)
+    return load_profile("apriori", overrides=settings)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -72,7 +73,7 @@ def build_pipeline(profile=None, overrides=None):
         ValueError: Profile과 overrides 동시 지정.
     """
     if profile is not None and overrides is not None:
-        raise ValueError('profile과 overrides를 동시에 지정하지 않습니다.')
+        raise ValueError("profile과 overrides를 동시에 지정하지 않습니다.")
     profile = load_recipe(overrides) if profile is None else profile
     return lambda baskets: run_apriori(baskets, profile=profile)
 
@@ -94,12 +95,12 @@ def main(cache_dir=None, overrides=None, max_transactions=1000, max_items=30):
     profile = load_recipe(overrides)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
-    print('=== Example : UCI Online Retail apriori ===')
-    print('transactions:', result.n_transactions)
-    print('itemsets:', len(result.itemsets), 'rules:', len(result.rules))
+    print("=== Example : UCI Online Retail apriori ===")
+    print("transactions:", result.n_transactions)
+    print("itemsets:", len(result.itemsets), "rules:", len(result.rules))
     print(result.rules.head(10).to_string(index=False))
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

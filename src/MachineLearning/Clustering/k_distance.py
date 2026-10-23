@@ -22,6 +22,7 @@ k_distance.py - DBSCAN eps 선택용 k-distance 진단
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class KDistanceProfile:
@@ -64,6 +70,7 @@ class KDistanceProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class KDistanceOutputDTO(OutputDTO):
@@ -88,6 +95,7 @@ class KDistanceOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, profile: KDistanceProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -105,13 +113,15 @@ def _validate_inputs(X: Any, profile: KDistanceProfile) -> np.ndarray:
     arr = validate_features(X)
     validate_scaling(profile.scaling)
     positive_int(profile.k, "k", 2)
-    if profile.k > len(arr): raise ValueError("k는 표본 수 이하여야 합니다.")
+    if profile.k > len(arr):
+        raise ValueError("k는 표본 수 이하여야 합니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, profile: KDistanceProfile) -> KDistanceOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -126,23 +136,38 @@ def _run_model(X: Any, profile: KDistanceProfile) -> KDistanceOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     from sklearn.neighbors import NearestNeighbors
+
     arr = validate_features(X)
-    model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", NearestNeighbors(n_neighbors=profile.k))])
+    model = Pipeline(
+        [
+            ("scaler", make_scaler(profile.scaling)),
+            ("model", NearestNeighbors(n_neighbors=profile.k)),
+        ]
+    )
     model.fit(arr)
-    scaled = model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
+    scaled = (
+        model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr
+    )
     # 명시적 X 조회는 자기 자신을 포함합니다. X=None 조회는 자기 자신을 제외하므로 사용하지 않음.
     distances = model.named_steps["model"].kneighbors(scaled)[0][:, -1]
     order = np.argsort(distances, kind="stable")
-    return KDistanceOutputDTO(model, feature_names(X), distances, order, distances[order])
+    return KDistanceOutputDTO(
+        model, feature_names(X), distances, order, distances[order]
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_k_distance(X: Any, profile: Optional[KDistanceProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> KDistanceOutputDTO:
+
+def run_k_distance(
+    X: Any,
+    profile: Optional[KDistanceProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> KDistanceOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -158,7 +183,9 @@ def run_k_distance(X: Any, profile: Optional[KDistanceProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("k-distance", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "k-distance", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, profile)
     return _run_model(X, profile)
 
@@ -169,6 +196,7 @@ def run_k_distance(X: Any, profile: Optional[KDistanceProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import make_blobs
+
     X, _ = make_blobs(n_samples=90, centers=3, cluster_std=0.3, random_state=1234)
     result = run_k_distance(X, load_profile("k-distance"))
     print(result.to_json(indent=2)[:500])

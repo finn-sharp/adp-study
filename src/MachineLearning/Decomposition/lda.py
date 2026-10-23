@@ -22,6 +22,7 @@ lda.py - LDA 선형 판별 차원 축소
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class LDAProfile:
@@ -68,6 +74,7 @@ class LDAProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class LDAOutputDTO(OutputDTO):
@@ -94,6 +101,7 @@ class LDAOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, y: Any, profile: LDAProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -115,19 +123,26 @@ def _validate_inputs(X: Any, y: Any, profile: LDAProfile) -> np.ndarray:
     positive_int(profile.n_components, "n_components")
     finite_number(profile.tol, "tol", positive=True)
     from sklearn.utils.multiclass import type_of_target
+
     target = np.asarray(y)
-    if target.ndim != 1 or len(target) != len(arr): raise ValueError("y는 X와 같은 길이의 1차원 라벨이어야 합니다.")
-    if pd.isna(target).any() or type_of_target(target) not in ("binary", "multiclass"): raise ValueError("y는 결측 없는 이산 클래스입니다.")
-    if np.issubdtype(target.dtype, np.number) and not np.isfinite(target).all(): raise ValueError("y는 유한해야 합니다.")
+    if target.ndim != 1 or len(target) != len(arr):
+        raise ValueError("y는 X와 같은 길이의 1차원 라벨이어야 합니다.")
+    if pd.isna(target).any() or type_of_target(target) not in ("binary", "multiclass"):
+        raise ValueError("y는 결측 없는 이산 클래스입니다.")
+    if np.issubdtype(target.dtype, np.number) and not np.isfinite(target).all():
+        raise ValueError("y는 유한해야 합니다.")
     classes, counts = np.unique(target, return_counts=True)
-    if len(classes) < 2 or counts.min() < 2: raise ValueError("클래스별 최소 2행이 필요합니다.")
-    if profile.n_components > min(arr.shape[1], len(classes)-1): raise ValueError("LDA 축 수는 min(n_features,n_classes-1) 이하여야 합니다.")
+    if len(classes) < 2 or counts.min() < 2:
+        raise ValueError("클래스별 최소 2행이 필요합니다.")
+    if profile.n_components > min(arr.shape[1], len(classes) - 1):
+        raise ValueError("LDA 축 수는 min(n_features,n_classes-1) 이하여야 합니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, y: Any, profile: LDAProfile) -> LDAOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -143,24 +158,41 @@ def _run_model(X: Any, y: Any, profile: LDAProfile) -> LDAOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-    estimator = LinearDiscriminantAnalysis(n_components=profile.n_components, solver="svd", tol=profile.tol)
+
+    estimator = LinearDiscriminantAnalysis(
+        n_components=profile.n_components, solver="svd", tol=profile.tol
+    )
     arr = validate_features(X)
     model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", estimator)])
     embedding = model.fit_transform(arr, y)
-    if not np.isfinite(embedding).all(): raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
+    if not np.isfinite(embedding).all():
+        raise ValueError("변환 좌표가 비유한 값입니다. 입력 rank와 설정을 확인하세요.")
     if embedding.shape[1] != profile.n_components or not np.isfinite(embedding).all():
         raise ValueError("입력 rank 부족으로 요청한 판별 축을 만들 수 없습니다.")
     fitted = model.named_steps["model"]
-    return LDAOutputDTO(model, embedding, feature_names(X), True, fitted.classes_.copy(), fitted.explained_variance_ratio_.copy())
+    return LDAOutputDTO(
+        model,
+        embedding,
+        feature_names(X),
+        True,
+        fitted.classes_.copy(),
+        fitted.explained_variance_ratio_.copy(),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_lda(X: Any, y: Any, profile: Optional[LDAProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> LDAOutputDTO:
+
+def run_lda(
+    X: Any,
+    y: Any,
+    profile: Optional[LDAProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> LDAOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -177,7 +209,9 @@ def run_lda(X: Any, y: Any, profile: Optional[LDAProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("lda", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "lda", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     return _run_model(X, y, profile)
 
@@ -188,6 +222,7 @@ def run_lda(X: Any, y: Any, profile: Optional[LDAProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_lda(X, y, load_profile("lda"))
     print(result.to_json(indent=2)[:500])

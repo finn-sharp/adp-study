@@ -44,13 +44,16 @@ import numpy as np
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AdaBoostProfile:
@@ -90,6 +93,7 @@ class AdaBoostProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AdaBoostOutputDTO(OutputDTO):
@@ -166,7 +170,11 @@ def _require_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·범위를 만족하지 않는 값.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 범위를 확인하세요.")
@@ -199,6 +207,7 @@ def _validate_inputs(X: Any, y: Any, profile: AdaBoostProfile) -> None:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
+
 def _create_model(profile: AdaBoostProfile) -> Any:
     """분류/회귀 목적에 맞는 미적합 모델을 생성합니다.
 
@@ -212,15 +221,18 @@ def _create_model(profile: AdaBoostProfile) -> Any:
     """
     from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
     from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
     classifier = profile.task == "classification"
     estimator = AdaBoostClassifier if classifier else AdaBoostRegressor
     tree_class = DecisionTreeClassifier if classifier else DecisionTreeRegressor
     tree = tree_class(max_depth=profile.max_depth, random_state=profile.random_state)
     signature = inspect.signature(estimator).parameters
     key = "estimator" if "estimator" in signature else "base_estimator"
-    parameters = dict(n_estimators=profile.n_estimators,
-                      learning_rate=profile.learning_rate,
-                      random_state=profile.random_state)
+    parameters = dict(
+        n_estimators=profile.n_estimators,
+        learning_rate=profile.learning_rate,
+        random_state=profile.random_state,
+    )
     parameters[key] = tree
     if classifier and "algorithm" in signature:
         parameters["algorithm"] = "SAMME"
@@ -229,7 +241,9 @@ def _create_model(profile: AdaBoostProfile) -> Any:
     return estimator(**parameters)
 
 
-def _fit_model(X: Any, y: Any, profile: AdaBoostProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: AdaBoostProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -250,6 +264,7 @@ def _fit_model(X: Any, y: Any, profile: AdaBoostProfile, estimator: Any) -> Supe
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_adaboost(
     X: Any,
@@ -281,7 +296,9 @@ def run_adaboost(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("adaboost", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "adaboost", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)

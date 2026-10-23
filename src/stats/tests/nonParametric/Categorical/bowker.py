@@ -16,6 +16,7 @@ bowker - McNemar–Bowker 대칭성
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, table_data, result)
+from src.stats.tests._common import number, table_data, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BowkerProfile:
@@ -47,12 +49,14 @@ class BowkerProfile:
     Attributes:
         alpha (float): 유한한 0<alpha<1 유의수준 기본 0.05.
     """
+
     alpha: float = 0.05
 
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BowkerOutputDTO(OutputDTO):
@@ -73,6 +77,7 @@ class BowkerOutputDTO(OutputDTO):
         contributions (np.ndarray): 위 삼각 쌍별 χ² 기여.
         zero_pairs (int): 양쪽 도수가 모두0인 쌍 수.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -92,6 +97,7 @@ class BowkerOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -104,22 +110,25 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = table_data(args['table'], True)
-    return {'table': a}
+    a = table_data(args["table"], True)
+    return {"table": a}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: BowkerProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: BowkerProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -130,13 +139,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: BowkerProfile) -> Dict[
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, BowkerProfile): raise TypeError("BowkerProfile이 필요합니다.")
+    if not isinstance(profile, BowkerProfile):
+        raise TypeError("BowkerProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -149,8 +160,8 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    t = d['table']
+    alt = getattr(p, "alternative", "two-sided")
+    t = d["table"]
     k = len(t)
     values = []
     zeros = 0
@@ -164,7 +175,17 @@ def _calculate(d, p):
                 values.append((float(t[i, j]) - t[j, i]) ** 2 / den)
     df = k * (k - 1) // 2
     s = sum(values)
-    return result('bowker', p, s, stats.chi2.sf(s, df), '전후 동일 범주의 결합확률이 대칭이다 (pij=pji)', 'bowker-chi-square', dict(df=df, contributions=np.asarray(values), zero_pairs=zeros), notes=['희소/0 비대각쌍은 점근 근사의 적절성을 확인하세요.'] if zeros else [])
+    return result(
+        "bowker",
+        p,
+        s,
+        stats.chi2.sf(s, df),
+        "전후 동일 범주의 결합확률이 대칭이다 (pij=pji)",
+        "bowker-chi-square",
+        dict(df=df, contributions=np.asarray(values), zero_pairs=zeros),
+        notes=["희소/0 비대각쌍은 점근 근사의 적절성을 확인하세요."] if zeros else [],
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: BowkerProfile) -> BowkerOutputDTO:
     """검증된 자료를 계산합니다.
@@ -184,7 +205,14 @@ def _run_test(data: Dict[str, Any], profile: BowkerProfile) -> BowkerOutputDTO:
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_bowker(table: Any, profile: Optional[BowkerProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> BowkerOutputDTO:
+
+def run_bowker(
+    table: Any,
+    profile: Optional[BowkerProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> BowkerOutputDTO:
     """McNemar–Bowker 대칭성.
 
     Args:
@@ -198,8 +226,10 @@ def run_bowker(table: Any, profile: Optional[BowkerProfile] = None, *, recipe_pa
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("bowker", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'table': table}, profile)
+    profile = resolve_profile(
+        "bowker", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"table": table}, profile)
     return _run_test(data, profile)
 
 
@@ -208,5 +238,5 @@ def run_bowker(table: Any, profile: Optional[BowkerProfile] = None, *, recipe_pa
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_bowker([[12,4,2],[1,15,3],[5,2,10]])
+    result = run_bowker([[12, 4, 2], [1, 15, 3], [5, 2, 10]])
     print(result.to_json(indent=2))

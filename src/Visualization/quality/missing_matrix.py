@@ -15,6 +15,7 @@ missing_matrix.py - 결측 블록·동시 누락·행 순서 관련 패턴을 �
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class QualityMissingMatrixProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         max_rows (int): 원 순서에서 표시할 최대 행 수. 기본 500.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     max_rows: int = 500
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class QualityMissingMatrixOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class QualityMissingMatrixOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, QualityMissingMatrixProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -103,17 +121,47 @@ def _draw(values, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw=values.copy() if isinstance(values,pd.DataFrame) else pd.DataFrame(values)
-    if raw.empty or not raw.columns.is_unique or profile.max_rows<1:raise ValueError('자료/행 한도 오류')
-    data=raw.isna().astype(int);shown=data.iloc[:profile.max_rows]
-    ax.imshow(shown.values,aspect='auto',interpolation='nearest',cmap='binary',vmin=0,vmax=1);ax.set_xticks(np.arange(raw.shape[1]));ax.set_xticklabels(raw.columns.astype(str),rotation=45,ha='right');ax.set_xlabel('Feature');ax.set_ylabel('Original row position (black = missing)')
-    diagnostics={'n_rows':len(raw),'displayed_rows':len(shown),'missing_cells':int(data.values.sum())};notes=['원 행 순서를 보존합니다. 표시 한도 이후 행도 반환 data에 포함됩니다.']
-    return finish(ax, before, data, diagnostics, profile, QualityMissingMatrixOutputDTO, 'Quality — Missing Matrix', notes)
+    raw = values.copy() if isinstance(values, pd.DataFrame) else pd.DataFrame(values)
+    if raw.empty or not raw.columns.is_unique or profile.max_rows < 1:
+        raise ValueError("자료/행 한도 오류")
+    data = raw.isna().astype(int)
+    shown = data.iloc[: profile.max_rows]
+    ax.imshow(
+        shown.values,
+        aspect="auto",
+        interpolation="nearest",
+        cmap="binary",
+        vmin=0,
+        vmax=1,
+    )
+    ax.set_xticks(np.arange(raw.shape[1]))
+    ax.set_xticklabels(raw.columns.astype(str), rotation=45, ha="right")
+    ax.set_xlabel("Feature")
+    ax.set_ylabel("Original row position (black = missing)")
+    diagnostics = {
+        "n_rows": len(raw),
+        "displayed_rows": len(shown),
+        "missing_cells": int(data.values.sum()),
+    }
+    notes = ["원 행 순서를 보존합니다. 표시 한도 이후 행도 반환 data에 포함됩니다."]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        QualityMissingMatrixOutputDTO,
+        "Quality — Missing Matrix",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_missing_matrix(values, *, ax, profile=None, recipe_path=None, overrides=None) -> QualityMissingMatrixOutputDTO:
+def plot_missing_matrix(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> QualityMissingMatrixOutputDTO:
     """결측 블록·동시 누락·행 순서 관련 패턴을 확인합니다.
 
     Args:
@@ -127,10 +175,16 @@ def plot_missing_matrix(values, *, ax, profile=None, recipe_path=None, overrides
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-quality-missing-matrix', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-quality-missing-matrix",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

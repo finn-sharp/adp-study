@@ -22,12 +22,11 @@ fp_growth.py - FPGrowth 빈발 항목집합·연관규칙
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -47,6 +46,7 @@ from ._mining_common import validate_transactions, minimum_count, build_tables
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class FPGrowthProfile:
     """FPGrowth 탐색과 규칙 설정.
@@ -61,6 +61,7 @@ class FPGrowthProfile:
         max_rule_candidates (int): 전체 규칙 후보 검사 한도; 기본 100000.
         max_nodes (int): 조건부 트리 포함 생성 노드 한도; 기본 100000.
     """
+
     min_support: float = 0.2
     min_confidence: float = 0.5
     min_lift: float = 1.0
@@ -75,6 +76,7 @@ class FPGrowthProfile:
 # 3. Output DTO
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class FPGrowthOutputDTO(OutputDTO):
     """FPGrowth 빈발 집합·규칙 결과.
@@ -86,6 +88,7 @@ class FPGrowthOutputDTO(OutputDTO):
         rules (pd.DataFrame): antecedents, consequents, support, confidence, lift, leverage, conviction.
         diagnostics (Dict[str, int]): 빈발 집합·규칙 후보 및 tree_nodes 수.
     """
+
     algorithm: str
     n_transactions: int
     itemsets: pd.DataFrame
@@ -96,6 +99,7 @@ class FPGrowthOutputDTO(OutputDTO):
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate_inputs(transactions, profile):
     """전용 Profile과 문자열 거래를 검증합니다.
@@ -108,14 +112,16 @@ def _validate_inputs(transactions, profile):
     Raises:
         TypeError/ValueError: Profile·자료·임계값·한도 오류.
     """
-    if not isinstance(profile,FPGrowthProfile):raise TypeError('FPGrowthProfile이 필요합니다.')
-    positive_int(profile.max_nodes,'max_nodes')
-    return validate_transactions(transactions,profile)
+    if not isinstance(profile, FPGrowthProfile):
+        raise TypeError("FPGrowthProfile이 필요합니다.")
+    positive_int(profile.max_nodes, "max_nodes")
+    return validate_transactions(transactions, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 class _FPNode:
     """FP-tree의 항목 노드.
@@ -126,7 +132,8 @@ class _FPNode:
         parent (object): 부모 노드 또는 None.
         children (dict): 항목별 자식 노드.
     """
-    def __init__(self,item,parent):
+
+    def __init__(self, item, parent):
         """비어 있는 FP 노드를 생성합니다.
 
         Args:
@@ -137,7 +144,10 @@ class _FPNode:
         Raises:
             None: 검증한 항목에서만 호출.
         """
-        self.item=item;self.parent=parent;self.count=0;self.children={}
+        self.item = item
+        self.parent = parent
+        self.count = 0
+        self.children = {}
 
 
 def _build_tree(paths, threshold, budget, profile):
@@ -153,21 +163,30 @@ def _build_tree(paths, threshold, budget, profile):
     Raises:
         ValueError: 노드 한도 초과; 부분 결과 반환하지 않음.
     """
-    counts={}
-    for items,weight in paths:
-        for item in items:counts[item]=counts.get(item,0)+weight
-    counts={item:count for item,count in counts.items() if count>=threshold}
-    root=_FPNode(None,None);headers={item:[] for item in counts}
-    for items,weight in paths:
-        ordered=sorted((item for item in items if item in counts),key=lambda item:(-counts[item],item))
-        node=root
+    counts = {}
+    for items, weight in paths:
+        for item in items:
+            counts[item] = counts.get(item, 0) + weight
+    counts = {item: count for item, count in counts.items() if count >= threshold}
+    root = _FPNode(None, None)
+    headers = {item: [] for item in counts}
+    for items, weight in paths:
+        ordered = sorted(
+            (item for item in items if item in counts),
+            key=lambda item: (-counts[item], item),
+        )
+        node = root
         for item in ordered:
             if item not in node.children:
-                budget[0]+=1
-                if budget[0]>profile.max_nodes:raise ValueError('FP-tree 누적 노드 한도 초과')
-                child=_FPNode(item,node);node.children[item]=child;headers[item].append(child)
-            node=node.children[item];node.count+=weight
-    return headers,counts
+                budget[0] += 1
+                if budget[0] > profile.max_nodes:
+                    raise ValueError("FP-tree 누적 노드 한도 초과")
+                child = _FPNode(item, node)
+                node.children[item] = child
+                headers[item].append(child)
+            node = node.children[item]
+            node.count += weight
+    return headers, counts
 
 
 def _mine_patterns(transactions, profile):
@@ -181,26 +200,38 @@ def _mine_patterns(transactions, profile):
     Raises:
         ValueError: 노드·항목집합 한도 초과.
     """
-    threshold=minimum_count(profile.min_support,len(transactions));budget=[0]
-    headers,counts=_build_tree([(items,1) for items in transactions],threshold,budget,profile)
-    stack=[((),headers,counts)];patterns={}
+    threshold = minimum_count(profile.min_support, len(transactions))
+    budget = [0]
+    headers, counts = _build_tree(
+        [(items, 1) for items in transactions], threshold, budget, profile
+    )
+    stack = [((), headers, counts)]
+    patterns = {}
     while stack:
-        prefix,headers,counts=stack.pop()
-        for item in sorted(counts,key=lambda item:(counts[item],item)):
-            pattern=tuple(sorted(prefix+(item,)))
-            if len(patterns)>=profile.max_itemsets:raise ValueError('빈발 항목집합 한도 초과')
-            patterns[pattern]=counts[item]
-            if len(pattern)>=profile.max_length:continue
-            paths=[]
+        prefix, headers, counts = stack.pop()
+        for item in sorted(counts, key=lambda item: (counts[item], item)):
+            pattern = tuple(sorted(prefix + (item,)))
+            if len(patterns) >= profile.max_itemsets:
+                raise ValueError("빈발 항목집합 한도 초과")
+            patterns[pattern] = counts[item]
+            if len(pattern) >= profile.max_length:
+                continue
+            paths = []
             for node in headers[item]:
-                items=[];parent=node.parent
+                items = []
+                parent = node.parent
                 while parent is not None and parent.item is not None:
-                    items.append(parent.item);parent=parent.parent
-                if items:paths.append((items,node.count))
+                    items.append(parent.item)
+                    parent = parent.parent
+                if items:
+                    paths.append((items, node.count))
             if paths:
-                conditional,conditional_counts=_build_tree(paths,threshold,budget,profile)
-                if conditional_counts:stack.append((prefix+(item,),conditional,conditional_counts))
-    return patterns,budget[0]
+                conditional, conditional_counts = _build_tree(
+                    paths, threshold, budget, profile
+                )
+                if conditional_counts:
+                    stack.append((prefix + (item,), conditional, conditional_counts))
+    return patterns, budget[0]
 
 
 def _run_model(transactions, profile):
@@ -214,16 +245,33 @@ def _run_model(transactions, profile):
     Raises:
         ValueError: 탐색·결과 한도 초과.
     """
-    counts,work=_mine_patterns(transactions,profile)
-    itemsets,rules,rule_candidates=build_tables(counts,len(transactions),profile)
-    return FPGrowthOutputDTO('fp-growth',len(transactions),itemsets,rules,{'n_itemsets':len(counts),'rule_candidates':rule_candidates,'tree_nodes':work})
+    counts, work = _mine_patterns(transactions, profile)
+    itemsets, rules, rule_candidates = build_tables(counts, len(transactions), profile)
+    return FPGrowthOutputDTO(
+        "fp-growth",
+        len(transactions),
+        itemsets,
+        rules,
+        {
+            "n_itemsets": len(counts),
+            "rule_candidates": rule_candidates,
+            "tree_nodes": work,
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_fp_growth(transactions: Any, profile: Optional[FPGrowthProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> FPGrowthOutputDTO:
+
+def run_fp_growth(
+    transactions: Any,
+    profile: Optional[FPGrowthProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> FPGrowthOutputDTO:
     """FPGrowth를 전용 JSON/Profile로 실행합니다.
 
     Args:
@@ -236,15 +284,20 @@ def run_fp_growth(transactions: Any, profile: Optional[FPGrowthProfile] = None, 
     Raises:
         ValueError/TypeError/OSError: 자료·설정·한도·레시피 오류.
     """
-    profile=resolve_profile('fp-growth',profile,recipe_path=recipe_path,overrides=overrides)
-    data=_validate_inputs(transactions,profile)
-    return _run_model(data,profile)
+    profile = resolve_profile(
+        "fp-growth", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs(transactions, profile)
+    return _run_model(data, profile)
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__ == '__main__':
-    result=run_fp_growth([['bread','milk'],['bread','butter'],['bread','milk','butter'],[]],overrides={'min_support':0.25})
+if __name__ == "__main__":
+    result = run_fp_growth(
+        [["bread", "milk"], ["bread", "butter"], ["bread", "milk", "butter"], []],
+        overrides={"min_support": 0.25},
+    )
     print(result.to_json(indent=2))

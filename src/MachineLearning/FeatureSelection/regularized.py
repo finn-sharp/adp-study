@@ -22,6 +22,7 @@ regularized.py - L1·L2 규제 기반 변수 선택
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,7 +41,12 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 from src.MachineLearning.FeatureSelection.wrapper import _base_estimator
@@ -49,6 +55,7 @@ from src.MachineLearning.FeatureSelection.wrapper import _base_estimator
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RegularizedSelectionProfile:
@@ -71,10 +78,10 @@ class RegularizedSelectionProfile:
         max_iter (int): 최대 반복 횟수. 양의 정수. 기본 5000.
     """
 
-    task: str = 'classification'
+    task: str = "classification"
     test_size: float = 0.3
     random_state: int = 1234
-    scaling: str = 'standard'
+    scaling: str = "standard"
     stratify: bool = True
     param_grid: Optional[Dict[str, Any]] = None
     cv: int = 3
@@ -90,6 +97,7 @@ class RegularizedSelectionProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RegularizedSelectionOutputDTO(OutputDTO):
@@ -154,7 +162,10 @@ class RegularizedSelectionOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
-def _validate_inputs(X: Any, y: Any, profile: RegularizedSelectionProfile) -> np.ndarray:
+
+def _validate_inputs(
+    X: Any, y: Any, profile: RegularizedSelectionProfile
+) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
     Args:
@@ -171,14 +182,17 @@ def _validate_inputs(X: Any, y: Any, profile: RegularizedSelectionProfile) -> np
         raise TypeError("RegularizedSelectionProfile이 필요합니다.")
     arr = validate_features(X)
     from src.MachineLearning.common import validate_supervised_inputs
+
     arr, target = validate_supervised_inputs(X, y, profile)
     validate_scaling(profile.scaling, profile.random_state)
     feature_names(X)
-    if profile.penalty not in ("l1", "l2"): raise ValueError("penalty는 l1/l2입니다.")
+    if profile.penalty not in ("l1", "l2"):
+        raise ValueError("penalty는 l1/l2입니다.")
     finite_number(profile.alpha, "alpha", positive=True)
     finite_number(profile.C, "C", positive=True)
     positive_int(profile.max_iter, "max_iter")
-    if profile.threshold is not None: finite_number(profile.threshold, "threshold", positive=True)
+    if profile.threshold is not None:
+        finite_number(profile.threshold, "threshold", positive=True)
     return arr
 
 
@@ -186,11 +200,21 @@ def _validate_inputs(X: Any, y: Any, profile: RegularizedSelectionProfile) -> np
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
+
 class RegularizedSelector(TransformerMixin, BaseEstimator):
     """학습 자료의 규제 모델 계수로 선택하는 sklearn 변환기."""
 
-    def __init__(self, task="classification", penalty="l1", alpha=0.01, C=1.0,
-                 threshold=None, max_iter=5000, scaling="standard", random_state=1234):
+    def __init__(
+        self,
+        task="classification",
+        penalty="l1",
+        alpha=0.01,
+        C=1.0,
+        threshold=None,
+        max_iter=5000,
+        scaling="standard",
+        random_state=1234,
+    ):
         """규제 및 임계값 조건을 저장합니다.
 
         Args:
@@ -229,20 +253,49 @@ class RegularizedSelector(TransformerMixin, BaseEstimator):
         """
         from sklearn.linear_model import Lasso, Ridge, LogisticRegression
         from sklearn.multiclass import OneVsRestClassifier
+
         arr = _validate_inputs(X, y, RegularizedSelectionProfile(**self.get_params()))
         self.n_features_in_ = arr.shape[1]
         if self.task == "regression":
-            estimator = Lasso(alpha=self.alpha, max_iter=self.max_iter) if self.penalty == "l1" else Ridge(alpha=self.alpha, solver="lsqr", max_iter=self.max_iter)
+            estimator = (
+                Lasso(alpha=self.alpha, max_iter=self.max_iter)
+                if self.penalty == "l1"
+                else Ridge(alpha=self.alpha, solver="lsqr", max_iter=self.max_iter)
+            )
         else:
-            estimator = OneVsRestClassifier(LogisticRegression(penalty=self.penalty, C=self.C,
-                solver="liblinear", max_iter=self.max_iter, random_state=self.random_state))
-        self.selection_model_ = Pipeline([("scaler", make_scaler(self.scaling)), ("model", estimator)])
+            estimator = OneVsRestClassifier(
+                LogisticRegression(
+                    penalty=self.penalty,
+                    C=self.C,
+                    solver="liblinear",
+                    max_iter=self.max_iter,
+                    random_state=self.random_state,
+                )
+            )
+        self.selection_model_ = Pipeline(
+            [("scaler", make_scaler(self.scaling)), ("model", estimator)]
+        )
         self.selection_model_.fit(arr, y)
-        self.coefficients_ = np.vstack([m.coef_.reshape(-1) for m in estimator.estimators_]) if self.task == "classification" else estimator.coef_.copy()
-        self.importances_ = np.abs(self.coefficients_) if self.coefficients_.ndim == 1 else np.mean(np.abs(self.coefficients_), axis=0)
-        self.threshold_ = self.threshold if self.threshold is not None else (1e-8 if self.penalty == "l1" else float(self.importances_.mean()))
+        self.coefficients_ = (
+            np.vstack([m.coef_.reshape(-1) for m in estimator.estimators_])
+            if self.task == "classification"
+            else estimator.coef_.copy()
+        )
+        self.importances_ = (
+            np.abs(self.coefficients_)
+            if self.coefficients_.ndim == 1
+            else np.mean(np.abs(self.coefficients_), axis=0)
+        )
+        self.threshold_ = (
+            self.threshold
+            if self.threshold is not None
+            else (1e-8 if self.penalty == "l1" else float(self.importances_.mean()))
+        )
         self.support_ = (self.importances_ >= self.threshold_) & (self.importances_ > 0)
-        if not self.support_.any(): raise ValueError("선택 변수가 없습니다. 규제 강도와 threshold를 조정하세요.")
+        if not self.support_.any():
+            raise ValueError(
+                "선택 변수가 없습니다. 규제 강도와 threshold를 조정하세요."
+            )
         return self
 
     def get_support(self):
@@ -270,11 +323,14 @@ class RegularizedSelector(TransformerMixin, BaseEstimator):
         """
         mask = self.get_support()
         arr = validate_features(X, min_samples=1)
-        if arr.shape[1] != len(mask): raise ValueError("학습 특성 수와 다릅니다.")
+        if arr.shape[1] != len(mask):
+            raise ValueError("학습 특성 수와 다릅니다.")
         return arr[:, mask]
 
 
-def _run_model(X: Any, y: Any, profile: RegularizedSelectionProfile) -> RegularizedSelectionOutputDTO:
+def _run_model(
+    X: Any, y: Any, profile: RegularizedSelectionProfile
+) -> RegularizedSelectionOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
 
     Args:
@@ -287,33 +343,63 @@ def _run_model(X: Any, y: Any, profile: RegularizedSelectionProfile) -> Regulari
         ValueError: 적합 실패 또는 알고리즘 자료 조건 불충족.
         ImportError: 선택적 라이브러리 미설치.
     """
-    selector = RegularizedSelector(task=profile.task, penalty=profile.penalty, alpha=profile.alpha,
-                                   C=profile.C, threshold=profile.threshold, max_iter=profile.max_iter,
-                                   scaling=profile.scaling, random_state=profile.random_state)
+    selector = RegularizedSelector(
+        task=profile.task,
+        penalty=profile.penalty,
+        alpha=profile.alpha,
+        C=profile.C,
+        threshold=profile.threshold,
+        max_iter=profile.max_iter,
+        scaling=profile.scaling,
+        random_state=profile.random_state,
+    )
     from dataclasses import replace
     from src.MachineLearning.common import run_supervised
+
     # 선택기의 내부 CV가 원 입력에서 스케일러를 폴드별 적합하도록 외부 선행 스케일러를 비활성화합니다.
     outer = replace(profile, scaling="none")
-    result = run_supervised(X, y, _base_estimator(profile.task, profile.C, profile.max_iter), outer,
-                            extra_steps=[("selector", selector), ("selected_scaler", make_scaler(profile.scaling))])
+    result = run_supervised(
+        X,
+        y,
+        _base_estimator(profile.task, profile.C, profile.max_iter),
+        outer,
+        extra_steps=[
+            ("selector", selector),
+            ("selected_scaler", make_scaler(profile.scaling)),
+        ],
+    )
     fitted = result.model.named_steps["selector"]
     indices = np.flatnonzero(fitted.get_support())
     arr = validate_features(X)
     names = feature_names(X)
-    return RegularizedSelectionOutputDTO(**result.to_dict(include_runtime=True), selector=fitted,
-        selected_indices=indices, selected_features=[names[i] for i in indices], support_mask=fitted.get_support(),
-        transformed_train=fitted.transform(arr[result.train_indices]), transformed_test=fitted.transform(arr[result.test_indices]),
-        importances=fitted.importances_.copy(), coefficients=fitted.coefficients_.copy(), applied_threshold=fitted.threshold_)
+    return RegularizedSelectionOutputDTO(
+        **result.to_dict(include_runtime=True),
+        selector=fitted,
+        selected_indices=indices,
+        selected_features=[names[i] for i in indices],
+        support_mask=fitted.get_support(),
+        transformed_train=fitted.transform(arr[result.train_indices]),
+        transformed_test=fitted.transform(arr[result.test_indices]),
+        importances=fitted.importances_.copy(),
+        coefficients=fitted.coefficients_.copy(),
+        applied_threshold=fitted.threshold_,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_regularized_selection(X: Any, y: Any, profile: Optional[RegularizedSelectionProfile] = None, *,
-              task: Optional[str] = None,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> RegularizedSelectionOutputDTO:
+
+def run_regularized_selection(
+    X: Any,
+    y: Any,
+    profile: Optional[RegularizedSelectionProfile] = None,
+    *,
+    task: Optional[str] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> RegularizedSelectionOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -331,7 +417,13 @@ def run_regularized_selection(X: Any, y: Any, profile: Optional[RegularizedSelec
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("regularized-selection", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "regularized-selection",
+        profile,
+        recipe_path=recipe_path,
+        task=task,
+        overrides=overrides,
+    )
     _validate_inputs(X, y, profile)
     return _run_model(X, y, profile)
 
@@ -342,6 +434,7 @@ def run_regularized_selection(X: Any, y: Any, profile: Optional[RegularizedSelec
 
 if __name__ == "__main__":
     from sklearn.datasets import load_iris
+
     X, y = load_iris(return_X_y=True)
     result = run_regularized_selection(X, y, load_profile("regularized-selection"))
     print(result.to_json(indent=2)[:500])

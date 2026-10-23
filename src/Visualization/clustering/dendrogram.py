@@ -15,6 +15,7 @@ dendrogram.py - 계층 병합 거리와 절단 후보로 군집 구조를 검토
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -48,15 +61,17 @@ class ClusteringDendrogramProfile:
         max_samples (int): O(n²) 계층 계산/표시의 최대 표본 수. 기본 1000.
         truncate_last (int): 마지막 병합 단위 표시 수; 0이면 원 잎 전체. 기본 30.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    method: str = 'ward'
-    metric: str = 'euclidean'
-    input_kind: str = 'observations'
+    method: str = "ward"
+    metric: str = "euclidean"
+    input_kind: str = "observations"
     cut_height: Optional[float] = None
     max_samples: int = 1000
     truncate_last: int = 30
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -74,6 +89,7 @@ class ClusteringDendrogramOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -81,6 +97,7 @@ class ClusteringDendrogramOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -96,6 +113,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, ClusteringDendrogramProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -116,34 +134,118 @@ def _draw(values, labels, ax, profile, before):
     """
     from scipy.cluster import hierarchy
     from scipy.spatial.distance import squareform
-    if profile.method not in ('single','complete','average','weighted','centroid','median','ward') or profile.max_samples<2 or profile.truncate_last<0:raise ValueError('계층 설정 오류')
-    if profile.cut_height is not None and (isinstance(profile.cut_height,bool) or not isinstance(profile.cut_height,(int,float)) or not np.isfinite(profile.cut_height) or profile.cut_height<0):raise ValueError('절단 높이 오류')
-    raw=frame(values)
-    if profile.input_kind=='linkage':
-        Z=raw.values;hierarchy.is_valid_linkage(Z,throw=True);n=len(Z)+1
-    elif profile.input_kind=='observations':
-        n=len(raw)
-        if n<2 or n>profile.max_samples:raise ValueError('표본 한도 오류')
-        if profile.method in ('ward','centroid','median') and profile.metric!='euclidean':raise ValueError('해당 linkage는 euclidean 관측 거리가 필요합니다.')
-        Z=hierarchy.linkage(raw.values,method=profile.method,metric=profile.metric)
-    elif profile.input_kind=='distance':
-        n=len(raw)
-        if raw.shape!=(n,n) or n<2 or n>profile.max_samples or (raw.values<0).any() or not np.allclose(raw.values,raw.values.T) or not np.allclose(np.diag(raw),0):raise ValueError('대칭 비음수 거리와 영 대각이 필요합니다.')
-        if profile.method in ('ward','centroid','median'):raise ValueError('사전 거리에는 average/complete/single/weighted를 사용하세요.')
-        Z=hierarchy.linkage(squareform(raw.values,checks=True),method=profile.method)
-    else:raise ValueError('input_kind 오류')
-    if n>profile.max_samples:raise ValueError('표본 한도 초과')
-    if labels is not None and (len(labels)!=n or any(pd.isna(v) for v in labels)):raise ValueError('잎 label 길이/결측 오류')
-    kwargs={'truncate_mode':'lastp','p':profile.truncate_last,'show_leaf_counts':True} if profile.truncate_last else {}
-    result=hierarchy.dendrogram(Z,labels=None if labels is None else [str(v) for v in labels],ax=ax,color_threshold=profile.cut_height,**kwargs)
-    if profile.cut_height is not None:ax.axhline(profile.cut_height,color='C3',linestyle='--')
-    ax.set_xlabel('Leaf / contracted cluster');ax.set_ylabel('Merge distance');data=pd.DataFrame(Z,columns=['left','right','distance','n_leaves']);diagnostics={'n_samples':n,'displayed_leaves':result['ivl'],'leaf_order':result['leaves'],'cluster_labels':hierarchy.fcluster(Z,profile.cut_height,criterion='distance') if profile.cut_height is not None else None,'method':profile.method,'metric':profile.metric};notes=['거리/스케일/연결 기준에 민감합니다. 절단 높이는 탐색 기준이며 최적 군집 수를 자동 결정하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, ClusteringDendrogramOutputDTO, 'Clustering — Dendrogram', notes)
+
+    if (
+        profile.method
+        not in (
+            "single",
+            "complete",
+            "average",
+            "weighted",
+            "centroid",
+            "median",
+            "ward",
+        )
+        or profile.max_samples < 2
+        or profile.truncate_last < 0
+    ):
+        raise ValueError("계층 설정 오류")
+    if profile.cut_height is not None and (
+        isinstance(profile.cut_height, bool)
+        or not isinstance(profile.cut_height, (int, float))
+        or not np.isfinite(profile.cut_height)
+        or profile.cut_height < 0
+    ):
+        raise ValueError("절단 높이 오류")
+    raw = frame(values)
+    if profile.input_kind == "linkage":
+        Z = raw.values
+        hierarchy.is_valid_linkage(Z, throw=True)
+        n = len(Z) + 1
+    elif profile.input_kind == "observations":
+        n = len(raw)
+        if n < 2 or n > profile.max_samples:
+            raise ValueError("표본 한도 오류")
+        if (
+            profile.method in ("ward", "centroid", "median")
+            and profile.metric != "euclidean"
+        ):
+            raise ValueError("해당 linkage는 euclidean 관측 거리가 필요합니다.")
+        Z = hierarchy.linkage(raw.values, method=profile.method, metric=profile.metric)
+    elif profile.input_kind == "distance":
+        n = len(raw)
+        if (
+            raw.shape != (n, n)
+            or n < 2
+            or n > profile.max_samples
+            or (raw.values < 0).any()
+            or not np.allclose(raw.values, raw.values.T)
+            or not np.allclose(np.diag(raw), 0)
+        ):
+            raise ValueError("대칭 비음수 거리와 영 대각이 필요합니다.")
+        if profile.method in ("ward", "centroid", "median"):
+            raise ValueError(
+                "사전 거리에는 average/complete/single/weighted를 사용하세요."
+            )
+        Z = hierarchy.linkage(
+            squareform(raw.values, checks=True), method=profile.method
+        )
+    else:
+        raise ValueError("input_kind 오류")
+    if n > profile.max_samples:
+        raise ValueError("표본 한도 초과")
+    if labels is not None and (len(labels) != n or any(pd.isna(v) for v in labels)):
+        raise ValueError("잎 label 길이/결측 오류")
+    kwargs = (
+        {"truncate_mode": "lastp", "p": profile.truncate_last, "show_leaf_counts": True}
+        if profile.truncate_last
+        else {}
+    )
+    result = hierarchy.dendrogram(
+        Z,
+        labels=None if labels is None else [str(v) for v in labels],
+        ax=ax,
+        color_threshold=profile.cut_height,
+        **kwargs,
+    )
+    if profile.cut_height is not None:
+        ax.axhline(profile.cut_height, color="C3", linestyle="--")
+    ax.set_xlabel("Leaf / contracted cluster")
+    ax.set_ylabel("Merge distance")
+    data = pd.DataFrame(Z, columns=["left", "right", "distance", "n_leaves"])
+    diagnostics = {
+        "n_samples": n,
+        "displayed_leaves": result["ivl"],
+        "leaf_order": result["leaves"],
+        "cluster_labels": (
+            hierarchy.fcluster(Z, profile.cut_height, criterion="distance")
+            if profile.cut_height is not None
+            else None
+        ),
+        "method": profile.method,
+        "metric": profile.metric,
+    }
+    notes = [
+        "거리/스케일/연결 기준에 민감합니다. 절단 높이는 탐색 기준이며 최적 군집 수를 자동 결정하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ClusteringDendrogramOutputDTO,
+        "Clustering — Dendrogram",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_dendrogram(values, labels=None, *, ax, profile=None, recipe_path=None, overrides=None) -> ClusteringDendrogramOutputDTO:
+def plot_dendrogram(
+    values, labels=None, *, ax, profile=None, recipe_path=None, overrides=None
+) -> ClusteringDendrogramOutputDTO:
     """계층 병합 거리와 절단 후보로 군집 구조를 검토합니다.
 
     Args:
@@ -158,10 +260,16 @@ def plot_dendrogram(values, labels=None, *, ax, profile=None, recipe_path=None, 
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-clustering-dendrogram', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-clustering-dendrogram",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, labels, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

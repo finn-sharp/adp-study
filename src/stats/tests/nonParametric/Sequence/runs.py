@@ -16,6 +16,7 @@ runs - Wald–Wolfowitz runs 검정
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, tail, result)
+from src.stats.tests._common import number, numeric, tail, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RunsProfile:
@@ -50,6 +52,7 @@ class RunsProfile:
         correction (bool): 양측 근사 z 연속성 보정 기본 True.
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     cutoff: Optional[float] = None
     correction: bool = True
@@ -59,6 +62,7 @@ class RunsProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class RunsOutputDTO(OutputDTO):
@@ -80,6 +84,7 @@ class RunsOutputDTO(OutputDTO):
         variance_runs (float): 귀무 run 분산.
         group_counts (List[int]): 0/1 관측 수.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -100,6 +105,7 @@ class RunsOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -112,29 +118,30 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = numeric(args['x'], 1, 3, policy)
+    a = numeric(args["x"], 1, 3, policy)
     if p.cutoff is None:
         if not np.isin(a, [0, 1]).all():
-            raise ValueError('cutoff 생략 시 0/1 자료 필요')
+            raise ValueError("cutoff 생략 시 0/1 자료 필요")
     else:
-        number(p.cutoff, 'cutoff')
+        number(p.cutoff, "cutoff")
         a = a[a != p.cutoff]
         a = (a > p.cutoff).astype(int)
     if len(a) < 3 or len(np.unique(a)) != 2:
-        raise ValueError('두 상태와 3개 이상 유효 관측 필요')
-    return {'x': a}
+        raise ValueError("두 상태와 3개 이상 유효 관측 필요")
+    return {"x": a}
+
 
 def _validate_inputs(arguments: Dict[str, Any], profile: RunsProfile) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
@@ -147,13 +154,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: RunsProfile) -> Dict[st
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, RunsProfile): raise TypeError("RunsProfile이 필요합니다.")
+    if not isinstance(profile, RunsProfile):
+        raise TypeError("RunsProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -166,8 +175,8 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    a = d['x']
+    alt = getattr(p, "alternative", "two-sided")
+    a = d["x"]
     n1 = int((a == 1).sum())
     n0 = len(a) - n1
     n = n0 + n1
@@ -175,12 +184,24 @@ def _calculate(d, p):
     expected = 1 + 2 * n0 * n1 / n
     var = 2 * n0 * n1 * (2 * n0 * n1 - n) / (n * n * (n - 1))
     if var <= 0:
-        raise ValueError('양의 run 분산 필요')
+        raise ValueError("양의 run 분산 필요")
     delta = runs - expected
     if p.correction:
         delta = np.sign(delta) * max(0, abs(delta) - 0.5)
     z = delta / np.sqrt(var)
-    return result('runs', p, z, tail(z, 'two-sided', stats.norm), '이진 관측 순서가 무작위이다', 'normal-approximation', dict(runs=runs, expected_runs=expected, variance_runs=var, group_counts=[n0, n1]), notes=['순서의 무작위성 검정; 관측을 정렬하면 안 됩니다.'])
+    return result(
+        "runs",
+        p,
+        z,
+        tail(z, "two-sided", stats.norm),
+        "이진 관측 순서가 무작위이다",
+        "normal-approximation",
+        dict(
+            runs=runs, expected_runs=expected, variance_runs=var, group_counts=[n0, n1]
+        ),
+        notes=["순서의 무작위성 검정; 관측을 정렬하면 안 됩니다."],
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: RunsProfile) -> RunsOutputDTO:
     """검증된 자료를 계산합니다.
@@ -200,7 +221,14 @@ def _run_test(data: Dict[str, Any], profile: RunsProfile) -> RunsOutputDTO:
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_runs(x: Any, profile: Optional[RunsProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> RunsOutputDTO:
+
+def run_runs(
+    x: Any,
+    profile: Optional[RunsProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> RunsOutputDTO:
     """Wald–Wolfowitz runs 검정.
 
     Args:
@@ -214,8 +242,10 @@ def run_runs(x: Any, profile: Optional[RunsProfile] = None, *, recipe_path: Opti
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("runs", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x}, profile)
+    profile = resolve_profile(
+        "runs", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x}, profile)
     return _run_test(data, profile)
 
 
@@ -224,5 +254,5 @@ def run_runs(x: Any, profile: Optional[RunsProfile] = None, *, recipe_path: Opti
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_runs([0,0,1,0,1,1,0,1])
+    result = run_runs([0, 0, 1, 0, 1, 1, 0, 1])
     print(result.to_json(indent=2))

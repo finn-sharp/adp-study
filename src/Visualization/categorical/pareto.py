@@ -15,6 +15,7 @@ pareto.py - 누적 기여를 기준으로 우선 검토할 범주를 선택합�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,11 +57,13 @@ class CategoricalParetoProfile:
         coverage (float): 주요 범주 누적 비율 기준 (0,1]. 기본 0.8.
         max_categories (int): 표시 한도; 누적 분모는 전체 유효 관측. 기본 20.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     coverage: float = 0.8
     max_categories: int = 20
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -66,6 +81,7 @@ class CategoricalParetoOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -73,6 +89,7 @@ class CategoricalParetoOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -88,6 +105,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, CategoricalParetoProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -105,18 +123,67 @@ def _draw(categories, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw,removed=paired(category=categories);counts=levels(raw.category).value_counts()
-    if not 0<profile.coverage<=1 or profile.max_categories<1:raise ValueError('coverage/한도 오류')
-    cumulative=counts.cumsum()/len(raw);shown=counts.iloc[:profile.max_categories];x=np.arange(len(shown))
-    ax.bar(x,shown/len(raw),color=profile.color,alpha=profile.alpha,label='Individual fraction');ax.plot(x,cumulative.iloc[:len(shown)],color='C3',marker='o',label='Cumulative fraction');ax.axhline(profile.coverage,color='black',linestyle='--');ax.set_ylim(0,1.05)
-    ax.set_xticks(x);ax.set_xticklabels(shown.index,rotation=45,ha='right');ax.set_ylabel('Fraction of all valid rows');ax.legend(fontsize=8)
-    data=pd.DataFrame({'category':counts.index,'count':counts.values,'cumulative_fraction':cumulative.values});diagnostics={'n':len(raw),'missing_removed':removed,'categories_to_coverage':int(np.searchsorted(cumulative.values,profile.coverage)+1),'omitted_rows':int(counts.iloc[len(shown):].sum())};notes=[]
-    return finish(ax, before, data, diagnostics, profile, CategoricalParetoOutputDTO, 'Categorical — Pareto', notes)
+    raw, removed = paired(category=categories)
+    counts = levels(raw.category).value_counts()
+    if not 0 < profile.coverage <= 1 or profile.max_categories < 1:
+        raise ValueError("coverage/한도 오류")
+    cumulative = counts.cumsum() / len(raw)
+    shown = counts.iloc[: profile.max_categories]
+    x = np.arange(len(shown))
+    ax.bar(
+        x,
+        shown / len(raw),
+        color=profile.color,
+        alpha=profile.alpha,
+        label="Individual fraction",
+    )
+    ax.plot(
+        x,
+        cumulative.iloc[: len(shown)],
+        color="C3",
+        marker="o",
+        label="Cumulative fraction",
+    )
+    ax.axhline(profile.coverage, color="black", linestyle="--")
+    ax.set_ylim(0, 1.05)
+    ax.set_xticks(x)
+    ax.set_xticklabels(shown.index, rotation=45, ha="right")
+    ax.set_ylabel("Fraction of all valid rows")
+    ax.legend(fontsize=8)
+    data = pd.DataFrame(
+        {
+            "category": counts.index,
+            "count": counts.values,
+            "cumulative_fraction": cumulative.values,
+        }
+    )
+    diagnostics = {
+        "n": len(raw),
+        "missing_removed": removed,
+        "categories_to_coverage": int(
+            np.searchsorted(cumulative.values, profile.coverage) + 1
+        ),
+        "omitted_rows": int(counts.iloc[len(shown) :].sum()),
+    }
+    notes = []
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        CategoricalParetoOutputDTO,
+        "Categorical — Pareto",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_pareto(categories, *, ax, profile=None, recipe_path=None, overrides=None) -> CategoricalParetoOutputDTO:
+def plot_pareto(
+    categories, *, ax, profile=None, recipe_path=None, overrides=None
+) -> CategoricalParetoOutputDTO:
     """누적 기여를 기준으로 우선 검토할 범주를 선택합니다.
 
     Args:
@@ -130,10 +197,13 @@ def plot_pareto(categories, *, ax, profile=None, recipe_path=None, overrides=Non
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-categorical-pareto', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-categorical-pareto", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(categories, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

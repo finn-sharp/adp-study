@@ -5,6 +5,7 @@
 작성자: 김재현(Finn), 2026-10-12. 변경 이력: v1.0.0 최초 추가.
 라이선스: Proprietary; UCI 자료는 별도 CC BY 4.0.
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -12,9 +13,13 @@ __status__ = "Development"
 
 from src.Recipes import load_profile
 from src.Preprocessing.numeric.imputation import build_numeric_imputation_transformer
-from src.Preprocessing.feature_pipeline import make_feature_spec, run_feature_preprocessing
+from src.Preprocessing.feature_pipeline import (
+    make_feature_spec,
+    run_feature_preprocessing,
+)
 from src.datasets.uci import load_tabular
 from sklearn.model_selection import train_test_split
+
 
 def load_data(cache_dir=None):
     """UCI 원본에서 타깃을 제외하고 학습/보류 Feature를 먼저 분리합니다.
@@ -26,8 +31,9 @@ def load_data(cache_dir=None):
     Raises:
         ValueError/TypeError/OSError: 자료·설정·스키마·다운로드 오류.
     """
-    data = load_tabular('regression', cache_dir=cache_dir).drop(columns='target')
-    return train_test_split(data, test_size=.2, random_state=1234)
+    data = load_tabular("regression", cache_dir=cache_dir).drop(columns="target")
+    return train_test_split(data, test_size=0.2, random_state=1234)
+
 
 def load_recipe(overrides=None):
     """전용 JSON을 Profile로 검증합니다.
@@ -39,7 +45,8 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 자료·설정·스키마·다운로드 오류.
     """
-    return load_profile('numeric-imputation', overrides=overrides)
+    return load_profile("numeric-imputation", overrides=overrides)
+
 
 def build_pipeline(feature_columns, profile=None, overrides=None):
     """FeatureSpec의 대상 열과 미적합 처리 순서를 선언합니다.
@@ -54,9 +61,16 @@ def build_pipeline(feature_columns, profile=None, overrides=None):
         ValueError/TypeError/OSError: 자료·설정·스키마·다운로드 오류.
     """
     if profile is not None and overrides is not None:
-        raise ValueError('profile과 overrides는 함께 지정하지 않습니다.')
+        raise ValueError("profile과 overrides는 함께 지정하지 않습니다.")
     profile = load_recipe(overrides) if profile is None else profile
-    return [make_feature_spec('numeric', list(feature_columns), [('imputation', build_numeric_imputation_transformer(profile))])]
+    return [
+        make_feature_spec(
+            "numeric",
+            list(feature_columns),
+            [("imputation", build_numeric_imputation_transformer(profile))],
+        )
+    ]
+
 
 def main(cache_dir=None, overrides=None):
     """학습 Feature만 적합하고 동일 구성으로 보류 Feature를 변환합니다.
@@ -73,10 +87,14 @@ def main(cache_dir=None, overrides=None):
     profile = load_recipe(overrides)
     features = build_pipeline(train.columns, profile=profile)
     result = run_feature_preprocessing(train, features, test)
-    print('train/new shapes:', result.preprocessed_feature.shape, result.new_preprocessed_feature.shape)
-    print('feature steps:', result.feature_specs)
+    print(
+        "train/new shapes:",
+        result.preprocessed_feature.shape,
+        result.new_preprocessed_feature.shape,
+    )
+    print("feature steps:", result.feature_specs)
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -22,6 +22,7 @@ apriori.py - Apriori 빈발 항목집합·연관규칙
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class AprioriProfile:
@@ -73,6 +79,7 @@ class AprioriProfile:
 # 3. Output DTO
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class AprioriOutputDTO(OutputDTO):
     """Apriori 빈발 항목집합·연관규칙 결과. 배열은 원 입력 행 순서.
@@ -91,6 +98,7 @@ class AprioriOutputDTO(OutputDTO):
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _transactions(transactions: Any) -> List[set]:
     """거래 자료를 중복 없는 문자열 항목 집합으로 정규화합니다.
@@ -134,7 +142,8 @@ def _validate_inputs(transactions: Any, profile: AprioriProfile) -> List[set]:
     positive_int(profile.max_length, "max_length")
     positive_int(profile.max_candidates, "max_candidates")
     positive_int(profile.max_rules, "max_rules")
-    if profile.min_support > 1 or profile.min_confidence > 1: raise ValueError("support/confidence는 1 이하여야 합니다.")
+    if profile.min_support > 1 or profile.min_confidence > 1:
+        raise ValueError("support/confidence는 1 이하여야 합니다.")
     arr = _transactions(transactions)
     return arr
 
@@ -142,6 +151,7 @@ def _validate_inputs(transactions: Any, profile: AprioriProfile) -> List[set]:
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(transactions: Any, profile: AprioriProfile) -> AprioriOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -156,35 +166,48 @@ def _run_model(transactions: Any, profile: AprioriProfile) -> AprioriOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     from itertools import combinations
+
     transactions = _transactions(transactions)
     items = sorted(set().union(*transactions))
-    if len(items) > profile.max_candidates: raise ValueError("Apriori 후보 한도를 초과했습니다.")
+    if len(items) > profile.max_candidates:
+        raise ValueError("Apriori 후보 한도를 초과했습니다.")
     supports = {}
     rows = []
     level = [(item,) for item in items]
     evaluated = 0
-    for length in range(1, profile.max_length+1):
-        if not level: break
+    for length in range(1, profile.max_length + 1):
+        if not level:
+            break
         evaluated += len(level)
-        if evaluated > profile.max_candidates: raise ValueError("Apriori 후보 한도를 초과했습니다.")
+        if evaluated > profile.max_candidates:
+            raise ValueError("Apriori 후보 한도를 초과했습니다.")
         frequent = []
         for candidate in level:
-            count = sum(set(candidate).issubset(transaction) for transaction in transactions)
+            count = sum(
+                set(candidate).issubset(transaction) for transaction in transactions
+            )
             support = count / len(transactions)
             if support >= profile.min_support:
                 supports[candidate] = support
-                rows.append(dict(items=candidate, count=count, support=support, length=length))
+                rows.append(
+                    dict(items=candidate, count=count, support=support, length=length)
+                )
                 frequent.append(candidate)
-        if length == profile.max_length: break
+        if length == profile.max_length:
+            break
         candidates = set()
         previous = set(frequent)
         for i, left in enumerate(frequent):
-            for right in frequent[i+1:]:
-                if left[:-1] != right[:-1]: continue
+            for right in frequent[i + 1 :]:
+                if left[:-1] != right[:-1]:
+                    continue
                 joined = tuple(sorted(set(left) | set(right)))
-                if len(joined) == length+1 and all(part in previous for part in combinations(joined, length)):
+                if len(joined) == length + 1 and all(
+                    part in previous for part in combinations(joined, length)
+                ):
                     candidates.add(joined)
-                    if evaluated + len(candidates) > profile.max_candidates: raise ValueError("Apriori 후보 한도를 초과했습니다.")
+                    if evaluated + len(candidates) > profile.max_candidates:
+                        raise ValueError("Apriori 후보 한도를 초과했습니다.")
         level = sorted(candidates)
     rules = []
     for itemset, support in supports.items():
@@ -194,21 +217,55 @@ def _run_model(transactions: Any, profile: AprioriProfile) -> AprioriOutputDTO:
                 confidence = support / supports[antecedent]
                 lift = confidence / supports[consequent]
                 if confidence >= profile.min_confidence and lift >= profile.min_lift:
-                    if len(rules) >= profile.max_rules: raise ValueError("Apriori 규칙 한도를 초과했습니다.")
-                    conviction = (1-supports[consequent])/(1-confidence) if confidence < 1 else np.inf
-                    rules.append(dict(antecedents=antecedent, consequents=consequent, support=support,
-                        confidence=confidence, lift=lift, leverage=support-supports[antecedent]*supports[consequent], conviction=conviction))
-    return AprioriOutputDTO(len(transactions), pd.DataFrame(rows, columns=["items","count","support","length"]),
-        pd.DataFrame(rules, columns=["antecedents","consequents","support","confidence","lift","leverage","conviction"]))
+                    if len(rules) >= profile.max_rules:
+                        raise ValueError("Apriori 규칙 한도를 초과했습니다.")
+                    conviction = (
+                        (1 - supports[consequent]) / (1 - confidence)
+                        if confidence < 1
+                        else np.inf
+                    )
+                    rules.append(
+                        dict(
+                            antecedents=antecedent,
+                            consequents=consequent,
+                            support=support,
+                            confidence=confidence,
+                            lift=lift,
+                            leverage=support
+                            - supports[antecedent] * supports[consequent],
+                            conviction=conviction,
+                        )
+                    )
+    return AprioriOutputDTO(
+        len(transactions),
+        pd.DataFrame(rows, columns=["items", "count", "support", "length"]),
+        pd.DataFrame(
+            rules,
+            columns=[
+                "antecedents",
+                "consequents",
+                "support",
+                "confidence",
+                "lift",
+                "leverage",
+                "conviction",
+            ],
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_apriori(transactions: Any, profile: Optional[AprioriProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> AprioriOutputDTO:
+
+def run_apriori(
+    transactions: Any,
+    profile: Optional[AprioriProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> AprioriOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -224,7 +281,9 @@ def run_apriori(transactions: Any, profile: Optional[AprioriProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("apriori", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "apriori", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(transactions, profile)
     return _run_model(transactions, profile)
 
@@ -234,7 +293,12 @@ def run_apriori(transactions: Any, profile: Optional[AprioriProfile] = None, *,
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    transactions = [["bread", "milk"], ["bread", "eggs"], ["milk", "eggs"], ["bread", "milk", "eggs"]]
+    transactions = [
+        ["bread", "milk"],
+        ["bread", "eggs"],
+        ["milk", "eggs"],
+        ["bread", "milk", "eggs"],
+    ]
     result = run_apriori(transactions, load_profile("apriori"))
     print(result.itemsets)
     print(result.rules)

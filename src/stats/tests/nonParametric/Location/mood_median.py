@@ -16,6 +16,7 @@ mood_median - Mood 중앙값 검정
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, result)
+from src.stats.tests._common import number, numeric, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MoodMedianProfile:
@@ -50,6 +52,7 @@ class MoodMedianProfile:
         ties (str): 공동 중앙값 같은 값 처리 below/above/ignore 기본 "below".
         correction (bool): 자유도1 Yates 보정 기본 True.
     """
+
     alpha: float = 0.05
     nan_policy: str = "raise"
     ties: str = "below"
@@ -59,6 +62,7 @@ class MoodMedianProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class MoodMedianOutputDTO(OutputDTO):
@@ -80,6 +84,7 @@ class MoodMedianOutputDTO(OutputDTO):
         pooled_median (float): 공동 중앙값.
         table (np.ndarray): 중앙값 위/아래의 2×k 도수표.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -100,6 +105,7 @@ class MoodMedianOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -112,26 +118,29 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    if len(args['groups']) < 2:
-        raise ValueError('2개 이상 독립 그룹 필요')
-    gs = [numeric(x, 1, 2, policy) for x in args['groups']]
-    if p.ties not in ('below', 'above', 'ignore'):
-        raise ValueError('ties 오류')
-    return {'groups': gs}
+    if len(args["groups"]) < 2:
+        raise ValueError("2개 이상 독립 그룹 필요")
+    gs = [numeric(x, 1, 2, policy) for x in args["groups"]]
+    if p.ties not in ("below", "above", "ignore"):
+        raise ValueError("ties 오류")
+    return {"groups": gs}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: MoodMedianProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: MoodMedianProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -142,13 +151,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: MoodMedianProfile) -> D
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, MoodMedianProfile): raise TypeError("MoodMedianProfile이 필요합니다.")
+    if not isinstance(profile, MoodMedianProfile):
+        raise TypeError("MoodMedianProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -161,12 +172,22 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    gs = d['groups']
+    alt = getattr(p, "alternative", "two-sided")
+    gs = d["groups"]
     n = [len(a) for a in gs]
     s, pv, med, t = stats.median_test(*gs, ties=p.ties, correction=p.correction)
-    extras = {'pooled_median': float(med), 'table': t}
-    return result('mood-median', p, s, pv, '그룹별 순위 분포/중앙값이 같다', 'chi-square-approximation', dict(df=len(gs) - 1, group_sizes=n, **extras), notes=['순위 검정을 중앙값 차이로 해석하려면 분포 형태 가정을 확인하세요.'])
+    extras = {"pooled_median": float(med), "table": t}
+    return result(
+        "mood-median",
+        p,
+        s,
+        pv,
+        "그룹별 순위 분포/중앙값이 같다",
+        "chi-square-approximation",
+        dict(df=len(gs) - 1, group_sizes=n, **extras),
+        notes=["순위 검정을 중앙값 차이로 해석하려면 분포 형태 가정을 확인하세요."],
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: MoodMedianProfile) -> MoodMedianOutputDTO:
     """검증된 자료를 계산합니다.
@@ -186,7 +207,13 @@ def _run_test(data: Dict[str, Any], profile: MoodMedianProfile) -> MoodMedianOut
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_mood_median(*groups: Any, profile: Optional[MoodMedianProfile] = None, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> MoodMedianOutputDTO:
+
+def run_mood_median(
+    *groups: Any,
+    profile: Optional[MoodMedianProfile] = None,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> MoodMedianOutputDTO:
     """Mood 중앙값 검정.
 
     Args:
@@ -200,8 +227,10 @@ def run_mood_median(*groups: Any, profile: Optional[MoodMedianProfile] = None, r
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("mood-median", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'groups': groups}, profile)
+    profile = resolve_profile(
+        "mood-median", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"groups": groups}, profile)
     return _run_test(data, profile)
 
 
@@ -210,5 +239,5 @@ def run_mood_median(*groups: Any, profile: Optional[MoodMedianProfile] = None, r
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_mood_median([1,2,5,8], [2,4,6,9], [3,7,10,11])
+    result = run_mood_median([1, 2, 5, 8], [2, 4, 6, 9], [3, 7, 10, 11])
     print(result.to_json(indent=2))

@@ -38,7 +38,7 @@ def load_data(cache_dir=None):
     Raises:
         ValueError/OSError: 자료/다운로드 오류.
     """
-    return _load_data('classification', cache_dir)
+    return _load_data("classification", cache_dir)
 
 
 def load_recipe(overrides=None):
@@ -51,7 +51,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/OSError: 레시피 오류.
     """
-    return load_profile('metric-classification-calibration', overrides=overrides)
+    return load_profile("metric-classification-calibration", overrides=overrides)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -66,8 +66,9 @@ def build_pipeline(profile=None, overrides=None):
         ValueError: Profile과 overrides 동시 지정.
     """
     if profile is not None and overrides is not None:
-        raise ValueError('profile과 overrides를 함께 지정하지 않습니다.')
+        raise ValueError("profile과 overrides를 함께 지정하지 않습니다.")
     p = load_recipe(overrides) if profile is None else profile
+
     def execute(data):
         """보류 예측을 만들고 해당 메트릭을 실행합니다.
 
@@ -78,7 +79,8 @@ def build_pipeline(profile=None, overrides=None):
         Raises:
             ValueError: 입력·지표 정의역 오류.
         """
-        return run_calibration(**prepare('classification', data), profile=p)
+        return run_calibration(**prepare("classification", data), profile=p)
+
     return execute
 
 
@@ -94,10 +96,12 @@ def main(cache_dir=None, overrides=None, data=None):
     Raises:
         ValueError/OSError: 자료/평가/레시피 오류.
     """
-    result = build_pipeline(overrides=overrides)(load_data(cache_dir) if data is None else data)
+    result = build_pipeline(overrides=overrides)(
+        load_data(cache_dir) if data is None else data
+    )
     print(result.to_json(indent=2))
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

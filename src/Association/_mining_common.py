@@ -15,6 +15,7 @@ _mining_common.py - 새 빈발 패턴 알고리즘의 거래 검증·결과 테�
     2026-10-12  김재현(Finn)     v1.0.0    별도 알고리즘의 공통 계약 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -37,20 +38,24 @@ def validate_transactions(transactions, profile):
     Raises:
         ValueError/TypeError: 자료·임계값·한도 오류.
     """
-    for name in ('min_support', 'min_confidence', 'min_lift'):
+    for name in ("min_support", "min_confidence", "min_lift"):
         finite_number(getattr(profile, name), name)
-    if not 0 < profile.min_support <= 1 or not 0 <= profile.min_confidence <= 1 or profile.min_lift < 0:
-        raise ValueError('support는 (0,1], confidence는 [0,1], lift는 0 이상입니다.')
-    for name in ('max_length', 'max_itemsets', 'max_rules', 'max_rule_candidates'):
+    if (
+        not 0 < profile.min_support <= 1
+        or not 0 <= profile.min_confidence <= 1
+        or profile.min_lift < 0
+    ):
+        raise ValueError("support는 (0,1], confidence는 [0,1], lift는 0 이상입니다.")
+    for name in ("max_length", "max_itemsets", "max_rules", "max_rule_candidates"):
         positive_int(getattr(profile, name), name)
     if not isinstance(transactions, (list, tuple)) or not transactions:
-        raise ValueError('비어 있지 않은 거래 목록이 필요합니다.')
+        raise ValueError("비어 있지 않은 거래 목록이 필요합니다.")
     result = []
     for transaction in transactions:
         if not isinstance(transaction, (list, tuple, set, frozenset)):
-            raise ValueError('각 거래는 문자열 항목 목록/집합입니다.')
+            raise ValueError("각 거래는 문자열 항목 목록/집합입니다.")
         if any(not isinstance(item, str) or not item.strip() for item in transaction):
-            raise ValueError('항목은 비어 있지 않은 문자열입니다.')
+            raise ValueError("항목은 비어 있지 않은 문자열입니다.")
         result.append(set(transaction))
     return result
 
@@ -87,27 +92,64 @@ def build_tables(counts, n, profile):
         ValueError: 후보·규칙 한도 초과; 부분 결과를 반환하지 않음.
     """
     ordered = sorted(counts, key=lambda items: (len(items), items))
-    rows = [dict(items=items, count=counts[items], support=counts[items]/n, length=len(items)) for items in ordered]
+    rows = [
+        dict(
+            items=items,
+            count=counts[items],
+            support=counts[items] / n,
+            length=len(items),
+        )
+        for items in ordered
+    ]
     rules = []
     evaluated = 0
     for items in ordered:
         possible = (1 << len(items)) - 2
         if evaluated + possible > profile.max_rule_candidates:
-            raise ValueError('규칙 후보 한도를 초과했습니다.')
+            raise ValueError("규칙 후보 한도를 초과했습니다.")
         evaluated += possible
         support = counts[items] / n
         for size in range(1, len(items)):
             for left in combinations(items, size):
                 right = tuple(item for item in items if item not in left)
-                antecedent_support, consequent_support = counts[left]/n, counts[right]/n
+                antecedent_support, consequent_support = (
+                    counts[left] / n,
+                    counts[right] / n,
+                )
                 confidence = support / antecedent_support
                 lift = confidence / consequent_support
                 if confidence >= profile.min_confidence and lift >= profile.min_lift:
                     if len(rules) >= profile.max_rules:
-                        raise ValueError('연관규칙 출력 한도를 초과했습니다.')
-                    conviction = (1-consequent_support)/(1-confidence) if confidence < 1 else np.inf
-                    rules.append(dict(antecedents=left, consequents=right, support=support,
-                                      confidence=confidence, lift=lift,
-                                      leverage=support-antecedent_support*consequent_support, conviction=conviction))
-    return (pd.DataFrame(rows, columns=['items','count','support','length']),
-            pd.DataFrame(rules, columns=['antecedents','consequents','support','confidence','lift','leverage','conviction']), evaluated)
+                        raise ValueError("연관규칙 출력 한도를 초과했습니다.")
+                    conviction = (
+                        (1 - consequent_support) / (1 - confidence)
+                        if confidence < 1
+                        else np.inf
+                    )
+                    rules.append(
+                        dict(
+                            antecedents=left,
+                            consequents=right,
+                            support=support,
+                            confidence=confidence,
+                            lift=lift,
+                            leverage=support - antecedent_support * consequent_support,
+                            conviction=conviction,
+                        )
+                    )
+    return (
+        pd.DataFrame(rows, columns=["items", "count", "support", "length"]),
+        pd.DataFrame(
+            rules,
+            columns=[
+                "antecedents",
+                "consequents",
+                "support",
+                "confidence",
+                "lift",
+                "leverage",
+                "conviction",
+            ],
+        ),
+        evaluated,
+    )

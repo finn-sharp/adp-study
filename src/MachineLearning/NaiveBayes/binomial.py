@@ -15,22 +15,30 @@ binomial.py - Beta 평활화 성공 확률의 독립 Binomial Naive Bayes
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from sklearn.base import BaseEstimator,ClassifierMixin
-from src.MachineLearning.NaiveBayes._distribution_common import validate_nb_profile,run_distribution,numeric_counts,labels_for_fit,log_priors,DistributionClassifierMixin
+from sklearn.base import BaseEstimator, ClassifierMixin
+from src.MachineLearning.NaiveBayes._distribution_common import (
+    validate_nb_profile,
+    run_distribution,
+    numeric_counts,
+    labels_for_fit,
+    log_priors,
+    DistributionClassifierMixin,
+)
 from src.Preprocessing._common import feature_array
 
 
@@ -56,19 +64,21 @@ class BinomialProfile:
         beta (float): 양수 Beta 실패 pseudo count. 기본 1.0.
         fit_prior (bool): 경험 클래스 prior 여부. 기본 True.
     """
+
     test_size: float = 0.3
     random_state: int = 1234
     stratify: bool = True
-    split_strategy: str = 'random'
-    scaling: str = 'none'
+    split_strategy: str = "random"
+    scaling: str = "none"
     cv: int = 3
     scoring: Optional[str] = None
     n_jobs: int = 1
-    param_grid: Optional[Dict[str,Any]] = None
+    param_grid: Optional[Dict[str, Any]] = None
     n_trials: int = 1
     alpha: float = 1.0
     beta: float = 1.0
     fit_prior: bool = True
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -96,10 +106,11 @@ class BinomialOutputDTO(OutputDTO):
         cv_results (Optional[Dict[str,Any]]): 전체 CV 결과 또는 None.
         warnings (List[str]): 분포·독립·확률 해석 가정.
     """
+
     model_name: str
     model: Any
-    train_metrics: Dict[str,float]
-    test_metrics: Dict[str,float]
+    train_metrics: Dict[str, float]
+    test_metrics: Dict[str, float]
     y_test: np.ndarray
     predictions: np.ndarray
     probabilities: np.ndarray
@@ -109,14 +120,16 @@ class BinomialOutputDTO(OutputDTO):
     train_indices: np.ndarray
     test_indices: np.ndarray
     feature_names: List[str]
-    best_params: Dict[str,Any]
+    best_params: Dict[str, Any]
     best_cv_score: Optional[float]
-    cv_results: Optional[Dict[str,Any]]
+    cv_results: Optional[Dict[str, Any]]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -128,12 +141,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_nb_profile(profile,BinomialProfile)
-    if profile.n_trials<1 or profile.alpha<=0 or profile.beta<=0:raise ValueError('Binomial 시행 수/Beta prior 오류')
+    validate_nb_profile(profile, BinomialProfile)
+    if profile.n_trials < 1 or profile.alpha <= 0 or profile.beta <= 0:
+        raise ValueError("Binomial 시행 수/Beta prior 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def build_binomial_classifier(profile=None, *, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -147,13 +163,17 @@ def build_binomial_classifier(profile=None, *, recipe_path=None, overrides=None)
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-binomial',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-binomial", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return BinomialNB(profile.n_trials,profile.alpha,profile.beta,profile.fit_prior)
+    return BinomialNB(profile.n_trials, profile.alpha, profile.beta, profile.fit_prior)
 
-class BinomialNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
+
+class BinomialNB(ClassifierMixin, DistributionClassifierMixin, BaseEstimator):
     """알려진 공통 시행 수 n의 클래스 조건부 독립 Binomial Feature 분류기."""
-    def __init__(self,n_trials=1,alpha=1.,beta=1.,fit_prior=True):
+
+    def __init__(self, n_trials=1, alpha=1.0, beta=1.0, fit_prior=True):
         """설정 보존.
 
         Args:
@@ -166,9 +186,12 @@ class BinomialNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         Raises:
             None: fit에서 검증.
         """
-        self.n_trials=n_trials;self.alpha=alpha;self.beta=beta;self.fit_prior=fit_prior
+        self.n_trials = n_trials
+        self.alpha = alpha
+        self.beta = beta
+        self.fit_prior = fit_prior
 
-    def fit(self,X,y):
+    def fit(self, X, y):
         """학습 클래스별 성공 확률과 prior를 적합합니다.
 
         Args:
@@ -179,17 +202,31 @@ class BinomialNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
         Raises:
             ValueError: 정의역·prior 오류.
         """
-        from src.MachineLearning.analysis_common import finite_number,positive_int
-        positive_int(self.n_trials,'n_trials');finite_number(self.alpha,'alpha',True);finite_number(self.beta,'beta',True)
-        a=numeric_counts(X,self.n_trials);self.classes_,index,self.class_count_=labels_for_fit(y,len(a));self.n_features_in_=a.shape[1];self.class_log_prior_=log_priors(self.class_count_,self.fit_prior);self.feature_count_=np.vstack([a[index==i].sum(axis=0) for i in range(len(self.classes_))]);self.success_prob_=(self.feature_count_+self.alpha)/(self.class_count_[:,None]*self.n_trials+self.alpha+self.beta)
-        success=self.feature_count_+self.alpha
-        failure=self.class_count_[:,None]*self.n_trials-self.feature_count_+self.beta
-        log_den=np.logaddexp(np.log(success),np.log(failure))
-        self.feature_log_success_=np.log(success)-log_den
-        self.feature_log_failure_=np.log(failure)-log_den
+        from src.MachineLearning.analysis_common import finite_number, positive_int
+
+        positive_int(self.n_trials, "n_trials")
+        finite_number(self.alpha, "alpha", True)
+        finite_number(self.beta, "beta", True)
+        a = numeric_counts(X, self.n_trials)
+        self.classes_, index, self.class_count_ = labels_for_fit(y, len(a))
+        self.n_features_in_ = a.shape[1]
+        self.class_log_prior_ = log_priors(self.class_count_, self.fit_prior)
+        self.feature_count_ = np.vstack(
+            [a[index == i].sum(axis=0) for i in range(len(self.classes_))]
+        )
+        self.success_prob_ = (self.feature_count_ + self.alpha) / (
+            self.class_count_[:, None] * self.n_trials + self.alpha + self.beta
+        )
+        success = self.feature_count_ + self.alpha
+        failure = (
+            self.class_count_[:, None] * self.n_trials - self.feature_count_ + self.beta
+        )
+        log_den = np.logaddexp(np.log(success), np.log(failure))
+        self.feature_log_success_ = np.log(success) - log_den
+        self.feature_log_failure_ = np.log(failure) - log_den
         return self
 
-    def _joint_log_likelihood(self,X):
+    def _joint_log_likelihood(self, X):
         """Binomial log PMF와 prior를 계산합니다.
 
         Args:
@@ -200,10 +237,20 @@ class BinomialNB(ClassifierMixin,DistributionClassifierMixin,BaseEstimator):
             ValueError: 정의역·열 수 오류.
         """
         from scipy.special import gammaln
-        a=numeric_counts(X,self.n_trials)
-        if a.shape[1]!=self.n_features_in_:raise ValueError('Feature 수 불일치')
-        coefficient=gammaln(self.n_trials+1)-gammaln(a+1)-gammaln(self.n_trials-a+1)
-        return a@self.feature_log_success_.T+(self.n_trials-a)@self.feature_log_failure_.T+coefficient.sum(axis=1)[:,None]+self.class_log_prior_[None,:]
+
+        a = numeric_counts(X, self.n_trials)
+        if a.shape[1] != self.n_features_in_:
+            raise ValueError("Feature 수 불일치")
+        coefficient = (
+            gammaln(self.n_trials + 1) - gammaln(a + 1) - gammaln(self.n_trials - a + 1)
+        )
+        return (
+            a @ self.feature_log_success_.T
+            + (self.n_trials - a) @ self.feature_log_failure_.T
+            + coefficient.sum(axis=1)[:, None]
+            + self.class_log_prior_[None, :]
+        )
+
 
 def _run(X, y, test_indices, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -218,14 +265,25 @@ def _run(X, y, test_indices, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    numeric_counts(X,profile.n_trials)
-    return run_distribution(X,y,build_binomial_classifier(profile),profile,BinomialOutputDTO,test_indices=test_indices)
+    numeric_counts(X, profile.n_trials)
+    return run_distribution(
+        X,
+        y,
+        build_binomial_classifier(profile),
+        profile,
+        BinomialOutputDTO,
+        test_indices=test_indices,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_binomial(X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None):
+
+def run_binomial(
+    X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -240,9 +298,12 @@ def run_binomial(X, y, test_indices=None, profile=None, *, recipe_path=None, ove
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-binomial',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-binomial", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X, y, test_indices,profile)
+    return _run(X, y, test_indices, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

@@ -16,6 +16,7 @@ regression.py - TensorFlow Dense 회귀
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -38,6 +39,7 @@ from .common import validate_profile, run_supervised, run_forecast
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class TFRegressionProfile:
     """TFRegressionProfile 필드 계약.
@@ -54,6 +56,7 @@ class TFRegressionProfile:
         verbose (int): Keras 출력 0/1/2. 기본 0.
         hidden_layer_sizes (Tuple[int, ...]): 은닉 Dense 폭, 양수 정수 tuple. 빈 tuple은 선형 출력. 기본 (32,16).
     """
+
     random_state: int = 1234
     epochs: int = 30
     batch_size: int = 32
@@ -69,6 +72,7 @@ class TFRegressionProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TFRegressionOutputDTO(OutputDTO):
@@ -92,6 +96,7 @@ class TFRegressionOutputDTO(OutputDTO):
         epochs_trained (int): 실제 실행한 epoch 수.
         best_epoch (int): 최저 val_loss epoch, 1부터 시작. 최적 weights 복원.
     """
+
     task: str
     parameters: Dict[str, Any]
     model: Any
@@ -114,6 +119,7 @@ class TFRegressionOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(profile: Optional[TFRegressionProfile]) -> None:
     """설정을 검증합니다.
 
@@ -124,7 +130,8 @@ def _validate_inputs(profile: Optional[TFRegressionProfile]) -> None:
     Raises:
         TypeError/ValueError: 잘못된 타입·범위.
     """
-    if not isinstance(profile, TFRegressionProfile): raise TypeError("TFRegressionProfile이 필요합니다.")
+    if not isinstance(profile, TFRegressionProfile):
+        raise TypeError("TFRegressionProfile이 필요합니다.")
     validate_profile(profile, "regression")
 
 
@@ -132,7 +139,10 @@ def _validate_inputs(profile: Optional[TFRegressionProfile]) -> None:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _run_model(X: Any, y: Any, profile: Optional[TFRegressionProfile]) -> TFRegressionOutputDTO:
+
+def _run_model(
+    X: Any, y: Any, profile: Optional[TFRegressionProfile]
+) -> TFRegressionOutputDTO:
     """검증된 모델을 적합합니다.
 
     Args:
@@ -152,7 +162,15 @@ def _run_model(X: Any, y: Any, profile: Optional[TFRegressionProfile]) -> TFRegr
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_tf_regression(X: Any, y: Any, profile: Optional[TFRegressionProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> TFRegressionOutputDTO:
+
+def run_tf_regression(
+    X: Any,
+    y: Any,
+    profile: Optional[TFRegressionProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> TFRegressionOutputDTO:
     """TensorFlow Dense 회귀 실행.
 
     Args:
@@ -168,7 +186,9 @@ def run_tf_regression(X: Any, y: Any, profile: Optional[TFRegressionProfile] = N
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: TensorFlow 미설치.
     """
-    profile = resolve_profile("tf-regression", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "tf-regression", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(profile)
     return _run_model(X, y, profile)
 
@@ -180,6 +200,6 @@ def run_tf_regression(X: Any, y: Any, profile: Optional[TFRegressionProfile] = N
 if __name__ == "__main__":
     rng = np.random.RandomState(1234)
     X = rng.normal(size=(80, 4))
-    y = X[:, 0]*2-X[:, 1]
+    y = X[:, 0] * 2 - X[:, 1]
     result = run_tf_regression(X, y, overrides={"epochs": 2})
     print(result.test_metrics, result.epochs_trained)

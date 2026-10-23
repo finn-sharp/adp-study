@@ -16,6 +16,7 @@ tf_time_series.py - tf-time-series UCI 스켈레톤
     2026-10-12  김재현(Finn)       v1.0.0    기존 파이프라인 기반 UCI 수치 예제
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -49,7 +50,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    return load_profile('tf-time-series', task=None, overrides=overrides)
+    return load_profile("tf-time-series", task=None, overrides=overrides)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -64,8 +65,9 @@ def build_pipeline(profile=None, overrides=None):
         ValueError: Profile과 overrides 동시 지정.
     """
     if profile is not None and overrides is not None:
-        raise ValueError('profile과 overrides를 동시에 지정하지 않습니다.')
+        raise ValueError("profile과 overrides를 동시에 지정하지 않습니다.")
     profile = load_recipe(overrides) if profile is None else profile
+
     def execute(data):
         """기존 runner의 내부 분할 이후에만 scaler를 적합합니다.
 
@@ -77,6 +79,7 @@ def build_pipeline(profile=None, overrides=None):
             ValueError/ImportError: 자료 조건 또는 TensorFlow 미설치.
         """
         return run_tf_time_series(data.to_numpy(dtype=float), profile=profile)
+
     return execute
 
 
@@ -96,17 +99,26 @@ def main(cache_dir=None, overrides=None):
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
     from src.Evaluation.time_series.metrics import run_time_series_metrics
-    columns = list(profile.target_columns) if profile.target_columns is not None else list(range(data.shape[1]))
+
+    columns = (
+        list(profile.target_columns)
+        if profile.target_columns is not None
+        else list(range(data.shape[1]))
+    )
     training = data.to_numpy(dtype=float)[result.train_indices][:, columns]
-    evaluation = run_time_series_metrics(result.y_test, result.predictions, y_train=training)
-    result.test_metrics.update({k: float(v) for k, v in evaluation.value.items() if k != 'horizon_errors'})
-    print('horizon_metrics:', evaluation.details['metrics']['horizon_errors']['table'])
-    print('=== Example : UCI bike tf_time_series ===')
-    print('input_shape:', result.input_shape)
-    print('metrics:', result.test_metrics)
-    print('epochs_trained:', result.epochs_trained)
+    evaluation = run_time_series_metrics(
+        result.y_test, result.predictions, y_train=training
+    )
+    result.test_metrics.update(
+        {k: float(v) for k, v in evaluation.value.items() if k != "horizon_errors"}
+    )
+    print("horizon_metrics:", evaluation.details["metrics"]["horizon_errors"]["table"])
+    print("=== Example : UCI bike tf_time_series ===")
+    print("input_shape:", result.input_shape)
+    print("metrics:", result.test_metrics)
+    print("epochs_trained:", result.epochs_trained)
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -15,6 +15,7 @@ feature.py - FeatureSpec 전처리 스키마
     2026-10-12  김재현(Finn)       v1.0.0    UCI 스켈레톤의 특성 계약 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -34,6 +35,7 @@ class FeatureSpec:
         transformer (Any): sklearn 변환기 또는 passthrough/drop 문자열.
         enabled (bool): False이면 그룹을 전처리에서 제외; 기본 True.
     """
+
     name: str
     columns: List[str]
     transformer: Any
@@ -50,18 +52,24 @@ class FeatureSpec:
             ValueError/TypeError: 이름·열·활성 상태·변환기 오류.
         """
         if not isinstance(self.name, str) or not self.name:
-            raise ValueError('feature 이름은 비어 있지 않은 문자열이어야 합니다.')
-        if isinstance(self.columns, str) or not self.columns or any(not isinstance(c, str) or not c for c in self.columns):
-            raise ValueError('feature에는 비어 있지 않은 열 이름 목록이 필요합니다.')
+            raise ValueError("feature 이름은 비어 있지 않은 문자열이어야 합니다.")
+        if (
+            isinstance(self.columns, str)
+            or not self.columns
+            or any(not isinstance(c, str) or not c for c in self.columns)
+        ):
+            raise ValueError("feature에는 비어 있지 않은 열 이름 목록이 필요합니다.")
         if len(set(self.columns)) != len(self.columns):
-            raise ValueError('같은 그룹의 열 이름이 중복되었습니다.')
+            raise ValueError("같은 그룹의 열 이름이 중복되었습니다.")
         if not isinstance(self.enabled, bool):
-            raise TypeError('enabled는 bool이어야 합니다.')
+            raise TypeError("enabled는 bool이어야 합니다.")
         if isinstance(self.transformer, str):
-            if self.transformer not in ('passthrough', 'drop'):
-                raise ValueError('문자열 변환기는 passthrough/drop만 지원합니다.')
-        elif not hasattr(self.transformer, 'fit') or not hasattr(self.transformer, 'transform'):
-            raise TypeError('sklearn 호환 fit/transform 변환기가 필요합니다.')
+            if self.transformer not in ("passthrough", "drop"):
+                raise ValueError("문자열 변환기는 passthrough/drop만 지원합니다.")
+        elif not hasattr(self.transformer, "fit") or not hasattr(
+            self.transformer, "transform"
+        ):
+            raise TypeError("sklearn 호환 fit/transform 변환기가 필요합니다.")
         self.columns = list(self.columns)
 
     def describe(self):
@@ -74,5 +82,14 @@ class FeatureSpec:
         Raises:
             None: 검증한 필드를 반환합니다.
         """
-        kind = self.transformer if isinstance(self.transformer, str) else type(self.transformer).__name__
-        return {'name': self.name, 'columns': self.columns.copy(), 'transformer': kind, 'enabled': self.enabled}
+        kind = (
+            self.transformer
+            if isinstance(self.transformer, str)
+            else type(self.transformer).__name__
+        )
+        return {
+            "name": self.name,
+            "columns": self.columns.copy(),
+            "transformer": kind,
+            "enabled": self.enabled,
+        }

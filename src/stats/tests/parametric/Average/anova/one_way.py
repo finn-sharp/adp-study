@@ -30,8 +30,6 @@ __version__ = "1.2.0"
 __status__ = "Development"
 
 
-
-
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
@@ -43,13 +41,18 @@ import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
-from src.stats.tests.parametric.Average.Multivariate._common import validate_alpha, validate_groups, validate_labels
+from src.stats.tests.parametric.Average.Multivariate._common import (
+    validate_alpha,
+    validate_groups,
+    validate_labels,
+)
 from statsmodels.stats.oneway import anova_oneway
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class OneWayANOVAProfile:
@@ -67,6 +70,7 @@ class OneWayANOVAProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class OneWayANOVAOutputDTO(OutputDTO):
@@ -98,6 +102,7 @@ class OneWayANOVAOutputDTO(OutputDTO):
     df_within: float
     anova_table: pd.DataFrame
 
+
 # 기존 공개 결과명 호환 별칭. 전체 필드는 위 DTO에 명시합니다.
 OneWayANOVAResult = OneWayANOVAOutputDTO
 
@@ -105,6 +110,7 @@ OneWayANOVAResult = OneWayANOVAOutputDTO
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate_inputs(groups: Any, profile: OneWayANOVAProfile) -> List[np.ndarray]:
     """일원배치 검정 조건과 집단을 검증합니다.
@@ -126,7 +132,9 @@ def _validate_inputs(groups: Any, profile: OneWayANOVAProfile) -> List[np.ndarra
     arrays = validate_groups(groups)
     variances = np.array([g.var(ddof=1) for g in arrays])
     if (not profile.equal_var and np.any(variances <= 0)) or variances.sum() <= 0:
-        raise ValueError("고전 ANOVA는 양의 잔차 분산, Welch는 모든 집단의 양의 분산이 필요합니다.")
+        raise ValueError(
+            "고전 ANOVA는 양의 잔차 분산, Welch는 모든 집단의 양의 분산이 필요합니다."
+        )
     return arrays
 
 
@@ -134,7 +142,10 @@ def _validate_inputs(groups: Any, profile: OneWayANOVAProfile) -> List[np.ndarra
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _run_anova(groups: List[np.ndarray], profile: OneWayANOVAProfile) -> OneWayANOVAOutputDTO:
+
+def _run_anova(
+    groups: List[np.ndarray], profile: OneWayANOVAProfile
+) -> OneWayANOVAOutputDTO:
     """고전 또는 Welch ANOVA를 계산합니다.
 
     Args:
@@ -149,35 +160,63 @@ def _run_anova(groups: List[np.ndarray], profile: OneWayANOVAProfile) -> OneWayA
     ns = np.array([len(g) for g in groups])
     variances = np.array([g.var(ddof=1) for g in groups])
     if profile.equal_var:
-        df1, df2 = float(len(groups)-1), float(ns.sum()-len(groups))
+        df1, df2 = float(len(groups) - 1), float(ns.sum() - len(groups))
         grand = np.average(means, weights=ns)
-        ssb = float(np.sum(ns*(means-grand)**2))
-        ssw = float(np.sum((ns-1)*variances))
-        statistic = (ssb/df1)/(ssw/df2)
+        ssb = float(np.sum(ns * (means - grand) ** 2))
+        ssw = float(np.sum((ns - 1) * variances))
+        statistic = (ssb / df1) / (ssw / df2)
         p = float(stats.f.sf(statistic, df1, df2))
-        table = pd.DataFrame({'sum_sq':[ssb,ssw,ssb+ssw], 'df':[df1,df2,float(ns.sum()-1)],
-                              'mean_sq':[ssb/df1,ssw/df2,np.nan], 'F':[statistic,np.nan,np.nan],
-                              'PR(>F)':[p,np.nan,np.nan]}, index=['Between Groups','Within Groups','Total'])
+        table = pd.DataFrame(
+            {
+                "sum_sq": [ssb, ssw, ssb + ssw],
+                "df": [df1, df2, float(ns.sum() - 1)],
+                "mean_sq": [ssb / df1, ssw / df2, np.nan],
+                "F": [statistic, np.nan, np.nan],
+                "PR(>F)": [p, np.nan, np.nan],
+            },
+            index=["Between Groups", "Within Groups", "Total"],
+        )
         name = "One-way ANOVA (Equal Variance)"
     else:
         result = anova_oneway(groups, use_var="unequal", welch_correction=True)
         statistic, p = float(result.statistic), float(result.pvalue)
         df1, df2 = map(float, result.df)
-        table = pd.DataFrame({'sum_sq':[np.nan,np.nan], 'df':[df1,df2],
-                              'mean_sq':[np.nan,np.nan], 'F':[statistic,np.nan],
-                              'PR(>F)':[p,np.nan]}, index=['Welch Between Groups','Approximate Residual'])
+        table = pd.DataFrame(
+            {
+                "sum_sq": [np.nan, np.nan],
+                "df": [df1, df2],
+                "mean_sq": [np.nan, np.nan],
+                "F": [statistic, np.nan],
+                "PR(>F)": [p, np.nan],
+            },
+            index=["Welch Between Groups", "Approximate Residual"],
+        )
         name = "Welch's One-way ANOVA (Unequal Variance)"
-    if not np.isfinite([statistic,p,df1,df2]).all():
+    if not np.isfinite([statistic, p, df1, df2]).all():
         raise ValueError("ANOVA 수치 계산 결과가 유한하지 않습니다.")
-    return OneWayANOVAOutputDTO(name,float(statistic),p,bool(p<profile.alpha),len(groups),
-                                means.tolist(),np.sqrt(variances).tolist(),ns.tolist(),df1,df2,table)
+    return OneWayANOVAOutputDTO(
+        name,
+        float(statistic),
+        p,
+        bool(p < profile.alpha),
+        len(groups),
+        means.tolist(),
+        np.sqrt(variances).tolist(),
+        ns.tolist(),
+        df1,
+        df2,
+        table,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_oneway_anova(groups: Any, profile: Optional[OneWayANOVAProfile] = None,
+
+def run_oneway_anova(
+    groups: Any,
+    profile: Optional[OneWayANOVAProfile] = None,
     *,
     recipe_path: Optional[str] = None,
     overrides: Optional[Dict[str, Any]] = None,
@@ -199,7 +238,9 @@ def run_oneway_anova(groups: Any, profile: Optional[OneWayANOVAProfile] = None,
         기존 OneWayANOVAResult 이름은 같은 DTO의 호환 별칭입니다.
         사후검정은 자동 실행하지 않으며 별도 run_posthoc을 호출합니다.
     """
-    profile = resolve_profile("oneway-anova", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "oneway-anova", profile, recipe_path=recipe_path, overrides=overrides
+    )
     return _run_anova(_validate_inputs(groups, profile), profile)
 
 
@@ -208,9 +249,11 @@ def run_oneway_anova(groups: Any, profile: Optional[OneWayANOVAProfile] = None,
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    groups = [[1,2,3,4], [4,5,6,8], [8,9,10,12]]
+    groups = [[1, 2, 3, 4], [4, 5, 6, 8], [8, 9, 10, 12]]
     for equal_var in (True, False):
-        result = run_oneway_anova(groups, load_profile("oneway-anova", overrides={"equal_var": equal_var}))
+        result = run_oneway_anova(
+            groups, load_profile("oneway-anova", overrides={"equal_var": equal_var})
+        )
         print(result.test_type, result.p_value)
         print(result.anova_table)
         print(result.to_json()[:200])

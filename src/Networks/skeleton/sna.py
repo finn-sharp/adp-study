@@ -16,6 +16,7 @@ sna.py - sna UCI 스켈레톤
     2026-10-12  김재현(Finn)       v1.0.0    기존 파이프라인 기반 UCI 수치 예제
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -53,7 +54,7 @@ def load_recipe(overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    return load_profile('sna', overrides=overrides)
+    return load_profile("sna", overrides=overrides)
 
 
 def build_pipeline(profile=None, overrides=None):
@@ -68,8 +69,9 @@ def build_pipeline(profile=None, overrides=None):
         ValueError: Profile과 overrides 동시 지정.
     """
     if profile is not None and overrides is not None:
-        raise ValueError('profile과 overrides를 동시에 지정하지 않습니다.')
+        raise ValueError("profile과 overrides를 동시에 지정하지 않습니다.")
     profile = load_recipe(overrides) if profile is None else profile
+
     def execute(baskets):
         """영수증의 상품 쌍을 가중 공동구매 edge로 변환합니다.
 
@@ -80,9 +82,12 @@ def build_pipeline(profile=None, overrides=None):
         Raises:
             ValueError/ImportError: edge 조건·networkx 오류.
         """
-        counts = Counter(pair for basket in baskets for pair in combinations(sorted(basket), 2))
+        counts = Counter(
+            pair for basket in baskets for pair in combinations(sorted(basket), 2)
+        )
         edges = [(a, b, float(weight)) for (a, b), weight in sorted(counts.items())]
         return run_sna(edges, profile=profile)
+
     return execute
 
 
@@ -103,12 +108,12 @@ def main(cache_dir=None, overrides=None, max_transactions=1000, max_items=30):
     profile = load_recipe(overrides)
     pipeline = build_pipeline(profile=profile)
     result = pipeline(data)
-    print('=== Example : UCI Online Retail sna ===')
-    print('nodes:', len(result.nodes), 'components:', result.n_components)
-    print('density:', result.density, 'modularity:', result.modularity)
+    print("=== Example : UCI Online Retail sna ===")
+    print("nodes:", len(result.nodes), "components:", result.n_components)
+    print("density:", result.density, "modularity:", result.modularity)
     print(result.node_metrics.head(10).to_string(index=False))
     return result
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

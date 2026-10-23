@@ -25,32 +25,36 @@ __status__ = "Development"
 from dataclasses import dataclass, fields
 from src.output import OutputDTO
 from typing import Optional
-from typing_extensions import Literal # 3.8 미만에서 사용 (pip install typing_extensions)
+from typing_extensions import (
+    Literal,
+)  # 3.8 미만에서 사용 (pip install typing_extensions)
 import numpy as np
 from scipy import stats
+
 
 # 1. 검정 조건 및 모집단 사전 정보를 정의하는 Profile
 @dataclass
 class TestProfile:
     """검정에 필요한 모집단 사전 정보 및 조건을 정의하는 데이터 클래스.
-    
+
     Attributes:
         mu_0: 귀무가설 모평균 (H0: μ = mu_0)
         known_var: 알려진 모분산(모표준편차) 유무
         sigma: 알려진 모표준편차 (known_var=True 일 때 지정)
     """
-    
-    mu_0: float                                      # 귀무가설 모평균 (H0: μ = mu_0)
-    known_var: bool = False                          # 알려진 모분산(모표준편차) 유무
-    sigma: Optional[float] = None                    # 알려진 모표준편차 (known_var=True 일 때 지정)
-    alpha: float = 0.05                              # 유의수준 (기본값 0.05)
-    alternative: Literal['two-sided', 'less', 'greater'] = 'two-sided'  # 대립가설 방향
+
+    mu_0: float  # 귀무가설 모평균 (H0: μ = mu_0)
+    known_var: bool = False  # 알려진 모분산(모표준편차) 유무
+    sigma: Optional[float] = None  # 알려진 모표준편차 (known_var=True 일 때 지정)
+    alpha: float = 0.05  # 유의수준 (기본값 0.05)
+    alternative: Literal["two-sided", "less", "greater"] = "two-sided"  # 대립가설 방향
+
 
 # 2. 검정 결과를 통일된 규격으로 반환하는 Result 객체
 @dataclass
 class TestResult(OutputDTO):
     """검정 결과를 통일된 규격으로 반환하는 데이터 클래스.
-    
+
     Attributes:
         test_type: 수행된 검정 유형 (예: "One-sample Z-test", "One-sample T-test")
         statistic: 검정 통계량 값
@@ -60,7 +64,7 @@ class TestResult(OutputDTO):
         sample_std: 표본 표준편차
         n: 표본 크기
     """
-    
+
     test_type: str
     statistic: float
     p_value: float
@@ -69,12 +73,18 @@ class TestResult(OutputDTO):
     sample_std: float
     n: int
 
+
 # ---------------------------------------------------------------------------
 # 2. Individual Test Runners (개별 검정 수행 전담 함수)
 # ---------------------------------------------------------------------------
 
 
-from .one_sample import OneSampleMeanProfile, OneSampleMeanOutputDTO, run_one_sample_mean
+from .one_sample import (
+    OneSampleMeanProfile,
+    OneSampleMeanOutputDTO,
+    run_one_sample_mean,
+)
+
 
 def _convert_result(value):
     """새 DTO를 기존 Result 필드와 생성자 순서로 변환합니다.
@@ -86,7 +96,16 @@ def _convert_result(value):
     Raises:
         AttributeError: 잘못된 새 결과.
     """
-    return TestResult(value.test_type, value.statistic, value.p_value, value.reject_h0, value.sample_mean, value.sample_std, value.n_effective)
+    return TestResult(
+        value.test_type,
+        value.statistic,
+        value.p_value,
+        value.reject_h0,
+        value.sample_mean,
+        value.sample_std,
+        value.n_effective,
+    )
+
 
 def _run_z_test(data, profile, sample_mean, sample_std):
     """이전 내부 함수의 호환 호출입니다. 요약 통계는 원 표본에서 재계산합니다.
@@ -103,6 +122,7 @@ def _run_z_test(data, profile, sample_mean, sample_std):
     value = run_one_sample_mean(data, profile=OneSampleMeanProfile(**settings))
     return _convert_result(value)
 
+
 def _run_t_test(data, profile, sample_mean, sample_std):
     """이전 내부 함수의 호환 호출입니다. 요약 통계는 원 표본에서 재계산합니다.
 
@@ -118,5 +138,6 @@ def _run_t_test(data, profile, sample_mean, sample_std):
     value = run_one_sample_mean(data, profile=OneSampleMeanProfile(**settings))
     return _convert_result(value)
 
+
 if __name__ == "__main__":
-    print(run_one_sample_mean([1,2,4,5,8]).to_json(indent=2))
+    print(run_one_sample_mean([1, 2, 4, 5, 8]).to_json(indent=2))

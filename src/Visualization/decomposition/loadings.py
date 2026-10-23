@@ -15,6 +15,7 @@ loadings.py - 성분을 구성하는 원 Feature와 부호·기여 패턴을 해
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class DecompositionLoadingsProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         annotate (bool): 각 성분 계수 표시. 기본 False.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     annotate: bool = False
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class DecompositionLoadingsOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class DecompositionLoadingsOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, DecompositionLoadingsProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -105,18 +123,58 @@ def _draw(components, feature_names, ax, profile, before, cax):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw=frame(components)
+    raw = frame(components)
     if feature_names is not None:
-        if len(feature_names)!=raw.shape[1] or len(set(str(v) for v in feature_names))!=len(feature_names):raise ValueError('고유 Feature 이름/길이 오류')
-        raw.columns=[str(v) for v in feature_names]
-    raw.index=['PC'+str(i+1) for i in range(len(raw))];limit=float(np.max(np.abs(raw.values))) or 1.
-    heatmap(ax,raw.values,raw.index,raw.columns,cmap='coolwarm',cax=cax,vmin=-limit,vmax=limit,annotate=profile.annotate);ax.set_xlabel('Original feature');ax.set_ylabel('Component');data=raw;diagnostics={'n_components':len(raw),'n_features':raw.shape[1]};notes=['입력은 components_/명시 loading 행렬입니다. 성분의 전체 부호는 임의이며 서로 다른 적합 결과의 부호를 직접 비교하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, DecompositionLoadingsOutputDTO, 'Decomposition — Loadings', notes)
+        if len(feature_names) != raw.shape[1] or len(
+            set(str(v) for v in feature_names)
+        ) != len(feature_names):
+            raise ValueError("고유 Feature 이름/길이 오류")
+        raw.columns = [str(v) for v in feature_names]
+    raw.index = ["PC" + str(i + 1) for i in range(len(raw))]
+    limit = float(np.max(np.abs(raw.values))) or 1.0
+    heatmap(
+        ax,
+        raw.values,
+        raw.index,
+        raw.columns,
+        cmap="coolwarm",
+        cax=cax,
+        vmin=-limit,
+        vmax=limit,
+        annotate=profile.annotate,
+    )
+    ax.set_xlabel("Original feature")
+    ax.set_ylabel("Component")
+    data = raw
+    diagnostics = {"n_components": len(raw), "n_features": raw.shape[1]}
+    notes = [
+        "입력은 components_/명시 loading 행렬입니다. 성분의 전체 부호는 임의이며 서로 다른 적합 결과의 부호를 직접 비교하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        DecompositionLoadingsOutputDTO,
+        "Decomposition — Loadings",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_loadings(components, feature_names=None, *, ax, profile=None, recipe_path=None, overrides=None, cax=None) -> DecompositionLoadingsOutputDTO:
+def plot_loadings(
+    components,
+    feature_names=None,
+    *,
+    ax,
+    profile=None,
+    recipe_path=None,
+    overrides=None,
+    cax=None,
+) -> DecompositionLoadingsOutputDTO:
     """성분을 구성하는 원 Feature와 부호·기여 패턴을 해석합니다.
 
     Args:
@@ -132,10 +190,16 @@ def plot_loadings(components, feature_names=None, *, ax, profile=None, recipe_pa
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-decomposition-loadings', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-decomposition-loadings",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax, cax)
+    before = start(ax, cax)
     return _draw(components, feature_names, ax, profile, before, cax)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

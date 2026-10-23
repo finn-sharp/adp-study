@@ -15,24 +15,25 @@ polynomial.py - 학습 전용 polynomial·상호작용 Feature 설계
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from sklearn.base import BaseEstimator,TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
-from src.stats.regression._common import validate_profile,numeric_data,vif_values
-from src.Preprocessing._common import ProfileTransformer,execute_preprocessing
+from src.stats.regression._common import validate_profile, numeric_data, vif_values
+from src.Preprocessing._common import ProfileTransformer, execute_preprocessing
 
 
 # ---------------------------------------------------------------------------
@@ -47,9 +48,11 @@ class PolynomialProfile:
         interaction_only (bool): 상호작용만 생성; 절편은 OLS가 추가. 기본 False.
         max_features (int): 생성 Feature 수 제한. 기본 500.
     """
+
     degree: int = 2
     interaction_only: bool = False
     max_features: int = 500
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,18 +71,21 @@ class PolynomialOutputDTO(OutputDTO):
         n_samples (int): 학습 행 수.
         warnings (List[str]): 추론·선택 해석 정보.
     """
+
     preprocessed_feature: Any
     new_preprocessed_feature: Any
     input_features: List[str]
     output_features: List[str]
-    parameters: Dict[str,Any]
+    parameters: Dict[str, Any]
     transformer: Any
     n_samples: int
     warnings: List[str]
 
+
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -91,12 +97,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,PolynomialProfile)
-    if not 1<=profile.degree<=3 or profile.max_features<1:raise ValueError('다항 차수/한도 오류')
+    validate_profile(profile, PolynomialProfile)
+    if not 1 <= profile.degree <= 3 or profile.max_features < 1:
+        raise ValueError("다항 차수/한도 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def build_polynomial_transformer(profile=None, *, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -110,14 +119,19 @@ def build_polynomial_transformer(profile=None, *, recipe_path=None, overrides=No
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('regression-polynomial',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "regression-polynomial", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
     from sklearn.preprocessing import PolynomialFeatures
+
     return PolynomialDesignTransformer(profile)
 
-class PolynomialDesignTransformer(TransformerMixin,BaseEstimator):
+
+class PolynomialDesignTransformer(TransformerMixin, BaseEstimator):
     """절편 없는 polynomial과 생성 열 한도를 관리합니다."""
-    def __init__(self,profile=None):
+
+    def __init__(self, profile=None):
         """설정 보존.
 
         Args:
@@ -127,9 +141,9 @@ class PolynomialDesignTransformer(TransformerMixin,BaseEstimator):
         Raises:
             None: fit에서 검증.
         """
-        self.profile=profile
+        self.profile = profile
 
-    def fit(self,X,y=None):
+    def fit(self, X, y=None):
         """학습 Feature 차원에서 생성 규칙을 적합합니다.
 
         Args:
@@ -141,17 +155,39 @@ class PolynomialDesignTransformer(TransformerMixin,BaseEstimator):
             ValueError: 차수/열 한도 오류.
         """
         import math
-        raw,_=numeric_data(X);profile=self.profile or PolynomialProfile();_validate(profile)
-        d=raw.shape[1]
-        if profile.interaction_only:count=sum(math.factorial(d)//(math.factorial(k)*math.factorial(d-k)) for k in range(1,min(d,profile.degree)+1))
-        else:count=math.factorial(d+profile.degree)//(math.factorial(profile.degree)*math.factorial(d))-1
-        if count>profile.max_features:raise ValueError('생성 Feature 한도 초과')
+
+        raw, _ = numeric_data(X)
+        profile = self.profile or PolynomialProfile()
+        _validate(profile)
+        d = raw.shape[1]
+        if profile.interaction_only:
+            count = sum(
+                math.factorial(d) // (math.factorial(k) * math.factorial(d - k))
+                for k in range(1, min(d, profile.degree) + 1)
+            )
+        else:
+            count = (
+                math.factorial(d + profile.degree)
+                // (math.factorial(profile.degree) * math.factorial(d))
+                - 1
+            )
+        if count > profile.max_features:
+            raise ValueError("생성 Feature 한도 초과")
         from sklearn.preprocessing import PolynomialFeatures
-        self.transformer_=ProfileTransformer(PolynomialFeatures(degree=profile.degree,interaction_only=profile.interaction_only,include_bias=False),numeric=True).fit(X)
-        self.feature_names_in_=self.transformer_.feature_names_in_;self.n_features_in_=d
+
+        self.transformer_ = ProfileTransformer(
+            PolynomialFeatures(
+                degree=profile.degree,
+                interaction_only=profile.interaction_only,
+                include_bias=False,
+            ),
+            numeric=True,
+        ).fit(X)
+        self.feature_names_in_ = self.transformer_.feature_names_in_
+        self.n_features_in_ = d
         return self
 
-    def transform(self,X):
+    def transform(self, X):
         """같은 Feature 순서에 학습 규칙을 적용합니다.
 
         Args:
@@ -161,11 +197,13 @@ class PolynomialDesignTransformer(TransformerMixin,BaseEstimator):
         Raises:
             ValueError/NotFittedError: 미적합·열·비유한 결과.
         """
-        check_is_fitted(self,'transformer_');result=self.transformer_.transform(X)
-        if not np.isfinite(result).all():raise ValueError('다항 Feature overflow')
+        check_is_fitted(self, "transformer_")
+        result = self.transformer_.transform(X)
+        if not np.isfinite(result).all():
+            raise ValueError("다항 Feature overflow")
         return result
 
-    def get_feature_names_out(self,input_features=None):
+    def get_feature_names_out(self, input_features=None):
         """Feature 변환 이름을 전달합니다.
 
         Args:
@@ -175,7 +213,9 @@ class PolynomialDesignTransformer(TransformerMixin,BaseEstimator):
         Raises:
             ValueError/NotFittedError: 미적합/이름 오류.
         """
-        check_is_fitted(self,'transformer_');return self.transformer_.get_feature_names_out(input_features)
+        check_is_fitted(self, "transformer_")
+        return self.transformer_.get_feature_names_out(input_features)
+
 
 def _run(X_train, X_new, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -189,14 +229,20 @@ def _run(X_train, X_new, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    transformer=build_polynomial_transformer(profile)
-    return execute_preprocessing(X_train,X_new,profile,transformer,PolynomialOutputDTO)
+    transformer = build_polynomial_transformer(profile)
+    return execute_preprocessing(
+        X_train, X_new, profile, transformer, PolynomialOutputDTO
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_polynomial(X_train, X_new=None, profile=None, *, recipe_path=None, overrides=None):
+
+def run_polynomial(
+    X_train, X_new=None, profile=None, *, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -210,9 +256,12 @@ def run_polynomial(X_train, X_new=None, profile=None, *, recipe_path=None, overr
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('regression-polynomial',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "regression-polynomial", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X_train, X_new,profile)
+    return _run(X_train, X_new, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

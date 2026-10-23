@@ -15,22 +15,24 @@ rolling_selection.py - 시간순 rolling 검증 차수 선택과 미래 보류 �
     2026-10-23  김재현(Finn)     v1.0.0    응용 분석 모듈·모의10회 실행 연결
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from src.stats.regression._common import validate_profile
 from ._rolling import rolling_fit
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -48,6 +50,7 @@ class RollingSelectionProfile:
         maxiter (int): 후보 최대 적합 반복, 양수 기본 100.
         alpha (float): 선택 예측구간 유의수준 (0,1) 기본 0.05.
     """
+
     horizon: int = 7
     validation_size: int = 7
     folds: int = 3
@@ -55,6 +58,7 @@ class RollingSelectionProfile:
     candidate_orders: Optional[List[List[int]]] = None
     maxiter: int = 100
     alpha: float = 0.05
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -77,22 +81,25 @@ class RollingSelectionOutputDTO(OutputDTO):
         parameters (Dict[str,Any]): Profile 전체.
         warnings (List[str]): 시간순·비교 척도·선택 후 구간 한계.
     """
+
     model: Any
     comparison: pd.DataFrame
-    folds: List[Dict[str,Any]]
+    folds: List[Dict[str, Any]]
     selected_order: List[int]
     train_indices: np.ndarray
     test_indices: np.ndarray
     predictions: np.ndarray
     baseline_predictions: np.ndarray
-    test_metrics: Dict[str,Any]
-    residual_diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    test_metrics: Dict[str, Any]
+    residual_diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -104,12 +111,21 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,RollingSelectionProfile)
-    if profile.horizon<2 or profile.validation_size<2 or profile.folds<2 or profile.period<1 or profile.maxiter<1:raise ValueError("시계열 분할/기간 설정 오류")
+    validate_profile(profile, RollingSelectionProfile)
+    if (
+        profile.horizon < 2
+        or profile.validation_size < 2
+        or profile.folds < 2
+        or profile.period < 1
+        or profile.maxiter < 1
+    ):
+        raise ValueError("시계열 분할/기간 설정 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(y, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -122,11 +138,13 @@ def _run(y, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    return rolling_fit(y,profile,RollingSelectionOutputDTO)
+    return rolling_fit(y, profile, RollingSelectionOutputDTO)
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_rolling_selection(y, profile=None, *, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -141,9 +159,15 @@ def run_rolling_selection(y, profile=None, *, recipe_path=None, overrides=None):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('timeseries-rolling-selection',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "timeseries-rolling-selection",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    return _run(y,profile)
+    return _run(y, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

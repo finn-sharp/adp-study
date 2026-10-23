@@ -16,6 +16,7 @@ one_sample - 단일 모집단 분산 χ²
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, result)
+from src.stats.tests._common import number, numeric, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class OneSampleVarianceProfile:
@@ -50,6 +52,7 @@ class OneSampleVarianceProfile:
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     variance_0: float = 1.0
     alternative: str = "two-sided"
@@ -59,6 +62,7 @@ class OneSampleVarianceProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class OneSampleVarianceOutputDTO(OutputDTO):
@@ -80,6 +84,7 @@ class OneSampleVarianceOutputDTO(OutputDTO):
         confidence_interval (Tuple[float, float]): 모분산 신뢰구간.
         n_effective (int): 유효 표본 수.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -100,6 +105,7 @@ class OneSampleVarianceOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -112,25 +118,28 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    number(p.variance_0, 'variance_0', True)
-    a = numeric(args['x'], 1, 2, policy)
+    number(p.variance_0, "variance_0", True)
+    a = numeric(args["x"], 1, 2, policy)
     if np.var(a, ddof=1) <= 0:
-        raise ValueError('양의 표본분산이 필요합니다.')
-    return {'x': a}
+        raise ValueError("양의 표본분산이 필요합니다.")
+    return {"x": a}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: OneSampleVarianceProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: OneSampleVarianceProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -141,13 +150,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: OneSampleVarianceProfil
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, OneSampleVarianceProfile): raise TypeError("OneSampleVarianceProfile이 필요합니다.")
+    if not isinstance(profile, OneSampleVarianceProfile):
+        raise TypeError("OneSampleVarianceProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -160,19 +171,46 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    a = d['x']
+    alt = getattr(p, "alternative", "two-sided")
+    a = d["x"]
     df = len(a) - 1
     v = a.var(ddof=1)
     s = df * v / p.variance_0
     dist = stats.chi2(df)
-    pv = dist.cdf(s) if alt == 'less' else dist.sf(s) if alt == 'greater' else min(1.0, 2 * min(dist.cdf(s), dist.sf(s)))
-    lo = df * v / dist.ppf(1 - p.alpha / 2 if alt == 'two-sided' else 1 - p.alpha)
-    hi = df * v / dist.ppf(p.alpha / 2 if alt == 'two-sided' else p.alpha)
-    ci = (0.0, float(hi)) if alt == 'less' else (float(lo), float('inf')) if alt == 'greater' else (float(lo), float(hi))
-    return result('one-sample-variance', p, s, pv, '모집단 분산이 variance_0와 같다', 'chi-square', dict(sample_variance=float(v), df=df, confidence_interval=ci, n_effective=len(a)), {'variance_0': p.variance_0}, ['정규 모집단을 가정하는 분산 검정입니다.'])
+    pv = (
+        dist.cdf(s)
+        if alt == "less"
+        else (
+            dist.sf(s)
+            if alt == "greater"
+            else min(1.0, 2 * min(dist.cdf(s), dist.sf(s)))
+        )
+    )
+    lo = df * v / dist.ppf(1 - p.alpha / 2 if alt == "two-sided" else 1 - p.alpha)
+    hi = df * v / dist.ppf(p.alpha / 2 if alt == "two-sided" else p.alpha)
+    ci = (
+        (0.0, float(hi))
+        if alt == "less"
+        else (float(lo), float("inf")) if alt == "greater" else (float(lo), float(hi))
+    )
+    return result(
+        "one-sample-variance",
+        p,
+        s,
+        pv,
+        "모집단 분산이 variance_0와 같다",
+        "chi-square",
+        dict(
+            sample_variance=float(v), df=df, confidence_interval=ci, n_effective=len(a)
+        ),
+        {"variance_0": p.variance_0},
+        ["정규 모집단을 가정하는 분산 검정입니다."],
+    )
 
-def _run_test(data: Dict[str, Any], profile: OneSampleVarianceProfile) -> OneSampleVarianceOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: OneSampleVarianceProfile
+) -> OneSampleVarianceOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -190,7 +228,14 @@ def _run_test(data: Dict[str, Any], profile: OneSampleVarianceProfile) -> OneSam
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_one_sample_variance(x: Any, profile: Optional[OneSampleVarianceProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> OneSampleVarianceOutputDTO:
+
+def run_one_sample_variance(
+    x: Any,
+    profile: Optional[OneSampleVarianceProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> OneSampleVarianceOutputDTO:
     """단일 모집단 분산 χ².
 
     Args:
@@ -204,8 +249,10 @@ def run_one_sample_variance(x: Any, profile: Optional[OneSampleVarianceProfile] 
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("one-sample-variance", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x}, profile)
+    profile = resolve_profile(
+        "one-sample-variance", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x}, profile)
     return _run_test(data, profile)
 
 
@@ -214,5 +261,5 @@ def run_one_sample_variance(x: Any, profile: Optional[OneSampleVarianceProfile] 
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_one_sample_variance([1,2,4,5,8])
+    result = run_one_sample_variance([1, 2, 4, 5, 8])
     print(result.to_json(indent=2))

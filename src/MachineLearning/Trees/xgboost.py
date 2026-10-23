@@ -47,13 +47,16 @@ from sklearn.utils.validation import check_is_fitted
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class XGBoostProfile:
@@ -111,6 +114,7 @@ class XGBoostProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class XGBoostOutputDTO(OutputDTO):
@@ -193,7 +197,11 @@ def _require_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·범위를 만족하지 않는 값.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 범위를 확인하세요.")
@@ -226,15 +234,30 @@ def _validate_inputs(X: Any, y: Any, profile: XGBoostProfile) -> None:
     for name in ("min_child_weight", "reg_alpha", "reg_lambda", "gamma"):
         _require_number(getattr(profile, name), name)
     if profile.early_stopping_rounds is not None:
-        _require_positive_integer(profile.early_stopping_rounds, "early_stopping_rounds")
-    if isinstance(profile.validation_fraction, bool) or not isinstance(profile.validation_fraction, (int, float)) or not 0 < profile.validation_fraction < 1:
+        _require_positive_integer(
+            profile.early_stopping_rounds, "early_stopping_rounds"
+        )
+    if (
+        isinstance(profile.validation_fraction, bool)
+        or not isinstance(profile.validation_fraction, (int, float))
+        or not 0 < profile.validation_fraction < 1
+    ):
         raise ValueError("validation_fraction은 0과 1 사이여야 합니다.")
-    if profile.eval_metric is not None and (not isinstance(profile.eval_metric, str) or not profile.eval_metric.strip()):
+    if profile.eval_metric is not None and (
+        not isinstance(profile.eval_metric, str) or not profile.eval_metric.strip()
+    ):
         raise ValueError("eval_metric은 비어 있지 않은 문자열 또는 None이어야 합니다.")
-    expected_objective = "reg:squarederror" if profile.task == "regression" else (
-        "binary:logistic" if len(np.unique(target)) == 2 else "multi:softprob")
+    expected_objective = (
+        "reg:squarederror"
+        if profile.task == "regression"
+        else ("binary:logistic" if len(np.unique(target)) == 2 else "multi:softprob")
+    )
     if profile.objective is not None and profile.objective != expected_objective:
-        raise ValueError("objective는 현재 task·클래스 수에 맞는 " + expected_objective + "여야 합니다.")
+        raise ValueError(
+            "objective는 현재 task·클래스 수에 맞는 "
+            + expected_objective
+            + "여야 합니다."
+        )
     if profile.task == "classification":
         labels = np.unique(target)
         if not np.array_equal(labels, np.arange(len(labels))):
@@ -245,15 +268,29 @@ def _validate_inputs(X: Any, y: Any, profile: XGBoostProfile) -> None:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
+
 class _XGBoostEstimator(BaseEstimator):
     """각 학습 폴드 안에서 조기 종료 자료를 분리하는 sklearn 추정기."""
 
-    def __init__(self, n_estimators=100, max_depth=3, learning_rate=0.1,
-                 subsample=1.0, colsample_bytree=1.0, min_child_weight=1.0,
-                 reg_alpha=0.0, reg_lambda=1.0, gamma=0.0, random_state=42,
-                 n_jobs=1, objective=None, eval_metric=None,
-                 early_stopping_rounds=None, validation_fraction=0.2,
-                 task="classification"):
+    def __init__(
+        self,
+        n_estimators=100,
+        max_depth=3,
+        learning_rate=0.1,
+        subsample=1.0,
+        colsample_bytree=1.0,
+        min_child_weight=1.0,
+        reg_alpha=0.0,
+        reg_lambda=1.0,
+        gamma=0.0,
+        random_state=42,
+        n_jobs=1,
+        objective=None,
+        eval_metric=None,
+        early_stopping_rounds=None,
+        validation_fraction=0.2,
+        task="classification",
+    ):
         """Profile의 모델 설정을 보존합니다.
 
         Args:
@@ -308,31 +345,42 @@ class _XGBoostEstimator(BaseEstimator):
             ImportError: XGBoost 미설치.
         """
         from xgboost import XGBClassifier, XGBRegressor
+
         _validate_inputs(X, y, XGBoostProfile(**self.get_params(deep=False)))
         X, y = np.asarray(X), np.asarray(y)
         self.training_indices_ = np.arange(len(y))
         self.validation_indices_ = np.array([], dtype=int)
         if self.early_stopping_rounds is not None:
             self.training_indices_, self.validation_indices_ = train_test_split(
-                self.training_indices_, test_size=self.validation_fraction,
+                self.training_indices_,
+                test_size=self.validation_fraction,
                 random_state=self.random_state,
-                stratify=y if self.task == "classification" else None)
+                stratify=y if self.task == "classification" else None,
+            )
             if min(len(self.training_indices_), len(self.validation_indices_)) < 2:
-                raise ValueError("조기 종료 학습·평가 자료는 각각 최소 2행이어야 합니다.")
+                raise ValueError(
+                    "조기 종료 학습·평가 자료는 각각 최소 2행이어야 합니다."
+                )
             if self.task == "classification" and not np.array_equal(
-                    np.unique(y[self.training_indices_]), np.unique(y)):
+                np.unique(y[self.training_indices_]), np.unique(y)
+            ):
                 raise ValueError("조기 종료 학습 자료에 모든 클래스가 필요합니다.")
         native_class = XGBClassifier if self.task == "classification" else XGBRegressor
         kwargs = self.get_params(deep=False).copy()
         for name in ("task", "validation_fraction", "early_stopping_rounds"):
             kwargs.pop(name)
         kwargs["objective"] = self.objective or (
-            "reg:squarederror" if self.task == "regression" else
-            "binary:logistic" if len(np.unique(y)) == 2 else "multi:softprob")
+            "reg:squarederror"
+            if self.task == "regression"
+            else "binary:logistic" if len(np.unique(y)) == 2 else "multi:softprob"
+        )
         metric = self.eval_metric
         if metric is None and self.early_stopping_rounds is not None:
-            metric = "rmse" if self.task == "regression" else (
-                "logloss" if len(np.unique(y)) == 2 else "mlogloss")
+            metric = (
+                "rmse"
+                if self.task == "regression"
+                else ("logloss" if len(np.unique(y)) == 2 else "mlogloss")
+            )
         kwargs.pop("eval_metric")
         kwargs["verbosity"] = 0
         fit_parameters = inspect.signature(native_class.fit).parameters
@@ -347,14 +395,22 @@ class _XGBoostEstimator(BaseEstimator):
                 fit_kwargs["early_stopping_rounds"] = self.early_stopping_rounds
             else:
                 kwargs["early_stopping_rounds"] = self.early_stopping_rounds
-            fit_kwargs.update(eval_set=[(X[self.validation_indices_], y[self.validation_indices_])],
-                              verbose=False)
+            fit_kwargs.update(
+                eval_set=[(X[self.validation_indices_], y[self.validation_indices_])],
+                verbose=False,
+            )
         self.native_model_ = native_class(**kwargs)
-        self.native_model_.fit(X[self.training_indices_], y[self.training_indices_], **fit_kwargs)
+        self.native_model_.fit(
+            X[self.training_indices_], y[self.training_indices_], **fit_kwargs
+        )
         self.n_features_in_ = X.shape[1]
         if self.task == "classification":
             self.classes_ = np.unique(y)
-        self.best_iteration_ = int(self.native_model_.best_iteration) if self.early_stopping_rounds is not None else None
+        self.best_iteration_ = (
+            int(self.native_model_.best_iteration)
+            if self.early_stopping_rounds is not None
+            else None
+        )
         return self
 
     def _prediction_kwargs(self, method):
@@ -440,20 +496,32 @@ def _create_model(profile: XGBoostProfile) -> Any:
         ImportError: 필요한 모델 라이브러리 미설치.
         ValueError: 라이브러리가 설정을 거부한 경우.
     """
-    adapter = _XGBoostClassifier if profile.task == "classification" else _XGBoostRegressor
+    adapter = (
+        _XGBoostClassifier if profile.task == "classification" else _XGBoostRegressor
+    )
     return adapter(
-        n_estimators=profile.n_estimators, max_depth=profile.max_depth,
-        learning_rate=profile.learning_rate, subsample=profile.subsample,
-        colsample_bytree=profile.colsample_bytree, min_child_weight=profile.min_child_weight,
-        reg_alpha=profile.reg_alpha, reg_lambda=profile.reg_lambda, gamma=profile.gamma,
-        random_state=profile.random_state, n_jobs=profile.n_jobs,
-        objective=profile.objective, eval_metric=profile.eval_metric,
+        n_estimators=profile.n_estimators,
+        max_depth=profile.max_depth,
+        learning_rate=profile.learning_rate,
+        subsample=profile.subsample,
+        colsample_bytree=profile.colsample_bytree,
+        min_child_weight=profile.min_child_weight,
+        reg_alpha=profile.reg_alpha,
+        reg_lambda=profile.reg_lambda,
+        gamma=profile.gamma,
+        random_state=profile.random_state,
+        n_jobs=profile.n_jobs,
+        objective=profile.objective,
+        eval_metric=profile.eval_metric,
         early_stopping_rounds=profile.early_stopping_rounds,
-        validation_fraction=profile.validation_fraction, task=profile.task,
+        validation_fraction=profile.validation_fraction,
+        task=profile.task,
     )
 
 
-def _fit_model(X: Any, y: Any, profile: XGBoostProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: XGBoostProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -474,6 +542,7 @@ def _fit_model(X: Any, y: Any, profile: XGBoostProfile, estimator: Any) -> Super
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_xgboost(
     X: Any,
@@ -505,7 +574,9 @@ def run_xgboost(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("xgboost", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "xgboost", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)
@@ -513,9 +584,19 @@ def run_xgboost(
     return XGBoostOutputDTO(
         **result.to_dict(include_runtime=True),
         feature_importances=np.asarray(fitted.feature_importances_, dtype=float).copy(),
-        best_iteration=fitted.best_iteration_ if fitted.early_stopping_rounds is not None else None,
-        early_stopping_train_indices=result.train_indices[fitted.training_indices_] if fitted.early_stopping_rounds is not None else None,
-        early_stopping_validation_indices=result.train_indices[fitted.validation_indices_] if fitted.early_stopping_rounds is not None else None,
+        best_iteration=(
+            fitted.best_iteration_ if fitted.early_stopping_rounds is not None else None
+        ),
+        early_stopping_train_indices=(
+            result.train_indices[fitted.training_indices_]
+            if fitted.early_stopping_rounds is not None
+            else None
+        ),
+        early_stopping_validation_indices=(
+            result.train_indices[fitted.validation_indices_]
+            if fitted.early_stopping_rounds is not None
+            else None
+        ),
     )
 
 

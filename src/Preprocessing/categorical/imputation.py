@@ -15,6 +15,7 @@ imputation.py - CategoricalImputation 전용 전처리
     2026-10-12  김재현(Finn)     v1.0.0    전처리·명세·레시피 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -26,18 +27,23 @@ __status__ = "Development"
 # ---------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Any,Dict,List,Optional,Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import inspect
 import numpy as np
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from src.MachineLearning.analysis_common import finite_number
-from src.Preprocessing._common import ProfileTransformer,feature_array,execute_preprocessing
+from src.Preprocessing._common import (
+    ProfileTransformer,
+    feature_array,
+    execute_preprocessing,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CategoricalImputationProfile:
@@ -47,13 +53,15 @@ class CategoricalImputationProfile:
         strategy (str): most_frequent/constant; 기본 'most_frequent'.
         fill_value (str): constant의 명시적 대치 범주; 기본 '(missing)'.
     """
-    strategy: str = 'most_frequent'
-    fill_value: str = '(missing)'
+
+    strategy: str = "most_frequent"
+    fill_value: str = "(missing)"
 
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CategoricalImputationOutputDTO(OutputDTO):
@@ -69,11 +77,12 @@ class CategoricalImputationOutputDTO(OutputDTO):
         n_samples (int): 학습 행 수.
         warnings (List[str]): 해석 정보.
     """
+
     preprocessed_feature: Any
     new_preprocessed_feature: Any
     input_features: List[str]
     output_features: List[str]
-    parameters: Dict[str,Any]
+    parameters: Dict[str, Any]
     transformer: Any
     n_samples: int
     warnings: List[str]
@@ -82,6 +91,7 @@ class CategoricalImputationOutputDTO(OutputDTO):
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate_profile(profile):
     """전용 설정의 정의역을 확인합니다.
@@ -93,16 +103,25 @@ def _validate_profile(profile):
     Raises:
         ValueError/TypeError: Profile·설정 오류.
     """
-    if not isinstance(profile,CategoricalImputationProfile):raise TypeError('CategoricalImputationProfile이 필요합니다.')
-    if profile.strategy not in ('most_frequent','constant'):raise ValueError('strategy 오류')
-    if not isinstance(profile.fill_value,str) or not profile.fill_value:raise ValueError('fill_value 오류')
+    if not isinstance(profile, CategoricalImputationProfile):
+        raise TypeError("CategoricalImputationProfile이 필요합니다.")
+    if profile.strategy not in ("most_frequent", "constant"):
+        raise ValueError("strategy 오류")
+    if not isinstance(profile.fill_value, str) or not profile.fill_value:
+        raise ValueError("fill_value 오류")
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def build_categorical_imputation_transformer(profile: Optional[CategoricalImputationProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str,Any]] = None):
+
+def build_categorical_imputation_transformer(
+    profile: Optional[CategoricalImputationProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+):
     """FeatureSpec에 사용할 미적합 변환기를 구성합니다.
 
     Args:
@@ -114,19 +133,36 @@ def build_categorical_imputation_transformer(profile: Optional[CategoricalImputa
     Raises:
         ValueError/TypeError/OSError: 설정·레시피 오류.
     """
-    profile=resolve_profile('categorical-imputation',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "categorical-imputation", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_profile(profile)
     from sklearn.impute import SimpleImputer
-    params=dict(strategy=profile.strategy,fill_value=profile.fill_value)
-    if 'keep_empty_features' in inspect.signature(SimpleImputer).parameters:params['keep_empty_features']=True
-    return ProfileTransformer(SimpleImputer(**params),numeric=False,allow_nan=True,reject_empty=profile.strategy!='constant')
+
+    params = dict(strategy=profile.strategy, fill_value=profile.fill_value)
+    if "keep_empty_features" in inspect.signature(SimpleImputer).parameters:
+        params["keep_empty_features"] = True
+    return ProfileTransformer(
+        SimpleImputer(**params),
+        numeric=False,
+        allow_nan=True,
+        reject_empty=profile.strategy != "constant",
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_categorical_imputation(X_train: Any, X_new: Any = None, profile: Optional[CategoricalImputationProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str,Any]] = None) -> CategoricalImputationOutputDTO:
+
+def run_categorical_imputation(
+    X_train: Any,
+    X_new: Any = None,
+    profile: Optional[CategoricalImputationProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> CategoricalImputationOutputDTO:
     """학습 구간만 적합하고 원/새 자료를 변환합니다.
 
     Args:
@@ -140,15 +176,19 @@ def run_categorical_imputation(X_train: Any, X_new: Any = None, profile: Optiona
     Raises:
         ValueError/TypeError/OSError: 자료·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('categorical-imputation',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "categorical-imputation", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_profile(profile)
-    transformer=build_categorical_imputation_transformer(profile)
-    return execute_preprocessing(X_train,X_new,profile,transformer,CategoricalImputationOutputDTO)
+    transformer = build_categorical_imputation_transformer(profile)
+    return execute_preprocessing(
+        X_train, X_new, profile, transformer, CategoricalImputationOutputDTO
+    )
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__=='__main__':
-    print(run_categorical_imputation([['a'],[None],['b']]).to_json(indent=2))
+if __name__ == "__main__":
+    print(run_categorical_imputation([["a"], [None], ["b"]]).to_json(indent=2))

@@ -15,22 +15,30 @@ observed_predicted.py - 원 단위 관측–예측과 R²·RMSE
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO,validate_profile,start,finish,paired,vector
-from src.stats.regression._common import ols_result,numeric_data
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    paired,
+    vector,
+)
+from src.stats.regression._common import ols_result, numeric_data
 from statsmodels.stats.outliers_influence import OLSInfluence
 
 
@@ -47,10 +55,12 @@ class ObservedPredictedProfile:
         alpha (float): 표식 투명도 [0,1]. 기본 0.8.
         sample_role (str): train/validation/test 출처 선언. 기본 'test'.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    sample_role: str = 'test'
+    sample_role: str = "test"
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,17 +78,20 @@ class ObservedPredictedOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): 적용 Profile.
         warnings (List[str]): 진단 가정·선택 후 해석 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -90,12 +103,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,ObservedPredictedProfile)
-    if profile.sample_role not in ('train','validation','test'):raise ValueError('표본 역할 오류')
+    validate_profile(profile, ObservedPredictedProfile)
+    if profile.sample_role not in ("train", "validation", "test"):
+        raise ValueError("표본 역할 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(observed, predictions, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -110,18 +126,54 @@ def _run(observed, predictions, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    before=start(ax)
-    from sklearn.metrics import mean_squared_error,mean_absolute_error,r2_score
-    raw,removed=paired(observed=observed,predicted=predictions);raw['observed']=vector(raw.observed,allow_missing=False)[0];raw['predicted']=vector(raw.predicted,allow_missing=False)[0]
-    if len(raw)<2:raise ValueError('R² 비교 관측 수 부족')
-    a=raw.observed.to_numpy();b=raw.predicted.to_numpy();ax.scatter(a,b,color=profile.color,alpha=profile.alpha,s=16);low=min(a.min(),b.min());high=max(a.max(),b.max());ax.plot([low,high],[low,high],'--',color='C3');ax.set_xlabel('Observed response (original units)');ax.set_ylabel('Predicted response (original units)');data=raw;diagnostics={'n':len(a),'missing_removed':removed,'sample_role':profile.sample_role,'rmse':float(np.sqrt(mean_squared_error(a,b))),'mae':float(mean_absolute_error(a,b)),'r2':float(r2_score(a,b))};notes=['identity 기준선입니다. 입력은 같은 y 단위·대응 행이어야 하며 train 점수는 일반화 성능이 아닙니다.']
-    return finish(ax,before,data,diagnostics,profile,ObservedPredictedOutputDTO,'Regression — observed predicted',notes)
+    before = start(ax)
+    from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+    raw, removed = paired(observed=observed, predicted=predictions)
+    raw["observed"] = vector(raw.observed, allow_missing=False)[0]
+    raw["predicted"] = vector(raw.predicted, allow_missing=False)[0]
+    if len(raw) < 2:
+        raise ValueError("R² 비교 관측 수 부족")
+    a = raw.observed.to_numpy()
+    b = raw.predicted.to_numpy()
+    ax.scatter(a, b, color=profile.color, alpha=profile.alpha, s=16)
+    low = min(a.min(), b.min())
+    high = max(a.max(), b.max())
+    ax.plot([low, high], [low, high], "--", color="C3")
+    ax.set_xlabel("Observed response (original units)")
+    ax.set_ylabel("Predicted response (original units)")
+    data = raw
+    diagnostics = {
+        "n": len(a),
+        "missing_removed": removed,
+        "sample_role": profile.sample_role,
+        "rmse": float(np.sqrt(mean_squared_error(a, b))),
+        "mae": float(mean_absolute_error(a, b)),
+        "r2": float(r2_score(a, b)),
+    }
+    notes = [
+        "identity 기준선입니다. 입력은 같은 y 단위·대응 행이어야 하며 train 점수는 일반화 성능이 아닙니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ObservedPredictedOutputDTO,
+        "Regression — observed predicted",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def plot_observed_predicted(observed, predictions, *, ax, profile=None, recipe_path=None, overrides=None):
+
+def plot_observed_predicted(
+    observed, predictions, *, ax, profile=None, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -136,9 +188,15 @@ def plot_observed_predicted(observed, predictions, *, ax, profile=None, recipe_p
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-regression-observed-predicted',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-regression-observed-predicted",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    return _run(observed, predictions, ax,profile)
+    return _run(observed, predictions, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

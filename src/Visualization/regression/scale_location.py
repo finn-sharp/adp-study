@@ -15,22 +15,30 @@ scale_location.py - 표준화 잔차 산포의 scale-location
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO,validate_profile,start,finish,paired,vector
-from src.stats.regression._common import ols_result,numeric_data
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    paired,
+    vector,
+)
+from src.stats.regression._common import ols_result, numeric_data
 from statsmodels.stats.outliers_influence import OLSInfluence
 
 
@@ -48,11 +56,13 @@ class ScaleLocationProfile:
         smooth (bool): scale-location LOWESS 탐색. 기본 True.
         fraction (float): LOWESS 비율 (0,1]. 기본 0.5.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     smooth: bool = True
     fraction: float = 0.5
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -70,17 +80,20 @@ class ScaleLocationOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): 적용 Profile.
         warnings (List[str]): 진단 가정·선택 후 해석 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -92,12 +105,15 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,ScaleLocationProfile)
-    if not 0<profile.fraction<=1:raise ValueError('LOWESS fraction 오류')
+    validate_profile(profile, ScaleLocationProfile)
+    if not 0 < profile.fraction <= 1:
+        raise ValueError("LOWESS fraction 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(model, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -111,19 +127,45 @@ def _run(model, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    before=start(ax)
-    result=ols_result(model);influence=OLSInfluence(result);residual=np.asarray(influence.resid_studentized_internal);fitted=np.asarray(result.fittedvalues)
-    if not np.isfinite(residual).all():raise ValueError('studentized 잔차가 퇴화했습니다.')
-    scale=np.sqrt(np.abs(residual));ax.scatter(fitted,scale,color=profile.color,alpha=profile.alpha,s=14)
+    before = start(ax)
+    result = ols_result(model)
+    influence = OLSInfluence(result)
+    residual = np.asarray(influence.resid_studentized_internal)
+    fitted = np.asarray(result.fittedvalues)
+    if not np.isfinite(residual).all():
+        raise ValueError("studentized 잔차가 퇴화했습니다.")
+    scale = np.sqrt(np.abs(residual))
+    ax.scatter(fitted, scale, color=profile.color, alpha=profile.alpha, s=14)
     if profile.smooth:
         from statsmodels.nonparametric.smoothers_lowess import lowess
-        curve=lowess(scale,fitted,frac=profile.fraction,return_sorted=True);ax.plot(curve[:,0],curve[:,1],color='C3')
-    ax.set_xlabel('Fitted response');ax.set_ylabel('sqrt(abs(internally studentized residual))');data=pd.DataFrame({'fitted':fitted,'scale_location':scale,'studentized_internal':residual});diagnostics={'n':len(scale)};notes=['증가하는 산포는 이분산 검토 신호이며 BP/White와 자료 설계를 함께 확인하세요.']
-    return finish(ax,before,data,diagnostics,profile,ScaleLocationOutputDTO,'Regression — scale location',notes)
+
+        curve = lowess(scale, fitted, frac=profile.fraction, return_sorted=True)
+        ax.plot(curve[:, 0], curve[:, 1], color="C3")
+    ax.set_xlabel("Fitted response")
+    ax.set_ylabel("sqrt(abs(internally studentized residual))")
+    data = pd.DataFrame(
+        {"fitted": fitted, "scale_location": scale, "studentized_internal": residual}
+    )
+    diagnostics = {"n": len(scale)}
+    notes = [
+        "증가하는 산포는 이분산 검토 신호이며 BP/White와 자료 설계를 함께 확인하세요."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ScaleLocationOutputDTO,
+        "Regression — scale location",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def plot_scale_location(model, *, ax, profile=None, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -139,9 +181,15 @@ def plot_scale_location(model, *, ax, profile=None, recipe_path=None, overrides=
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-regression-scale-location',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-regression-scale-location",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    return _run(model, ax,profile)
+    return _run(model, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

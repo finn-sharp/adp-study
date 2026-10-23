@@ -30,8 +30,6 @@ __version__ = "1.2.0"
 __status__ = "Development"
 
 
-
-
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
@@ -43,7 +41,11 @@ import pandas as pd
 from scipy import stats
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
-from src.stats.tests.parametric.Average.Multivariate._common import validate_alpha, validate_groups, validate_labels
+from src.stats.tests.parametric.Average.Multivariate._common import (
+    validate_alpha,
+    validate_groups,
+    validate_labels,
+)
 from statsmodels.formula.api import ols
 from statsmodels.stats.anova import anova_lm
 
@@ -51,6 +53,7 @@ from statsmodels.stats.anova import anova_lm
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TwoWayANOVAProfile:
@@ -70,6 +73,7 @@ class TwoWayANOVAProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class TwoWayANOVAOutputDTO(OutputDTO):
@@ -105,6 +109,7 @@ class TwoWayANOVAOutputDTO(OutputDTO):
     reject_h0_interaction: Optional[bool]
     anova_table: pd.DataFrame
 
+
 TwoWayANOVAResult = TwoWayANOVAOutputDTO
 
 
@@ -112,8 +117,10 @@ TwoWayANOVAResult = TwoWayANOVAOutputDTO
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
-def _validate_inputs(y: Any, factor1: Any, factor2: Any, profile: TwoWayANOVAProfile,
-                     names: List[str]) -> pd.DataFrame:
+
+def _validate_inputs(
+    y: Any, factor1: Any, factor2: Any, profile: TwoWayANOVAProfile, names: List[str]
+) -> pd.DataFrame:
     """이원배치 입력과 요인 조합을 검증합니다.
 
     Args:
@@ -131,19 +138,31 @@ def _validate_inputs(y: Any, factor1: Any, factor2: Any, profile: TwoWayANOVAPro
     if not isinstance(profile, TwoWayANOVAProfile):
         raise TypeError("TwoWayANOVAProfile이 필요합니다.")
     validate_alpha(profile.alpha)
-    if not isinstance(profile.interaction, bool) or isinstance(profile.ss_type, bool) or not isinstance(profile.ss_type,int) or profile.ss_type not in (1,2,3):
+    if (
+        not isinstance(profile.interaction, bool)
+        or isinstance(profile.ss_type, bool)
+        or not isinstance(profile.ss_type, int)
+        or profile.ss_type not in (1, 2, 3)
+    ):
         raise ValueError("interaction은 bool, ss_type은 1/2/3 정수여야 합니다.")
-    if any(not isinstance(s,str) or not s.strip() for s in names) or len(set(names)) != 3:
+    if (
+        any(not isinstance(s, str) or not s.strip() for s in names)
+        or len(set(names)) != 3
+    ):
         raise ValueError("표시 이름은 서로 다른 비어 있지 않은 문자열이어야 합니다.")
-    response = np.asarray(y,dtype=float)
-    if response.ndim != 1 or len(response)<4 or not np.isfinite(response).all():
+    response = np.asarray(y, dtype=float)
+    if response.ndim != 1 or len(response) < 4 or not np.isfinite(response).all():
         raise ValueError("y는 최소 4행의 유한한 1차원 수치 자료여야 합니다.")
-    f1, f2 = validate_labels(factor1,len(response)), validate_labels(factor2,len(response))
-    data = pd.DataFrame({'Response':response,'Factor1':f1,'Factor2':f2})
+    f1, f2 = validate_labels(factor1, len(response)), validate_labels(
+        factor2, len(response)
+    )
+    data = pd.DataFrame({"Response": response, "Factor1": f1, "Factor2": f2})
     if profile.interaction:
-        counts = data.groupby(['Factor1','Factor2']).size()
-        if len(counts)!=len(np.unique(f1))*len(np.unique(f2)) or counts.min()<2:
-            raise ValueError("교호작용 모델은 모든 요인 조합에 최소 두 관측이 필요합니다.")
+        counts = data.groupby(["Factor1", "Factor2"]).size()
+        if len(counts) != len(np.unique(f1)) * len(np.unique(f2)) or counts.min() < 2:
+            raise ValueError(
+                "교호작용 모델은 모든 요인 조합에 최소 두 관측이 필요합니다."
+            )
     return data
 
 
@@ -151,8 +170,13 @@ def _validate_inputs(y: Any, factor1: Any, factor2: Any, profile: TwoWayANOVAPro
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def _run_twoway(data: pd.DataFrame, profile: TwoWayANOVAProfile,
-                factor1_name: str, factor2_name: str) -> TwoWayANOVAOutputDTO:
+
+def _run_twoway(
+    data: pd.DataFrame,
+    profile: TwoWayANOVAProfile,
+    factor1_name: str,
+    factor2_name: str,
+) -> TwoWayANOVAOutputDTO:
     """Sum 코딩 OLS를 적합하고 이름으로 효과를 추출합니다.
 
     Args:
@@ -167,35 +191,66 @@ def _run_twoway(data: pd.DataFrame, profile: TwoWayANOVAProfile,
     Notes:
         Type III는 Sum 대비를 사용하며 행 위치로 효과를 추출하지 않습니다.
     """
-    t1,t2 = 'C(Factor1, Sum)','C(Factor2, Sum)'
-    formula = 'Response ~ '+t1+(' * ' if profile.interaction else ' + ')+t2
-    model = ols(formula,data=data).fit()
-    if np.linalg.matrix_rank(model.model.exog)<model.model.exog.shape[1] or model.df_resid<=0 or model.ssr<=0:
+    t1, t2 = "C(Factor1, Sum)", "C(Factor2, Sum)"
+    formula = "Response ~ " + t1 + (" * " if profile.interaction else " + ") + t2
+    model = ols(formula, data=data).fit()
+    if (
+        np.linalg.matrix_rank(model.model.exog) < model.model.exog.shape[1]
+        or model.df_resid <= 0
+        or model.ssr <= 0
+    ):
         raise ValueError("추정 가능한 설계와 양의 잔차 자유도·분산이 필요합니다.")
-    table = anova_lm(model,typ=profile.ss_type)
+    table = anova_lm(model, typ=profile.ss_type)
     values = {}
-    for suffix,term in [('factor1',t1),('factor2',t2),('interaction',t1+':'+t2)]:
-        if suffix=='interaction' and not profile.interaction:
-            values.update(f_interaction=None,p_interaction=None,reject_h0_interaction=None)
+    for suffix, term in [
+        ("factor1", t1),
+        ("factor2", t2),
+        ("interaction", t1 + ":" + t2),
+    ]:
+        if suffix == "interaction" and not profile.interaction:
+            values.update(
+                f_interaction=None, p_interaction=None, reject_h0_interaction=None
+            )
             continue
-        f,p = float(table.loc[term,'F']),float(table.loc[term,'PR(>F)'])
-        if not np.isfinite([f,p]).all():
+        f, p = float(table.loc[term, "F"]), float(table.loc[term, "PR(>F)"])
+        if not np.isfinite([f, p]).all():
             raise ValueError("효과의 F 또는 p-value가 유한하지 않습니다.")
-        values['f_'+suffix],values['p_'+suffix],values['reject_h0_'+suffix] = f,p,bool(p<profile.alpha)
-    table = table.rename(index={t1:'C('+factor1_name+', Sum)',t2:'C('+factor2_name+', Sum)',
-                               t1+':'+t2:'C('+factor1_name+', Sum):C('+factor2_name+', Sum)'})
-    return TwoWayANOVAOutputDTO(test_type='Two-way ANOVA (Type {} SS, interaction={})'.format(profile.ss_type,profile.interaction),
-                                factor1_name=factor1_name,factor2_name=factor2_name,anova_table=table,**values)
+        values["f_" + suffix], values["p_" + suffix], values["reject_h0_" + suffix] = (
+            f,
+            p,
+            bool(p < profile.alpha),
+        )
+    table = table.rename(
+        index={
+            t1: "C(" + factor1_name + ", Sum)",
+            t2: "C(" + factor2_name + ", Sum)",
+            t1 + ":" + t2: "C(" + factor1_name + ", Sum):C(" + factor2_name + ", Sum)",
+        }
+    )
+    return TwoWayANOVAOutputDTO(
+        test_type="Two-way ANOVA (Type {} SS, interaction={})".format(
+            profile.ss_type, profile.interaction
+        ),
+        factor1_name=factor1_name,
+        factor2_name=factor2_name,
+        anova_table=table,
+        **values,
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_twoway_anova(y: Any, factor1: Any, factor2: Any,
-                     profile: Optional[TwoWayANOVAProfile] = None,
-                     factor1_name: str = "Factor1", factor2_name: str = "Factor2",
-                     response_name: str = "Response",
+
+def run_twoway_anova(
+    y: Any,
+    factor1: Any,
+    factor2: Any,
+    profile: Optional[TwoWayANOVAProfile] = None,
+    factor1_name: str = "Factor1",
+    factor2_name: str = "Factor2",
+    response_name: str = "Response",
     *,
     recipe_path: Optional[str] = None,
     overrides: Optional[Dict[str, Any]] = None,
@@ -222,9 +277,13 @@ def run_twoway_anova(y: Any, factor1: Any, factor2: Any,
         기존 함수 인자와 TwoWayANOVAResult 이름은 호환됩니다.
         유의한 교호작용은 주효과만으로 해석하지 말고 단순효과를 확인해야 합니다.
     """
-    profile = resolve_profile("twoway-anova", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs(y,factor1,factor2,profile,[factor1_name,factor2_name,response_name])
-    return _run_twoway(data,profile,factor1_name,factor2_name)
+    profile = resolve_profile(
+        "twoway-anova", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs(
+        y, factor1, factor2, profile, [factor1_name, factor2_name, response_name]
+    )
+    return _run_twoway(data, profile, factor1_name, factor2_name)
 
 
 # ---------------------------------------------------------------------------
@@ -232,10 +291,15 @@ def run_twoway_anova(y: Any, factor1: Any, factor2: Any,
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    y = [1,2,3,4, 3,4,5,7, 5,6,7,9, 10,11,12,14]
-    factor1 = ['A']*8+['B']*8
-    factor2 = (['Low']*4+['High']*4)*2
-    for ss_type in (1,2,3):
-        result = run_twoway_anova(y,factor1,factor2,load_profile("twoway-anova", overrides={"ss_type": ss_type}))
+    y = [1, 2, 3, 4, 3, 4, 5, 7, 5, 6, 7, 9, 10, 11, 12, 14]
+    factor1 = ["A"] * 8 + ["B"] * 8
+    factor2 = (["Low"] * 4 + ["High"] * 4) * 2
+    for ss_type in (1, 2, 3):
+        result = run_twoway_anova(
+            y,
+            factor1,
+            factor2,
+            load_profile("twoway-anova", overrides={"ss_type": ss_type}),
+        )
         print(result.anova_table)
         print(result.to_json()[:200])

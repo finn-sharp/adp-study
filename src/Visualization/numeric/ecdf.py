@@ -15,6 +15,7 @@ ecdf.py - 특정 기준 이하의 비율과 분위수로 운영 기준을 검토
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -42,9 +55,11 @@ class NumericEcdfProfile:
         color (str): Matplotlib 기본 선/표식 색. 기본 'C0'.
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -62,6 +77,7 @@ class NumericEcdfOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -69,6 +85,7 @@ class NumericEcdfOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -84,6 +101,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, NumericEcdfProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -101,15 +119,40 @@ def _draw(values, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    a,removed=vector(values);unique,counts=np.unique(a,return_counts=True);fraction=np.cumsum(counts)/len(a)
-    ax.step(unique,fraction,where='post',color=profile.color,alpha=profile.alpha);ax.set_ylim(0,1);ax.set_xlabel('Value');ax.set_ylabel('Cumulative fraction')
-    data=pd.DataFrame({'value':unique,'cumulative_fraction':fraction,'count':counts});diagnostics={'n':len(a),'missing_removed':removed,'q25_q50_q75':np.quantile(a,[.25,.5,.75]).tolist()};notes=[]
-    return finish(ax, before, data, diagnostics, profile, NumericEcdfOutputDTO, 'Numeric — Ecdf', notes)
+    a, removed = vector(values)
+    unique, counts = np.unique(a, return_counts=True)
+    fraction = np.cumsum(counts) / len(a)
+    ax.step(unique, fraction, where="post", color=profile.color, alpha=profile.alpha)
+    ax.set_ylim(0, 1)
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Cumulative fraction")
+    data = pd.DataFrame(
+        {"value": unique, "cumulative_fraction": fraction, "count": counts}
+    )
+    diagnostics = {
+        "n": len(a),
+        "missing_removed": removed,
+        "q25_q50_q75": np.quantile(a, [0.25, 0.5, 0.75]).tolist(),
+    }
+    notes = []
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        NumericEcdfOutputDTO,
+        "Numeric — Ecdf",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_ecdf(values, *, ax, profile=None, recipe_path=None, overrides=None) -> NumericEcdfOutputDTO:
+def plot_ecdf(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> NumericEcdfOutputDTO:
     """특정 기준 이하의 비율과 분위수로 운영 기준을 검토합니다.
 
     Args:
@@ -123,10 +166,13 @@ def plot_ecdf(values, *, ax, profile=None, recipe_path=None, overrides=None) -> 
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-numeric-ecdf', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-numeric-ecdf", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

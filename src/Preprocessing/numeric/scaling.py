@@ -15,6 +15,7 @@ scaling.py - NumericScaling 전용 전처리
     2026-10-12  김재현(Finn)     v1.0.0    전처리·명세·레시피 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -26,18 +27,23 @@ __status__ = "Development"
 # ---------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Any,Dict,List,Optional,Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import inspect
 import numpy as np
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from src.MachineLearning.analysis_common import finite_number
-from src.Preprocessing._common import ProfileTransformer,feature_array,execute_preprocessing
+from src.Preprocessing._common import (
+    ProfileTransformer,
+    feature_array,
+    execute_preprocessing,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class NumericScalingProfile:
@@ -50,16 +56,18 @@ class NumericScalingProfile:
         clip (bool): MinMax 새 입력 clipping; 기본 False.
         norm (str): Normalizer l1/l2/max; 기본 'l2'.
     """
-    method: str = 'standard'
+
+    method: str = "standard"
     center: bool = True
     scale: bool = True
     clip: bool = False
-    norm: str = 'l2'
+    norm: str = "l2"
 
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class NumericScalingOutputDTO(OutputDTO):
@@ -75,11 +83,12 @@ class NumericScalingOutputDTO(OutputDTO):
         n_samples (int): 학습 행 수.
         warnings (List[str]): 해석 정보.
     """
+
     preprocessed_feature: Any
     new_preprocessed_feature: Any
     input_features: List[str]
     output_features: List[str]
-    parameters: Dict[str,Any]
+    parameters: Dict[str, Any]
     transformer: Any
     n_samples: int
     warnings: List[str]
@@ -88,6 +97,7 @@ class NumericScalingOutputDTO(OutputDTO):
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate_profile(profile):
     """전용 설정의 정의역을 확인합니다.
@@ -99,18 +109,35 @@ def _validate_profile(profile):
     Raises:
         ValueError/TypeError: Profile·설정 오류.
     """
-    if not isinstance(profile,NumericScalingProfile):raise TypeError('NumericScalingProfile이 필요합니다.')
-    if profile.method not in ('none','standard','minmax','robust','maxabs','normalize'):raise ValueError('method 오류')
-    for name in ('center','scale','clip'):
-        if not isinstance(getattr(profile,name),bool):raise TypeError(name+'는 bool입니다.')
-    if profile.norm not in ('l1','l2','max'):raise ValueError('norm 오류')
+    if not isinstance(profile, NumericScalingProfile):
+        raise TypeError("NumericScalingProfile이 필요합니다.")
+    if profile.method not in (
+        "none",
+        "standard",
+        "minmax",
+        "robust",
+        "maxabs",
+        "normalize",
+    ):
+        raise ValueError("method 오류")
+    for name in ("center", "scale", "clip"):
+        if not isinstance(getattr(profile, name), bool):
+            raise TypeError(name + "는 bool입니다.")
+    if profile.norm not in ("l1", "l2", "max"):
+        raise ValueError("norm 오류")
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
-def build_numeric_scaling_transformer(profile: Optional[NumericScalingProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str,Any]] = None):
+
+def build_numeric_scaling_transformer(
+    profile: Optional[NumericScalingProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+):
     """FeatureSpec에 사용할 미적합 변환기를 구성합니다.
 
     Args:
@@ -122,18 +149,47 @@ def build_numeric_scaling_transformer(profile: Optional[NumericScalingProfile] =
     Raises:
         ValueError/TypeError/OSError: 설정·레시피 오류.
     """
-    profile=resolve_profile('numeric-scaling',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "numeric-scaling", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_profile(profile)
-    from sklearn.preprocessing import StandardScaler,MinMaxScaler,RobustScaler,MaxAbsScaler,Normalizer,FunctionTransformer
-    factories={'none':lambda:FunctionTransformer(),'standard':lambda:StandardScaler(with_mean=profile.center,with_std=profile.scale),'minmax':lambda:MinMaxScaler(clip=profile.clip),'robust':lambda:RobustScaler(with_centering=profile.center,with_scaling=profile.scale),'maxabs':lambda:MaxAbsScaler(),'normalize':lambda:Normalizer(norm=profile.norm)}
-    return ProfileTransformer(factories[profile.method](),numeric=True)
+    from sklearn.preprocessing import (
+        StandardScaler,
+        MinMaxScaler,
+        RobustScaler,
+        MaxAbsScaler,
+        Normalizer,
+        FunctionTransformer,
+    )
+
+    factories = {
+        "none": lambda: FunctionTransformer(),
+        "standard": lambda: StandardScaler(
+            with_mean=profile.center, with_std=profile.scale
+        ),
+        "minmax": lambda: MinMaxScaler(clip=profile.clip),
+        "robust": lambda: RobustScaler(
+            with_centering=profile.center, with_scaling=profile.scale
+        ),
+        "maxabs": lambda: MaxAbsScaler(),
+        "normalize": lambda: Normalizer(norm=profile.norm),
+    }
+    return ProfileTransformer(factories[profile.method](), numeric=True)
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_numeric_scaling(X_train: Any, X_new: Any = None, profile: Optional[NumericScalingProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str,Any]] = None) -> NumericScalingOutputDTO:
+
+def run_numeric_scaling(
+    X_train: Any,
+    X_new: Any = None,
+    profile: Optional[NumericScalingProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> NumericScalingOutputDTO:
     """학습 구간만 적합하고 원/새 자료를 변환합니다.
 
     Args:
@@ -147,15 +203,19 @@ def run_numeric_scaling(X_train: Any, X_new: Any = None, profile: Optional[Numer
     Raises:
         ValueError/TypeError/OSError: 자료·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('numeric-scaling',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "numeric-scaling", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_profile(profile)
-    transformer=build_numeric_scaling_transformer(profile)
-    return execute_preprocessing(X_train,X_new,profile,transformer,NumericScalingOutputDTO)
+    transformer = build_numeric_scaling_transformer(profile)
+    return execute_preprocessing(
+        X_train, X_new, profile, transformer, NumericScalingOutputDTO
+    )
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__=='__main__':
-    print(run_numeric_scaling([[1.,2.],[3.,4.],[5.,6.]]).to_json(indent=2))
+if __name__ == "__main__":
+    print(run_numeric_scaling([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]).to_json(indent=2))

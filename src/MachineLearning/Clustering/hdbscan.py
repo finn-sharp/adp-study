@@ -22,6 +22,7 @@ hdbscan.py - HDBSCAN 계층 밀도 군집화
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,13 +41,18 @@ from sklearn.pipeline import Pipeline
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import validate_features, make_scaler
-from src.MachineLearning.analysis_common import positive_int, finite_number, validate_scaling, feature_names
-
+from src.MachineLearning.analysis_common import (
+    positive_int,
+    finite_number,
+    validate_scaling,
+    feature_names,
+)
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class HDBSCANProfile:
@@ -68,6 +74,7 @@ class HDBSCANProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class HDBSCANOutputDTO(OutputDTO):
@@ -98,6 +105,7 @@ class HDBSCANOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(X: Any, profile: HDBSCANProfile) -> np.ndarray:
     """자료와 Profile 조건을 검증합니다.
 
@@ -115,17 +123,21 @@ def _validate_inputs(X: Any, profile: HDBSCANProfile) -> np.ndarray:
     arr = validate_features(X)
     validate_scaling(profile.scaling)
     positive_int(profile.min_cluster_size, "min_cluster_size", 2)
-    if profile.min_cluster_size > len(arr): raise ValueError("min_cluster_size는 표본 수 이하여야 합니다.")
+    if profile.min_cluster_size > len(arr):
+        raise ValueError("min_cluster_size는 표본 수 이하여야 합니다.")
     if profile.min_samples is not None:
         positive_int(profile.min_samples, "min_samples")
-        if profile.min_samples >= len(arr): raise ValueError("min_samples는 표본 수 미만이어야 합니다.")
-    if profile.cluster_selection_method not in ("eom", "leaf"): raise ValueError("군집 선택은 eom/leaf입니다.")
+        if profile.min_samples >= len(arr):
+            raise ValueError("min_samples는 표본 수 미만이어야 합니다.")
+    if profile.cluster_selection_method not in ("eom", "leaf"):
+        raise ValueError("군집 선택은 eom/leaf입니다.")
     return arr
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_model(X: Any, profile: HDBSCANProfile) -> HDBSCANOutputDTO:
     """검증된 입력을 적합하고 알고리즘별 결과를 구성합니다.
@@ -140,26 +152,50 @@ def _run_model(X: Any, profile: HDBSCANProfile) -> HDBSCANOutputDTO:
         ImportError: 선택적 라이브러리 미설치.
     """
     import hdbscan
-    estimator = hdbscan.HDBSCAN(min_cluster_size=profile.min_cluster_size, min_samples=profile.min_samples,
-                                metric="euclidean", cluster_selection_method=profile.cluster_selection_method,
-                                core_dist_n_jobs=1)
+
+    estimator = hdbscan.HDBSCAN(
+        min_cluster_size=profile.min_cluster_size,
+        min_samples=profile.min_samples,
+        metric="euclidean",
+        cluster_selection_method=profile.cluster_selection_method,
+        core_dist_n_jobs=1,
+    )
     arr = validate_features(X)
     model = Pipeline([("scaler", make_scaler(profile.scaling)), ("model", estimator)])
     labels = model.fit_predict(arr)
     from src.MachineLearning.analysis_common import cluster_summary
-    summary = cluster_summary(model.named_steps["scaler"].transform(arr) if profile.scaling != "none" else arr, labels)
+
+    summary = cluster_summary(
+        (
+            model.named_steps["scaler"].transform(arr)
+            if profile.scaling != "none"
+            else arr
+        ),
+        labels,
+    )
     fitted = model.named_steps["model"]
-    return HDBSCANOutputDTO(model=model, labels=labels, feature_names=feature_names(X), **summary,
-                           probabilities=fitted.probabilities_.copy(), outlier_scores=fitted.outlier_scores_.copy())
+    return HDBSCANOutputDTO(
+        model=model,
+        labels=labels,
+        feature_names=feature_names(X),
+        **summary,
+        probabilities=fitted.probabilities_.copy(),
+        outlier_scores=fitted.outlier_scores_.copy(),
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_hdbscan(X: Any, profile: Optional[HDBSCANProfile] = None, *,
-              recipe_path: Optional[str] = None,
-              overrides: Optional[Dict[str, Any]] = None) -> HDBSCANOutputDTO:
+
+def run_hdbscan(
+    X: Any,
+    profile: Optional[HDBSCANProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> HDBSCANOutputDTO:
     """분석 조건을 검증하고 실행합니다.
 
     Args:
@@ -175,7 +211,9 @@ def run_hdbscan(X: Any, profile: Optional[HDBSCANProfile] = None, *,
         FileNotFoundError/OSError: 레시피 읽기 실패.
         ImportError: 선택적 라이브러리 미설치.
     """
-    profile = resolve_profile("hdbscan", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "hdbscan", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate_inputs(X, profile)
     return _run_model(X, profile)
 
@@ -186,6 +224,7 @@ def run_hdbscan(X: Any, profile: Optional[HDBSCANProfile] = None, *,
 
 if __name__ == "__main__":
     from sklearn.datasets import make_blobs
+
     X, _ = make_blobs(n_samples=90, centers=3, cluster_std=0.3, random_state=1234)
     result = run_hdbscan(X, load_profile("hdbscan"))
     print(result.to_json(indent=2)[:500])

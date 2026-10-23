@@ -16,6 +16,7 @@ odds_ratio - 독립 2×2 odds ratio
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, table_data, tail, mean_interval, result)
+from src.stats.tests._common import number, table_data, tail, mean_interval, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class OddsRatioProfile:
@@ -49,6 +51,7 @@ class OddsRatioProfile:
         zero_correction (str): none/haldane; 0셀 존재 시만 전체 셀에 0.5 더함 기본 "none".
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
     """
+
     alpha: float = 0.05
     zero_correction: str = "none"
     alternative: str = "two-sided"
@@ -57,6 +60,7 @@ class OddsRatioProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class OddsRatioOutputDTO(OutputDTO):
@@ -79,6 +83,7 @@ class OddsRatioOutputDTO(OutputDTO):
         confidence_interval (Tuple[float, float]): 방향 일치 log-Wald 구간을 원 scale로 변환.
         table_used (np.ndarray): 실제 계산 도수; 보정 여부 확인.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -100,6 +105,7 @@ class OddsRatioOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -112,26 +118,31 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = table_data(args['table'], False)
-    if a.shape != (2, 2) or p.zero_correction not in ('none', 'haldane'):
-        raise ValueError('2×2와 zero_correction 필요')
-    if (a == 0).any() and p.zero_correction == 'none':
-        raise ValueError('0셀의 log-Wald 추론은 정의되지 않습니다. haldane을 명시하세요.')
-    return {'table': a}
+    a = table_data(args["table"], False)
+    if a.shape != (2, 2) or p.zero_correction not in ("none", "haldane"):
+        raise ValueError("2×2와 zero_correction 필요")
+    if (a == 0).any() and p.zero_correction == "none":
+        raise ValueError(
+            "0셀의 log-Wald 추론은 정의되지 않습니다. haldane을 명시하세요."
+        )
+    return {"table": a}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: OddsRatioProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: OddsRatioProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -142,13 +153,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: OddsRatioProfile) -> Di
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, OddsRatioProfile): raise TypeError("OddsRatioProfile이 필요합니다.")
+    if not isinstance(profile, OddsRatioProfile):
+        raise TypeError("OddsRatioProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -161,8 +174,8 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    t = d['table'].astype(float)
+    alt = getattr(p, "alternative", "two-sided")
+    t = d["table"].astype(float)
     corrected = (t == 0).any()
     if corrected:
         t = t + 0.5
@@ -170,11 +183,32 @@ def _calculate(d, p):
     estimate = a * e / (b * c)
     se = np.sqrt((1 / t).sum())
     if se <= 0:
-        raise ValueError('양의 효과크기 표준오차 필요')
+        raise ValueError("양의 효과크기 표준오차 필요")
     log = float(np.log(estimate))
     ci = mean_interval(log, se, p.alpha, alt, stats.norm)
     bounds = tuple((float(np.exp(v)) for v in ci))
-    return result('odds-ratio', p, log / se, tail(log / se, alt, stats.norm), 'OR/RR=1 (독립 집단의 연관/위험 동일)', 'log-wald', dict(estimate=float(estimate), log_estimate=log, standard_error=float(se), confidence_interval=bounds, table_used=t), {'zero_correction_applied': bool(corrected), 'row_order': ['exposed', 'unexposed'], 'column_order': ['event', 'non_event']}, ['0셀 존재로 전체 표에 0.5 Haldane 보정을 적용했습니다.'] if corrected else [])
+    return result(
+        "odds-ratio",
+        p,
+        log / se,
+        tail(log / se, alt, stats.norm),
+        "OR/RR=1 (독립 집단의 연관/위험 동일)",
+        "log-wald",
+        dict(
+            estimate=float(estimate),
+            log_estimate=log,
+            standard_error=float(se),
+            confidence_interval=bounds,
+            table_used=t,
+        ),
+        {
+            "zero_correction_applied": bool(corrected),
+            "row_order": ["exposed", "unexposed"],
+            "column_order": ["event", "non_event"],
+        },
+        ["0셀 존재로 전체 표에 0.5 Haldane 보정을 적용했습니다."] if corrected else [],
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: OddsRatioProfile) -> OddsRatioOutputDTO:
     """검증된 자료를 계산합니다.
@@ -194,7 +228,14 @@ def _run_test(data: Dict[str, Any], profile: OddsRatioProfile) -> OddsRatioOutpu
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_odds_ratio(table: Any, profile: Optional[OddsRatioProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> OddsRatioOutputDTO:
+
+def run_odds_ratio(
+    table: Any,
+    profile: Optional[OddsRatioProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> OddsRatioOutputDTO:
     """독립 2×2 odds ratio.
 
     Args:
@@ -208,8 +249,10 @@ def run_odds_ratio(table: Any, profile: Optional[OddsRatioProfile] = None, *, re
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("odds-ratio", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'table': table}, profile)
+    profile = resolve_profile(
+        "odds-ratio", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"table": table}, profile)
     return _run_test(data, profile)
 
 
@@ -218,5 +261,5 @@ def run_odds_ratio(table: Any, profile: Optional[OddsRatioProfile] = None, *, re
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_odds_ratio([[12,28],[8,42]])
+    result = run_odds_ratio([[12, 28], [8, 42]])
     print(result.to_json(indent=2))

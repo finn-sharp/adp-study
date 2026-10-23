@@ -15,6 +15,7 @@ silhouette.py - 음의 silhouette·군집별 산포와 평균으로 군집 분�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -45,12 +58,14 @@ class ClusteringSilhouetteProfile:
         noise_label (Any): 제외할 밀도 군집 noise 라벨; None은 미제외. 기본 -1.
         max_samples (int): 전체 쌍 거리 계산의 최대 유효 표본. 기본 5000.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    metric: str = 'euclidean'
+    metric: str = "euclidean"
     noise_label: Any = -1
     max_samples: int = 5000
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,6 +83,7 @@ class ClusteringSilhouetteOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -75,6 +91,7 @@ class ClusteringSilhouetteOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -90,6 +107,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, ClusteringSilhouetteProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -109,27 +127,94 @@ def _draw(values, labels, ax, profile, before):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from sklearn.metrics import silhouette_samples
-    if isinstance(values,pd.DataFrame) and isinstance(labels,pd.Series) and not values.index.equals(labels.index):raise ValueError('관측과 군집 라벨 인덱스가 다릅니다.')
-    raw=frame(values);lab=np.asarray(labels)
-    if lab.ndim!=1 or len(lab)!=len(raw) or pd.isna(lab).any():raise ValueError('대응 라벨 오류')
-    keep=np.ones(len(lab),dtype=bool) if profile.noise_label is None else pd.Series(lab).ne(profile.noise_label).to_numpy(dtype=bool)
-    if profile.metric=='precomputed':
-        if raw.shape!=(len(raw),len(raw)) or (raw.values<0).any() or not np.allclose(raw.values,raw.values.T) or not np.allclose(np.diag(raw),0):raise ValueError('precomputed 거리 행렬 오류')
-        X=raw.values[np.ix_(keep,keep)]
-    else:X=raw.values[keep]
-    lab=lab[keep];unique=pd.unique(lab)
-    if not 2<=len(unique)<len(lab) or len(lab)>profile.max_samples or profile.max_samples<3:raise ValueError('silhouette 군집/표본 수/한도 오류')
-    scores=silhouette_samples(X,lab,metric=profile.metric);bottom=0
-    for i,label in enumerate(unique):
-        selected=np.sort(scores[lab==label]);ax.fill_betweenx(np.arange(bottom,bottom+len(selected)),0,selected,alpha=profile.alpha,color='C'+str(i%10));ax.text(-.98,bottom+len(selected)/2,str(label),fontsize=8);bottom+=len(selected)+3
-    mean=float(scores.mean());ax.axvline(mean,color='C3',linestyle='--',label='Mean='+format(mean,'.3f'));ax.set_xlim(-1,1);ax.set_xlabel('Silhouette');ax.set_ylabel('Samples grouped by cluster');ax.legend(fontsize=8)
-    data=pd.DataFrame({'original_position':np.flatnonzero(keep),'cluster':lab,'silhouette':scores});diagnostics={'mean_silhouette':mean,'negative_fraction':float((scores<0).mean()),'noise_excluded':int((~keep).sum()),'n':len(lab)};notes=['noise 제외 후 군집 구조를 평가합니다. 서로 다른 거리/Feature 공간의 점수를 직접 비교하지 않습니다.']
-    return finish(ax, before, data, diagnostics, profile, ClusteringSilhouetteOutputDTO, 'Clustering — Silhouette', notes)
+
+    if (
+        isinstance(values, pd.DataFrame)
+        and isinstance(labels, pd.Series)
+        and not values.index.equals(labels.index)
+    ):
+        raise ValueError("관측과 군집 라벨 인덱스가 다릅니다.")
+    raw = frame(values)
+    lab = np.asarray(labels)
+    if lab.ndim != 1 or len(lab) != len(raw) or pd.isna(lab).any():
+        raise ValueError("대응 라벨 오류")
+    keep = (
+        np.ones(len(lab), dtype=bool)
+        if profile.noise_label is None
+        else pd.Series(lab).ne(profile.noise_label).to_numpy(dtype=bool)
+    )
+    if profile.metric == "precomputed":
+        if (
+            raw.shape != (len(raw), len(raw))
+            or (raw.values < 0).any()
+            or not np.allclose(raw.values, raw.values.T)
+            or not np.allclose(np.diag(raw), 0)
+        ):
+            raise ValueError("precomputed 거리 행렬 오류")
+        X = raw.values[np.ix_(keep, keep)]
+    else:
+        X = raw.values[keep]
+    lab = lab[keep]
+    unique = pd.unique(lab)
+    if (
+        not 2 <= len(unique) < len(lab)
+        or len(lab) > profile.max_samples
+        or profile.max_samples < 3
+    ):
+        raise ValueError("silhouette 군집/표본 수/한도 오류")
+    scores = silhouette_samples(X, lab, metric=profile.metric)
+    bottom = 0
+    for i, label in enumerate(unique):
+        selected = np.sort(scores[lab == label])
+        ax.fill_betweenx(
+            np.arange(bottom, bottom + len(selected)),
+            0,
+            selected,
+            alpha=profile.alpha,
+            color="C" + str(i % 10),
+        )
+        ax.text(-0.98, bottom + len(selected) / 2, str(label), fontsize=8)
+        bottom += len(selected) + 3
+    mean = float(scores.mean())
+    ax.axvline(mean, color="C3", linestyle="--", label="Mean=" + format(mean, ".3f"))
+    ax.set_xlim(-1, 1)
+    ax.set_xlabel("Silhouette")
+    ax.set_ylabel("Samples grouped by cluster")
+    ax.legend(fontsize=8)
+    data = pd.DataFrame(
+        {
+            "original_position": np.flatnonzero(keep),
+            "cluster": lab,
+            "silhouette": scores,
+        }
+    )
+    diagnostics = {
+        "mean_silhouette": mean,
+        "negative_fraction": float((scores < 0).mean()),
+        "noise_excluded": int((~keep).sum()),
+        "n": len(lab),
+    }
+    notes = [
+        "noise 제외 후 군집 구조를 평가합니다. 서로 다른 거리/Feature 공간의 점수를 직접 비교하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ClusteringSilhouetteOutputDTO,
+        "Clustering — Silhouette",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_silhouette(values, labels, *, ax, profile=None, recipe_path=None, overrides=None) -> ClusteringSilhouetteOutputDTO:
+def plot_silhouette(
+    values, labels, *, ax, profile=None, recipe_path=None, overrides=None
+) -> ClusteringSilhouetteOutputDTO:
     """음의 silhouette·군집별 산포와 평균으로 군집 분리를 비교합니다.
 
     Args:
@@ -144,10 +229,16 @@ def plot_silhouette(values, labels, *, ax, profile=None, recipe_path=None, overr
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-clustering-silhouette', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-clustering-silhouette",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, labels, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

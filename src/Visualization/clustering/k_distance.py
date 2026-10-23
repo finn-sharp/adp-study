@@ -15,6 +15,7 @@ k_distance.py - 밀도 군집 eps 후보와 거리의 급격한 변화를 검토
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -45,12 +58,14 @@ class ClusteringKDistanceProfile:
         metric (str): NearestNeighbors 거리. 기본 'euclidean'.
         eps (Optional[float]): 사용자가 검토하는 비음수 DBSCAN eps. 기본 None.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     k: int = 5
-    metric: str = 'euclidean'
+    metric: str = "euclidean"
     eps: Optional[float] = None
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,6 +83,7 @@ class ClusteringKDistanceOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -75,6 +91,7 @@ class ClusteringKDistanceOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -90,6 +107,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, ClusteringKDistanceProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -108,19 +126,59 @@ def _draw(values, ax, profile, before):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from sklearn.neighbors import NearestNeighbors
-    raw=frame(values)
-    if not 2<=profile.k<=len(raw):raise ValueError('k는 2 이상 표본 수 이하입니다.')
-    if profile.eps is not None and (isinstance(profile.eps,bool) or not isinstance(profile.eps,(int,float)) or not np.isfinite(profile.eps) or profile.eps<0):raise ValueError('eps 오류')
-    distances=NearestNeighbors(n_neighbors=profile.k,metric=profile.metric).fit(raw).kneighbors(raw,return_distance=True)[0][:,-1];ordered=np.sort(distances)
-    ax.plot(np.arange(len(raw)),ordered,color=profile.color,alpha=profile.alpha)
-    if profile.eps is not None:ax.axhline(profile.eps,color='C3',linestyle='--')
-    ax.set_xlabel('Sorted sample rank');ax.set_ylabel('k-neighbor distance (self included)');data=pd.DataFrame({'rank':np.arange(len(raw)),'distance':ordered});diagnostics={'k':profile.k,'self_included':True,'fraction_within_eps':float((distances<=profile.eps).mean()) if profile.eps is not None else None};notes=['무릎은 eps 후보의 시각적 기준이며 자동 최적값이 아닙니다. scaling과 metric을 먼저 결정하세요.']
-    return finish(ax, before, data, diagnostics, profile, ClusteringKDistanceOutputDTO, 'Clustering — K Distance', notes)
+
+    raw = frame(values)
+    if not 2 <= profile.k <= len(raw):
+        raise ValueError("k는 2 이상 표본 수 이하입니다.")
+    if profile.eps is not None and (
+        isinstance(profile.eps, bool)
+        or not isinstance(profile.eps, (int, float))
+        or not np.isfinite(profile.eps)
+        or profile.eps < 0
+    ):
+        raise ValueError("eps 오류")
+    distances = (
+        NearestNeighbors(n_neighbors=profile.k, metric=profile.metric)
+        .fit(raw)
+        .kneighbors(raw, return_distance=True)[0][:, -1]
+    )
+    ordered = np.sort(distances)
+    ax.plot(np.arange(len(raw)), ordered, color=profile.color, alpha=profile.alpha)
+    if profile.eps is not None:
+        ax.axhline(profile.eps, color="C3", linestyle="--")
+    ax.set_xlabel("Sorted sample rank")
+    ax.set_ylabel("k-neighbor distance (self included)")
+    data = pd.DataFrame({"rank": np.arange(len(raw)), "distance": ordered})
+    diagnostics = {
+        "k": profile.k,
+        "self_included": True,
+        "fraction_within_eps": (
+            float((distances <= profile.eps).mean())
+            if profile.eps is not None
+            else None
+        ),
+    }
+    notes = [
+        "무릎은 eps 후보의 시각적 기준이며 자동 최적값이 아닙니다. scaling과 metric을 먼저 결정하세요."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ClusteringKDistanceOutputDTO,
+        "Clustering — K Distance",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_k_distance(values, *, ax, profile=None, recipe_path=None, overrides=None) -> ClusteringKDistanceOutputDTO:
+def plot_k_distance(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> ClusteringKDistanceOutputDTO:
     """밀도 군집 eps 후보와 거리의 급격한 변화를 검토합니다.
 
     Args:
@@ -134,10 +192,16 @@ def plot_k_distance(values, *, ax, profile=None, recipe_path=None, overrides=Non
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-clustering-k-distance', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-clustering-k-distance",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

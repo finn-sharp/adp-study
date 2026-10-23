@@ -16,6 +16,7 @@ hotelling - 독립 두 집단 Hotelling T²
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, result)
+from src.stats.tests._common import number, numeric, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class HotellingProfile:
@@ -48,6 +50,7 @@ class HotellingProfile:
         alpha (float): 유한한 0<alpha<1 유의수준 기본 0.05.
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     nan_policy: str = "raise"
 
@@ -55,6 +58,7 @@ class HotellingProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class HotellingOutputDTO(OutputDTO):
@@ -79,6 +83,7 @@ class HotellingOutputDTO(OutputDTO):
         pooled_covariance (np.ndarray): pooled 공분산.
         group_sizes (List[int]): 집단별 n.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -102,6 +107,7 @@ class HotellingOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -114,25 +120,28 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = numeric(args['x'], 2, 2, policy)
-    b = numeric(args['y'], 2, 2, policy)
+    a = numeric(args["x"], 2, 2, policy)
+    b = numeric(args["y"], 2, 2, policy)
     if a.shape[1] != b.shape[1] or len(a) + len(b) - a.shape[1] - 1 <= 0:
-        raise ValueError('특성 수/자유도 오류')
-    return {'x': a, 'y': b}
+        raise ValueError("특성 수/자유도 오류")
+    return {"x": a, "y": b}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: HotellingProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: HotellingProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -143,13 +152,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: HotellingProfile) -> Di
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, HotellingProfile): raise TypeError("HotellingProfile이 필요합니다.")
+    if not isinstance(profile, HotellingProfile):
+        raise TypeError("HotellingProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -162,8 +173,8 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    gs = [d['x'], d['y']]
+    alt = getattr(p, "alternative", "two-sided")
+    gs = [d["x"], d["y"]]
     ns = [len(a) for a in gs]
     covs = [np.atleast_2d(np.cov(a, rowvar=False, ddof=1)) for a in gs]
     q = gs[0].shape[1]
@@ -173,12 +184,29 @@ def _calculate(d, p):
     try:
         np.linalg.cholesky(pooled)
     except np.linalg.LinAlgError as exc:
-        raise ValueError('특이 pooled 공분산입니다.') from exc
+        raise ValueError("특이 pooled 공분산입니다.") from exc
     diff = gs[0].mean(axis=0) - gs[1].mean(axis=0)
     T = float(ns[0] * ns[1] / N * diff @ np.linalg.solve(pooled, diff))
     df2 = N - q - 1
     F = T * df2 / (q * (N - 2))
-    return result('hotelling', p, T, stats.f.sf(F, q, df2), '두 집단의 평균 벡터가 같다', 'pooled-hotelling-f', dict(t_squared=T, f_value=F, df_num=q, df_den=df2, mean_difference=diff, pooled_covariance=pooled, group_sizes=ns))
+    return result(
+        "hotelling",
+        p,
+        T,
+        stats.f.sf(F, q, df2),
+        "두 집단의 평균 벡터가 같다",
+        "pooled-hotelling-f",
+        dict(
+            t_squared=T,
+            f_value=F,
+            df_num=q,
+            df_den=df2,
+            mean_difference=diff,
+            pooled_covariance=pooled,
+            group_sizes=ns,
+        ),
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: HotellingProfile) -> HotellingOutputDTO:
     """검증된 자료를 계산합니다.
@@ -198,7 +226,15 @@ def _run_test(data: Dict[str, Any], profile: HotellingProfile) -> HotellingOutpu
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_hotelling(x: Any, y: Any, profile: Optional[HotellingProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> HotellingOutputDTO:
+
+def run_hotelling(
+    x: Any,
+    y: Any,
+    profile: Optional[HotellingProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> HotellingOutputDTO:
     """독립 두 집단 Hotelling T².
 
     Args:
@@ -213,8 +249,10 @@ def run_hotelling(x: Any, y: Any, profile: Optional[HotellingProfile] = None, *,
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("hotelling", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x, 'y': y}, profile)
+    profile = resolve_profile(
+        "hotelling", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x, "y": y}, profile)
     return _run_test(data, profile)
 
 
@@ -224,5 +262,5 @@ def run_hotelling(x: Any, y: Any, profile: Optional[HotellingProfile] = None, *,
 
 if __name__ == "__main__":
     rng = np.random.RandomState(1234)
-    result = run_hotelling(rng.normal(size=(12,2)), rng.normal(size=(14,2))+0.3)
+    result = run_hotelling(rng.normal(size=(12, 2)), rng.normal(size=(14, 2)) + 0.3)
     print(result.to_json(indent=2))

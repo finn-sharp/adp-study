@@ -16,6 +16,7 @@ homogeneity - 범주분포 동질성
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -33,12 +34,13 @@ from src.output import OutputDTO
 from src.Recipes import resolve_profile
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, table_data, result)
+from src.stats.tests._common import number, table_data, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ChiSquareHomogeneityProfile:
@@ -48,6 +50,7 @@ class ChiSquareHomogeneityProfile:
         alpha (float): 유한한 0<alpha<1 유의수준 기본 0.05.
         correction (bool): 자유도1 Yates 보정 기본 True.
     """
+
     alpha: float = 0.05
     correction: bool = True
 
@@ -55,6 +58,7 @@ class ChiSquareHomogeneityProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class ChiSquareHomogeneityOutputDTO(OutputDTO):
@@ -75,6 +79,7 @@ class ChiSquareHomogeneityOutputDTO(OutputDTO):
         expected (np.ndarray): 동질성 귀무 기대도수.
         observed (np.ndarray): 원 도수표.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -94,6 +99,7 @@ class ChiSquareHomogeneityOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -106,22 +112,25 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    a = table_data(args['table'], False)
-    return {'table': a}
+    a = table_data(args["table"], False)
+    return {"table": a}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: ChiSquareHomogeneityProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: ChiSquareHomogeneityProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -132,13 +141,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: ChiSquareHomogeneityPro
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, ChiSquareHomogeneityProfile): raise TypeError("ChiSquareHomogeneityProfile이 필요합니다.")
+    if not isinstance(profile, ChiSquareHomogeneityProfile):
+        raise TypeError("ChiSquareHomogeneityProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -151,11 +162,23 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    s, pv, df, expected = stats.chi2_contingency(d['table'], correction=p.correction)
-    return result('chi-square-homogeneity', p, s, pv, '독립 모집단의 범주분포가 모두 같다', 'pearson-chi-square', dict(df=int(df), expected=expected, observed=d['table']), notes=['기대도수 5 미만 셀이 있습니다.'] if (expected < 5).any() else [])
+    alt = getattr(p, "alternative", "two-sided")
+    s, pv, df, expected = stats.chi2_contingency(d["table"], correction=p.correction)
+    return result(
+        "chi-square-homogeneity",
+        p,
+        s,
+        pv,
+        "독립 모집단의 범주분포가 모두 같다",
+        "pearson-chi-square",
+        dict(df=int(df), expected=expected, observed=d["table"]),
+        notes=["기대도수 5 미만 셀이 있습니다."] if (expected < 5).any() else [],
+    )
 
-def _run_test(data: Dict[str, Any], profile: ChiSquareHomogeneityProfile) -> ChiSquareHomogeneityOutputDTO:
+
+def _run_test(
+    data: Dict[str, Any], profile: ChiSquareHomogeneityProfile
+) -> ChiSquareHomogeneityOutputDTO:
     """검증된 자료를 계산합니다.
 
     Args:
@@ -173,7 +196,14 @@ def _run_test(data: Dict[str, Any], profile: ChiSquareHomogeneityProfile) -> Chi
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_chi_square_homogeneity(table: Any, profile: Optional[ChiSquareHomogeneityProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> ChiSquareHomogeneityOutputDTO:
+
+def run_chi_square_homogeneity(
+    table: Any,
+    profile: Optional[ChiSquareHomogeneityProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> ChiSquareHomogeneityOutputDTO:
     """범주분포 동질성.
 
     Args:
@@ -187,8 +217,10 @@ def run_chi_square_homogeneity(table: Any, profile: Optional[ChiSquareHomogeneit
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("chi-square-homogeneity", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'table': table}, profile)
+    profile = resolve_profile(
+        "chi-square-homogeneity", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"table": table}, profile)
     return _run_test(data, profile)
 
 
@@ -197,5 +229,5 @@ def run_chi_square_homogeneity(table: Any, profile: Optional[ChiSquareHomogeneit
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_chi_square_homogeneity([[30,20],[10,40],[20,30]])
+    result = run_chi_square_homogeneity([[30, 20], [10, 40], [20, 30]])
     print(result.to_json(indent=2))

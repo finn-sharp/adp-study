@@ -2,16 +2,17 @@
 
 작성자: 김재현(Finn), 2026-10-23; Proprietary, UCI 라이선스는 원자료에 따름.
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 from functools import partial
 from io import BytesIO
 import pandas as pd
 from src.Recipes import load_profile
-from src.datasets.uci import load_tabular,load_bike,dataset_bytes
+from src.datasets.uci import load_tabular, load_bike, dataset_bytes
 from src.MachineLearning.GeneralizedLinearModels.poisson import run_poisson
 
 
@@ -25,7 +26,8 @@ def load_data(cache_dir=None):
     Raises:
         OSError/ValueError: 다운로드/자료 오류.
     """
-    d=pd.read_csv(BytesIO(dataset_bytes('bike',cache_dir)));return d[['temp','hum','windspeed']],d.cnt
+    d = pd.read_csv(BytesIO(dataset_bytes("bike", cache_dir)))
+    return d[["temp", "hum", "windspeed"]], d.cnt
 
 
 def load_recipe(overrides=None):
@@ -38,7 +40,7 @@ def load_recipe(overrides=None):
     Raises:
         OSError/ValueError/TypeError: 레시피 오류.
     """
-    return load_profile('glm-poisson',overrides=overrides)
+    return load_profile("glm-poisson", overrides=overrides)
 
 
 def build_pipeline(profile):
@@ -51,10 +53,10 @@ def build_pipeline(profile):
     Raises:
         TypeError: 실행 때 설정 오류.
     """
-    return partial(run_poisson,profile=profile)
+    return partial(run_poisson, profile=profile)
 
 
-def main(cache_dir=None,overrides=None):
+def main(cache_dir=None, overrides=None):
     """정의역에 맞는 실제 UCI 실행 예제.
 
     Args:
@@ -65,7 +67,10 @@ def main(cache_dir=None,overrides=None):
     Raises:
         ValueError/TypeError/OSError: 자료·설정·적합 오류.
     """
-    X,y=load_data(cache_dir);runner=build_pipeline(load_recipe(overrides));return runner(X,y)
+    X, y = load_data(cache_dir)
+    runner = build_pipeline(load_recipe(overrides))
+    return runner(X, y)
 
 
-if __name__=='__main__':print(main().to_json(indent=2))
+if __name__ == "__main__":
+    print(main().to_json(indent=2))

@@ -22,12 +22,11 @@ eclat.py - Eclat 빈발 항목집합·연관규칙
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -47,6 +46,7 @@ from ._mining_common import validate_transactions, minimum_count, build_tables
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class EclatProfile:
     """Eclat 탐색과 규칙 설정.
@@ -61,6 +61,7 @@ class EclatProfile:
         max_rule_candidates (int): 전체 규칙 후보 검사 한도; 기본 100000.
         max_intersections (int): TID 교집합 검사 한도; 기본 100000.
     """
+
     min_support: float = 0.2
     min_confidence: float = 0.5
     min_lift: float = 1.0
@@ -75,6 +76,7 @@ class EclatProfile:
 # 3. Output DTO
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class EclatOutputDTO(OutputDTO):
     """Eclat 빈발 집합·규칙 결과.
@@ -86,6 +88,7 @@ class EclatOutputDTO(OutputDTO):
         rules (pd.DataFrame): antecedents, consequents, support, confidence, lift, leverage, conviction.
         diagnostics (Dict[str, int]): 빈발 집합·규칙 후보 및 intersections 수.
     """
+
     algorithm: str
     n_transactions: int
     itemsets: pd.DataFrame
@@ -96,6 +99,7 @@ class EclatOutputDTO(OutputDTO):
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate_inputs(transactions, profile):
     """전용 Profile과 문자열 거래를 검증합니다.
@@ -108,14 +112,16 @@ def _validate_inputs(transactions, profile):
     Raises:
         TypeError/ValueError: Profile·자료·임계값·한도 오류.
     """
-    if not isinstance(profile,EclatProfile):raise TypeError('EclatProfile이 필요합니다.')
-    positive_int(profile.max_intersections,'max_intersections')
-    return validate_transactions(transactions,profile)
+    if not isinstance(profile, EclatProfile):
+        raise TypeError("EclatProfile이 필요합니다.")
+    positive_int(profile.max_intersections, "max_intersections")
+    return validate_transactions(transactions, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _mine_patterns(transactions, profile):
     """수직 TID 집합을 교집합하여 빈발 항목집합을 탐색합니다.
@@ -128,27 +134,39 @@ def _mine_patterns(transactions, profile):
     Raises:
         ValueError: 항목집합·교집합 한도 초과.
     """
-    vertical={}
-    for index,items in enumerate(transactions):
-        for item in items:vertical.setdefault(item,set()).add(index)
-    threshold=minimum_count(profile.min_support,len(transactions))
-    suffixes=[(item,vertical[item]) for item in sorted(vertical) if len(vertical[item])>=threshold]
-    stack=[((),suffixes)];patterns={};intersections=0
+    vertical = {}
+    for index, items in enumerate(transactions):
+        for item in items:
+            vertical.setdefault(item, set()).add(index)
+    threshold = minimum_count(profile.min_support, len(transactions))
+    suffixes = [
+        (item, vertical[item])
+        for item in sorted(vertical)
+        if len(vertical[item]) >= threshold
+    ]
+    stack = [((), suffixes)]
+    patterns = {}
+    intersections = 0
     while stack:
-        prefix,suffixes=stack.pop()
-        for index,(item,tids) in enumerate(suffixes):
-            pattern=prefix+(item,)
-            if len(patterns)>=profile.max_itemsets:raise ValueError('빈발 항목집합 한도 초과')
-            patterns[pattern]=len(tids)
-            if len(pattern)>=profile.max_length:continue
-            children=[]
-            for other,other_tids in suffixes[index+1:]:
-                intersections+=1
-                if intersections>profile.max_intersections:raise ValueError('Eclat 교집합 한도 초과')
-                common=tids & other_tids
-                if len(common)>=threshold:children.append((other,common))
-            if children:stack.append((pattern,children))
-    return patterns,intersections
+        prefix, suffixes = stack.pop()
+        for index, (item, tids) in enumerate(suffixes):
+            pattern = prefix + (item,)
+            if len(patterns) >= profile.max_itemsets:
+                raise ValueError("빈발 항목집합 한도 초과")
+            patterns[pattern] = len(tids)
+            if len(pattern) >= profile.max_length:
+                continue
+            children = []
+            for other, other_tids in suffixes[index + 1 :]:
+                intersections += 1
+                if intersections > profile.max_intersections:
+                    raise ValueError("Eclat 교집합 한도 초과")
+                common = tids & other_tids
+                if len(common) >= threshold:
+                    children.append((other, common))
+            if children:
+                stack.append((pattern, children))
+    return patterns, intersections
 
 
 def _run_model(transactions, profile):
@@ -162,16 +180,33 @@ def _run_model(transactions, profile):
     Raises:
         ValueError: 탐색·결과 한도 초과.
     """
-    counts,work=_mine_patterns(transactions,profile)
-    itemsets,rules,rule_candidates=build_tables(counts,len(transactions),profile)
-    return EclatOutputDTO('eclat',len(transactions),itemsets,rules,{'n_itemsets':len(counts),'rule_candidates':rule_candidates,'intersections':work})
+    counts, work = _mine_patterns(transactions, profile)
+    itemsets, rules, rule_candidates = build_tables(counts, len(transactions), profile)
+    return EclatOutputDTO(
+        "eclat",
+        len(transactions),
+        itemsets,
+        rules,
+        {
+            "n_itemsets": len(counts),
+            "rule_candidates": rule_candidates,
+            "intersections": work,
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_eclat(transactions: Any, profile: Optional[EclatProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> EclatOutputDTO:
+
+def run_eclat(
+    transactions: Any,
+    profile: Optional[EclatProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> EclatOutputDTO:
     """Eclat를 전용 JSON/Profile로 실행합니다.
 
     Args:
@@ -184,15 +219,20 @@ def run_eclat(transactions: Any, profile: Optional[EclatProfile] = None, *, reci
     Raises:
         ValueError/TypeError/OSError: 자료·설정·한도·레시피 오류.
     """
-    profile=resolve_profile('eclat',profile,recipe_path=recipe_path,overrides=overrides)
-    data=_validate_inputs(transactions,profile)
-    return _run_model(data,profile)
+    profile = resolve_profile(
+        "eclat", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs(transactions, profile)
+    return _run_model(data, profile)
 
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 
-if __name__ == '__main__':
-    result=run_eclat([['bread','milk'],['bread','butter'],['bread','milk','butter'],[]],overrides={'min_support':0.25})
+if __name__ == "__main__":
+    result = run_eclat(
+        [["bread", "milk"], ["bread", "butter"], ["bread", "milk", "butter"], []],
+        overrides={"min_support": 0.25},
+    )
     print(result.to_json(indent=2))

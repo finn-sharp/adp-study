@@ -1,4 +1,5 @@
 """ANOVA・MANOVA・사후검정의 유한한 입력 및 범주 라벨 검증."""
+
 from typing import Any, List
 import numpy as np
 import pandas as pd
@@ -14,7 +15,12 @@ def validate_alpha(alpha: float) -> None:
     Raises:
         ValueError: 잘못된 타입·유한성·범위.
     """
-    if isinstance(alpha, bool) or not isinstance(alpha, (int, float)) or not np.isfinite(alpha) or not 0 < alpha < 1:
+    if (
+        isinstance(alpha, bool)
+        or not isinstance(alpha, (int, float))
+        or not np.isfinite(alpha)
+        or not 0 < alpha < 1
+    ):
         raise ValueError("alpha는 0과 1 사이의 유한한 수여야 합니다.")
 
 
@@ -31,9 +37,15 @@ def validate_groups(groups: Any) -> List[np.ndarray]:
     try:
         arrays = [np.asarray(group, dtype=float) for group in groups]
     except (TypeError, ValueError) as exc:
-        raise ValueError("groups는 수치형 1차원 집단 배열의 목록이어야 합니다.") from exc
-    if len(arrays) < 2 or any(g.ndim != 1 or len(g) < 2 or not np.isfinite(g).all() for g in arrays):
-        raise ValueError("각 집단은 최소 2행의 유한한 1차원 수치 자료이며 최소 두 집단이 필요합니다.")
+        raise ValueError(
+            "groups는 수치형 1차원 집단 배열의 목록이어야 합니다."
+        ) from exc
+    if len(arrays) < 2 or any(
+        g.ndim != 1 or len(g) < 2 or not np.isfinite(g).all() for g in arrays
+    ):
+        raise ValueError(
+            "각 집단은 최소 2행의 유한한 1차원 수치 자료이며 최소 두 집단이 필요합니다."
+        )
     return arrays
 
 
@@ -50,7 +62,9 @@ def validate_labels(labels: Any, n: int) -> np.ndarray:
     """
     arr = np.asarray(labels, dtype=object)
     if arr.ndim != 1 or len(arr) != n or pd.isna(arr).any():
-        raise ValueError("요인 라벨은 결측 없이 반응변수와 길이가 같은 1차원 배열이어야 합니다.")
+        raise ValueError(
+            "요인 라벨은 결측 없이 반응변수와 길이가 같은 1차원 배열이어야 합니다."
+        )
     if any(isinstance(v, (float, np.floating)) and not np.isfinite(v) for v in arr):
         raise ValueError("요인 라벨에 무한대를 포함할 수 없습니다.")
     normalized = np.array([str(v) for v in arr])

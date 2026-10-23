@@ -16,6 +16,7 @@ f_test.py - 독립 두 표본 분산비 F 검정
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -40,6 +41,7 @@ from src.MachineLearning.analysis_common import positive_int, finite_number
 # 2. Input Profile
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class FTestProfile:
     """FTestProfile 필드 계약.
@@ -49,6 +51,7 @@ class FTestProfile:
         alternative (str): two-sided/less/greater: var(x)/var(y) 방향. 기본 two-sided.
         ratio_0 (float): 귀무 분산비, 양수. 기본 1.
     """
+
     alpha: float = 0.05
     alternative: str = "two-sided"
     ratio_0: float = 1.0
@@ -57,6 +60,7 @@ class FTestProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class FTestOutputDTO(OutputDTO):
@@ -71,6 +75,7 @@ class FTestOutputDTO(OutputDTO):
         details (Dict[str, Any]): 자유도·기대도수·표본수 등 검정별 진단.
         warnings (List[str]): 근사 조건과 해석 제약.
     """
+
     statistic: float
     p_value: float
     reject_h0: bool
@@ -84,6 +89,7 @@ class FTestOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_inputs(x: Any, y: Any, profile: Optional[FTestProfile] = None) -> Any:
     """입력 검증.
 
@@ -96,18 +102,22 @@ def _validate_inputs(x: Any, y: Any, profile: Optional[FTestProfile] = None) -> 
     Raises:
         ValueError/TypeError: 입력 조건 오류.
     """
-    if not isinstance(profile, FTestProfile): raise TypeError("FTestProfile이 필요합니다")
+    if not isinstance(profile, FTestProfile):
+        raise TypeError("FTestProfile이 필요합니다")
     alpha(profile.alpha)
     a, b = vector(x), vector(y)
     finite_number(profile.ratio_0, "ratio_0", True)
-    if profile.alternative not in ("two-sided", "less", "greater"): raise ValueError("alternative 오류")
-    if np.var(a, ddof=1) <= 0 or np.var(b, ddof=1) <= 0: raise ValueError("양의 표본 분산이 필요합니다.")
+    if profile.alternative not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    if np.var(a, ddof=1) <= 0 or np.var(b, ddof=1) <= 0:
+        raise ValueError("양의 표본 분산이 필요합니다.")
     return a, b
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run_test(data: Any, profile: Optional[FTestProfile]) -> tuple:
     """검정 계산.
@@ -121,18 +131,46 @@ def _run_test(data: Any, profile: Optional[FTestProfile]) -> tuple:
         ValueError: 미정의 통계량.
     """
     a, b = data
-    ratio = np.var(a, ddof=1)/np.var(b, ddof=1)
-    s = ratio/profile.ratio_0
-    d1, d2 = len(a)-1, len(b)-1
-    p = stats.f.cdf(s,d1,d2) if profile.alternative == "less" else stats.f.sf(s,d1,d2) if profile.alternative == "greater" else min(1.,2*min(stats.f.cdf(s,d1,d2),stats.f.sf(s,d1,d2)))
-    return float(s), float(p), "모집단 분산비가 ratio_0와 같다", {"df_num": d1, "df_den": d2, "variance_ratio": float(ratio), "ratio_0": profile.ratio_0, "alternative": profile.alternative}, ["정규성·독립성을 가정하는 분산비 검정입니다."]
+    ratio = np.var(a, ddof=1) / np.var(b, ddof=1)
+    s = ratio / profile.ratio_0
+    d1, d2 = len(a) - 1, len(b) - 1
+    p = (
+        stats.f.cdf(s, d1, d2)
+        if profile.alternative == "less"
+        else (
+            stats.f.sf(s, d1, d2)
+            if profile.alternative == "greater"
+            else min(1.0, 2 * min(stats.f.cdf(s, d1, d2), stats.f.sf(s, d1, d2)))
+        )
+    )
+    return (
+        float(s),
+        float(p),
+        "모집단 분산비가 ratio_0와 같다",
+        {
+            "df_num": d1,
+            "df_den": d2,
+            "variance_ratio": float(ratio),
+            "ratio_0": profile.ratio_0,
+            "alternative": profile.alternative,
+        },
+        ["정규성·독립성을 가정하는 분산비 검정입니다."],
+    )
 
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_f_test(x: Any, y: Any, profile: Optional[FTestProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> FTestOutputDTO:
+
+def run_f_test(
+    x: Any,
+    y: Any,
+    profile: Optional[FTestProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> FTestOutputDTO:
     """독립 두 표본 분산비 F 검정.
 
     Args:
@@ -147,10 +185,14 @@ def run_f_test(x: Any, y: Any, profile: Optional[FTestProfile] = None, *, recipe
         ValueError/TypeError: 입력·설정 오류.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("f-test", profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "f-test", profile, recipe_path=recipe_path, overrides=overrides
+    )
     data = _validate_inputs(x, y, profile=profile)
     statistic, p, h0, details, notes = _run_test(data, profile)
-    return FTestOutputDTO(statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes)
+    return FTestOutputDTO(
+        statistic, p, bool(p < profile.alpha), profile.alpha, h0, details, notes
+    )
 
 
 # ---------------------------------------------------------------------------

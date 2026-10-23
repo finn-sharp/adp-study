@@ -15,6 +15,7 @@ rope.py - Rotary Position Embedding 전용 변환
     2026-10-12  김재현(Finn)     v1.0.0    RoPE 전용 모듈·레시피·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -23,14 +24,15 @@ __status__ = "Development"
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,Optional,List
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, Optional, List
 import numpy as np
-from sklearn.base import BaseEstimator,TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from src.MachineLearning.analysis_common import positive_int,finite_number
+from src.MachineLearning.analysis_common import positive_int, finite_number
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -47,12 +49,14 @@ class RoPEProfile:
         position_scale (float): 위치를 나눌 양수 척도; 기본 1.
         inverse (bool): 음의 각도로 역회전할지 여부; 기본 False.
     """
+
     rotary_dim: Optional[int] = None
-    base: float = 10000.
-    layout: str = 'interleaved'
+    base: float = 10000.0
+    layout: str = "interleaved"
     offset: int = 0
-    position_scale: float = 1.
+    position_scale: float = 1.0
     inverse: bool = False
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -69,17 +73,19 @@ class RoPEOutputDTO(OutputDTO):
         transformer (Any): 재사용 sklearn 변환기; JSON 제외.
         warnings (List[str]): 임베딩 해석 정보.
     """
+
     preprocessed_feature: np.ndarray
     positions: np.ndarray
     inverse_frequencies: np.ndarray
-    parameters: Dict[str,Any]
+    parameters: Dict[str, Any]
     transformer: Any
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
-def _validate(X,positions,profile):
+def _validate(X, positions, profile):
     """임베딩·짝수 부분 차원·위치·회전 설정을 검증합니다.
 
     Args:
@@ -91,23 +97,51 @@ def _validate(X,positions,profile):
     Raises:
         ValueError/TypeError: 자료·차원·위치·설정 오류.
     """
-    if not isinstance(profile,RoPEProfile):raise TypeError('RoPEProfile이 필요합니다.')
-    if np.iscomplexobj(X):raise ValueError('실수 임베딩이 필요합니다.')
-    a=np.asarray(X)
-    if a.dtype.kind not in 'fiu' or a.ndim<2 or min(a.shape)<1 or not np.isfinite(a).all():raise ValueError('유한한 시퀀스 임베딩이 필요합니다.')
-    positive_int(profile.offset,'offset',0);finite_number(profile.base,'base');finite_number(profile.position_scale,'position_scale',True)
-    if profile.base<=1 or profile.layout not in ('interleaved','split_half') or not isinstance(profile.inverse,bool):raise ValueError('RoPE 설정 오류')
-    dim=a.shape[-1] if profile.rotary_dim is None else profile.rotary_dim
-    positive_int(dim,'rotary_dim')
-    if dim%2 or dim>a.shape[-1]:raise ValueError('rotary_dim은 embedding 이하 짝수입니다.')
-    pos=np.arange(a.shape[-2],dtype=float)+profile.offset if positions is None else np.asarray(positions)
-    if pos.ndim!=1 or len(pos)!=a.shape[-2] or pos.dtype.kind not in 'fiu' or not np.isfinite(pos).all() or (pos<0).any():raise ValueError('위치는 길이가 같은 유한 비음수 1차원 자료입니다.')
-    return a,pos.astype(float),dim
+    if not isinstance(profile, RoPEProfile):
+        raise TypeError("RoPEProfile이 필요합니다.")
+    if np.iscomplexobj(X):
+        raise ValueError("실수 임베딩이 필요합니다.")
+    a = np.asarray(X)
+    if (
+        a.dtype.kind not in "fiu"
+        or a.ndim < 2
+        or min(a.shape) < 1
+        or not np.isfinite(a).all()
+    ):
+        raise ValueError("유한한 시퀀스 임베딩이 필요합니다.")
+    positive_int(profile.offset, "offset", 0)
+    finite_number(profile.base, "base")
+    finite_number(profile.position_scale, "position_scale", True)
+    if (
+        profile.base <= 1
+        or profile.layout not in ("interleaved", "split_half")
+        or not isinstance(profile.inverse, bool)
+    ):
+        raise ValueError("RoPE 설정 오류")
+    dim = a.shape[-1] if profile.rotary_dim is None else profile.rotary_dim
+    positive_int(dim, "rotary_dim")
+    if dim % 2 or dim > a.shape[-1]:
+        raise ValueError("rotary_dim은 embedding 이하 짝수입니다.")
+    pos = (
+        np.arange(a.shape[-2], dtype=float) + profile.offset
+        if positions is None
+        else np.asarray(positions)
+    )
+    if (
+        pos.ndim != 1
+        or len(pos) != a.shape[-2]
+        or pos.dtype.kind not in "fiu"
+        or not np.isfinite(pos).all()
+        or (pos < 0).any()
+    ):
+        raise ValueError("위치는 길이가 같은 유한 비음수 1차원 자료입니다.")
+    return a, pos.astype(float), dim
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
-def _rotate(X,positions,profile):
+def _rotate(X, positions, profile):
     """짝별 회전 행렬을 임베딩에 적용합니다.
 
     Args:
@@ -119,32 +153,42 @@ def _rotate(X,positions,profile):
     Raises:
         ValueError/TypeError: 입력/각도 비유한 값.
     """
-    a,pos,dim=_validate(X,positions,profile)
-    frequencies=profile.base**(-np.arange(0,dim,2,dtype=float)/dim)
-    angles=np.outer(pos/profile.position_scale,frequencies)*(-1 if profile.inverse else 1)
-    if not np.isfinite(angles).all():raise ValueError('회전 각도 overflow')
-    cosine,sine=np.cos(angles),np.sin(angles)
-    cosine=cosine.reshape((1,)*(a.ndim-2)+cosine.shape);sine=sine.reshape((1,)*(a.ndim-2)+sine.shape)
-    result=a.astype(float,copy=True);part=result[...,:dim]
-    if profile.layout=='interleaved':
-        first,second=part[...,::2].copy(),part[...,1::2].copy()
-        part[...,::2]=first*cosine-second*sine;part[...,1::2]=first*sine+second*cosine
+    a, pos, dim = _validate(X, positions, profile)
+    frequencies = profile.base ** (-np.arange(0, dim, 2, dtype=float) / dim)
+    angles = np.outer(pos / profile.position_scale, frequencies) * (
+        -1 if profile.inverse else 1
+    )
+    if not np.isfinite(angles).all():
+        raise ValueError("회전 각도 overflow")
+    cosine, sine = np.cos(angles), np.sin(angles)
+    cosine = cosine.reshape((1,) * (a.ndim - 2) + cosine.shape)
+    sine = sine.reshape((1,) * (a.ndim - 2) + sine.shape)
+    result = a.astype(float, copy=True)
+    part = result[..., :dim]
+    if profile.layout == "interleaved":
+        first, second = part[..., ::2].copy(), part[..., 1::2].copy()
+        part[..., ::2] = first * cosine - second * sine
+        part[..., 1::2] = first * sine + second * cosine
     else:
-        first,second=part[...,:dim//2].copy(),part[...,dim//2:].copy()
-        part[...,:dim//2]=first*cosine-second*sine;part[...,dim//2:]=first*sine+second*cosine
-    if a.dtype.kind=='f':result=result.astype(a.dtype)
-    if not np.isfinite(result).all():raise ValueError('회전 결과가 출력 dtype 범위를 초과했습니다.')
-    return result,pos,frequencies
+        first, second = part[..., : dim // 2].copy(), part[..., dim // 2 :].copy()
+        part[..., : dim // 2] = first * cosine - second * sine
+        part[..., dim // 2 :] = first * sine + second * cosine
+    if a.dtype.kind == "f":
+        result = result.astype(a.dtype)
+    if not np.isfinite(result).all():
+        raise ValueError("회전 결과가 출력 dtype 범위를 초과했습니다.")
+    return result, pos, frequencies
 
 
-class RotaryPositionTransformer(TransformerMixin,BaseEstimator):
+class RotaryPositionTransformer(TransformerMixin, BaseEstimator):
     """학습 통계가 없는 clone 호환 RoPE 변환기.
 
     Attributes:
         profile (RoPEProfile): 회전 설정.
         embedding_dim_ (int): fit 입력의 마지막 차원.
     """
-    def __init__(self,profile=None):
+
+    def __init__(self, profile=None):
         """회전 설정을 보존합니다.
 
         Args:
@@ -154,9 +198,9 @@ class RotaryPositionTransformer(TransformerMixin,BaseEstimator):
         Raises:
             None: 입력은 fit/transform에서 검증.
         """
-        self.profile=profile
+        self.profile = profile
 
-    def fit(self,X,y=None):
+    def fit(self, X, y=None):
         """임베딩 차원만 확인합니다. 값/타깃에서 학습하지 않습니다.
 
         Args:
@@ -167,10 +211,11 @@ class RotaryPositionTransformer(TransformerMixin,BaseEstimator):
         Raises:
             ValueError/TypeError: 정의역 오류.
         """
-        _validate(X,None,self.profile or RoPEProfile());self.embedding_dim_=np.shape(X)[-1]
+        _validate(X, None, self.profile or RoPEProfile())
+        self.embedding_dim_ = np.shape(X)[-1]
         return self
 
-    def transform(self,X,positions=None):
+    def transform(self, X, positions=None):
         """같은 embedding 차원에 위치 회전을 적용합니다.
 
         Args:
@@ -181,14 +226,16 @@ class RotaryPositionTransformer(TransformerMixin,BaseEstimator):
         Raises:
             ValueError/NotFittedError: 미적합/차원 오류.
         """
-        check_is_fitted(self,'embedding_dim_')
-        if np.shape(X)[-1]!=self.embedding_dim_:raise ValueError('학습 embedding 차원과 다릅니다.')
-        return _rotate(X,positions,self.profile or RoPEProfile())[0]
+        check_is_fitted(self, "embedding_dim_")
+        if np.shape(X)[-1] != self.embedding_dim_:
+            raise ValueError("학습 embedding 차원과 다릅니다.")
+        return _rotate(X, positions, self.profile or RoPEProfile())[0]
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def build_rope_transformer(profile=None,*,recipe_path=None,overrides=None):
+def build_rope_transformer(profile=None, *, recipe_path=None, overrides=None):
     """sklearn 파이프라인용 미적합 RoPE 변환기를 생성합니다.
 
     Args:
@@ -200,11 +247,13 @@ def build_rope_transformer(profile=None,*,recipe_path=None,overrides=None):
     Raises:
         ValueError/TypeError/OSError: 레시피 오류.
     """
-    profile=resolve_profile('rope',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "rope", profile, recipe_path=recipe_path, overrides=overrides
+    )
     return RotaryPositionTransformer(profile)
 
 
-def run_rope(X,positions=None,profile=None,*,recipe_path=None,overrides=None):
+def run_rope(X, positions=None, profile=None, *, recipe_path=None, overrides=None):
     """RoPE 전처리 결과·위치·주파수를 반환합니다.
 
     Args:
@@ -218,12 +267,22 @@ def run_rope(X,positions=None,profile=None,*,recipe_path=None,overrides=None):
     Raises:
         ValueError/TypeError/OSError: 입력·설정·레시피 오류.
     """
-    profile=resolve_profile('rope',profile,recipe_path=recipe_path,overrides=overrides)
-    transformed,pos,frequencies=_rotate(X,positions,profile)
-    return RoPEOutputDTO(transformed,pos,frequencies,asdict(profile),RotaryPositionTransformer(profile).fit(X),[])
+    profile = resolve_profile(
+        "rope", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    transformed, pos, frequencies = _rotate(X, positions, profile)
+    return RoPEOutputDTO(
+        transformed,
+        pos,
+        frequencies,
+        asdict(profile),
+        RotaryPositionTransformer(profile).fit(X),
+        [],
+    )
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution
 # ---------------------------------------------------------------------------
-if __name__=='__main__':
-    print(run_rope(np.ones((2,3,4))).to_json(indent=2))
+if __name__ == "__main__":
+    print(run_rope(np.ones((2, 3, 4))).to_json(indent=2))

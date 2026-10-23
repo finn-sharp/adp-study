@@ -43,7 +43,9 @@ import numpy as np
 from src.output import OutputDTO
 from src.Recipes import load_profile, resolve_profile
 from src.MachineLearning.common import (
-    SupervisedOutputDTO, run_supervised, validate_supervised_inputs,
+    SupervisedOutputDTO,
+    run_supervised,
+    validate_supervised_inputs,
 )
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.utils.validation import check_is_fitted
@@ -52,6 +54,7 @@ from sklearn.utils.validation import check_is_fitted
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CatBoostProfile:
@@ -91,6 +94,7 @@ class CatBoostProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class CatBoostOutputDTO(OutputDTO):
@@ -167,7 +171,11 @@ def _require_number(value: Any, name: str, positive: bool = False) -> None:
     Raises:
         ValueError: 자료형·유한성·범위를 만족하지 않는 값.
     """
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value):
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not np.isfinite(value)
+    ):
         raise ValueError(name + "는 유한한 수여야 합니다.")
     if value < 0 or (positive and value == 0):
         raise ValueError(name + "의 범위를 확인하세요.")
@@ -203,6 +211,7 @@ def _validate_inputs(X: Any, y: Any, profile: CatBoostProfile) -> None:
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
 
+
 class _CatBoostEstimator(BaseEstimator):
     """CatBoost를 sklearn의 clone·Pipeline·CV 계약에 연결합니다.
 
@@ -214,9 +223,16 @@ class _CatBoostEstimator(BaseEstimator):
         classes_: 분류 모델 fit 후 원래 타깃 클래스 순서.
     """
 
-    def __init__(self, iterations=100, depth=6, learning_rate=0.1,
-                 l2_leaf_reg=3.0, random_state=1234, n_jobs=1,
-                 task="classification"):
+    def __init__(
+        self,
+        iterations=100,
+        depth=6,
+        learning_rate=0.1,
+        l2_leaf_reg=3.0,
+        random_state=1234,
+        n_jobs=1,
+        task="classification",
+    ):
         """clone이 재구성할 수 있도록 학습 설정을 그대로 저장합니다.
 
         Args:
@@ -253,12 +269,19 @@ class _CatBoostEstimator(BaseEstimator):
             ValueError: 원 모델이 입력이나 학습 설정을 거부한 경우.
         """
         from catboost import CatBoostClassifier, CatBoostRegressor
-        estimator = CatBoostClassifier if self.task == "classification" else CatBoostRegressor
+
+        estimator = (
+            CatBoostClassifier if self.task == "classification" else CatBoostRegressor
+        )
         self.native_model_ = estimator(
-            iterations=self.iterations, depth=self.depth,
-            learning_rate=self.learning_rate, l2_leaf_reg=self.l2_leaf_reg,
-            random_seed=self.random_state, thread_count=self.n_jobs,
-            verbose=False, allow_writing_files=False,
+            iterations=self.iterations,
+            depth=self.depth,
+            learning_rate=self.learning_rate,
+            l2_leaf_reg=self.l2_leaf_reg,
+            random_seed=self.random_state,
+            thread_count=self.n_jobs,
+            verbose=False,
+            allow_writing_files=False,
         ).fit(X, y)
         self.n_features_in_ = np.asarray(X).shape[1]
         if self.task == "classification":
@@ -331,16 +354,23 @@ def _create_model(profile: CatBoostProfile) -> Any:
         import catboost  # 선택 의존성 확인. 학습은 어댑터에서 실행합니다.
     except ImportError as exc:
         raise ImportError("catboost 패키지를 설치하세요.") from exc
-    estimator = _CatBoostClassifier if profile.task == "classification" else _CatBoostRegressor
+    estimator = (
+        _CatBoostClassifier if profile.task == "classification" else _CatBoostRegressor
+    )
     return estimator(
-        iterations=profile.iterations, depth=profile.depth,
-        learning_rate=profile.learning_rate, l2_leaf_reg=profile.l2_leaf_reg,
-        random_state=profile.random_state, n_jobs=profile.n_jobs,
+        iterations=profile.iterations,
+        depth=profile.depth,
+        learning_rate=profile.learning_rate,
+        l2_leaf_reg=profile.l2_leaf_reg,
+        random_state=profile.random_state,
+        n_jobs=profile.n_jobs,
         task=profile.task,
     )
 
 
-def _fit_model(X: Any, y: Any, profile: CatBoostProfile, estimator: Any) -> SupervisedOutputDTO:
+def _fit_model(
+    X: Any, y: Any, profile: CatBoostProfile, estimator: Any
+) -> SupervisedOutputDTO:
     """학습/보류 분할, Pipeline 적합 및 평가를 수행합니다.
 
     Args:
@@ -361,6 +391,7 @@ def _fit_model(X: Any, y: Any, profile: CatBoostProfile, estimator: Any) -> Supe
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def run_catboost(
     X: Any,
@@ -392,7 +423,9 @@ def run_catboost(
         입력 열 순서는 새 데이터 예측에서도 유지합니다. 자동 결측 대체·범주 인코딩은 하지 않습니다.
         기본 to_dict()/to_json()은 모델 실행 객체를 제외하고 분석 데이터를 반환합니다.
     """
-    profile = resolve_profile("catboost", profile, recipe_path=recipe_path, task=task, overrides=overrides)
+    profile = resolve_profile(
+        "catboost", profile, recipe_path=recipe_path, task=task, overrides=overrides
+    )
     _validate_inputs(X, y, profile)
     estimator = _create_model(profile)
     result = _fit_model(X, y, profile, estimator)

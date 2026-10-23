@@ -15,6 +15,7 @@ contingency.py - 범주 조합의 집중·조건부 구성 차이와 희소 셀�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -45,12 +58,14 @@ class CategoricalContingencyProfile:
         annotate (bool): 셀 값 표시. 기본 True.
         max_categories (int): 각 축의 최대 범주 수. 기본 20.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
-    normalization: str = 'row'
+    normalization: str = "row"
     annotate: bool = True
     max_categories: int = 20
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,6 +83,7 @@ class CategoricalContingencyOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -75,6 +91,7 @@ class CategoricalContingencyOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -90,6 +107,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, CategoricalContingencyProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -109,22 +127,50 @@ def _draw(x, y, ax, profile, before, cax):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    raw,removed=paired(x=x,y=y);table=pd.crosstab(levels(raw.x),levels(raw.y))
-    if max(table.shape)>profile.max_categories or profile.max_categories<1:raise ValueError('범주 한도 초과')
-    if profile.normalization=='count':data=table.astype(float)
-    elif profile.normalization=='row':data=table.div(table.sum(axis=1),axis=0)
-    elif profile.normalization=='column':data=table.div(table.sum(axis=0),axis=1)
-    elif profile.normalization=='all':data=table/table.to_numpy().sum()
-    else:raise ValueError('normalization 오류')
-    heatmap(ax,data.values,data.index,data.columns,cax=cax,annotate=profile.annotate)
-    ax.set_xlabel('Y category');ax.set_ylabel('X category')
-    diagnostics={'n':len(raw),'missing_removed':removed,'counts':table,'normalization':profile.normalization};notes=['비율과 원 빈도를 함께 보세요. 색 차이 자체는 유의성 검정이 아닙니다.']
-    return finish(ax, before, data, diagnostics, profile, CategoricalContingencyOutputDTO, 'Categorical — Contingency', notes)
+    raw, removed = paired(x=x, y=y)
+    table = pd.crosstab(levels(raw.x), levels(raw.y))
+    if max(table.shape) > profile.max_categories or profile.max_categories < 1:
+        raise ValueError("범주 한도 초과")
+    if profile.normalization == "count":
+        data = table.astype(float)
+    elif profile.normalization == "row":
+        data = table.div(table.sum(axis=1), axis=0)
+    elif profile.normalization == "column":
+        data = table.div(table.sum(axis=0), axis=1)
+    elif profile.normalization == "all":
+        data = table / table.to_numpy().sum()
+    else:
+        raise ValueError("normalization 오류")
+    heatmap(
+        ax, data.values, data.index, data.columns, cax=cax, annotate=profile.annotate
+    )
+    ax.set_xlabel("Y category")
+    ax.set_ylabel("X category")
+    diagnostics = {
+        "n": len(raw),
+        "missing_removed": removed,
+        "counts": table,
+        "normalization": profile.normalization,
+    }
+    notes = ["비율과 원 빈도를 함께 보세요. 색 차이 자체는 유의성 검정이 아닙니다."]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        CategoricalContingencyOutputDTO,
+        "Categorical — Contingency",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_contingency(x, y, *, ax, profile=None, recipe_path=None, overrides=None, cax=None) -> CategoricalContingencyOutputDTO:
+def plot_contingency(
+    x, y, *, ax, profile=None, recipe_path=None, overrides=None, cax=None
+) -> CategoricalContingencyOutputDTO:
     """범주 조합의 집중·조건부 구성 차이와 희소 셀을 판단합니다.
 
     Args:
@@ -140,10 +186,16 @@ def plot_contingency(x, y, *, ax, profile=None, recipe_path=None, overrides=None
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-categorical-contingency', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-categorical-contingency",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    before=start(ax, cax)
+    before = start(ax, cax)
     return _draw(x, y, ax, profile, before, cax)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

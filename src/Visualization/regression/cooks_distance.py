@@ -15,22 +15,30 @@ cooks_distance.py - Cook 관측 영향력과 명시 기준
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO,validate_profile,start,finish,paired,vector
-from src.stats.regression._common import ols_result,numeric_data
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    paired,
+    vector,
+)
+from src.stats.regression._common import ols_result, numeric_data
 from statsmodels.stats.outliers_influence import OLSInfluence
 
 
@@ -47,10 +55,12 @@ class CooksDistanceProfile:
         alpha (float): 표식 투명도 [0,1]. 기본 0.8.
         threshold (Optional[float]): 양수 검토 기준; None=4/n. 기본 None.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     threshold: Optional[float] = None
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -68,17 +78,20 @@ class CooksDistanceOutputDTO(PlotOutputDTO):
         parameters (Dict[str,Any]): 적용 Profile.
         warnings (List[str]): 진단 가정·선택 후 해석 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
     data: pd.DataFrame
-    diagnostics: Dict[str,Any]
-    parameters: Dict[str,Any]
+    diagnostics: Dict[str, Any]
+    parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -90,12 +103,20 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_profile(profile,CooksDistanceProfile)
-    if profile.threshold is not None and (isinstance(profile.threshold,bool) or not isinstance(profile.threshold,(int,float)) or not np.isfinite(profile.threshold) or profile.threshold<=0):raise ValueError('Cook 기준 오류')
+    validate_profile(profile, CooksDistanceProfile)
+    if profile.threshold is not None and (
+        isinstance(profile.threshold, bool)
+        or not isinstance(profile.threshold, (int, float))
+        or not np.isfinite(profile.threshold)
+        or profile.threshold <= 0
+    ):
+        raise ValueError("Cook 기준 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _run(model, ax, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -109,18 +130,57 @@ def _run(model, ax, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    before=start(ax)
-    result=ols_result(model);cook=np.asarray(OLSInfluence(result).cooks_distance[0]);n=len(cook)
-    if not np.isfinite(cook).all():raise ValueError('Cook 지표가 퇴화했습니다.')
-    threshold=4/n if profile.threshold is None else profile.threshold;positions=np.arange(n);flag=cook>threshold
-    ax.vlines(positions,0,cook,color=profile.color,alpha=profile.alpha);ax.scatter(positions[flag],cook[flag],color='C3',s=16,label='Review');ax.axhline(threshold,color='black',linestyle='--',label='Threshold='+format(threshold,'.3g'));ax.legend(fontsize=8);ax.set_xlabel('Fitted observation position');ax.set_ylabel("Cook's distance");labels=result.model.data.row_labels
-    if labels is None:labels=positions
-    data=pd.DataFrame({'position':positions,'row_label':list(labels),'cooks_distance':cook,'flag':flag});diagnostics={'threshold':threshold,'flagged':int(flag.sum()),'n':n};notes=['영향 관측은 오류/결측과 다릅니다. 이 함수는 표시만 하며 자동 삭제하지 않습니다.']
-    return finish(ax,before,data,diagnostics,profile,CooksDistanceOutputDTO,'Regression — cooks distance',notes)
+    before = start(ax)
+    result = ols_result(model)
+    cook = np.asarray(OLSInfluence(result).cooks_distance[0])
+    n = len(cook)
+    if not np.isfinite(cook).all():
+        raise ValueError("Cook 지표가 퇴화했습니다.")
+    threshold = 4 / n if profile.threshold is None else profile.threshold
+    positions = np.arange(n)
+    flag = cook > threshold
+    ax.vlines(positions, 0, cook, color=profile.color, alpha=profile.alpha)
+    ax.scatter(positions[flag], cook[flag], color="C3", s=16, label="Review")
+    ax.axhline(
+        threshold,
+        color="black",
+        linestyle="--",
+        label="Threshold=" + format(threshold, ".3g"),
+    )
+    ax.legend(fontsize=8)
+    ax.set_xlabel("Fitted observation position")
+    ax.set_ylabel("Cook's distance")
+    labels = result.model.data.row_labels
+    if labels is None:
+        labels = positions
+    data = pd.DataFrame(
+        {
+            "position": positions,
+            "row_label": list(labels),
+            "cooks_distance": cook,
+            "flag": flag,
+        }
+    )
+    diagnostics = {"threshold": threshold, "flagged": int(flag.sum()), "n": n}
+    notes = [
+        "영향 관측은 오류/결측과 다릅니다. 이 함수는 표시만 하며 자동 삭제하지 않습니다."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        CooksDistanceOutputDTO,
+        "Regression — cooks distance",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
+
 
 def plot_cooks_distance(model, *, ax, profile=None, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -136,9 +196,15 @@ def plot_cooks_distance(model, *, ax, profile=None, recipe_path=None, overrides=
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('plot-regression-cooks-distance',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "plot-regression-cooks-distance",
+        profile,
+        recipe_path=recipe_path,
+        overrides=overrides,
+    )
     _validate(profile)
-    return _run(model, ax,profile)
+    return _run(model, ax, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

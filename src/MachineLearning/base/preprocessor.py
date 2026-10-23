@@ -15,6 +15,7 @@ preprocessor.py - FeatureSpec과 ColumnTransformer 연결
     2026-10-12  김재현(Finn)       v1.0.0    UCI 스켈레톤 전처리 연결 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -31,6 +32,7 @@ class BasePreprocessor:
         features (list): 등록한 FeatureSpec 목록.
         preprocessor (object): 활성 특성의 ColumnTransformer 또는 None.
     """
+
     def __init__(self, features=None):
         """특성 그룹을 등록하고 미적합 전처리를 생성합니다.
 
@@ -56,8 +58,12 @@ class BasePreprocessor:
         Raises:
             ValueError: sklearn 전처리 설정 오류.
         """
-        transformers = [(f.name, f.transformer, f.columns) for f in self.features if f.enabled]
-        self.preprocessor = ColumnTransformer(transformers, remainder='drop') if transformers else None
+        transformers = [
+            (f.name, f.transformer, f.columns) for f in self.features if f.enabled
+        ]
+        self.preprocessor = (
+            ColumnTransformer(transformers, remainder="drop") if transformers else None
+        )
 
     def add_feature(self, feature):
         """고유 이름의 특성 그룹을 등록합니다.
@@ -70,9 +76,9 @@ class BasePreprocessor:
             TypeError/ValueError: 자료형 또는 중복 이름 오류.
         """
         if not isinstance(feature, FeatureSpec):
-            raise TypeError('FeatureSpec이 필요합니다.')
+            raise TypeError("FeatureSpec이 필요합니다.")
         if any(f.name == feature.name for f in self.features):
-            raise ValueError('feature 이름이 중복되었습니다: ' + feature.name)
+            raise ValueError("feature 이름이 중복되었습니다: " + feature.name)
         self.features.append(feature)
         self._build_preprocessor()
         return self
@@ -130,7 +136,7 @@ class BasePreprocessor:
             ValueError: 활성 그룹 없음.
         """
         if self.preprocessor is None:
-            raise ValueError('활성 feature 전처리가 없습니다.')
+            raise ValueError("활성 feature 전처리가 없습니다.")
         return self.preprocessor
 
     def fit(self, X, y=None):

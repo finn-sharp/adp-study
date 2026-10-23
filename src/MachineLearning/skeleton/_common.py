@@ -16,6 +16,7 @@ _common.py - UCI 스켈레톤 파이프라인·결과 공통 계약
     2026-10-12  김재현(Finn)       v1.0.0    UCI 스켈레톤의 공통 계약과 수치 자료 변환
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin-klg@naver.com"
 __version__ = "1.0.0"
@@ -25,8 +26,19 @@ from dataclasses import asdict, dataclass, replace
 import importlib
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, mean_absolute_error, r2_score
-from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold, train_test_split
+from sklearn.metrics import (
+    accuracy_score,
+    f1_score,
+    mean_squared_error,
+    mean_absolute_error,
+    r2_score,
+)
+from sklearn.model_selection import (
+    GridSearchCV,
+    KFold,
+    StratifiedKFold,
+    train_test_split,
+)
 from sklearn.preprocessing import LabelEncoder
 from src.output import OutputDTO
 from src.Evaluation.adapters import evaluate_predictions
@@ -54,6 +66,7 @@ class SkeletonOutputDTO(OutputDTO):
         train_indices (object): 원 입력의 학습 행 위치; 분석은 None.
         test_indices (object): 원 입력의 보류 행 위치; 분석은 None.
     """
+
     model_name: str
     dataset_name: str
     task: str
@@ -77,10 +90,14 @@ class SkeletonOutputDTO(OutputDTO):
         Raises:
             ValueError/AttributeError: 비지도 분석 또는 입력/미적합 오류.
         """
-        if self.task not in ('classification', 'regression'):
-            raise ValueError('이 분석 결과에는 지도 학습 predict를 적용하지 않습니다.')
+        if self.task not in ("classification", "regression"):
+            raise ValueError("이 분석 결과에는 지도 학습 predict를 적용하지 않습니다.")
         values = self.model.pipeline.predict(X)
-        return self.encoder.inverse_transform(np.asarray(values, dtype=int)) if self.encoder is not None else values
+        return (
+            self.encoder.inverse_transform(np.asarray(values, dtype=int))
+            if self.encoder is not None
+            else values
+        )
 
 
 def connect_pipeline(columns, estimator, profile, scaling=None):
@@ -96,7 +113,13 @@ def connect_pipeline(columns, estimator, profile, scaling=None):
     Raises:
         ValueError/TypeError: 열·전처리 설정 오류.
     """
-    features = [FeatureSpec(name='numeric', columns=list(columns), transformer=make_scaler(profile.scaling if scaling is None else scaling))]
+    features = [
+        FeatureSpec(
+            name="numeric",
+            columns=list(columns),
+            transformer=make_scaler(profile.scaling if scaling is None else scaling),
+        )
+    ]
     preprocessor = BasePreprocessor(features)
     # The supplied BasePreprocessor is not cloneable; use its sklearn transformer for CV.
     pipeline = Basepipeline(preprocessor.get_preprocessor(), estimator)
@@ -118,50 +141,94 @@ def fit_evaluate(data, pipeline, model_name):
         ValueError/TypeError: 자료·분할·CV·모델 적합 오류.
     """
     p = pipeline.profile
-    X, y = data.drop(columns='target'), data.target
-    classification = p.task == 'classification'
-    train, test = train_test_split(np.arange(len(data)), test_size=p.test_size, random_state=p.random_state,
-                                  stratify=y if classification and p.stratify else None)
+    X, y = data.drop(columns="target"), data.target
+    classification = p.task == "classification"
+    train, test = train_test_split(
+        np.arange(len(data)),
+        test_size=p.test_size,
+        random_state=p.random_state,
+        stratify=y if classification and p.stratify else None,
+    )
     encoder = LabelEncoder().fit(y.iloc[train]) if classification else None
-    train_y = encoder.transform(y.iloc[train]) if classification else y.iloc[train].to_numpy()
+    train_y = (
+        encoder.transform(y.iloc[train]) if classification else y.iloc[train].to_numpy()
+    )
     best_params = {}
     if p.param_grid is not None:
-        splitter = StratifiedKFold(p.cv, shuffle=True, random_state=p.random_state) if classification else KFold(p.cv, shuffle=True, random_state=p.random_state)
+        splitter = (
+            StratifiedKFold(p.cv, shuffle=True, random_state=p.random_state)
+            if classification
+            else KFold(p.cv, shuffle=True, random_state=p.random_state)
+        )
         grid = {}
-        nested = getattr(pipeline.get_model(), 'named_steps', None)
+        nested = getattr(pipeline.get_model(), "named_steps", None)
         for key, values in p.param_grid.items():
             if nested is None:
-                name = key if '__' in key else 'model__' + key
-            elif key.startswith('preprocessor__'):
+                name = key if "__" in key else "model__" + key
+            elif key.startswith("preprocessor__"):
                 name = key
-            elif key.startswith('model__') and key.split('__')[1] in nested:
+            elif key.startswith("model__") and key.split("__")[1] in nested:
                 name = key
-            elif key.startswith('model__'):
-                name = 'model__model__' + key[len('model__'):]
+            elif key.startswith("model__"):
+                name = "model__model__" + key[len("model__") :]
             else:
-                name = 'model__' + key if '__' in key else 'model__model__' + key
+                name = "model__" + key if "__" in key else "model__model__" + key
             grid[name] = values
-        search = GridSearchCV(pipeline.pipeline, grid, cv=splitter, scoring=p.scoring or ('accuracy' if classification else 'neg_mean_squared_error'), n_jobs=p.n_jobs, error_score='raise')
+        search = GridSearchCV(
+            pipeline.pipeline,
+            grid,
+            cv=splitter,
+            scoring=p.scoring
+            or ("accuracy" if classification else "neg_mean_squared_error"),
+            n_jobs=p.n_jobs,
+            error_score="raise",
+        )
         search.fit(X.iloc[train], train_y)
         pipeline.pipeline = search.best_estimator_
-        pipeline.preprocessor = pipeline.pipeline.named_steps['preprocessor']
-        pipeline.model = pipeline.pipeline.named_steps['model']
+        pipeline.preprocessor = pipeline.pipeline.named_steps["preprocessor"]
+        pipeline.model = pipeline.pipeline.named_steps["model"]
         best_params = search.best_params_
     else:
         pipeline.pipeline.fit(X.iloc[train], train_y)
     prediction = pipeline.pipeline.predict(X.iloc[test])
     if classification:
         prediction = encoder.inverse_transform(np.asarray(prediction, dtype=int))
-        probabilities = pipeline.pipeline.predict_proba(X.iloc[test]) if hasattr(pipeline.pipeline, 'predict_proba') else None
-        metrics = evaluate_predictions(y.iloc[test], prediction, 'classification', probabilities, encoder.classes_)
+        probabilities = (
+            pipeline.pipeline.predict_proba(X.iloc[test])
+            if hasattr(pipeline.pipeline, "predict_proba")
+            else None
+        )
+        metrics = evaluate_predictions(
+            y.iloc[test], prediction, "classification", probabilities, encoder.classes_
+        )
     else:
-        metrics = evaluate_predictions(y.iloc[test], prediction, 'regression')
-    dataset = 'UCI Iris' if classification else 'UCI Wine Quality (red)'
-    details = {'feature_names': X.columns.tolist(), 'preprocessor': pipeline.feature_specification.describe(), 'best_params': best_params, 'recipe': asdict(p)}
+        metrics = evaluate_predictions(y.iloc[test], prediction, "regression")
+    dataset = "UCI Iris" if classification else "UCI Wine Quality (red)"
+    details = {
+        "feature_names": X.columns.tolist(),
+        "preprocessor": pipeline.feature_specification.describe(),
+        "best_params": best_params,
+        "recipe": asdict(p),
+    }
     final = pipeline.get_model()
-    if hasattr(final, 'named_steps') and 'selector' in final.named_steps:
-        details['selected_features'] = X.columns[final.named_steps['selector'].get_support()].tolist()
-    return SkeletonOutputDTO(model_name, dataset, p.task, len(data), X.shape[1], metrics, details, pipeline, encoder, prediction, train, test)
+    if hasattr(final, "named_steps") and "selector" in final.named_steps:
+        details["selected_features"] = X.columns[
+            final.named_steps["selector"].get_support()
+        ].tolist()
+    return SkeletonOutputDTO(
+        model_name,
+        dataset,
+        p.task,
+        len(data),
+        X.shape[1],
+        metrics,
+        details,
+        pipeline,
+        encoder,
+        prediction,
+        train,
+        test,
+    )
 
 
 class AnalysisEstimator(TransformerMixin, BaseEstimator):
@@ -173,6 +240,7 @@ class AnalysisEstimator(TransformerMixin, BaseEstimator):
         profile (object): 외부 전처리와 중복 적합하지 않을 Profile.
         result_ (object): fit 후 기법별 Output DTO.
     """
+
     def __init__(self, module_name, runner_name, profile):
         """adapter 생성.
 
@@ -201,8 +269,12 @@ class AnalysisEstimator(TransformerMixin, BaseEstimator):
             ValueError/ImportError: 기법 조건·라이브러리 오류.
         """
         runner = getattr(importlib.import_module(self.module_name), self.runner_name)
-        profile = replace(self.profile, scaling='none')
-        self.result_ = runner(X, y, profile=profile) if self.runner_name == 'run_lda' else runner(X, profile=profile)
+        profile = replace(self.profile, scaling="none")
+        self.result_ = (
+            runner(X, y, profile=profile)
+            if self.runner_name == "run_lda"
+            else runner(X, profile=profile)
+        )
         return self
 
     def fit_transform(self, X, y=None, **kwargs):
@@ -230,8 +302,8 @@ class AnalysisEstimator(TransformerMixin, BaseEstimator):
         Raises:
             ValueError/AttributeError: 미지원 또는 미적합.
         """
-        if not getattr(self.result_, 'supports_transform', False):
-            raise ValueError('이 기법은 새 입력 transform을 지원하지 않습니다.')
+        if not getattr(self.result_, "supports_transform", False):
+            raise ValueError("이 기법은 새 입력 transform을 지원하지 않습니다.")
         return self.result_.model.transform(X)
 
 
@@ -245,8 +317,8 @@ def report(result):
     Raises:
         TypeError: 잘못된 결과 구조.
     """
-    print('=== Example : {} {} ==='.format(result.dataset_name, result.model_name))
-    print('rows={}, features={}'.format(result.n_rows, result.n_features))
-    print('metrics:', result.metrics)
-    print('details:', result.details)
+    print("=== Example : {} {} ===".format(result.dataset_name, result.model_name))
+    print("rows={}, features={}".format(result.n_rows, result.n_features))
+    print("metrics:", result.metrics)
+    print("details:", result.details)
     return result

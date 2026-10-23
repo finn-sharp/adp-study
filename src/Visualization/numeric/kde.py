@@ -15,6 +15,7 @@ kde.py - 히스토그램 구간 선택에 따른 착시를 비교하고 분포 �
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -44,11 +57,13 @@ class NumericKdeProfile:
         points (int): 밀도 평가 격자 수, 2 이상. 기본 200.
         bandwidth (float): Scott bandwidth에 곱할 양수 배율. 기본 1.0.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     points: int = 200
     bandwidth: float = 1.0
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -66,6 +81,7 @@ class NumericKdeOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -73,6 +89,7 @@ class NumericKdeOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -88,6 +105,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, NumericKdeProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -106,20 +124,45 @@ def _draw(values, ax, profile, before):
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
     from scipy.stats import gaussian_kde
-    a,removed=vector(values,min_size=2)
-    if profile.points<2 or profile.bandwidth<=0 or np.ptp(a)==0:raise ValueError('KDE 격자/대역폭/상수 자료 오류')
-    model=gaussian_kde(a,bw_method=lambda estimator:estimator.scotts_factor()*profile.bandwidth)
-    width=3*np.sqrt(float(model.covariance[0,0]));x=np.linspace(a.min()-width,a.max()+width,profile.points);density=model(x)
-    ax.plot(x,density,color=profile.color,alpha=profile.alpha);ax.fill_between(x,0,density,color=profile.color,alpha=profile.alpha*.2)
-    ax.set_xlabel('Value');ax.set_ylabel('Density')
-    data=pd.DataFrame({'value':x,'density':density});diagnostics={'n':len(a),'missing_removed':removed,'bandwidth_factor':float(model.factor)}
-    notes=['KDE는 경계 밖에도 밀도를 배정하며 bandwidth에 따라 모양이 달라집니다.']
-    return finish(ax, before, data, diagnostics, profile, NumericKdeOutputDTO, 'Numeric — Kde', notes)
+
+    a, removed = vector(values, min_size=2)
+    if profile.points < 2 or profile.bandwidth <= 0 or np.ptp(a) == 0:
+        raise ValueError("KDE 격자/대역폭/상수 자료 오류")
+    model = gaussian_kde(
+        a, bw_method=lambda estimator: estimator.scotts_factor() * profile.bandwidth
+    )
+    width = 3 * np.sqrt(float(model.covariance[0, 0]))
+    x = np.linspace(a.min() - width, a.max() + width, profile.points)
+    density = model(x)
+    ax.plot(x, density, color=profile.color, alpha=profile.alpha)
+    ax.fill_between(x, 0, density, color=profile.color, alpha=profile.alpha * 0.2)
+    ax.set_xlabel("Value")
+    ax.set_ylabel("Density")
+    data = pd.DataFrame({"value": x, "density": density})
+    diagnostics = {
+        "n": len(a),
+        "missing_removed": removed,
+        "bandwidth_factor": float(model.factor),
+    }
+    notes = ["KDE는 경계 밖에도 밀도를 배정하며 bandwidth에 따라 모양이 달라집니다."]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        NumericKdeOutputDTO,
+        "Numeric — Kde",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_kde(values, *, ax, profile=None, recipe_path=None, overrides=None) -> NumericKdeOutputDTO:
+def plot_kde(
+    values, *, ax, profile=None, recipe_path=None, overrides=None
+) -> NumericKdeOutputDTO:
     """히스토그램 구간 선택에 따른 착시를 비교하고 분포 구조를 탐색합니다.
 
     Args:
@@ -133,10 +176,13 @@ def plot_kde(values, *, ax, profile=None, recipe_path=None, overrides=None) -> N
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-numeric-kde', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-numeric-kde", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(values, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

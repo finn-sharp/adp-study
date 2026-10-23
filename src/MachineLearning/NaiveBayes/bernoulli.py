@@ -15,22 +15,30 @@ bernoulli.py - bernoulli 분포 전용 Naive Bayes
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
 ================================================================================
 """
-__author__='김재현(Finn)'
-__email__='penguin.klg@gmail.com'
-__version__='1.0.0'
-__status__='Development'
+
+__author__ = "김재현(Finn)"
+__email__ = "penguin.klg@gmail.com"
+__version__ = "1.0.0"
+__status__ = "Development"
 
 # ---------------------------------------------------------------------------
 # 1. Imports
 # ---------------------------------------------------------------------------
-from dataclasses import dataclass,asdict
-from typing import Any,Dict,List,Optional,Tuple
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from src.output import OutputDTO
 from src.Recipes import resolve_profile
-from sklearn.base import BaseEstimator,ClassifierMixin
-from src.MachineLearning.NaiveBayes._distribution_common import validate_nb_profile,run_distribution,numeric_counts,labels_for_fit,log_priors,DistributionClassifierMixin
+from sklearn.base import BaseEstimator, ClassifierMixin
+from src.MachineLearning.NaiveBayes._distribution_common import (
+    validate_nb_profile,
+    run_distribution,
+    numeric_counts,
+    labels_for_fit,
+    log_priors,
+    DistributionClassifierMixin,
+)
 from src.Preprocessing._common import feature_array
 
 
@@ -54,17 +62,19 @@ class BernoulliProfile:
         alpha (float): 양수 Bernoulli 가산 평활화. 기본 1.0.
         binarize (Optional[float]): None이면 엄격 0/1; 유한 수면 고정 임계값으로 이진화. 기본 None.
     """
+
     test_size: float = 0.3
     random_state: int = 1234
     stratify: bool = True
-    split_strategy: str = 'random'
-    scaling: str = 'none'
+    split_strategy: str = "random"
+    scaling: str = "none"
     cv: int = 3
     scoring: Optional[str] = None
     n_jobs: int = 1
-    param_grid: Optional[Dict[str,Any]] = None
+    param_grid: Optional[Dict[str, Any]] = None
     alpha: float = 1.0
     binarize: Optional[float] = None
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -92,10 +102,11 @@ class BernoulliOutputDTO(OutputDTO):
         cv_results (Optional[Dict[str,Any]]): 전체 CV 결과 또는 None.
         warnings (List[str]): 분포·독립·확률 해석 가정.
     """
+
     model_name: str
     model: Any
-    train_metrics: Dict[str,float]
-    test_metrics: Dict[str,float]
+    train_metrics: Dict[str, float]
+    test_metrics: Dict[str, float]
     y_test: np.ndarray
     predictions: np.ndarray
     probabilities: np.ndarray
@@ -105,14 +116,16 @@ class BernoulliOutputDTO(OutputDTO):
     train_indices: np.ndarray
     test_indices: np.ndarray
     feature_names: List[str]
-    best_params: Dict[str,Any]
+    best_params: Dict[str, Any]
     best_cv_score: Optional[float]
-    cv_results: Optional[Dict[str,Any]]
+    cv_results: Optional[Dict[str, Any]]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
+
 
 def _validate(profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -124,13 +137,21 @@ def _validate(profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    validate_nb_profile(profile,BernoulliProfile)
-    if profile.alpha<=0:raise ValueError('alpha는 양수입니다.')
-    if profile.binarize is not None and (isinstance(profile.binarize,bool) or not isinstance(profile.binarize,(int,float)) or not np.isfinite(profile.binarize)):raise ValueError('binarize 오류')
+    validate_nb_profile(profile, BernoulliProfile)
+    if profile.alpha <= 0:
+        raise ValueError("alpha는 양수입니다.")
+    if profile.binarize is not None and (
+        isinstance(profile.binarize, bool)
+        or not isinstance(profile.binarize, (int, float))
+        or not np.isfinite(profile.binarize)
+    ):
+        raise ValueError("binarize 오류")
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def build_bernoulli_classifier(profile=None, *, recipe_path=None, overrides=None):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -144,10 +165,14 @@ def build_bernoulli_classifier(profile=None, *, recipe_path=None, overrides=None
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-bernoulli',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-bernoulli", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
     from sklearn.naive_bayes import BernoulliNB
-    return BernoulliNB(alpha=profile.alpha,binarize=profile.binarize)
+
+    return BernoulliNB(alpha=profile.alpha, binarize=profile.binarize)
+
 
 def _run(X, y, test_indices, profile):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
@@ -162,15 +187,27 @@ def _run(X, y, test_indices, profile):
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    a,_=feature_array(X,True,False)
-    if profile.binarize is None and not np.isin(a,[0,1]).all():raise ValueError('Bernoulli는 0/1 입력 또는 명시 binarize가 필요합니다.')
-    return run_distribution(X,y,build_bernoulli_classifier(profile),profile,BernoulliOutputDTO,test_indices=test_indices)
+    a, _ = feature_array(X, True, False)
+    if profile.binarize is None and not np.isin(a, [0, 1]).all():
+        raise ValueError("Bernoulli는 0/1 입력 또는 명시 binarize가 필요합니다.")
+    return run_distribution(
+        X,
+        y,
+        build_bernoulli_classifier(profile),
+        profile,
+        BernoulliOutputDTO,
+        test_indices=test_indices,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_bernoulli(X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None):
+
+def run_bernoulli(
+    X, y, test_indices=None, profile=None, *, recipe_path=None, overrides=None
+):
     """전용 입력/설정을 검증하고 해당 계산을 수행합니다.
 
     Args:
@@ -185,9 +222,12 @@ def run_bernoulli(X, y, test_indices=None, profile=None, *, recipe_path=None, ov
     Raises:
         ValueError/TypeError/OSError: 입력·정의역·설정·레시피 오류.
     """
-    profile=resolve_profile('naive-bayes-bernoulli',profile,recipe_path=recipe_path,overrides=overrides)
+    profile = resolve_profile(
+        "naive-bayes-bernoulli", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    return _run(X, y, test_indices,profile)
+    return _run(X, y, test_indices, profile)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

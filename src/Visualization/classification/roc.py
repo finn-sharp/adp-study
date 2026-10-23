@@ -15,6 +15,7 @@ roc.py - 분류 순위 성능과 위양성/민감도의 균형을 비교합니�
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -28,7 +29,19 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 from src.Recipes import resolve_profile
-from src.Visualization._common import PlotOutputDTO, validate_profile, start, finish, vector, frame, paired, levels, heatmap, binary_scores
+from src.Visualization._common import (
+    PlotOutputDTO,
+    validate_profile,
+    start,
+    finish,
+    vector,
+    frame,
+    paired,
+    levels,
+    heatmap,
+    binary_scores,
+)
+
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
@@ -43,10 +56,12 @@ class ClassificationRocProfile:
         alpha (float): artist 투명도 [0,1]. 기본 0.8.
         positive_label (Any): 큰 score가 의미하는 양성 라벨. 기본 1.
     """
-    title: str = ''
-    color: str = 'C0'
+
+    title: str = ""
+    color: str = "C0"
     alpha: float = 0.8
     positive_label: Any = 1
+
 
 # ---------------------------------------------------------------------------
 # 3. Output DTO
@@ -64,6 +79,7 @@ class ClassificationRocOutputDTO(PlotOutputDTO):
         parameters (Dict[str, Any]): 적용 Profile 설정.
         warnings (List[str]): 해석 가정·미표시/표본 제한 정보.
     """
+
     figure: Any
     axes: Any
     artists: List[Any]
@@ -71,6 +87,7 @@ class ClassificationRocOutputDTO(PlotOutputDTO):
     diagnostics: Dict[str, Any]
     parameters: Dict[str, Any]
     warnings: List[str]
+
 
 # ---------------------------------------------------------------------------
 # 4. Input Validation
@@ -86,6 +103,7 @@ def _validate(profile):
         ValueError/TypeError: Profile 타입·필드·스타일 오류.
     """
     validate_profile(profile, ClassificationRocProfile)
+
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
@@ -104,15 +122,52 @@ def _draw(y_true, scores, ax, profile, before):
     Raises:
         ValueError/TypeError: 기법별 입력·설정 정의역 오류.
     """
-    from sklearn.metrics import roc_curve,auc
-    y,s,removed=binary_scores(y_true,scores,profile.positive_label);fpr,tpr,thresholds=roc_curve(y,s,drop_intermediate=False);area=float(auc(fpr,tpr));ax.plot(fpr,tpr,color=profile.color,alpha=profile.alpha,label='AUC='+format(area,'.3f'));ax.plot([0,1],[0,1],color='gray',linestyle='--');ax.set_xlim(0,1);ax.set_ylim(0,1.02);ax.set_xlabel('False positive rate');ax.set_ylabel('True positive rate');ax.legend(fontsize=8)
-    data=pd.DataFrame({'fpr':fpr,'tpr':tpr,'threshold':thresholds});diagnostics={'roc_auc':area,'n':len(y),'positive_fraction':float(y.mean()),'missing_removed':removed};notes=['이진 score 순위 평가입니다. 보류/외부 점수를 사용하고 비용에 맞는 임계값은 별도로 선택하세요.']
-    return finish(ax, before, data, diagnostics, profile, ClassificationRocOutputDTO, 'Classification — Roc', notes)
+    from sklearn.metrics import roc_curve, auc
+
+    y, s, removed = binary_scores(y_true, scores, profile.positive_label)
+    fpr, tpr, thresholds = roc_curve(y, s, drop_intermediate=False)
+    area = float(auc(fpr, tpr))
+    ax.plot(
+        fpr,
+        tpr,
+        color=profile.color,
+        alpha=profile.alpha,
+        label="AUC=" + format(area, ".3f"),
+    )
+    ax.plot([0, 1], [0, 1], color="gray", linestyle="--")
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1.02)
+    ax.set_xlabel("False positive rate")
+    ax.set_ylabel("True positive rate")
+    ax.legend(fontsize=8)
+    data = pd.DataFrame({"fpr": fpr, "tpr": tpr, "threshold": thresholds})
+    diagnostics = {
+        "roc_auc": area,
+        "n": len(y),
+        "positive_fraction": float(y.mean()),
+        "missing_removed": removed,
+    }
+    notes = [
+        "이진 score 순위 평가입니다. 보류/외부 점수를 사용하고 비용에 맞는 임계값은 별도로 선택하세요."
+    ]
+    return finish(
+        ax,
+        before,
+        data,
+        diagnostics,
+        profile,
+        ClassificationRocOutputDTO,
+        "Classification — Roc",
+        notes,
+    )
+
 
 # ---------------------------------------------------------------------------
 # 6. Public Runner
 # ---------------------------------------------------------------------------
-def plot_roc(y_true, scores, *, ax, profile=None, recipe_path=None, overrides=None) -> ClassificationRocOutputDTO:
+def plot_roc(
+    y_true, scores, *, ax, profile=None, recipe_path=None, overrides=None
+) -> ClassificationRocOutputDTO:
     """분류 순위 성능과 위양성/민감도의 균형을 비교합니다.
 
     Args:
@@ -127,10 +182,13 @@ def plot_roc(y_true, scores, *, ax, profile=None, recipe_path=None, overrides=No
     Raises:
         ValueError/TypeError/OSError: 자료·설정·축·레시피 오류.
     """
-    profile=resolve_profile('plot-classification-roc', profile, recipe_path=recipe_path, overrides=overrides)
+    profile = resolve_profile(
+        "plot-classification-roc", profile, recipe_path=recipe_path, overrides=overrides
+    )
     _validate(profile)
-    before=start(ax)
+    before = start(ax)
     return _draw(y_true, scores, ax, profile, before)
+
 
 # ---------------------------------------------------------------------------
 # 7. Example Execution

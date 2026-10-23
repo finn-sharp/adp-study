@@ -16,6 +16,7 @@ wilcoxon - Wilcoxon 부호순위
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
 ================================================================================
 """
+
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -35,12 +36,13 @@ import inspect
 import warnings as pywarnings
 from scipy import stats
 from src.stats.tests._validation import alpha
-from src.stats.tests._common import (number, numeric, paired, result)
+from src.stats.tests._common import number, numeric, paired, result
 
 
 # ---------------------------------------------------------------------------
 # 2. Input Profile
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class WilcoxonProfile:
@@ -56,6 +58,7 @@ class WilcoxonProfile:
         alternative (str): two-sided/less/greater; 입력 x−y 또는 첫/둘째 집단 방향 기본 "two-sided".
         nan_policy (str): raise/omit. 대응 자료 omit은 쌍/블록 전체 제거; 무한대 거부 기본 "raise".
     """
+
     alpha: float = 0.05
     sample_design: str = "one_sample"
     location_0: float = 0.0
@@ -69,6 +72,7 @@ class WilcoxonProfile:
 # ---------------------------------------------------------------------------
 # 3. Output DTO
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class WilcoxonOutputDTO(OutputDTO):
@@ -90,6 +94,7 @@ class WilcoxonOutputDTO(OutputDTO):
         positive_rank_sum (float): 양의 차이 순위 합.
         negative_rank_sum (float): 음의 차이 순위 합.
     """
+
     test_type: str
     statistic: float
     p_value: Optional[float]
@@ -110,6 +115,7 @@ class WilcoxonOutputDTO(OutputDTO):
 # 4. Input Validation
 # ---------------------------------------------------------------------------
 
+
 def _validate_data(args, p):
     """공개 입력을 설계별로 정규화합니다.
 
@@ -122,36 +128,43 @@ def _validate_data(args, p):
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
     alpha(p.alpha)
-    alt = getattr(p, 'alternative', 'two-sided')
-    if alt not in ('two-sided', 'less', 'greater'):
-        raise ValueError('alternative 오류')
-    for name in ('known_var', 'equal_var', 'correction', 'estimated_parameters'):
+    alt = getattr(p, "alternative", "two-sided")
+    if alt not in ("two-sided", "less", "greater"):
+        raise ValueError("alternative 오류")
+    for name in ("known_var", "equal_var", "correction", "estimated_parameters"):
         if hasattr(p, name) and (not isinstance(getattr(p, name), bool)):
-            raise ValueError(name + '는 bool입니다.')
-    policy = getattr(p, 'nan_policy', 'raise')
-    if policy not in ('raise', 'omit'):
-        raise ValueError('nan_policy 오류')
-    for name in ('mu_0', 'diff_0', 'location_0'):
+            raise ValueError(name + "는 bool입니다.")
+    policy = getattr(p, "nan_policy", "raise")
+    if policy not in ("raise", "omit"):
+        raise ValueError("nan_policy 오류")
+    for name in ("mu_0", "diff_0", "location_0"):
         if hasattr(p, name):
             number(getattr(p, name), name)
-    if p.sample_design not in ('one_sample', 'paired'):
-        raise ValueError('sample_design 오류')
-    if p.sample_design == 'paired':
-        if args['y'] is None:
-            raise ValueError('paired는 y가 필요합니다.')
-        a, b = paired(args['x'], args['y'], policy)
+    if p.sample_design not in ("one_sample", "paired"):
+        raise ValueError("sample_design 오류")
+    if p.sample_design == "paired":
+        if args["y"] is None:
+            raise ValueError("paired는 y가 필요합니다.")
+        a, b = paired(args["x"], args["y"], policy)
         d = a - b - p.location_0
     else:
-        if args['y'] is not None:
-            raise ValueError('one_sample에서는 y를 지정하지 않습니다.')
-        d = numeric(args['x'], 1, 1, policy) - p.location_0
+        if args["y"] is not None:
+            raise ValueError("one_sample에서는 y를 지정하지 않습니다.")
+        d = numeric(args["x"], 1, 1, policy) - p.location_0
     if not np.isfinite(d).all():
-        raise ValueError('차이 계산 overflow입니다.')
-    if p.method not in ('auto', 'exact', 'asymptotic') or p.zero_method not in ('wilcox', 'pratt', 'zsplit'):
-        raise ValueError('method/zero_method 오류')
-    return {'d': d}
+        raise ValueError("차이 계산 overflow입니다.")
+    if p.method not in ("auto", "exact", "asymptotic") or p.zero_method not in (
+        "wilcox",
+        "pratt",
+        "zsplit",
+    ):
+        raise ValueError("method/zero_method 오류")
+    return {"d": d}
 
-def _validate_inputs(arguments: Dict[str, Any], profile: WilcoxonProfile) -> Dict[str, Any]:
+
+def _validate_inputs(
+    arguments: Dict[str, Any], profile: WilcoxonProfile
+) -> Dict[str, Any]:
     """자료와 설정을 검증합니다.
 
     Args:
@@ -162,13 +175,15 @@ def _validate_inputs(arguments: Dict[str, Any], profile: WilcoxonProfile) -> Dic
     Raises:
         TypeError/ValueError: 잘못된 Profile·표본·설정·가정 조건.
     """
-    if not isinstance(profile, WilcoxonProfile): raise TypeError("WilcoxonProfile이 필요합니다.")
+    if not isinstance(profile, WilcoxonProfile):
+        raise TypeError("WilcoxonProfile이 필요합니다.")
     return _validate_data(arguments, profile)
 
 
 # ---------------------------------------------------------------------------
 # 5. Individual Model Runners
 # ---------------------------------------------------------------------------
+
 
 def _calculate(d, p):
     """기법별 통계 계산과 전용 결과 필드를 제공합니다.
@@ -181,31 +196,65 @@ def _calculate(d, p):
     Raises:
         ValueError/TypeError: 자료·설정·정의역·계산 한도 오류.
     """
-    alt = getattr(p, 'alternative', 'two-sided')
-    diff = d['d']
+    alt = getattr(p, "alternative", "two-sided")
+    diff = d["d"]
     zeros = int((diff == 0).sum())
     nonzero = diff[diff != 0]
     n = len(nonzero)
-    ranks = stats.rankdata(np.abs(nonzero if p.zero_method == 'wilcox' else diff))
-    used = nonzero if p.zero_method == 'wilcox' else diff
+    ranks = stats.rankdata(np.abs(nonzero if p.zero_method == "wilcox" else diff))
+    used = nonzero if p.zero_method == "wilcox" else diff
     wp = float(ranks[used > 0].sum())
     wm = float(ranks[used < 0].sum())
-    if p.zero_method == 'zsplit':
+    if p.zero_method == "zsplit":
         wp += float(ranks[used == 0].sum() / 2)
         wm += float(ranks[used == 0].sum() / 2)
-    extras = dict(n_effective=n, zero_count=zeros, positive_rank_sum=wp, negative_rank_sum=wm)
+    extras = dict(
+        n_effective=n, zero_count=zeros, positive_rank_sum=wp, negative_rank_sum=wm
+    )
     if n == 0:
-        return result('wilcoxon', p, min(wp, wm) if alt == 'two-sided' else wp, 1.0, '차이분포가 지정 위치를 중심으로 대칭이다', 'degenerate-all-zero', extras, notes=['모든 차이가 0입니다. 순위 추론 정보가 없습니다.'])
+        return result(
+            "wilcoxon",
+            p,
+            min(wp, wm) if alt == "two-sided" else wp,
+            1.0,
+            "차이분포가 지정 위치를 중심으로 대칭이다",
+            "degenerate-all-zero",
+            extras,
+            notes=["모든 차이가 0입니다. 순위 추론 정보가 없습니다."],
+        )
     ties = len(np.unique(np.abs(nonzero))) < n
-    method = ('exact' if n <= 50 and (not ties) and (not zeros) else 'asymptotic') if p.method == 'auto' else p.method
-    if method == 'exact' and (ties or zeros):
-        raise ValueError('exact는 동률/0차이 없는 자료만 지원합니다.')
-    kwargs = {'alternative': alt, 'zero_method': p.zero_method, 'correction': p.correction}
-    name = 'method' if 'method' in inspect.signature(stats.wilcoxon).parameters else 'mode'
-    kwargs[name] = method if name == 'method' else 'approx' if method == 'asymptotic' else method
+    method = (
+        ("exact" if n <= 50 and (not ties) and (not zeros) else "asymptotic")
+        if p.method == "auto"
+        else p.method
+    )
+    if method == "exact" and (ties or zeros):
+        raise ValueError("exact는 동률/0차이 없는 자료만 지원합니다.")
+    kwargs = {
+        "alternative": alt,
+        "zero_method": p.zero_method,
+        "correction": p.correction,
+    }
+    name = (
+        "method" if "method" in inspect.signature(stats.wilcoxon).parameters else "mode"
+    )
+    kwargs[name] = (
+        method if name == "method" else "approx" if method == "asymptotic" else method
+    )
     with pywarnings.catch_warnings(record=True) as caught:
         r = stats.wilcoxon(diff, **kwargs)
-    return result('wilcoxon', p, r.statistic, r.pvalue, '차이분포가 지정 위치를 중심으로 대칭이다', method, extras, {'ties': ties}, [str(w.message) for w in caught])
+    return result(
+        "wilcoxon",
+        p,
+        r.statistic,
+        r.pvalue,
+        "차이분포가 지정 위치를 중심으로 대칭이다",
+        method,
+        extras,
+        {"ties": ties},
+        [str(w.message) for w in caught],
+    )
+
 
 def _run_test(data: Dict[str, Any], profile: WilcoxonProfile) -> WilcoxonOutputDTO:
     """검증된 자료를 계산합니다.
@@ -225,7 +274,15 @@ def _run_test(data: Dict[str, Any], profile: WilcoxonProfile) -> WilcoxonOutputD
 # 6. Public Runner
 # ---------------------------------------------------------------------------
 
-def run_wilcoxon(x: Any, y: Any = None, profile: Optional[WilcoxonProfile] = None, *, recipe_path: Optional[str] = None, overrides: Optional[Dict[str, Any]] = None) -> WilcoxonOutputDTO:
+
+def run_wilcoxon(
+    x: Any,
+    y: Any = None,
+    profile: Optional[WilcoxonProfile] = None,
+    *,
+    recipe_path: Optional[str] = None,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> WilcoxonOutputDTO:
     """Wilcoxon 부호순위.
 
     Args:
@@ -240,8 +297,10 @@ def run_wilcoxon(x: Any, y: Any = None, profile: Optional[WilcoxonProfile] = Non
         TypeError/ValueError: 입력/설정/설계/계산 조건 위반.
         FileNotFoundError/OSError: 레시피 읽기 실패.
     """
-    profile = resolve_profile("wilcoxon", profile, recipe_path=recipe_path, overrides=overrides)
-    data = _validate_inputs({'x': x, 'y': y}, profile)
+    profile = resolve_profile(
+        "wilcoxon", profile, recipe_path=recipe_path, overrides=overrides
+    )
+    data = _validate_inputs({"x": x, "y": y}, profile)
     return _run_test(data, profile)
 
 
@@ -250,5 +309,5 @@ def run_wilcoxon(x: Any, y: Any = None, profile: Optional[WilcoxonProfile] = Non
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    result = run_wilcoxon([1,2,-3,4,5])
+    result = run_wilcoxon([1, 2, -3, 4, 5])
     print(result.to_json(indent=2))
