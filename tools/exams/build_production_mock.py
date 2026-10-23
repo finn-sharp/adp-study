@@ -59,11 +59,9 @@ cycles=pd.read_csv(HERE/'data/cycle_times.csv')
 answers=[]
 def record(question,**values):
     answers.append(dict(question=question,**values))
-    (HERE/'실행結果').mkdir(exist_ok=True)
-    (HERE/'실行結果') if False else None
     dest=HERE/'실행결과';dest.mkdir(exist_ok=True)
     (dest/'답안수치.json').write_text(json.dumps(answers,ensure_ascii=False,indent=2,allow_nan=False)+'\\n')
-'''.replace("    (HERE/'실행結果').mkdir(exist_ok=True)\n    (HERE/'실行結果') if False else None\n",'')
+'''
 ANSWERS={
 '1-1':('각 행은 투입 전 배치, id는 식별자이고 yield는 최종 목표다. 사후 수율을 입력으로 쓰면 타깃 누출이다. 결측 대치 통계량은 학습 자료에만 적합한다. 전체 자료의 기술 탐색은 수행하되 최종 평가값으로 전처리·후보를 변경하지 않는다.',"display(quality.describe()); display(quality.isna().sum()); record('1-1',n=len(quality),missing_temperature=int(quality.temperature.isna().sum()))"),
 '1-2':('무작위 IID 학습/최종 평가 분할이며 표준화와 중앙값 대치를 Pipeline 안에 두므로 CV 폴드마다 다시 적합한다. 랜덤포레스트는 스케일에 의존하지 않아 대치만 적용한다. 시계열 배치에는 이 분할을 그대로 적용하지 않는다.',"""train,test=train_test_split(np.arange(len(quality)),test_size=.3,random_state=2026)
@@ -95,7 +93,7 @@ print(exact_cost,exact_solution);display(pd.DataFrame(runs));record('2-4',exact_
 for demand in [70000.,90000.]:
     r=run_production_allocation(*base_args,overrides={'target_production':demand});scenarios.append(dict(target=demand,solution=r.exact_solution.tolist(),cost=r.exact_cost,capacities=(r.exact_solution*H/processes.minutes_per_unit).tolist()))
 impossible=run_production_allocation(*base_args,overrides={'budget':29000.});print(scenarios,impossible.exact_status);record('2-5',scenarios=scenarios,budget_status=impossible.exact_status)"""),
-'2-6':('권고는 첫해 2억9,800만원, 설비 2·1·2대, 목표 대비 라인 여유 1만 개다. 구매비 24,?가 아니라 각 항목을 직접 합산한다. 구매비 25,000만원, 운영비 4,800만원이다. 결정적 최적화는 모집단 추론이 아니므로 p값이 없다. 고장·설비 가동률·서비스시간 변동·품질·작업자·현금흐름을 추가해야 실제 투자 판단에 가까워진다.',"""purchase=float(np.array(exact_solution)@processes.purchase_cost);operating=float(np.array(exact_solution)@processes.operating_cost)
+'2-6':('권고는 첫해 2억9,800만원, 설비 2·1·2대, 목표 대비 라인 여유 1만 개다. 구매비는 25,000만원, 운영비는 4,800만원이다. 결정적 최적화는 모집단 추론이 아니므로 p값이 없다. 고장·설비 가동률·서비스시간 변동·품질·작업자·현금흐름을 추가해야 실제 투자 판단에 가까워진다.',"""purchase=float(np.array(exact_solution)@processes.purchase_cost);operating=float(np.array(exact_solution)@processes.operating_cost)
 print('구매/연간 운영:',purchase,operating);record('2-6',purchase_cost=purchase,annual_operating_cost=operating,first_year_cost=purchase+operating,capacity_slack=allocation.annual_production-50000)"""),
 '3-1':('새 배치에서 별도로 측정했으므로 독립 두 표본이다. 동일 배치 전후가 아니어서 대응 검정을 사용하지 않는다. 공정 처리시간 수준이 서로 달라 전체를 합치면 집단 구성 차이를 개선 효과와 혼동한다.',"summary=cycles.groupby(['process','phase']).minutes.agg(['size','mean','std']);display(summary);record('3-1',summary=summary.reset_index().to_dict('records'))"),
 '3-2':('각 집단의 중심화 자료에 Shapiro-Wilk 진단을 적용한다. H0는 해당 모집단이 정규분포, H1은 비정규다. 평균 제거는 Shapiro 통계량에 영향을 주지 않는다. 여섯 진단의 Holm 보정으로 판단하고 비기각은 가정의 증명이 아니다. QQ는 진단 그림이며 적합한 모수의 정식 독립 검정이 아니다.',"""normality=[];fig,axes=plt.subplots(2,3,figsize=(12,7))
@@ -106,9 +104,9 @@ for ax,((process,phase),part) in zip(axes.flat,cycles.groupby(['process','phase'
 adjusted=multipletests([r['p_value'] for r in normality],method='holm')[1]
 for r,p in zip(normality,adjusted):r.update(p_holm=float(p),reject_H0=bool(p<.05),H0='population is normal',H1='population is not normal')
 plt.tight_layout();plt.show();display(pd.DataFrame(normality));record('3-2',tests=normality)"""),
-'3-3':('独立な正規母集団という作業仮定の下、Welch の独立二標本 t 検定を選ぶ。差 new-old で H0: μnew-μold≥0、H1:<0。境界差0で単側pを計算する。分散既知・等分散・対応を仮定しない。処理時間の減少はライン全体の費用減少を直接意味しない。',"""old=cycles[(cycles.process==3)&(cycles.phase=='old')].minutes.to_numpy();new=cycles[(cycles.process==3)&(cycles.phase=='new')].minutes.to_numpy()
+'3-3':('독립 정규 모집단 작업 가정에서 Welch 독립 두 표본 t 검정을 선택한다. 차이는 new-old이며 H0: μnew-μold≥0, H1:<0이다. 영가설 경계0에서 하측 p값을 계산한다. 등분산·분산 기지·대응을 가정하지 않는다. 평균 감소의 증거는 전체 라인의 실제 비용 감소나 인과 효과를 보장하지 않는다.',"""old=cycles[(cycles.process==3)&(cycles.phase=='old')].minutes.to_numpy();new=cycles[(cycles.process==3)&(cycles.phase=='new')].minutes.to_numpy()
 a=new.var(ddof=1)/len(new);b=old.var(ddof=1)/len(old);difference=float(new.mean()-old.mean());stat=difference/np.sqrt(a+b);df=(a+b)**2/(a*a/(len(new)-1)+b*b/(len(old)-1));p=float(stats.t.cdf(stat,df))
-report=dict(method='Welch one-sided',H0='mu_new-mu_old >= 0',H1='mu_new-mu_old < 0',difference=difference,statistic=float(stat),df=float(df),p_value=p,reject_H0=bool(p<.05),conclusion='平均減少を支持' if p<.05 else '平均減少の証拠が不足')
+report=dict(method='Welch one-sided',H0='mu_new-mu_old >= 0',H1='mu_new-mu_old < 0',difference=difference,statistic=float(stat),df=float(df),p_value=p,reject_H0=bool(p<.05),conclusion='평균 감소를 지지' if p<.05 else '평균 감소 근거 부족')
 print(report);record('3-3',**report)"""),
 '3-4':('정규·독립 표본에서 각 평균의 단측 상한 mean+t(1-0.05/3,29)×s/√30을 사용한다. Bonferroni로 세 상한의 가족 포함률이 적어도95%가 된다. 공정 간 독립은 Bonferroni에 필수는 아니다. 이 구간은 평균의 불확실성만 반영하며 제품 하나·고장·대기·연간 생산량 확률 보증이 아니다.',"""upper=[]
 for process,part in cycles[cycles.phase=='new'].groupby('process'):
@@ -117,9 +115,6 @@ for process,part in cycles[cycles.phase=='new'].groupby('process'):
 conservative=run_production_allocation(upper,processes.purchase_cost,processes.operating_cost)
 print(upper,conservative.exact_solution,conservative.exact_cost);record('3-4',mean_upper=upper,solution=conservative.exact_solution.tolist(),cost=conservative.exact_cost,family_confidence=.95)"""),
 }
-# Keep explanations in Korean throughout.
-ANSWERS['2-6']=(ANSWERS['2-6'][0].replace('구매비 24,?가 아니라 각 항목을 직접 합산한다. 구매비 25,000만원, 운영비 4,800만원이다.','구매비는 25,000만원, 운영비는 4,800만원이다.'),ANSWERS['2-6'][1])
-ANSWERS['3-3']=('독립 정규 모집단 작업 가정에서 Welch 독립 두 표본 t 검정을 선택한다. 차이는 new-old이며 H0: μnew-μold≥0, H1:<0이다. 영가설 경계0에서 하측 p값을 계산한다. 등분산·분산 기지·대응을 가정하지 않는다. 평균 감소의 증거는 전체 라인의 실제 비용 감소나 인과 효과를 보장하지 않는다.',ANSWERS['3-3'][1].replace('平均減少を支持','평균 감소를 지지').replace('平均減少の証拠が不足','평균 감소 근거 부족'))
 
 def make_data():
     d=DEST/'data';d.mkdir(parents=True,exist_ok=True);rng=np.random.RandomState(20261023)

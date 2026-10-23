@@ -69,7 +69,6 @@ class DistributionNaiveBayesTest(unittest.TestCase):
         with self.assertRaises(ValueError):model.predict(pd.DataFrame({'b':['x']}))
         large=PoissonNB().fit(np.array([[0,1000],[1,900],[900,1],[1000,0]]),['a','a','b','b']);np.testing.assert_allclose(large.predict_proba([[10000,0]]).sum(),1.)
 
-if __name__=='__main__':unittest.main()
 
 class SmallPriorStabilityTest(unittest.TestCase):
     def test_binomial_tiny_positive_prior_keeps_finite_log_probabilities(self):
@@ -77,3 +76,5 @@ class SmallPriorStabilityTest(unittest.TestCase):
         model=BinomialNB(n_trials=1,alpha=1e-30,beta=1e-30).fit([[0],[0],[1],[1]],[0,0,1,1])
         self.assertTrue(np.isfinite(model.predict_log_proba([[0],[1]])).all())
         np.testing.assert_allclose(model.predict_proba([[0],[1]]).sum(axis=1),1.)
+
+if __name__=='__main__':unittest.main()
