@@ -4,6 +4,7 @@ from dataclasses import asdict
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+from statsmodels.tools.sm_exceptions import PerfectSeparationError
 from scipy.stats import chi2
 from src.stats.regression._common import numeric_data
 
@@ -46,7 +47,8 @@ def fit_family(X,y,X_new,offset,new_offset,profile,family,dto):
     if new_offset is not None and X_new is None:raise ValueError('X_new 없이 new_offset을 지정할 수 없습니다.')
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter('always')
-        model=sm.GLM(target,design,family=distribution,offset=off).fit(maxiter=profile.maxiter,cov_type=profile.cov_type)
+        try:model=sm.GLM(target,design,family=distribution,offset=off).fit(maxiter=profile.maxiter,cov_type=profile.cov_type)
+        except PerfectSeparationError as exc:raise ValueError('완전 분리로 GLM 추론이 불가능합니다.') from exc
     if not model.converged or not np.isfinite(model.params).all() or not np.isfinite(model.bse).all() or any('separation' in str(w.message).lower() for w in caught):raise ValueError('미수렴 또는 완전/준완전 분리로 안정적인 GLM 추론이 불가능합니다.')
     interval=np.asarray(model.conf_int(alpha=profile.alpha));coef=np.asarray(model.params)
     table=pd.DataFrame(dict(term=design.columns,coefficient=coef,standard_error=np.asarray(model.bse),z_statistic=np.asarray(model.tvalues),p_value=np.asarray(model.pvalues),ci_lower=interval[:,0],ci_upper=interval[:,1],exp_coefficient=np.exp(coef)))

@@ -35,10 +35,13 @@ from src.stats.regression.independence import run_independence
 from src.stats.regression.collinearity import run_collinearity
 from src.stats.regression.influence import run_influence
 from src.TimeSeries.rolling_selection import run_rolling_selection
+from src.Visualization.time_series.timeline import plot_timeline
 from src.stats.tests.TimeSeries.adf import run_adf
 from src.Visualization.qq.normal import plot_normal
 from src.Visualization.regression.glm_residuals import plot_glm_residuals
 from src.Visualization.regression.residual_fitted import plot_residual_fitted
+from src.Visualization.regression.partial_residual import plot_partial_residual
+from src.Visualization.regression.vif import plot_vif
 from src.Visualization.regression.cooks_distance import plot_cooks_distance
 from src.Visualization.regression.observed_predicted import plot_observed_predicted
 from src.Visualization.regression.coefficient_intervals import plot_coefficient_intervals
@@ -70,7 +73,9 @@ class Context:
         return dict(train=metrics(self.y.iloc[self.rt],self.base.predict(self.X.iloc[self.rt])),cv_r2=self.base_cv,coefficients=inf.coefficients,fit_metrics=inf.fit_metrics,final_test='not evaluated yet')
     def reg_diagnostics(self):
         m=self.base.inference_;self.base_influence=run_influence(m);self.base_diagnostics=dict(normality=run_normality(m),linearity=run_linearity(m),heteroscedasticity=run_heteroscedasticity(m),independence=run_independence(m,overrides={'ordered':self.plan['ordered_regression'],'nlags':3}),collinearity=run_collinearity(m.design.drop(columns='Intercept')))
-        fig,axes=plt.subplots(2,2,figsize=(11,8));plot_residual_fitted(m,ax=axes[0,0]);plot_normal(m.residuals,ax=axes[0,1],overrides={'fit_parameters':True});plot_cooks_distance(m,ax=axes[1,0]);plot_coefficient_intervals(m,ax=axes[1,1]);plt.tight_layout();plt.show()
+        fig,axes=plt.subplots(3,3,figsize=(16,12));plot_residual_fitted(m,ax=axes[0,0]);plot_normal(m.residuals,ax=axes[0,1],overrides={'fit_parameters':True});plot_cooks_distance(m,ax=axes[1,0]);plot_coefficient_intervals(m,ax=axes[1,1]);plot_vif(self.base_diagnostics['collinearity'],ax=axes[0,2])
+        for feature,ax in zip(m.design.columns[1:],[axes[1,2],axes[2,0],axes[2,1],axes[2,2]]):plot_partial_residual(m,feature,ax=ax)
+        plt.tight_layout();plt.show()
         return dict(tests=self.base_diagnostics,influence=self.base_influence.table,review_original_positions=self.rt[self.base_influence.table.cook_flag.to_numpy()] if 'cook_flag' in self.base_influence.table else [],interpretation='tests are conditional on fitted training model; nonrejection does not prove assumptions; Cook flags are review only')
     def reg_selection(self):
         design=self.base.transform_features(self.X.iloc[self.rt]);self.ic_results={criterion:run_information_selection(design,self.y.iloc[self.rt].to_numpy(),overrides={'criterion':criterion}) for criterion in ['aic','bic']}
@@ -154,5 +159,5 @@ class Context:
     def ts_diagnostics(self):
         return dict(diagnostics=self.forecast.residual_diagnostics,train_information=dict(aic=self.forecast.model.aic,bic=self.forecast.model.bic),meaning='Ljung-Box subtracts p+q+P+Q degrees of freedom and removes initialization. Nonrejection does not prove independence. Compare differencing/families via rolling error; AIC/BIC are not predictive R2.')
     def ts_final(self):
-        f=self.forecast;fig,ax=plt.subplots(figsize=(9,4));ax.plot(self.ts.index[-35:],self.ts.iloc[-35:],label='Observed');ax.plot(self.ts_test.index,f.predictions,label='Selected forecast');ax.plot(self.ts_test.index,f.baseline_predictions,label='Naive forecast');ax.fill_between(self.ts_test.index,f.model.prediction_lower,f.model.prediction_upper,alpha=.2,label='Conditional interval');ax.legend();ax.set_title('Future holdout after rolling selection');plt.tight_layout();plt.show()
+        f=self.forecast;fig,ax=plt.subplots(figsize=(9,4));plot_timeline(self.ts.index[-35:],self.ts.iloc[-35:],ax=ax,overrides={'rolling_window':0});ax.plot(self.ts_test.index,f.predictions,label='Selected forecast',color='C1');ax.plot(self.ts_test.index,f.baseline_predictions,label='Naive forecast',color='C2');ax.fill_between(self.ts_test.index,f.model.prediction_lower,f.model.prediction_upper,alpha=.2,label='Conditional interval');ax.legend();ax.set_title('Future holdout after rolling selection');plt.tight_layout();plt.show()
         return dict(test_metrics=f.test_metrics,test_indices=f.test_indices,truth=self.ts_test.to_numpy(),predictions=f.predictions,baseline_predictions=f.baseline_predictions,interval_lower=f.model.prediction_lower,interval_upper=f.model.prediction_upper,interval='conditional on fitted selected model; selection uncertainty not included')

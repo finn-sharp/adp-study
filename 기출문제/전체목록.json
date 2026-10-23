@@ -2262,7 +2262,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -2386,8 +2388,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -2427,7 +2431,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -2551,8 +2557,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -2592,7 +2600,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -2716,8 +2726,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -2757,7 +2769,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -2881,8 +2895,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -2922,7 +2938,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -3046,8 +3064,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -3087,7 +3107,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -3211,8 +3233,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -3252,7 +3276,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -3376,8 +3402,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -3417,7 +3445,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -3541,8 +3571,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -3582,7 +3614,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -3706,8 +3740,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],
@@ -3747,7 +3783,9 @@
             "src.Visualization.qq.normal",
             "src.Visualization.regression.coefficient_intervals",
             "src.Visualization.regression.cooks_distance",
+            "src.Visualization.regression.partial_residual",
             "src.Visualization.regression.residual_fitted",
+            "src.Visualization.regression.vif",
             "src.stats.regression.collinearity",
             "src.stats.regression.heteroscedasticity",
             "src.stats.regression.independence",
@@ -3871,8 +3909,10 @@
         {
           "id": "3-4",
           "text": "선택 모형과 지정 naive의 동일 미래7일 RMSE·MAE·R²·MASE를 비교하고 예측·관측·조건부 예측구간을 시각화하시오. MASE의 학습 분모, 음의 보류 R² 가능성, 차수 선택 불확실성을 구간이 모두 반영하지 않는 한계를 설명하시오.",
-          "module_paths": [],
-          "mapping": "exam_specific_or_direct_library",
+          "module_paths": [
+            "src.Visualization.time_series.timeline"
+          ],
+          "mapping": "static_reference",
           "note": "정적 참조 목록이며 모듈 재사용 완결성이나 실행 커버리지를 의미하지 않습니다."
         }
       ],

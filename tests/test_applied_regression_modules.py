@@ -29,6 +29,8 @@ class AppliedModulesTest(unittest.TestCase):
         for name,y,family in [('logistic',r.binomial(1,.5,120),sm.families.Binomial()),('poisson',r.poisson(3,size=120),sm.families.Poisson()),('gamma',np.exp(self.y/5),sm.families.Gamma(link=getattr(sm.families.links,'Log',sm.families.links.log)()))]:
             module=importlib.import_module('src.MachineLearning.GeneralizedLinearModels.'+name);out=getattr(module,'run_'+name)(self.X,y,self.X[:3]);native=sm.GLM(y,sm.add_constant(self.X),family=family).fit();np.testing.assert_allclose(out.coefficients.coefficient,native.params,rtol=1e-8);self.assertAlmostEqual(out.fit_metrics['aic'],native.aic);np.testing.assert_allclose(out.predictions,native.predict(sm.add_constant(self.X[:3],has_constant='add')));json.loads(out.to_json());self.assertTrue((out.diagnostics.cooks_distance>=0).all())
         from src.MachineLearning.GeneralizedLinearModels.poisson import run_poisson
+        from src.MachineLearning.GeneralizedLinearModels.logistic import run_logistic
+        with self.assertRaises(ValueError):run_logistic(pd.DataFrame({'x':np.r_[np.arange(-20,0),np.arange(1,21)]}),np.r_[np.zeros(20),np.ones(20)])
         with self.assertRaises(ValueError):run_poisson(self.X,np.arange(120)+.2)
         offset=np.log(np.linspace(1,2,120));out=run_poisson(self.X,np.random.RandomState(5).poisson(3,size=120),self.X[:3],offset=offset,new_offset=offset[:3]);self.assertEqual(out.predictions.shape,(3,))
         with self.assertRaises(ValueError):run_poisson(self.X,np.arange(120),self.X[:3],offset=offset)
