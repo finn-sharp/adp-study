@@ -1,0 +1,14 @@
+{
+  "population_size": 80,
+  "generations": 120,
+  "elite_size": 2,
+  "tournament_size": 3,
+  "crossover_rate": 0.8,
+  "mutation_rate": 0.15,
+  "mutation_scale": 0.1,
+  "maximize": false,
+  "constraint_tolerance": 1e-08,
+  "stall_generations": 30,
+  "improvement_tolerance": 1e-10,
+  "random_state": 1234
+}

@@ -1,0 +1,12 @@
+{
+  "test_size": 0.3,
+  "random_state": 1234,
+  "cv": 3,
+  "split_strategy": "random",
+  "scoring": "neg_root_mean_squared_error",
+  "target_missing": "raise",
+  "alpha": 0.05,
+  "cov_type": "nonrobust",
+  "hac_maxlags": 1,
+  "candidates": null
+}

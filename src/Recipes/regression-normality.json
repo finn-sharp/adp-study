@@ -1,0 +1,4 @@
+{
+  "alpha": 0.05,
+  "method": "jarque_bera"
+}

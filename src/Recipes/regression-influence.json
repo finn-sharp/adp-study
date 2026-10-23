@@ -1,0 +1,8 @@
+{
+  "alpha": 0.05,
+  "cook_threshold": null,
+  "leverage_multiplier": 2.0,
+  "studentized_threshold": 3.0,
+  "p_adjust": "bonferroni",
+  "max_samples": 3000
+}

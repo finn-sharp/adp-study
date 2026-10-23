@@ -1,8 +1,6 @@
 """
-================================================================================
-loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
-================================================================================
-설명:
+=========================================================================loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
+=========================================================================설명:
     - src/Recipes의 평면 JSON 설정을 모델별 Profile로 변환합니다.
     - 레시피 → 명시적 overrides → Profile → 실행기 순서로 설정을 적용합니다.
 
@@ -20,8 +18,7 @@ loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
     DATE        AUTHOR          VERSION   DESCRIPTION
     ----------------------------------------------------------------------------
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피와 실행기 연결
-================================================================================
-"""
+========================================================================="""
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
@@ -37,6 +34,53 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    'genetic-algorithm': ('src.Optimization.genetic_algorithm', 'GeneticAlgorithmProfile', None, (None,)),
+    'production-allocation': ('src.Optimization.production_allocation', 'ProductionAllocationProfile', None, (None,)),
+    'plot-optimization-convergence': ('src.Visualization.optimization.convergence', 'OptimizationConvergenceProfile', None, (None,)),
+    'regression-ols': ('src.stats.regression.ols', 'OLSProfile', None, (None,)),
+    'regression-joint-f': ('src.stats.regression.joint_f', 'JointFProfile', None, (None,)),
+    'regression-nested-f': ('src.stats.regression.nested_f', 'NestedFProfile', None, (None,)),
+    'regression-linearity': ('src.stats.regression.linearity', 'LinearityProfile', None, (None,)),
+    'regression-normality': ('src.stats.regression.normality', 'RegressionNormalityProfile', None, (None,)),
+    'regression-heteroscedasticity': ('src.stats.regression.heteroscedasticity', 'HeteroscedasticityProfile', None, (None,)),
+    'regression-independence': ('src.stats.regression.independence', 'IndependenceProfile', None, (None,)),
+    'regression-collinearity': ('src.stats.regression.collinearity', 'CollinearityProfile', None, (None,)),
+    'regression-influence': ('src.stats.regression.influence', 'InfluenceProfile', None, (None,)),
+    'regression-polynomial': ('src.Preprocessing.regression.polynomial', 'PolynomialProfile', None, (None,)),
+    'regression-target-transform': ('src.Preprocessing.regression.target_transform', 'TargetTransformProfile', None, (None,)),
+    'regression-vif-selection': ('src.Preprocessing.regression.vif_selection', 'VIFSelectionProfile', None, (None,)),
+    'regression-influence-filter': ('src.Preprocessing.regression.influence_filter', 'InfluenceFilterProfile', None, (None,)),
+    'regression-workflow': ('src.MachineLearning.LinearModels.regression_workflow', 'RegressionWorkflowProfile', None, (None,)),
+    'naive-bayes-gaussian': ('src.MachineLearning.NaiveBayes.gaussian', 'GaussianProfile', None, (None,)),
+    'naive-bayes-bernoulli': ('src.MachineLearning.NaiveBayes.bernoulli', 'BernoulliProfile', None, (None,)),
+    'naive-bayes-multinomial': ('src.MachineLearning.NaiveBayes.multinomial', 'MultinomialProfile', None, (None,)),
+    'naive-bayes-complement': ('src.MachineLearning.NaiveBayes.complement', 'ComplementProfile', None, (None,)),
+    'naive-bayes-poisson': ('src.MachineLearning.NaiveBayes.poisson', 'PoissonProfile', None, (None,)),
+    'naive-bayes-binomial': ('src.MachineLearning.NaiveBayes.binomial', 'BinomialProfile', None, (None,)),
+    'naive-bayes-categorical': ('src.MachineLearning.NaiveBayes.categorical', 'CategoricalProfile', None, (None,)),
+    'plot-qq-normal': ('src.Visualization.qq.normal', 'QQNormalProfile', None, (None,)),
+    'plot-qq-student-t': ('src.Visualization.qq.student_t', 'QQStudentTProfile', None, (None,)),
+    'plot-qq-exponential': ('src.Visualization.qq.exponential', 'QQExponentialProfile', None, (None,)),
+    'plot-qq-gamma': ('src.Visualization.qq.gamma', 'QQGammaProfile', None, (None,)),
+    'plot-qq-lognormal': ('src.Visualization.qq.lognormal', 'QQLognormalProfile', None, (None,)),
+    'plot-qq-weibull': ('src.Visualization.qq.weibull', 'QQWeibullProfile', None, (None,)),
+    'plot-qq-beta': ('src.Visualization.qq.beta', 'QQBetaProfile', None, (None,)),
+    'plot-qq-uniform': ('src.Visualization.qq.uniform', 'QQUniformProfile', None, (None,)),
+    'plot-qq-chi-square': ('src.Visualization.qq.chi_square', 'QQChiSquareProfile', None, (None,)),
+    'plot-qq-logistic': ('src.Visualization.qq.logistic', 'QQLogisticProfile', None, (None,)),
+    'plot-qq-poisson': ('src.Visualization.qq.poisson', 'QQPoissonProfile', None, (None,)),
+    'plot-qq-binomial': ('src.Visualization.qq.binomial', 'QQBinomialProfile', None, (None,)),
+    'plot-qq-bernoulli': ('src.Visualization.qq.bernoulli', 'QQBernoulliProfile', None, (None,)),
+    'plot-regression-residual-fitted': ('src.Visualization.regression.residual_fitted', 'ResidualFittedProfile', None, (None,)),
+    'plot-regression-scale-location': ('src.Visualization.regression.scale_location', 'ScaleLocationProfile', None, (None,)),
+    'plot-regression-residual-order': ('src.Visualization.regression.residual_order', 'ResidualOrderProfile', None, (None,)),
+    'plot-regression-cooks-distance': ('src.Visualization.regression.cooks_distance', 'CooksDistanceProfile', None, (None,)),
+    'plot-regression-leverage': ('src.Visualization.regression.leverage', 'LeverageProfile', None, (None,)),
+    'plot-regression-coefficient-intervals': ('src.Visualization.regression.coefficient_intervals', 'CoefficientIntervalsProfile', None, (None,)),
+    'plot-regression-observed-predicted': ('src.Visualization.regression.observed_predicted', 'ObservedPredictedProfile', None, (None,)),
+    'plot-regression-prediction-interval': ('src.Visualization.regression.prediction_interval', 'PredictionIntervalProfile', None, (None,)),
+    'plot-regression-partial-residual': ('src.Visualization.regression.partial_residual', 'PartialResidualProfile', None, (None,)),
+    'plot-regression-vif': ('src.Visualization.regression.vif', 'VIFPlotProfile', None, (None,)),
     # Domain architecture extension (2026-10-20)
     'survival-kaplan-meier': ('src.stats.survival.kaplan_meier', 'KaplanMeierProfile', None, (None,)),
     'survival-rmst': ('src.stats.survival.rmst', 'RMSTProfile', None, (None,)),

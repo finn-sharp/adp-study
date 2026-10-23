@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parents[2]
 
 
 def compare(base):
-    differences=[];files=0;numbers=0
+    differences=[];files=0;numbers=0;new_files=[]
     def visit(a,b,path):
         nonlocal numbers
         if isinstance(a,dict) and isinstance(b,dict):
@@ -25,10 +25,13 @@ def compare(base):
     paths=sorted(p for p in (ROOT/'기출문제').rglob('*.json') if p.name in ('답안수치.json','가설검정_답안.json'))
     for path in paths:
         relative=path.relative_to(ROOT).as_posix()
+        present=subprocess.run(['git','cat-file','-e',base+':'+relative],cwd=str(ROOT),stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+        if present.returncode:
+            new_files.append(relative);continue
         previous=subprocess.check_output(['git','show',base+':'+relative],cwd=str(ROOT))
         visit(json.loads(previous),json.loads(path.read_text()),relative);files+=1
     return dict(status='passed' if not differences else 'failed',base=base,files=files,
-                numeric_values=numbers,relative_tolerance=1e-8,absolute_tolerance=1e-10,differences=differences)
+                numeric_values=numbers,new_files=new_files,relative_tolerance=1e-8,absolute_tolerance=1e-10,differences=differences)
 
 
 if __name__=='__main__':

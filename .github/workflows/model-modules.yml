@@ -132,6 +132,10 @@ jobs:
           python -m src.MachineLearning.skeleton.optimization_optuna_search
       - name: Execute all evaluation metric examples
         run: python -m examples.evaluation_metric_examples
+      - name: Execute regression and genetic examples
+        run: |
+          python -m examples.regression_distribution_examples
+          python -m src.Optimization.skeleton.production_allocation
       - name: Execute Axes visualization examples
         run: python -m examples.eda_visualization_examples
       - name: Verify legacy CLI compatibility

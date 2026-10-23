@@ -1,0 +1,12 @@
+{
+  "annual_minutes": 120000.0,
+  "target_production": 50000.0,
+  "min_machines": 1,
+  "max_machines": 10,
+  "budget": null,
+  "population_size": 80,
+  "generations": 120,
+  "random_state": 1234,
+  "verify_exact": true,
+  "max_exact_candidates": 1000000
+}

@@ -1,0 +1,7 @@
+{
+  "threshold": 10.0,
+  "drop_constant": true,
+  "max_steps": 100,
+  "min_features": 1,
+  "preserve_columns": null
+}

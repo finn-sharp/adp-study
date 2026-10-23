@@ -133,7 +133,7 @@ class VisualizationModulesTest(unittest.TestCase):
             for forbidden in ('plt.show','plt.subplots','plt.figure','plt.gca','plt.sca','savefig(','sns.'):
                 self.assertNotIn(forbidden,source)
             if sys.version_info >= (3,8):ast.parse(source,feature_version=(3,7))
-        self.assertEqual(count,35)
+        self.assertEqual(count,59)
 
     def test_alternative_views_and_explicit_uncertainty(self):
         _,ax=plt.subplots();X=np.array([1.,2.,4.,5.,6.,9.]);categories=['a']*3+['b']*3
