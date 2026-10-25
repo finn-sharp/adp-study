@@ -1,4 +1,4 @@
-"""등록부·레시피·30개 학습 묶음의 단일 집계 및 문항-모듈 정적 대응표."""
+"""등록부·레시피·전체 학습 묶음의 단일 집계 및 문항-모듈 정적 대응표."""
 
 from pathlib import Path
 import ast
@@ -95,6 +95,11 @@ def build():
         folder = "모의고사/%d회" % (number + 5)
         entries.append(
             (folder, "applied_original_mock", read(ROOT / folder / "문항명세.json"))
+        )
+    for number in range(16, 21):
+        folder = "모의고사/%d회" % number
+        entries.append(
+            (folder, "researched_original_mock", read(ROOT / folder / "문항명세.json"))
         )
     for folder, kind, spec in entries:
         dest = ROOT / folder
@@ -218,7 +223,7 @@ def build():
         code_cells=sum(b["code_cells"] for b in bundles),
         figures=sum(b["figures"] for b in bundles),
     )
-    assert summary["bundles"] == 41 and summary["questions"] == 393
+    assert summary["bundles"] == 46 and summary["questions"] == 453
     payload = dict(
         schema_version=1,
         analysis=registry_counts(),

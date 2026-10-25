@@ -1,0 +1,22 @@
+{
+  "seed": 20281020,
+  "sections": [
+    {
+      "family": "lag",
+      "settings": {},
+      "context": "등간격 일별240행. target은 당일 온도(도), lag1/lag2는 제공된 과거값이나 오류가 각각1건 있다. target.shift(1/2)로 재구성하고 최초2행을 버린다. audit는 당일 target으로 만든 사후 점수이며 입력에서 제외한다. 입력은 lag1,lag2와 day-of-year의 sin/cos이다. 유효 자료 앞70%가 학습, 그 뒤가 최종평가다. 후보 RF60나무 깊이3/5, SVR RBF C=1/10,epsilon0.1. 학습 앞80% proper-fit, 뒤20% calibration을 먼저 분리한다. proper-fit 안의3-fold TimeSeriesSplit(gap2) CV RMSE 최소로 선택한다. calibration 절대잔차의 ceil((m+1)×0.9)번째 순위값(상한m)을 구간 반폭으로 쓴다. 최종 기간은 매일 전날 실제값이 공개되는1-step 운영이다."
+    },
+    {
+      "family": "energy",
+      "settings": {},
+      "context": "가상12가구×14일×24시간의 등간격 전력량이다. key는 household/timestamp. 가구별 시간대 평균24열 각각을 가구 간 평균/표준편차(ddof0)로 표준화하고 KMeans k=2/3/4,n_init10,seed=20281020로 비교한다. silhouette 최대 선택, 동률은 작은k다. 그 라벨을 many-to-one으로 원 관측에 연결한다. 군집×요일(월0)×시간 평균 kWh 히트맵은 공통색범위를 쓴다. 원 후기의15분 자료 대신1시간 간격으로 새로 설계했다."
+    },
+    {
+      "family": "reg",
+      "settings": {
+        "interaction": false
+      },
+      "context": "x1=거리 편차지수, x2=화물량 편차지수, x3=취급 점수, target=배송비(천원). 240행. x1에 결측이 있다. id를 제외하고 중앙값 대치 후 수치형은 학습 평균/표준편차(ddof0)로 표준화하고 집단은 one-hot(drop first) 처리한 뒤 OLS를 적합한다. x1,x2,x3의 단순/전체모형 비교는 같은 학습 행이다. random_state=20281020로 학습70%/평가30%를 나누고 학습3-fold shuffled CV를 사용한다. 다항식 차수2, RF60나무 깊이3/5는 사전 후보다."
+    }
+  ]
+}

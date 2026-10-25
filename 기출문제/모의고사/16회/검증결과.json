@@ -1,0 +1,20 @@
+{
+  "number": 16,
+  "status": "passed",
+  "questions": 12,
+  "points": 100,
+  "code_cells": 13,
+  "figures": 7,
+  "pdf_pages": 7,
+  "source_ids": [
+    "R11",
+    "R19"
+  ],
+  "checks": [
+    "지문·배점·출처 대응",
+    "고정 합성 CSV 재생성",
+    "직접 OLS·지표·순위 AUC·Welch·alpha 검산",
+    "CV/최종평가/calibration 경계",
+    "거래·문서·시간·가구 집계 분모"
+  ]
+}

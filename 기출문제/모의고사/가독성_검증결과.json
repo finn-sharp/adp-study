@@ -1,8 +1,8 @@
 {
   "status": "passed",
-  "bundles": 16,
-  "questions": 211,
-  "pdf_pages": 112,
+  "bundles": 21,
+  "questions": 271,
+  "pdf_pages": 147,
   "checks": [
     "전수 변수 사전",
     "관측·도메인 설명",
@@ -98,6 +98,36 @@
     {
       "folder": "기출문제/모의고사/15회",
       "questions": 15,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/16회",
+      "questions": 12,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/17회",
+      "questions": 12,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/18회",
+      "questions": 12,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/19회",
+      "questions": 12,
+      "pages": 7,
+      "status": "passed"
+    },
+    {
+      "folder": "기출문제/모의고사/20회",
+      "questions": 12,
       "pages": 7,
       "status": "passed"
     },
