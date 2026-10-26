@@ -69,7 +69,7 @@ loaded = run_tabular_loader("data.csv", profile)
 | `xml_xpath` | str / `./*` | 행 요소를 고르는 ElementTree 경로. 전체 XPath 언어와 다름 |
 | `xml_namespaces` | Dict[str,str] / {} | 경로용 prefix→URI. 출력 열 이름의 namespace URI는 보존 |
 | `xml_attributes` | bool / True | 행 속성은 `@id`, 자식 속성은 `tag@unit`로 포함 |
-| `dtype` | Dict[str,str] / {} | 명시한 열만 pandas astype 변환. 실패는 오류 |
+| `dtype` | Dict[str,str] / {} | 명시한 열만 dtype 변환. 정수/실수형은 엄격한 숫자 파싱 후 astype 적용; 실패는 오류 |
 | `parse_dates` | List[str] / [] | 명시한 열만 엄격하게 날짜 변환. dtype과 같은 열 지정 불가 |
 | `date_format` | Optional[str] / None | parse_dates가 있을 때 날짜 형식 지정. 잘못된 날짜는 오류 |
 | `required_columns` | List[str] / [] | 필수 열 존재 확인. 추가 열의 제거·순서 변경 없음 |

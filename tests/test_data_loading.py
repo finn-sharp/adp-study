@@ -220,6 +220,11 @@ class DataLoadingTest(unittest.TestCase):
         )
         self.assertEqual(len(frame), 2)
         self.assertEqual(str(frame.x.dtype), "Float64")
+        integers = self.read('[{"x":"1"},{"x":null}]', dtype={"x": "Int64"})
+        self.assertEqual(str(integers.x.dtype), "Int64")
+        self.assertTrue(pd.isna(integers.x.iloc[1]))
+        with self.assertRaises(ValueError):
+            self.read('{"x":"invalid"}', dtype={"x": "Float64"})
         self.assertTrue(pd.isna(frame.day.iloc[1]))
         for options in (
             {"required_columns": ["missing"]},

@@ -60,7 +60,7 @@ class TabularLoaderProfile:
         xml_xpath (str): ElementTree 형식 행 선택 경로. 기본 './*'; 전체 XPath가 아님.
         xml_namespaces (Dict[str,str]): XML 경로용 prefix→URI. 기본{}; 출력 태그 URI는 보존.
         xml_attributes (bool): XML 행 속성 @key·자식 속성 tag@key 포함. 기본True.
-        dtype (Dict[str,str]): 명시 열→pandas dtype 변환. 기본{}; 자동 학습 전처리 아님.
+        dtype (Dict[str,str]): 명시 열→pandas dtype 변환; 숫자형은 엄격한 숫자 파싱 후 변환. 기본{}; 자동 학습 전처리 아님.
         parse_dates (List[str]): 엄격한 날짜 파싱 열. 기본[]; dtype과 중복 불가.
         date_format (Optional[str]): parse_dates의 명시 형식. 기본None; 파싱 실패는 오류.
         required_columns (List[str]): 필수 열; 기본[]. 이름·행을 임의 변경하지 않음.
@@ -355,8 +355,15 @@ def _run(source, p):
         raise ValueError(
             "필수/변환 열을 찾을 수 없습니다: " + ", ".join(sorted(missing))
         )
-    if p.dtype:
-        data = data.astype(p.dtype)
+    for column, dtype in p.dtype.items():
+        target_dtype = pd.api.types.pandas_dtype(dtype)
+        # pandas1.3은 object의 숫자 문자열→nullable Float64 직접 astype을 거부합니다.
+        # 명시 숫자형에만 엄격한 파싱을 적용하여 두 지원 환경의 계약을 맞춥니다.
+        if pd.api.types.is_integer_dtype(target_dtype) or pd.api.types.is_float_dtype(
+            target_dtype
+        ):
+            data[column] = pd.to_numeric(data[column], errors="raise")
+        data[column] = data[column].astype(target_dtype)
     for column in p.parse_dates:
         data[column] = pd.to_datetime(
             data[column], format=p.date_format, errors="raise"
