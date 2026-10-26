@@ -1,6 +1,6 @@
 # 전체 분석 파이프라인과 Profile·DTO의 역할
 
-이 저장소는 하나의 거대한 자동 실행기가 아니라, 분석 단계별 모듈을 조합하는 구조입니다. 아래가 지도 학습의 기본 흐름이며, 통계 추론·군집·생존분석·의사결정 최적화는 목적에 맞는 가지를 사용합니다. [전체 기능 카탈로그](ANALYSIS_CATALOG.md)는 266개 등록 모듈을 이 흐름에 맞춰 정리합니다.
+이 저장소는 하나의 거대한 자동 실행기가 아니라, 분석 단계별 모듈을 조합하는 구조입니다. 아래가 지도 학습의 기본 흐름이며, 통계 추론·군집·생존분석·의사결정 최적화는 목적에 맞는 가지를 사용합니다. [전체 기능 카탈로그](ANALYSIS_CATALOG.md)는 267개 등록 모듈을 이 흐름에 맞춰 정리합니다.
 
 ```mermaid
 flowchart TD
@@ -29,7 +29,7 @@ flowchart TD
 
 | 구성 | 제공 기능과 경계 | 실제 위치 |
 | --- | --- | --- |
-| Dataset | 자료 로드, 관측 단위·열·목표·시간·그룹·출처 정의. 공통 Dataset 클래스 하나를 강제하지 않습니다. UCI 공통 로더와 각 skeleton의 `load_data()`를 사용합니다. | [UCI 로더](../src/datasets/uci.py), [skeleton 안내](UCI_SKELETONS.md) |
+| Dataset | 자료 로드, 관측 단위·열·목표·시간·그룹·출처 정의. 공통 Dataset 클래스 하나를 강제하지 않습니다. 일반 파일은 `tabular-loader`로 읽고, UCI 공통 로더와 각 skeleton의 `load_data()`도 사용할 수 있습니다. 일반 로더는 학습용 전처리를 적합하지 않습니다. | [파일 로딩 명세](DATA_LOADING.md), [UCI 로더](../src/datasets/uci.py), [skeleton 안내](UCI_SKELETONS.md) |
 | FeatureSpec | 그룹 이름, 대상 열 순서, 변환기, 활성 여부 선언. 타깃·ID·미래 정보를 자동으로 추측해 제외하는 객체는 아닙니다. | [FeatureSpec](../src/MachineLearning/base/feature.py) |
 | Feature factory | 미적합 변환기를 구성해 CV마다 독립 적합할 수 있게 합니다. `build_feature_preprocessor()`는 여러 FeatureSpec을 결합합니다. | [Feature 처리](../src/Preprocessing/feature_pipeline.py) |
 | Recipe | 평면 JSON의 반복 실행 설정. 데이터 행·적합 모델·예측 결과는 저장하지 않습니다. | [레시피 로더](../src/Recipes/loader.py), [설정 안내](RECIPES.md) |

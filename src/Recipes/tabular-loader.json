@@ -1,0 +1,22 @@
+{
+  "format": "auto",
+  "encoding": "utf-8-sig",
+  "sep": null,
+  "header": 0,
+  "names": null,
+  "text_mode": "lines",
+  "keep_blank_lines": true,
+  "sheet_name": 0,
+  "excel_data_only": true,
+  "orient": "records",
+  "record_path": [],
+  "flatten": false,
+  "xml_xpath": "./*",
+  "xml_namespaces": {},
+  "xml_attributes": true,
+  "dtype": {},
+  "parse_dates": [],
+  "date_format": null,
+  "required_columns": [],
+  "allow_empty": false
+}

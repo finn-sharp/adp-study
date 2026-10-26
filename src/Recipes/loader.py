@@ -35,6 +35,7 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    "tabular-loader": ("src.datasets.tabular", "TabularLoaderProfile", None, (None,)),
     "plot-regression-glm-residuals": (
         "src.Visualization.regression.glm_residuals",
         "GLMResidualsProfile",

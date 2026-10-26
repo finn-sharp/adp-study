@@ -1,0 +1,6 @@
+# 다중 형식 파일 로딩용 선택 의존성. 기존 분석/모델 환경에 추가 설치합니다.
+openpyxl==3.0.10; python_version < "3.8"
+openpyxl==3.1.5; python_version >= "3.8"
+PyYAML==6.0.1; python_version < "3.8"
+PyYAML==6.0.3; python_version >= "3.8"
+defusedxml==0.7.1

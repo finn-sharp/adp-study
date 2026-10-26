@@ -9,6 +9,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 STAGES = OrderedDict([
+ ('loading', ('0. 데이터 로딩·스키마', '로컬 파일·스트림을 표로 해석하고 명시한 타입·필수 열을 검증합니다. 학습용 결측 대치·스케일링·행 선택은 Feature와 학습 단계에서 수행합니다.')),
  ('exploration', ('1. 데이터 이해·EDA·상관분석', '분포·결측·집단 차이·연관을 탐색합니다. 목표와의 관계로 처리 규칙을 정하면 학습 자료에서만 탐색하고 CV 안에서 검증합니다. 상관·그림만으로 인과나 자동 변수 제거를 결정하지 않습니다.')),
  ('features', ('2. Feature 정의·전처리', '대상 열과 처리 순서를 선언합니다. 미적합 factory를 모델 Pipeline에 연결하고 각 학습 폴드에서 fit합니다. 목표 변환과 시퀀스 임베딩은 일반 표 Feature 처리와 분리합니다.')),
  ('sampling', ('3. 학습 표본 처리', 'X와 y의 행을 함께 처리합니다. 학습 폴드에만 fit_resample하고 검증·최종 평가 행과 발생률은 보존합니다. Cook 기준 제거는 기본 동작이 아닌 명시적 학습 정책입니다.')),
@@ -21,6 +22,7 @@ STAGES = OrderedDict([
  ('decision', ('10. 목적함수 기반 의사결정 최적화', '예측모형의 하이퍼파라미터 탐색과 별개입니다. 목적함수·제약·변수 범위를 입력하고 해의 실행가능성과 최적성 근거를 구분합니다.')),
 ])
 FUNCTIONS = {
+ 'tabular-loader':'CSV·TSV·JSON/JSONL·XML·YAML·TXT·XLSX 읽기·명시적 스키마 검증',
  'numeric-imputation':'평균·중앙값·최빈값·상수 결측 대치와 선택적 결측 indicator',
  'numeric-scaling':'standard·minmax·robust·maxabs·행 normalize 또는 항등 변환',
  'numeric-power':'Yeo–Johnson·Box–Cox와 선택적 표준화',
@@ -84,6 +86,7 @@ METRICS = {
  'horizon-errors':'예측 horizon별 오차 집계',
 }
 INPUTS = {
+ 'tabular-loader':'로컬 경로·bytes·읽기 스트림·형식별 Profile/레시피',
  'one-sample-mean':'수치 표본 x·귀무 평균·선택적 알려진 sigma', 'two-sample-mean':'독립 수치 표본 x/y·귀무 차이',
  'paired-t':'같은 대상의 동일 길이 x/y', 'one-sample-variance':'수치 표본·귀무 분산',
  'one-sample-proportion':'성공 수·시행 수·귀무 비율', 'two-sample-proportion':'두 집단의 성공/시행 수',
@@ -119,6 +122,7 @@ def registry():
  return next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='_REGISTRY' for t in n.targets))
 
 def stage(key,module):
+ if module.startswith('src.datasets.'):return 'loading'
  if module.startswith('src.Optimization.'):return 'decision'
  if key.startswith('optimization-') or key in ('regression-workflow','timeseries-rolling-selection'):return 'search'
  if key.startswith('resampling-') or key=='regression-influence-filter':return 'sampling'
@@ -181,7 +185,7 @@ def build():
  recipes=len(list((ROOT/'src/Recipes').glob('*.json')))
  text='# 단계별 전체 모듈 기능 카탈로그\n\n등록 모듈은 '+str(len(reg))+'개, 모델·목적별 JSON 레시피는 '+str(recipes)+'개입니다. 모든 등록 키를 아래 한 단계에 한 번씩 배치했습니다. 단계는 활용 목적에 따른 분류이며, 모든 모듈을 차례로 실행해야 한다는 의미가 아닙니다.\n\n'
  text+='[전체 파이프라인](ANALYSIS_PIPELINE.md)에서 책임과 자료 경계를 먼저 확인하고, [문서 안내](README.md)에서 분야별 상세 명세를 찾으세요. 표의 결과 열은 실제 전용 DTO의 대표 필드이며 전체 필드 목록은 아닙니다. 모듈 키 링크는 해당 기능의 구현·Profile·전체 DTO 계약으로 연결됩니다.\n\n'
- text+='Dataset·FeatureSpec·Recipe 로더·OutputDTO는 공통 기반이므로 등록 모듈 수에 포함하지 않습니다. 이들의 기능은 [기반 계약](ANALYSIS_PIPELINE.md#공통-기반의-역할)에 따로 정리했습니다. 같은 함수가 여러 목적을 지원하더라도 등록 키당 한 번 셉니다. 빈 파일·호환 import·내부 helper는 구현 모듈로 중복 집계하지 않습니다.\n\n'
+ text+='구체적인 파일 로더 tabular-loader는 등록 모듈로 셉니다. Dataset 설계 개념·FeatureSpec·Recipe 로더·OutputDTO 기반 클래스는 공통 계약이므로 별도 등록 모듈로 세지 않습니다. 이들의 기능은 [기반 계약](ANALYSIS_PIPELINE.md#공통-기반의-역할)에 따로 정리했습니다. 같은 함수가 여러 목적을 지원하더라도 등록 키당 한 번 셉니다. 빈 파일·호환 import·내부 helper는 구현 모듈로 중복 집계하지 않습니다.\n\n'
  text+='| 단계 | 모듈 수 |\n| --- | ---: |\n'+''.join('| '+STAGES[k][0]+' | '+str(len(v))+' |\n' for k,v in buckets.items())+'| 합계 | '+str(len(reg))+' |\n\n'
  for group,rows in buckets.items():
   title,desc=STAGES[group];text+='## '+title+'\n\n'+desc+'\n\n| 모듈 | 구현 기능 | 필요한 입력 | 대표 결과(DTO) |\n| --- | --- | --- | --- |\n'+'\n'.join(rows)+'\n\n'
