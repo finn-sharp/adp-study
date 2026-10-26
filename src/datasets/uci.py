@@ -79,18 +79,57 @@ def dataset_bytes(name, cache_dir=None):
         return archive.read(matches[0])
 
 
-def load_tabular(task="regression", binary=False, cache_dir=None):
-    """Wine Quality 회귀 또는 Iris 분류 자료를 로딩합니다.
+def load_tabular(
+    task="regression",
+    binary=False,
+    cache_dir=None,
+    *,
+    source=None,
+    target_column="target",
+    data_profile=None,
+    data_overrides=None,
+):
+    """Wine Quality/Iris 또는 명시 사용자 파일을 분석 입력으로 로딩합니다.
 
     Args:
         task: regression/classification.
         binary: Iris에서 두 종류만 선택; Adaline 전용.
         cache_dir: 선택 캐시 위치.
+        source: 선택 사용자 파일/스트림. 생략하면 기존 UCI 자료를 사용.
+        target_column: 사용자 파일의 반응 열; 반환 시 target으로 명시 변환.
+        data_profile: 선택 TabularLoaderProfile; 데이터 해석 전용 설정.
+        data_overrides: 데이터 로더 레시피 재정의; 모델 overrides와 별개.
     Returns:
-        pd.DataFrame: 수치 특성 및 마지막 target 열.
+        pd.DataFrame: UCI 표 또는 사용자 파일의 열 순서를 보존한 표.
     Raises:
-        ValueError/OSError: 목적·스키마·다운로드 오류.
+        ValueError/OSError/ImportError: 목적·스키마·파싱·다운로드/의존성 오류.
     """
+    if task not in ("classification", "regression"):
+        raise ValueError("task는 classification/regression입니다.")
+    if source is not None:
+        from src.datasets.tabular import read_table
+
+        if cache_dir is not None:
+            raise ValueError(
+                "사용자 source와 UCI cache_dir를 동시에 지정하지 않습니다."
+            )
+        frame = read_table(source, data_profile, overrides=data_overrides)
+        if not isinstance(target_column, str) or target_column not in frame:
+            raise ValueError("사용자 파일의 target_column을 찾을 수 없습니다.")
+        if target_column != "target" and "target" in frame:
+            raise ValueError("target 이름으로 바꿀 때 기존 열과 충돌합니다.")
+        frame = frame.rename(columns={target_column: "target"})
+        if frame.target.isna().any() or len(frame.columns) < 2:
+            raise ValueError("결측 없는 target과 하나 이상의 Feature가 필요합니다.")
+        if binary and frame.target.nunique() != 2:
+            raise ValueError("사용자 binary 자료는 정확히 두 클래스여야 합니다.")
+        return frame
+    if (
+        data_profile is not None
+        or data_overrides is not None
+        or target_column != "target"
+    ):
+        raise ValueError("사용자 데이터 설정에는 source가 필요합니다.")
     if task == "regression":
         frame = pd.read_csv(BytesIO(dataset_bytes("wine", cache_dir)), sep=";").rename(
             columns={"quality": "target"}

@@ -1,6 +1,6 @@
 # Recipe·Profile 설정 관리
 
-실행 설정은 `src/Recipes/*.json`, 기법별 설정 계약은 해당 모듈의 Profile, 실행 결과는 전용 DTO에 둡니다. 현재 전체 JSON 293개이며, 등록 모듈의 기본 모델·목적 로드 조합은 281개입니다. 차이는 추가 RF/LightGBM 튜닝 레시피처럼 사용자 경로로 선택하는 파일 때문입니다. 모든 기능은 [전체 카탈로그](ANALYSIS_CATALOG.md), 각 단계의 연결은 [파이프라인](ANALYSIS_PIPELINE.md)을 참고하세요.
+실행 설정은 `src/Recipes/*.json`, 기법별 설정 계약은 해당 모듈의 Profile, 실행 결과는 전용 DTO에 둡니다. 현재 전체 JSON 294개이며, 등록 모듈의 기본 모델·목적 로드 조합은 282개입니다. 차이는 추가 RF/LightGBM 튜닝 레시피처럼 사용자 경로로 선택하는 파일 때문입니다. 모든 기능은 [전체 카탈로그](ANALYSIS_CATALOG.md), 각 단계의 연결은 [파이프라인](ANALYSIS_PIPELINE.md)을 참고하세요.
 
 ## 설정을 선택하는 두 방식
 

@@ -31,9 +31,13 @@ jobs:
         run: python -m pip install -r ${{ matrix.requirements }}
       - name: Install optional optimization dependencies
         run: python -m pip install -r requirements-optimization-py${{ matrix.python == '3.7' && '37' || '312' }}.txt
+      - name: Install optional file format readers
+        run: python -m pip install -r requirements-data-loading.txt
       - run: python -m unittest discover -s tests -v
       - name: Execute module examples
         run: |
+          python -m src.datasets.tabular
+          python -m src.datasets.skeleton.tabular
           python -m src.MachineLearning.Trees.xgboost
           python -m src.MachineLearning.Trees.catboost
           python -m src.MachineLearning.Trees.lightgbm

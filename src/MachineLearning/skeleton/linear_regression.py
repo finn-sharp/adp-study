@@ -28,20 +28,40 @@ from src.datasets.uci import load_tabular
 from ._common import connect_pipeline, fit_evaluate, report
 
 
-def load_data(task="regression", cache_dir=None):
-    """UCI 자료를 원 특성과 target 열로 불러옵니다.
+def load_data(
+    task="regression",
+    cache_dir=None,
+    *,
+    source=None,
+    target_column="target",
+    data_profile=None,
+    data_overrides=None,
+):
+    """UCI 또는 사용자 자료를 원 특성과 target 열로 불러옵니다.
 
     Args:
         task: 지원하는 분류/회귀 목적.
-        cache_dir: 선택 UCI 원본 캐시.
+        cache_dir: 선택 UCI 원본 캐시; 사용자 source와 동시 사용 불가.
+        source: 선택 로컬 파일/스트림; 생략 시 UCI 원본 사용.
+        target_column: 사용자 자료의 반응 열 이름.
+        data_profile: 데이터 해석용 TabularLoaderProfile 또는None.
+        data_overrides: 데이터 로더 설정; 모델 overrides와 구분.
     Returns:
-        pd.DataFrame: Iris 또는 Wine Quality; Adaline은 이진 Iris.
+        pd.DataFrame: UCI 표 또는 사용자 파일; target 열은 반드시 필요.
     Raises:
-        ValueError/OSError: 목적·자료·다운로드 오류.
+        TypeError/ValueError/OSError/ImportError: 목적·자료·파싱·다운로드/의존성 오류.
     """
     if task not in ("regression",):
         raise ValueError("이 모델 스켈레톤이 지원하지 않는 task입니다.")
-    return load_tabular(task, binary=False, cache_dir=cache_dir)
+    return load_tabular(
+        task,
+        binary=False,
+        cache_dir=cache_dir,
+        source=source,
+        target_column=target_column,
+        data_profile=data_profile,
+        data_overrides=data_overrides,
+    )
 
 
 def load_recipe(task="regression", overrides=None):
@@ -80,23 +100,50 @@ def build_pipeline(feature_columns, task="regression", profile=None, overrides=N
     return connect_pipeline(feature_columns, estimator, profile, scaling=None)
 
 
-def main(task="regression", cache_dir=None, overrides=None):
+def main(
+    task="regression",
+    cache_dir=None,
+    overrides=None,
+    *,
+    source=None,
+    target_column="target",
+    data_profile=None,
+    data_overrides=None,
+):
     """원 참고 코드의 순서로 학습·예측·수치 평가를 실행합니다.
 
     Args:
         task: 분류/회귀 목적.
-        cache_dir: 선택 UCI 원본 캐시.
+        cache_dir: 선택 UCI 원본 캐시; 사용자 source와 동시 사용 불가.
+        source: 선택 로컬 파일/스트림; 생략 시 UCI 원본 사용.
+        target_column: 사용자 자료의 반응 열 이름.
+        data_profile: 데이터 해석용 TabularLoaderProfile 또는None.
+        data_overrides: 데이터 로더 설정; 모델 overrides와 구분.
         overrides: 명시적인 레시피 재정의.
     Returns:
         SkeletonOutputDTO: 보류 평가·예측·재사용 파이프라인.
     Raises:
         ValueError/OSError/ImportError: 자료·설정·라이브러리 오류.
     """
-    data = load_data(task, cache_dir)
+    data = load_data(
+        task,
+        cache_dir,
+        source=source,
+        target_column=target_column,
+        data_profile=data_profile,
+        data_overrides=data_overrides,
+    )
     profile = load_recipe(task, overrides)
     feature_columns = [column for column in data.columns if column != "target"]
     pipeline = build_pipeline(feature_columns, task=task, profile=profile)
-    return report(fit_evaluate(data, pipeline, "Linear Regression"))
+    return report(
+        fit_evaluate(
+            data,
+            pipeline,
+            "Linear Regression",
+            dataset_name="사용자 파일" if source is not None else None,
+        )
+    )
 
 
 if __name__ == "__main__":

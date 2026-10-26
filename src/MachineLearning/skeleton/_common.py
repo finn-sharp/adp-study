@@ -54,7 +54,7 @@ class SkeletonOutputDTO(OutputDTO):
 
     Attributes:
         model_name (str): 스켈레톤 모델명.
-        dataset_name (str): 사용한 UCI 자료명.
+        dataset_name (str): 사용한 UCI 자료명 또는 명시 사용자 자료명.
         task (str): 분류·회귀·분석 목적.
         n_rows (int): 실제 사용한 표본 수.
         n_features (int): 실제 입력 특성 수.
@@ -128,13 +128,14 @@ def connect_pipeline(columns, estimator, profile, scaling=None):
     return pipeline
 
 
-def fit_evaluate(data, pipeline, model_name):
+def fit_evaluate(data, pipeline, model_name, dataset_name=None):
     """분할 → 학습 구간 CV/적합 → 보류 예측 → 수치 평가를 수행합니다.
 
     Args:
         data: 수치 특성 및 target 열의 DataFrame.
         pipeline: build_pipeline에서 만든 연결 객체.
         model_name: 출력에 사용할 모델명.
+        dataset_name: 사용자 자료명. None이면 기존 task별 UCI 명칭.
     Returns:
         SkeletonOutputDTO: 원 라벨 예측·행 위치·전처리를 포함한 모델.
     Raises:
@@ -203,7 +204,9 @@ def fit_evaluate(data, pipeline, model_name):
         )
     else:
         metrics = evaluate_predictions(y.iloc[test], prediction, "regression")
-    dataset = "UCI Iris" if classification else "UCI Wine Quality (red)"
+    dataset = dataset_name or (
+        "UCI Iris" if classification else "UCI Wine Quality (red)"
+    )
     details = {
         "feature_names": X.columns.tolist(),
         "preprocessor": pipeline.feature_specification.describe(),
