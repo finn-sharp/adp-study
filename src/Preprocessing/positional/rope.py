@@ -13,6 +13,7 @@ rope.py - Rotary Position Embedding 전용 변환
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    RoPE 전용 모듈·레시피·명세
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

@@ -9,13 +9,13 @@ kaplan_meier.py - 우측 중도절단 자료의 Kaplan-Meier 생존함수 추정
     - 동일 시각의 사건·절단은 모두 직전 위험집합에 포함합니다.
     - 좌측/구간 절단, 지연 진입, 가중치, 경쟁위험은 지원하지 않습니다.
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-20
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-20  김재현(Finn)     v1.0.0    승인된 생존분석 모듈·Greenwood 신뢰구간 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

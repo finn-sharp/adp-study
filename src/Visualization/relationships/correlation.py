@@ -13,6 +13,7 @@ correlation.py - 강한 중복 Feature와 보정 유의성 조건을 함께 검�
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

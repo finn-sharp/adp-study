@@ -8,17 +8,18 @@ tabular.py - JSON·XML·YAML·TXT·XLSX·CSV 공통 데이터 로딩
     - 로딩과 Feature 적합을 구분합니다. 행 제거·결측 대치·학습 스케일링은 하지 않습니다.
     - 중첩 레코드 경로·시트·표 구조를 명시하며 임의 추측으로 자료를 펼치지 않습니다.
 작성 정보:
-    - 작성자: 김재현(Finn) (penguin-klg@naver.com)
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-26
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-26  김재현(Finn)     v1.0.0    파일 형식별 읽기·스키마·DTO 계약
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
-__email__ = "penguin-klg@naver.com"
+__email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
 
@@ -45,7 +46,8 @@ class TabularLoaderProfile:
     """파일 해석 조건. 행·열 순서와 명시하지 않은 결측/중첩 값은 보존합니다.
 
     Attributes:
-        format (str): auto/csv/tsv/txt/json/jsonl/xml/yaml/xlsx. 기본 auto; 확장자로 판단.
+        format (str): auto/csv/tsv/txt/json/jsonl/xml/yaml/xlsx/parquet/joblib/pickle. 기본 auto; 확장자로 판단.
+        trusted (bool): pickle/joblib을 읽을 때 명시 신뢰 확인. 기본False; 코드 실행 가능.
         encoding (str): 텍스트 바이트 디코딩. 기본 utf-8-sig; XML 바이트는 자체 선언 사용.
         sep (Optional[str]): 구분자 한 문자 또는 r'\\s+'. 기본 None; csv 쉼표, tsv 탭. 구분자 TXT에는 필수.
         header (Optional[int]): CSV/구분자 TXT/XLSX의 첫 행 헤더0 또는 헤더 없음None. 기본0.
@@ -68,6 +70,7 @@ class TabularLoaderProfile:
     """
 
     format: str = "auto"
+    trusted: bool = False
     encoding: str = "utf-8-sig"
     sep: Optional[str] = None
     header: Optional[int] = 0
@@ -126,8 +129,25 @@ class TabularLoaderOutputDTO(OutputDTO):
 # ---------------------------------------------------------------------------
 # 4. Input Validation
 # ---------------------------------------------------------------------------
-_FORMATS = {"csv", "tsv", "txt", "json", "jsonl", "xml", "yaml", "xlsx"}
+_FORMATS = {
+    "csv",
+    "tsv",
+    "txt",
+    "json",
+    "jsonl",
+    "xml",
+    "yaml",
+    "xlsx",
+    "parquet",
+    "joblib",
+    "pickle",
+}
 _EXTENSIONS = {
+    ".parquet": "parquet",
+    ".pq": "parquet",
+    ".joblib": "joblib",
+    ".pickle": "pickle",
+    ".pkl": "pickle",
     ".csv": "csv",
     ".tsv": "tsv",
     ".txt": "txt",
@@ -185,6 +205,7 @@ def _validate_profile(p):
     if p.names == []:
         raise ValueError("names는 빈 목록일 수 없습니다.")
     for key in (
+        "trusted",
         "keep_blank_lines",
         "excel_data_only",
         "flatten",
@@ -229,7 +250,7 @@ def _validate_profile(p):
         raise ValueError("date_format은 parse_dates와 함께 지정하는 문자열입니다.")
 
 
-def _source_info(source):
+def _source_info(source, writable=False):
     """데이터 내용과 파일 경로를 혼동하지 않고 소스 이름을 결정합니다."""
     if isinstance(source, (str, os.PathLike)):
         name = os.fspath(source)
@@ -240,9 +261,9 @@ def _source_info(source):
                 "로컬 파일만 지원합니다. UCI 다운로드는 전용 로더를 사용하십시오."
             )
         return name, "path"
-    if isinstance(source, (bytes, bytearray)):
+    if not writable and isinstance(source, (bytes, bytearray)):
         return "<bytes>", "bytes"
-    if callable(getattr(source, "read", None)):
+    if callable(getattr(source, "write" if writable else "read", None)):
         name = getattr(source, "name", "<stream>")
         return name if isinstance(name, str) else "<stream>", "stream"
     raise TypeError("파일 경로·bytes·읽을 수 있는 스트림이 필요합니다.")
@@ -315,7 +336,17 @@ def _run(source, p):
     _format_options(p, fmt)
     raw, metadata = _payload(source, name, kind)
     warnings = []
-    if fmt == "xlsx":
+    if fmt in ("parquet", "joblib", "pickle"):
+        from .persistence import load_artifact
+
+        restored = load_artifact(raw, overrides={"format": fmt, "trusted": p.trusted})
+        if not isinstance(restored.value, pd.DataFrame):
+            raise TypeError(
+                "read_table은 DataFrame만 받습니다. 일반 객체는 load/load_artifact를 사용하십시오."
+            )
+        data = restored.value.copy()
+        warnings.extend(restored.warnings)
+    elif fmt == "xlsx":
         if not isinstance(raw, bytes):
             raise TypeError("XLSX에는 bytes 기반 파일/스트림이 필요합니다.")
         data, sheet = _readers.excel_table(raw, p)

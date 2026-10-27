@@ -7,17 +7,18 @@ preprocessor.py - FeatureSpec과 ColumnTransformer 연결
 분석 가정:
     - CV에는 get_preprocessor의 sklearn 변환기를 연결해 폴드마다 적합합니다.
 작성 정보:
-    - 작성자: 김재현(Finn) (penguin-klg@naver.com)
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-12
     - 라이선스: Proprietary
 변경 이력 (Revision History):
-    DATE        AUTHOR           VERSION   DESCRIPTION
+    DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)       v1.0.0    UCI 스켈레톤 전처리 연결 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
-__email__ = "penguin-klg@naver.com"
+__email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
 

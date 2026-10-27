@@ -7,13 +7,13 @@ classification.py - TensorFlow Dense 분류
 분석 가정:
     - 유한한 수치 입력; 시계열은 시간 순서로 정렬. 전처리와 조기 종료에 보류 test를 사용하지 않음.
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-12
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

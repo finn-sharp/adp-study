@@ -7,13 +7,13 @@ gru.py - TensorFlow GRU 전용 분류·회귀
 분석 가정:
     - 독립 이미지/시퀀스 표본; 전처리와 조기 종료는 학습/검증 자료만 사용.
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-12
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    입력 검증·전용 DTO·레시피·예제 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

@@ -11,9 +11,9 @@ specificity.py - classification specificity 평가
     - 작성일: 2026-10-13
     - 라이선스: Proprietary
 변경 이력 (Revision History):
-    DATE        AUTHOR           VERSION   DESCRIPTION
-    ----------------------------------------------------------------------------
+    DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-13  김재현(Finn)      v1.0.0    독립 메트릭·JSON·Profile·Output DTO
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

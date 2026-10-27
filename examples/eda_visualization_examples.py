@@ -1,4 +1,20 @@
-"""오프라인 검증용 예제 자료로 35개 Axes 모듈을 실행합니다. UCI 예제는 별도 skeleton입니다."""
+"""
+================================================================================
+eda_visualization_examples.py - 오프라인 검증용 예제 자료로 35개 Axes 모듈을 실행합니다. UCI 예제는 별도 skeleton입니다.
+================================================================================
+설명:
+    - 오프라인 검증용 예제 자료로 35개 Axes 모듈을 실행합니다. UCI 예제는 별도 skeleton입니다.
+분석 가정:
+    - 입력의 형상·타입·자료 순서를 호출자가 확인합니다. 계산과 파일 쓰기의 조건은 각 공개 함수의 계약을 따릅니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
+"""
 import importlib
 from matplotlib import pyplot as plt
 from examples.eda_visualization_inputs import cases

@@ -1,8 +1,24 @@
-"""모의21묶음의 자료 안내·문제지·풀이·실행 해설을 같은 독자 기준으로 정리합니다.
-
-지문·수식·배점·데이터·수치 답안은 유지하며 표현과 배치만 다룹니다.
-생성기 뒤에서 호출하거나 python tools/exams/improve_mock_readability.py로 실행합니다.
 """
+================================================================================
+improve_mock_readability.py - 모의21묶음의 자료 안내·문제지·풀이·실행 해설을 같은 독자 기준으로 정리합니다.
+================================================================================
+설명:
+    - 모의21묶음의 자료 안내·문제지·풀이·실행 해설을 같은 독자 기준으로 정리합니다.
+    - 지문·수식·배점·데이터·수치 답안은 유지하며 표현과 배치만 다룹니다.
+    - 생성기 뒤에서 호출하거나 python tools/exams/improve_mock_readability.py로 실행합니다.
+분석 가정:
+    - 저장소 경로와 입력 명세를 기준으로 실행합니다. 생성·검사 대상과 외부 의존성은 각 실행 함수의 조건을 따릅니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
+"""
+
+from module_spec import write_python
 
 from pathlib import Path
 import argparse
@@ -519,7 +535,7 @@ def improve_bundle(folder, render_pdf=True, answers_only=False):
                 chunks.append("# 문항 " + cell.source.splitlines()[0][4:])
             elif cell.cell_type == "code":
                 chunks.append(cell.source)
-        (folder / "분석코드.py").write_text(wrapper + "\n\n".join(chunks) + "\n")
+        write_python(folder / "분석코드.py", wrapper + "\n\n".join(chunks) + "\n")
         readme = folder / "README.md"
         text = readme.read_text() if readme.exists() else "# " + title + "\n"
         marker = "\n<!-- reader-guide -->"

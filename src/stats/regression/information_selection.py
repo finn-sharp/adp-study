@@ -13,6 +13,7 @@ information_selection.py - 동일 반응 OLS AIC/BIC 후진 변수 선택
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-23  김재현(Finn)     v1.0.0    응용 분석 모듈·모의10회 실행 연결
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

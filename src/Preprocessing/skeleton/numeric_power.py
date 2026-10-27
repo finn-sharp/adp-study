@@ -1,13 +1,26 @@
-"""numeric_power UCI 스켈레톤.
-
-데이터 로딩 → JSON/Profile → Feature/분석 연결 → 실행 → 수치 확인.
-전처리는 학습 Feature에서만 적합하며 타깃을 제외합니다. 시각화를 포함하지 않습니다.
-작성자: 김재현(Finn), 2026-10-12. 변경 이력: v1.0.0 최초 추가.
-라이선스: Proprietary; UCI 자료는 별도 CC BY 4.0.
+"""
+================================================================================
+numeric_power.py - numeric_power UCI 스켈레톤.
+================================================================================
+설명:
+    - numeric_power UCI 스켈레톤.
+    - 데이터 로딩 → JSON/Profile → Feature/분석 연결 → 실행 → 수치 확인.
+    - 전처리는 학습 Feature에서만 적합하며 타깃을 제외합니다. 시각화를 포함하지 않습니다.
+    - 작성자: 김재현(Finn), 2026-10-12.
+분석 가정:
+    - 자료의 열·타깃·분할 조건을 확인하고, 학습 전처리는 학습 구간에서만 적합합니다. 실행은 명시한 진입점에서 수행합니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary; UCI 자료는 별도 CC BY 4.0.
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
 """
 
 __author__ = "김재현(Finn)"
-__email__ = "penguin-klg@naver.com"
+__email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
 

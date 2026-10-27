@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "analysis": {
-    "modules": 267,
-    "recipe_files": 294,
-    "default_recipe_combinations": 282
+    "modules": 268,
+    "recipe_files": 295,
+    "default_recipe_combinations": 283
   },
   "summary": {
     "bundles": 46,

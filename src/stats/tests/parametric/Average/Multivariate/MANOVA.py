@@ -7,13 +7,13 @@ MANOVA.py - 기존 import·실행 예제 호환 경로
 분석 가정:
     - 정식 구현은 src.stats.tests.parametric.Multivariate.manova에서 관리합니다.
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-12
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    통계 PDF 전체 범위 모듈화·입력 검증·명세
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

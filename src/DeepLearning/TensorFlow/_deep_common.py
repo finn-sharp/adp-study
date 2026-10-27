@@ -13,6 +13,7 @@ _deep_common.py - 새 CNN·SimpleRNN·LSTM·GRU의 분할·학습·검증 계약
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    별도 알고리즘의 공통 계약 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

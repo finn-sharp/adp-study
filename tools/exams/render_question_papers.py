@@ -1,7 +1,21 @@
-"""Render all question-only PDFs in a consistent Korean administrative style.
-
-Sources are the existing question manifests, never answer notebook outputs.
-Run from any directory: python tools/exams/render_question_papers.py.
+"""
+================================================================================
+render_question_papers.py - Render all question-only PDFs in a consistent Korean administrative style.
+================================================================================
+설명:
+    - Render all question-only PDFs in a consistent Korean administrative style.
+    - Sources are the existing question manifests, never answer notebook outputs.
+    - Run from any directory: python tools/exams/render_question_papers.py.
+분석 가정:
+    - 저장소 경로와 입력 명세를 기준으로 실행합니다. 생성·검사 대상과 외부 의존성은 각 실행 함수의 조건을 따릅니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
 """
 from pathlib import Path
 import argparse
