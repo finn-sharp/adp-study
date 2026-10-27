@@ -38,6 +38,8 @@ jobs:
         run: |
           python -m src.datasets.tabular
           python -m src.datasets.skeleton.tabular
+          python -m src.datasets.persistence
+          python -m src.datasets.skeleton.persistence
           python -m src.MachineLearning.Trees.xgboost
           python -m src.MachineLearning.Trees.catboost
           python -m src.MachineLearning.Trees.lightgbm

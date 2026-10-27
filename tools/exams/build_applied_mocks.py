@@ -1,4 +1,22 @@
-"""기존 공문서형 서식의 신규 응용 모의10회·150문항·코드·해설을 생성합니다."""
+"""
+================================================================================
+build_applied_mocks.py - 기존 공문서형 서식의 신규 응용 모의10회·150문항·코드·해설을 생성합니다.
+================================================================================
+설명:
+    - 기존 공문서형 서식의 신규 응용 모의10회·150문항·코드·해설을 생성합니다.
+분석 가정:
+    - 저장소 경로와 입력 명세를 기준으로 실행합니다. 생성·검사 대상과 외부 의존성은 각 실행 함수의 조건을 따릅니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
+"""
+
+from module_spec import write_python
 
 from pathlib import Path
 import sys, json
@@ -153,11 +171,9 @@ def build():
         nbformat.write(
             book, folder / ("모의고사_%d회_풀이.ipynb" % spec["exam_number"])
         )
-        (folder / "분석코드.py").write_text(
-            '"""해당 파일 폴더 또는 임의 cwd에서 실행 가능한 실제 모의 풀이."""\n'
+        write_python(folder / "분석코드.py", '"""해당 파일 폴더 또는 임의 cwd에서 실행 가능한 실제 모의 풀이."""\n'
             + "\n\n".join(codes)
-            + "\n"
-        )
+            + "\n")
         (folder / "해설.md").write_text("\n".join(explanations) + "\n")
         (folder / "README.md").write_text(
             "# 모의고사 "

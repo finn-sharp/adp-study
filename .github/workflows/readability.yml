@@ -13,3 +13,5 @@ jobs:
       - run: python -m pip install -r requirements-dev-py312.txt
       - name: Check source formatting
         run: python -m black --check --workers 1 src 기출문제/모의고사/공통
+      - name: Audit every tracked Python module specification
+        run: python tools/exams/module_spec.py --check

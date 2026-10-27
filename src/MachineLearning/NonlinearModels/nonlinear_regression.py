@@ -7,13 +7,13 @@ nonlinear_regression.py - 명명된 비선형 평균모형 회귀
 분석 가정:
     - 독립 수치 관측·정확한 평균 함수형태·식별 가능한 파라미터. 학습 잔차와 보류 성능을 구분합니다.
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-20
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-20  김재현(Finn)     v1.0.0    도메인 공통화·전용 명세·실행 예제 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

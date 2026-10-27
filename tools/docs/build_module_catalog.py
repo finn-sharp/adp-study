@@ -1,6 +1,20 @@
-"""등록부와 소스의 기능 설명에서 단계별 기능 카탈로그를 생성합니다.
-
-분석 의존성을 import하거나 모형을 학습하지 않습니다. --check는 누락·중복·생성 차이를 검사합니다.
+"""
+================================================================================
+build_module_catalog.py - 등록부와 소스의 기능 설명에서 단계별 기능 카탈로그를 생성합니다.
+================================================================================
+설명:
+    - 등록부와 소스의 기능 설명에서 단계별 기능 카탈로그를 생성합니다.
+    - 분석 의존성을 import하거나 모형을 학습하지 않습니다. --check는 누락·중복·생성 차이를 검사합니다.
+분석 가정:
+    - 저장소 경로와 입력 명세를 기준으로 실행합니다. 생성·검사 대상과 외부 의존성은 각 실행 함수의 조건을 따릅니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
 """
 import ast
 from collections import OrderedDict
@@ -22,6 +36,7 @@ STAGES = OrderedDict([
  ('decision', ('10. 목적함수 기반 의사결정 최적화', '예측모형의 하이퍼파라미터 탐색과 별개입니다. 목적함수·제약·변수 범위를 입력하고 해의 실행가능성과 최적성 근거를 구분합니다.')),
 ])
 FUNCTIONS = {
+ 'artifact-persistence':'Parquet 표·joblib/pickle 분석 객체의 저장·복원, 명시 신뢰·덮어쓰기 정책',
  'tabular-loader':'CSV·TSV·JSON/JSONL·XML·YAML·TXT·XLSX 읽기·명시적 스키마 검증',
  'numeric-imputation':'평균·중앙값·최빈값·상수 결측 대치와 선택적 결측 indicator',
  'numeric-scaling':'standard·minmax·robust·maxabs·행 normalize 또는 항등 변환',
@@ -86,6 +101,7 @@ METRICS = {
  'horizon-errors':'예측 horizon별 오차 집계',
 }
 INPUTS = {
+ 'artifact-persistence':'DataFrame/분석 객체·로컬 경로/바이너리 스트림·저장/복원 Profile',
  'tabular-loader':'로컬 경로·bytes·읽기 스트림·형식별 Profile/레시피',
  'one-sample-mean':'수치 표본 x·귀무 평균·선택적 알려진 sigma', 'two-sample-mean':'독립 수치 표본 x/y·귀무 차이',
  'paired-t':'같은 대상의 동일 길이 x/y', 'one-sample-variance':'수치 표본·귀무 분산',

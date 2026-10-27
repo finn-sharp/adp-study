@@ -7,13 +7,13 @@ sarima.py - SARIMA 학습·차수 선택·고정 horizon 예측
 분석 가정:
     - 시간 순 정규 격자·결측 없는 학습 자료. 미래 목표값은 학습·차수 선택에 사용하지 않습니다.
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-20
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-20  김재현(Finn)     v1.0.0    도메인 공통화·전용 명세·실행 예제 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

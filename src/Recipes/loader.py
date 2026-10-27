@@ -1,24 +1,23 @@
 """
-=========================================================================loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
-=========================================================================설명:
+================================================================================
+loader.py - 모델별 JSON 레시피 읽기·검증·Profile 구성
+================================================================================
+설명:
     - src/Recipes의 평면 JSON 설정을 모델별 Profile로 변환합니다.
     - 레시피 → 명시적 overrides → Profile → 실행기 순서로 설정을 적용합니다.
-
 분석 가정:
     - 레시피는 JSON 객체이며 입력 데이터는 실행기에서 별도로 검증합니다.
     - 파일 누락·알 수 없는 키·중복 키는 오류이며 설정을 조용히 무시하지 않습니다.
-
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-11
     - 라이선스: Proprietary
-
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
-    ----------------------------------------------------------------------------
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피와 실행기 연결
-========================================================================="""
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
+"""
 
 __author__ = "김재현(Finn)"
 __email__ = "penguin.klg@gmail.com"
@@ -35,6 +34,12 @@ from typing import Any, Dict, Optional
 
 # 모델명: (모듈, Profile, 기본 task, 지원 task). 통계 검정에는 task 필드가 없습니다.
 _REGISTRY = {
+    "artifact-persistence": (
+        "src.datasets.persistence",
+        "PersistenceProfile",
+        None,
+        (None,),
+    ),
     "tabular-loader": ("src.datasets.tabular", "TabularLoaderProfile", None, (None,)),
     "plot-regression-glm-residuals": (
         "src.Visualization.regression.glm_residuals",

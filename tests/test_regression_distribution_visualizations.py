@@ -1,4 +1,20 @@
-"""분포 QQ 분위수·지지/추정·회귀 subplot 수치·새44개 명세 계약 검증."""
+"""
+================================================================================
+test_regression_distribution_visualizations.py - 분포 QQ 분위수·지지/추정·회귀 subplot 수치·새44개 명세 계약 검증.
+================================================================================
+설명:
+    - 분포 QQ 분위수·지지/추정·회귀 subplot 수치·새44개 명세 계약 검증.
+분석 가정:
+    - 테스트의 고정 입력·합성 자료와 명시한 허용오차를 사용합니다. 시험 데이터의 성능 보장이 아닙니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
+"""
 import ast,importlib,json,sys
 from dataclasses import fields
 from pathlib import Path

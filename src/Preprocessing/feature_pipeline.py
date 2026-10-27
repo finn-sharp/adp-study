@@ -13,6 +13,7 @@ feature_pipeline.py - Feature 기반 전처리 순서와 컬럼 조합
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    Feature별 순서·학습 전용 전처리 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

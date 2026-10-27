@@ -12,8 +12,9 @@ optuna_search.py - Optuna TPE 교차검증 탐색
     - 작성일: 2026-10-14
     - 라이선스: Proprietary
 변경 이력 (Revision History):
-    DATE        AUTHOR           VERSION   DESCRIPTION
+    DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-14  김재현(Finn)       v1.0.0    Profile/DTO/JSON/skeleton 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

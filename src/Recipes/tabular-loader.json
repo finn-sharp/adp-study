@@ -18,5 +18,6 @@
   "parse_dates": [],
   "date_format": null,
   "required_columns": [],
-  "allow_empty": false
+  "allow_empty": false,
+  "trusted": false
 }

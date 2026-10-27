@@ -13,6 +13,7 @@ optdigits.py - 새 딥러닝 스켈레톤용 UCI Optdigits 공식 train/test 로
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
     2026-10-12  김재현(Finn)     v1.0.0    별도 알고리즘의 공통 계약 추가
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

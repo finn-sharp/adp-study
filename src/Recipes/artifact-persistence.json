@@ -1,0 +1,9 @@
+{
+  "format": "auto",
+  "trusted": false,
+  "overwrite": false,
+  "pickle_protocol": 4,
+  "joblib_compress": 3,
+  "parquet_compression": "snappy",
+  "parquet_index": true
+}

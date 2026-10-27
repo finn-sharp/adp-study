@@ -3,22 +3,22 @@
 xgboost.py - xgboost 스캘레톤 코드
 ================================================================================
 설명:
-	- xgboost 기반 추론 과정에 대한 기초 구조를 확인해볼 수 있는 코드
-
+    - xgboost 기반 추론 과정에 대한 기초 구조를 확인해볼 수 있는 코드
+분석 가정:
+    - 입력의 형상·타입·자료 순서를 호출자가 확인합니다. 계산과 파일 쓰기의 조건은 각 공개 함수의 계약을 따릅니다.
 작성 정보:
-	- 작성자: 김재현(Finn) (penguin-klg@naver.com)
-	- 작성일: 2026-09-10
-	- 라이선스: Proprietary
-
-변경 이력:
-	DATE        AUTHOR           VERSION   DESCRIPTION
-	----------------------------------------------------------------------------
-	2026-09-10  김재현(Finn)       v1.0.0    최초 작성
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-09-10
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-09-10  김재현(Finn)       v1.0.0    최초 작성
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 
 __author__ = "김재현(Finn)"
-__email__ = "penguin-klg@naver.com"
+__email__ = "penguin.klg@gmail.com"
 __version__ = "1.0.0"
 __status__ = "Development"
 

@@ -5,21 +5,17 @@ k_distance.py - DBSCAN eps 선택용 k-distance 진단
 설명:
     - DBSCAN eps 선택용 k-distance 진단을 Profile·전용 Output DTO·공개 실행기로 제공합니다.
     - 실행 설정은 src/Recipes의 모델별 JSON에서 별도로 관리합니다.
-
 분석 가정:
     - 진단 도구이며 자동 최적 eps 또는 이상 탐지 임계값을 주장하지 않습니다.
     - 결측값과 범주형 인코딩은 실행 전에 처리합니다.
-
 작성 정보:
-    - 작성자: 김재현(Finn)
-    - 이메일: penguin.klg@gmail.com
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-11
     - 라이선스: Proprietary
-
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
-    ----------------------------------------------------------------------------
     2026-10-11  김재현(Finn)     v1.0.0    모델별 레시피·전체 명세·실행 예제 작성
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
 """
 

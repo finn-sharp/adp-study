@@ -1,8 +1,22 @@
-"""파일/스트림 → 로딩 Profile → DataFrame DTO → Feature 입력 스켈레톤.
-
-실행: python -m src.datasets.skeleton.tabular
-사용자 자료: main("data.xlsx", overrides={"sheet_name": "자료"})
-학습용 fit·결측 대치·sampling은 이 로딩 단계에서 수행하지 않습니다.
+"""
+================================================================================
+tabular.py - 파일/스트림 → 로딩 Profile → DataFrame DTO → Feature 입력 스켈레톤.
+================================================================================
+설명:
+    - 파일/스트림 → 로딩 Profile → DataFrame DTO → Feature 입력 스켈레톤.
+    - 실행: python -m src.datasets.skeleton.tabular
+    - 사용자 자료: main("data.xlsx", overrides={"sheet_name": "자료"})
+    - 학습용 fit·결측 대치·sampling은 이 로딩 단계에서 수행하지 않습니다.
+분석 가정:
+    - 자료의 열·타깃·분할 조건을 확인하고, 학습 전처리는 학습 구간에서만 적합합니다. 실행은 명시한 진입점에서 수행합니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
 """
 
 from io import StringIO

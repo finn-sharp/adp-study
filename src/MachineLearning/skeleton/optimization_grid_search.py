@@ -1,7 +1,20 @@
-"""grid_search skeleton: 로딩 → JSON → Pipeline → train CV → 보류 평가.
-
-작성 정보: 김재현(Finn), 2026-10-14, Proprietary.
-원 자료 ML Template Code의 RF/LightGBM tuning 흐름을 실행 가능한 코드로 연결.
+"""
+================================================================================
+optimization_grid_search.py - grid_search skeleton: 로딩 → JSON → Pipeline → train CV → 보류 평가.
+================================================================================
+설명:
+    - grid_search skeleton: 로딩 → JSON → Pipeline → train CV → 보류 평가.
+    -
+분석 가정:
+    - 자료의 열·타깃·분할 조건을 확인하고, 학습 전처리는 학습 구간에서만 적합합니다. 실행은 명시한 진입점에서 수행합니다.
+작성 정보:
+    - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
+    - 작성일: 2026-10-27
+    - 라이선스: Proprietary
+변경 이력 (Revision History):
+    DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
+================================================================================
 """
 
 __author__ = "김재현(Finn)"

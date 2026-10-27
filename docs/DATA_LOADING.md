@@ -54,7 +54,8 @@ loaded = run_tabular_loader("data.csv", profile)
 
 | 필드 | 타입 / 기본값 | 동작·적용 조건 |
 | --- | --- | --- |
-| `format` | str / `auto` | auto, csv, tsv, txt, json, jsonl, xml, yaml, xlsx. auto는 확장자로 선택 |
+| `format` | str / `auto` | auto, csv, tsv, txt, json, jsonl, xml, yaml, xlsx, parquet, joblib, pickle. auto는 확장자로 선택 |
+| `trusted` | bool / False | pickle/joblib 읽기에 필수인 신뢰 확인; DataFrame 여부 검사 전에도 코드 실행 가능 |
 | `encoding` | str / `utf-8-sig` | JSON/YAML/CSV/TSV/TXT 바이트 디코딩. XML 바이트는 XML 선언, XLSX는 워크북 인코딩 사용. 텍스트 스트림은 이미 디코딩된 값 |
 | `sep` | Optional[str] / None | 구분자 한 문자 또는 `r"\s+"`. CSV/TSV 기본값은 쉼표/탭, 구분자 TXT에는 명시 필수 |
 | `header` | Optional[int] / 0 | 구분자 표/XLSX에서 첫 행 헤더0 또는 헤더 없음None |
@@ -153,3 +154,61 @@ python -m src.datasets.skeleton.tabular
 ```
 
 [선택 의존성](../requirements-data-loading.txt)은 Python3.7/3.12 환경을 구분합니다. 누락된 패키지는 설치 파일을 가리키는 ImportError로 알립니다. 파일 누락·권한 오류는 OSError, 인코딩 오류는 UnicodeError, 잘못된 형식/구조/스키마·빈 자료는 TypeError/ValueError로 전달합니다. XML/YAML 파싱 실패와 유효하지 않은 XLSX는 ValueError로 알립니다. 경고를 예외로 감추거나 빈 표로 대체하지 않습니다.
+
+## Parquet·joblib·pickle 저장 및 복원
+
+`read_table`도 `.parquet`/`.pq`, `.joblib`, `.pickle`/`.pkl`을 읽습니다. pickle/joblib의 원 객체가 DataFrame인 경우에만 표 로더로 연결하며, 일반 객체는 `load` 또는 `load_artifact`를 사용합니다. 기존 TabularLoaderProfile에는 `trusted: bool = False`가 추가되었고 기존 설정/필드는 유지합니다.
+
+[저장·복원 모듈](../src/datasets/persistence.py)은 `artifact-persistence` 레시피와 `PersistenceProfile`을 사용합니다. [독립 스켈레톤](../src/datasets/skeleton/persistence.py)에서 저장 후 실제 복원까지 실행할 수 있습니다. 여기서 제공하는 save/load의 형식은 Parquet·joblib·pickle 세 가지이며, 앞서 제공한 텍스트/스프레드시트 형식은 기존 읽기 API를 유지합니다.
+
+```python
+from src.datasets import read_table, save, load, save_artifact, load_artifact
+
+save(frame, "processed.parquet")
+frame = read_table("processed.parquet")
+
+save(fitted_pipeline, "pipeline.joblib")
+pipeline = load("pipeline.joblib", overrides={"trusted": True})
+predictions = pipeline.predict(new_X)
+
+save(result_dto, "analysis.pkl")
+restored = load_artifact("analysis.pkl", overrides={"trusted": True})
+result_dto = restored.value
+print(restored.to_json(indent=2))  # 원 객체는 JSON에 포함하지 않음
+```
+
+pickle/joblib은 역직렬화 중 코드를 실행할 수 있으므로 **직접 만들었거나 출처·무결성을 신뢰할 수 있는 파일만** `trusted=True`로 읽습니다. 단순 DataFrame인지 확인하기 전에도 실행될 수 있어 표 로더에도 같은 조건을 적용합니다. Python·pandas·scikit-learn·joblib·클래스 경로가 바뀐 환경에서의 복원 호환은 보장하지 않습니다. [Python pickle 공식 명세](https://docs.python.org/3/library/pickle.html)를 참고하세요.
+
+### PersistenceProfile
+
+| 필드 | 타입 / 기본값 | 동작 |
+| --- | --- | --- |
+| `format` | str / auto | auto/parquet/joblib/pickle; 익명 bytes/스트림은 명시 필요 |
+| `trusted` | bool / False | pickle/joblib 복원 실행에 대한 명시적 신뢰 확인 |
+| `overwrite` | bool / False | 저장 시 기존 로컬 파일 교체 허용; load와 스트림에는 미적용 |
+| `pickle_protocol` | int / 4 | pickle/joblib 저장 프로토콜. 현재 Python이 지원하는 범위만 허용 |
+| `joblib_compress` | int / 3 | joblib 저장 압축 수준0..9 |
+| `parquet_compression` | Optional[str] / snappy | Parquet 저장 압축; snappy/gzip/brotli/lz4/zstd/None |
+| `parquet_index` | bool / True | Parquet 저장 시 index 보존; False면 index 제외 |
+
+`save_artifact(value, destination, profile=None, *, recipe_path=None, overrides=None)`와 `load_artifact(source, profile=None, *, recipe_path=None, overrides=None)`는 기존 레시피/명시 Profile의 배타 조건을 따릅니다. `save`는 저장 DTO를 반환하는 편의 함수, `load`는 복원 객체만 반환하는 편의 함수입니다. 비기본 저장 전용 옵션을 load에 전달하면 오류입니다.
+
+Parquet에는 고유한 문자열 열 이름의 DataFrame만 저장합니다. pyarrow 엔진으로 dtype·열 순서와 기본 index를 보존합니다. 파일/객체의 모든 Python 타입을 Parquet이 표현할 수 있는 것은 아니므로 중첩/사용자 객체 열의 지원은 엔진의 스키마 조건을 따릅니다. 실패 시 임의로 문자열로 바꾸지 않습니다. [pandas Parquet 명세](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_parquet.html)를 참고하세요.
+
+### PersistenceOutputDTO
+
+| 필드 | 타입 | 제공 내용 |
+| --- | --- | --- |
+| `operation` | str | save/load |
+| `format` | str | 적용 형식 |
+| `source_name`, `source_kind` | str | 경로/스트림 이름 및 path/bytes/stream |
+| `n_bytes` | int | 저장/읽은 크기 |
+| `object_type` | str | 객체의 module.class 이름 |
+| `metadata` | Dict[str,Any] | 적용 엔진 또는 스트림 위치 복원 여부 |
+| `parameters` | Dict[str,Any] | 적용 Profile 전체 |
+| `warnings` | List[str] | 신뢰·환경 의존성과 스트림 소비 조건 |
+| `value` | Any | load의 원 객체; save는None. 기본 JSON/사전에서는 제외하는 실행 필드 |
+
+저장 대상은 로컬 경로 또는 바이너리 write 스트림입니다. 부모 폴더는 미리 준비해야 합니다. 로컬 파일은 직렬화를 끝낸 뒤 같은 디렉터리의 임시 파일을 통해 완성된 파일만 공개하고, 실패한 임시 파일을 정리합니다. 기본값은 기존 파일이 있으면 FileExistsError이며 교체하려면 `overwrite=True`가 필요합니다. 스트림은 현재 위치에 쓰고 닫거나 되감지 않습니다. 부분 쓰기 실패 시 OSError이며 호출자 스트림의 이미 쓴 부분을 되돌리지는 않습니다. 읽기 스트림은 기존 로더처럼 가능한 경우 원래 위치를 복원합니다.
+
+Parquet 선택 의존성 pyarrow도 `requirements-data-loading.txt`에 추가했습니다. joblib은 모델 환경과 같은 고정 버전을 사용합니다. 파일 신뢰 여부를 판정하는 자동 보안 검사나 모델 재학습은 수행하지 않습니다.
