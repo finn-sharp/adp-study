@@ -1,12 +1,13 @@
 {
   "schema_version": 1,
+  "theme": "analysis-report-v2",
   "seed": 20261027,
   "modules": {
     "association.rules": {
       "image": "association/rules.png",
       "width": 1350,
       "height": 900,
-      "sha256": "63423370513f33031317ceb1615d1b47854a7ea1aef450553fc9effd86df8d99",
+      "sha256": "e1dbdb7b04ad3f58b73f1dfd86677a2045fbb032cc5c985b4dfff2cb43591a6c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -34,7 +35,7 @@
       "image": "categorical/category_rate.png",
       "width": 1350,
       "height": 900,
-      "sha256": "58baeda5ebf042f126a555d5e1cf2d88ff5d3d55037a4e58e5abfdd83e16ce4a",
+      "sha256": "03ae8b15fe2ae52e486f332d12eb076ed47df99a30a43a89f4c4f497182569cf",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -60,7 +61,7 @@
       "image": "categorical/contingency.png",
       "width": 1350,
       "height": 900,
-      "sha256": "0bbf605081be1001108596cee94d385662fce1d08120edd66cb0d712e49a918c",
+      "sha256": "d3a22e46b49a824b090ae03472effd4752ca97cb98855e46ea242447c3c810e7",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -115,7 +116,7 @@
       "image": "categorical/count.png",
       "width": 1350,
       "height": 900,
-      "sha256": "3599330fd27950dc8ada230f88fb2b5a4ff135224615c03c6915833ba8d8e1f6",
+      "sha256": "7a5354d6e299b43a3cdadc06471accb1bac1e912fa2344704267936374d9b20c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -138,7 +139,7 @@
       "image": "categorical/grouped_distribution.png",
       "width": 1350,
       "height": 900,
-      "sha256": "360cf767df4b5d18557c1d609907c4024b8994b44740c8e464c3c7728235fa41",
+      "sha256": "bba6fe0327d7d6a83010a8b897f1e14d60ff98b44aa2502e179e86d056cbe032",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -164,7 +165,7 @@
       "image": "categorical/mosaic.png",
       "width": 1350,
       "height": 900,
-      "sha256": "a7ae4c65f551909bb286dc16086479831b0a2d8f218fcc3fbfd5726f5961c5f2",
+      "sha256": "d9b91a1609584625440ab201a684dcffccde789218700640d6c7bc43369aba18",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -188,7 +189,7 @@
       "image": "categorical/pareto.png",
       "width": 1350,
       "height": 900,
-      "sha256": "0e6b57be987a32f78ac3db56429ae1e0f1e5be7374bc3fc591e20e60b8d50986",
+      "sha256": "d012147b38abb3b41009f3cea044f219a349eae7879f7b8352321649ed21edcd",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -211,7 +212,7 @@
       "image": "classification/calibration.png",
       "width": 1350,
       "height": 900,
-      "sha256": "b5c0d1b2390f2c8a42fdd69feffd854050747a3269186802f2b60b4866c340b6",
+      "sha256": "7c0220c4e57146123ecac3a54da7ec7dfa069df7f8cb4f2746477cbb81d61301",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -236,7 +237,7 @@
       "image": "classification/confusion.png",
       "width": 1350,
       "height": 900,
-      "sha256": "bfed78235a8a2cb14248d99156cf3e87ac76c51878b68c0687e58b357e00e066",
+      "sha256": "a7ec05333689add0c0849c02e7a329178a4538d40b4047b427038767513d2485",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -281,7 +282,7 @@
       "image": "classification/precision_recall.png",
       "width": 1350,
       "height": 900,
-      "sha256": "1f820951e11fa159bd99b27ee9688f9b02f9e6fce4b1478fe5b45e3d027809f9",
+      "sha256": "15c0873e9c5240b842117b235c9c53fe5d257a7e301611bcf245722138781517",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -305,7 +306,7 @@
       "image": "classification/roc.png",
       "width": 1350,
       "height": 900,
-      "sha256": "0eb5355f49c908e1e9519558993d071591703550ec0bed055e1b720a46eb3469",
+      "sha256": "77294758b6e8e07d8891d84557b621311fb1084b1d2367bac33b6abb05229d94",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -329,7 +330,7 @@
       "image": "classification/threshold.png",
       "width": 1350,
       "height": 900,
-      "sha256": "18529b90b3130e8a88d2b6e3ad102e35daaa8fe5469c1cefdf9795ad4f37884f",
+      "sha256": "10cef5b8aef0170630231084bdd4cf3aed7ae74644dfaa2798c1077d1f5263ea",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -359,7 +360,7 @@
       "image": "clustering/dendrogram.png",
       "width": 1350,
       "height": 900,
-      "sha256": "af6ae018a95a35f09edcc00b58fcc9de3fdb25f42997107c1b57eb9ab6247a22",
+      "sha256": "29f19524962cbf3151a8fa078eafb04b93166f282c3419856d7eb9df51c5c038",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -489,7 +490,7 @@
       "image": "clustering/elbow.png",
       "width": 1350,
       "height": 900,
-      "sha256": "bf98eb6d912c8c996947ef5cded571b68fad5c7a125dbe0d498fbcc376d56e7a",
+      "sha256": "699863c139f674da1c769db62b9315fa74370299a8cd2e81049dc9d9006d7674",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -514,7 +515,7 @@
       "image": "clustering/k_distance.png",
       "width": 1350,
       "height": 900,
-      "sha256": "8b6acb95c09cf795c196079bb7c5b8eb12818b0abf0e778d6a0893fcb4c9c659",
+      "sha256": "cd156945847b65b95ac52300a3e5a94f1a984956a3e46dfad4824762830d3c39",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -539,7 +540,7 @@
       "image": "clustering/silhouette.png",
       "width": 1350,
       "height": 900,
-      "sha256": "7879dbc42833ffc21a245dae3c12312eb9965af3aa116f018b3502feca464959",
+      "sha256": "7c3c47130db78d0c0ea6e3ea2251d1eca1696634ee89ed8dc0bbdf3c9aa9e6f8",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -565,7 +566,7 @@
       "image": "decomposition/explained_variance.png",
       "width": 1350,
       "height": 900,
-      "sha256": "f6a8de6b51152bcd954b4355497b177be674a562e954333eae4ee96cb24d507f",
+      "sha256": "5fe9a82eba00e397415e96ae0d4e36180ab1fc883b24b3d3b3308384417ada2a",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -587,7 +588,7 @@
       "image": "decomposition/loadings.png",
       "width": 1350,
       "height": 900,
-      "sha256": "6541e0f9c6ae4bb7da2168a14fb3999ec2b55e2dc1e7ffc23be3a90319094275",
+      "sha256": "fab5e8f5900977def8fefb20ac8c17bed0014589357a9c482980c74700127d3b",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -609,7 +610,7 @@
       "image": "networks/graph.png",
       "width": 1350,
       "height": 900,
-      "sha256": "fb5851b255ae265cdc9aef622c80f00262480f7c178e3f95cf43fcc04738f5f1",
+      "sha256": "3ccf63e1e5dc08632aed2f55a8016a2633fca4d068aa64cf52b5c81cf1ae68d6",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -635,7 +636,7 @@
       "image": "numeric/ecdf.png",
       "width": 1350,
       "height": 900,
-      "sha256": "f60385bcff69765a6a82c34013e1c8573bf804e332b81061ae0e0ba350a4cf55",
+      "sha256": "e97e13ac5d020ac7bc7132839b43526966af16fa9c94752a064e92950d14dd8d",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -659,7 +660,7 @@
       "image": "numeric/histogram.png",
       "width": 1350,
       "height": 900,
-      "sha256": "c9649eaffb5bba3e71be390775d1871b1aea45cabe2526f7cad2d3c19d78abac",
+      "sha256": "aa898b84c9a5a277b90444b66e098ad92c388b6985097261cc23fd09d7494909",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -682,7 +683,7 @@
       "image": "numeric/kde.png",
       "width": 1350,
       "height": 900,
-      "sha256": "dab4a9ac8a94fee3b852edb29c62eaacedba56f5bd3d725297a3895aa3177242",
+      "sha256": "787f139d9d6c567d713da1efaf9fad09db61226fab448f0a0eacf8fc5fbf9b44",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -706,7 +707,7 @@
       "image": "numeric/qq.png",
       "width": 1350,
       "height": 900,
-      "sha256": "15cf06e423cb882fda225c416f8690554c66cb7d1ab177323ba0eaa0771be607",
+      "sha256": "67e6d996648f853323314027e15675cc0da52da0b56a0b04ee291ccd39ecc790",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -731,7 +732,7 @@
       "image": "optimization/convergence.png",
       "width": 1350,
       "height": 900,
-      "sha256": "8fa2fc476d0b84ddd0ba74ef821cf5602827ffedd303ab7c51e16ce8a8a7e67b",
+      "sha256": "f6cb23c472ed9da067f3032d48cab72e0175b4d10c8ea70ef2df11eef9b3a34c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -754,7 +755,7 @@
       "image": "qq/bernoulli.png",
       "width": 1350,
       "height": 900,
-      "sha256": "c03cc09bf091f7b4bd23a857403a80c14e19e3d235750ceed3ae635815910563",
+      "sha256": "acc09cd4b8bdadd458e79136131611e0a676e22bc808847e73e747f9d52f14f6",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -789,7 +790,7 @@
       "image": "qq/beta.png",
       "width": 1350,
       "height": 900,
-      "sha256": "9f0bf165ed130f3f5fd9a9c11d7517f718f685157fffcf17c5b8cc426ace400a",
+      "sha256": "1401614e5fa63e5f4c29b87fc844bbf9ef803375d5a1e0a1d57899a14b9cf4e6",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -827,7 +828,7 @@
       "image": "qq/binomial.png",
       "width": 1350,
       "height": 900,
-      "sha256": "e12f26de06ea280c4aabbdd5e9c0446800c687e27ba2cf60e4a163adf493a39e",
+      "sha256": "7853449ac7657886ca207cd6b211c3c724d3a00b4fbbfa14664d15eea4c035e0",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -864,7 +865,7 @@
       "image": "qq/chi_square.png",
       "width": 1350,
       "height": 900,
-      "sha256": "7470300473d4ec9c6bc61870d775168c6f359b97d19dd60d000beca3e403a0ed",
+      "sha256": "aaf42b674b516fee1688f68094b747e65f2383ae8d56e195e9d61dea6db8068d",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -900,7 +901,7 @@
       "image": "qq/exponential.png",
       "width": 1350,
       "height": 900,
-      "sha256": "c6b064a446a7e0c362e0237481bfbf1936d3b5bef87e5e555816c63fa666b3c9",
+      "sha256": "ebacc5725e67d5a90faeb6def81591be651701c5e5f5b4250a8d5792b4f97a3b",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -934,7 +935,7 @@
       "image": "qq/gamma.png",
       "width": 1350,
       "height": 900,
-      "sha256": "ffde942bdcd07e0ead2824ede3e543b59d24dd1813872d7300d7918c644b50ff",
+      "sha256": "3a03f3eb6fe9f394e8a7a9ce7019afa9b84a796bd68d604eb242985f8c8b3305",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -970,7 +971,7 @@
       "image": "qq/logistic.png",
       "width": 1350,
       "height": 900,
-      "sha256": "d4e340e34ab58e65a8949bda639a540c3f5ab0b179a91985e9ba6fdb6d9503ab",
+      "sha256": "9389785901fa59d826e38b57756353fd5bd42362d7580ac85c540fa35fe97d51",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1004,7 +1005,7 @@
       "image": "qq/lognormal.png",
       "width": 1350,
       "height": 900,
-      "sha256": "1f8523d70e3135503b88539cd8ed330a03ecb30946bf14fcdbeda68e780e2c94",
+      "sha256": "8b39894ffb4b1500cc1c6b36f18e97b744bc69719d0337eb93f9508f93de8320",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1040,7 +1041,7 @@
       "image": "qq/normal.png",
       "width": 1350,
       "height": 900,
-      "sha256": "b169110df558dbe0b72d34e104c012c57f6cc911578d4813da34512852dad0ac",
+      "sha256": "0451b849e1adf725ef871ccd1adf05118c3d22e82d6a8935b37ae87981361407",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1074,7 +1075,7 @@
       "image": "qq/poisson.png",
       "width": 1350,
       "height": 900,
-      "sha256": "b36d266fbf4b7676e3a2f2c4dce4f0330bd99486eb13a8efb54f1a2a9ebe68a3",
+      "sha256": "750bbf14bf70189bd9df862673850125b6be6b913fad10e646230122fa00ae5c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1109,7 +1110,7 @@
       "image": "qq/student_t.png",
       "width": 1350,
       "height": 900,
-      "sha256": "bb26ff302aeafcf9fb9793b664ef6946a3a2747f312b2ec722652fda2667834d",
+      "sha256": "036e61754ecd36063baebc05375c62fc960f60a10046e8d5f89afa8d8693c110",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1145,7 +1146,7 @@
       "image": "qq/uniform.png",
       "width": 1350,
       "height": 900,
-      "sha256": "ecd06a80017cd87962636d1c544679f58c94966ff4451f8d443bef2c5081f792",
+      "sha256": "3ad1347b216d40282fc35be9bcd70ca80c28c3e7d463911953a2adfbc0c03757",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1179,7 +1180,7 @@
       "image": "qq/weibull.png",
       "width": 1350,
       "height": 900,
-      "sha256": "93016d0122dca74b1402d64d6f4346064d524024f64cda5676232bec5b0abde4",
+      "sha256": "ee0c4e2c1258417455446ede6b379ccdfc2f0f59893c6ed89c0eaaddcda7357a",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1215,7 +1216,7 @@
       "image": "quality/missing_association.png",
       "width": 1350,
       "height": 900,
-      "sha256": "7787255806be3f511a249cf384dd56d131d7474992e7418f0149b3a05995f998",
+      "sha256": "b7c1bcdbe1a3f47d5a1ee28410bd4021a63d8e5625fdb281f9243adee465bd3f",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1255,7 +1256,7 @@
       "image": "quality/missing_matrix.png",
       "width": 1350,
       "height": 900,
-      "sha256": "af2c05ff19b65f5545e06b482a0c42a30e016923d364af7ee7aa7f89b7cd7bf7",
+      "sha256": "e4c5ced75e13697844e2a32574030209e382d79eacda3cd8ffe3f0361777217c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1278,7 +1279,7 @@
       "image": "quality/missingness.png",
       "width": 1350,
       "height": 900,
-      "sha256": "b05c85296142058b8c637d43520405a03baf9cc7b54386e53019a8da3c94ff47",
+      "sha256": "f86144af6b6199f2bc1cba398060e313f16fe4f7d4c1bac1eb980c056bfb4d3b",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1299,7 +1300,7 @@
       "image": "regression/coefficient_intervals.png",
       "width": 1350,
       "height": 900,
-      "sha256": "615e9fa9f63477923e068354fd2166509fc86c37303de5d99c8c1b1552a4d04f",
+      "sha256": "773ade6e83c44ba21762b1adb4ea0fcd4dfc951c80339fa1b3f4f74bbd367e5c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1323,7 +1324,7 @@
       "image": "regression/cooks_distance.png",
       "width": 1350,
       "height": 900,
-      "sha256": "6848f0316f9ad3bcea877ed5efa490862a15774d66f3c887d9e7c924cd108433",
+      "sha256": "f1c198f950c68dc7d5ef3bd2dd8fd12d41e559ff7b5988f0418d46d71c48d8f8",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1346,7 +1347,7 @@
       "image": "regression/glm_residuals.png",
       "width": 1350,
       "height": 900,
-      "sha256": "eca334e852ef183b9452e75481a0960a73153750853f3b5a0557734a94c3f2c9",
+      "sha256": "f0b7c740a04de7e666e559897263b6b8d70138447a931ac59a09480fa1b465bf",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1368,7 +1369,7 @@
           "image": "regression/glm_residuals__logistic_pearson.png",
           "width": 1350,
           "height": 900,
-          "sha256": "9a29dea9a3f9aec06d7b03e6bc8da30ad3e8e7cfe4731ea865499e6bc67b3abe",
+          "sha256": "205ebb67efe1d16bc2122e33aaf6dc011f0d47a956d4196c1b26b229b2a1fb84",
           "parameters": {
             "title": "",
             "color": "C0",
@@ -1390,7 +1391,7 @@
           "image": "regression/glm_residuals__logistic_deviance.png",
           "width": 1350,
           "height": 900,
-          "sha256": "18999375d707931f57190cfee0561bcf6f7a2ab03e836cd512a12e3a217b689c",
+          "sha256": "6af75abdccb6edc8c323457943d763c19ac6e4cd3a1b2e4dc9683dacbe983fc5",
           "parameters": {
             "title": "",
             "color": "C0",
@@ -1412,7 +1413,7 @@
           "image": "regression/glm_residuals__poisson_deviance.png",
           "width": 1350,
           "height": 900,
-          "sha256": "c24c22644a584e1bd51888100d3ba137c7e14e7601e70994d4f634b1eef45e39",
+          "sha256": "c2390bcf4ba2a28d6876f049ccbaefb750cdc63a1794b20b95f2bddd99815746",
           "parameters": {
             "title": "",
             "color": "C0",
@@ -1434,7 +1435,7 @@
           "image": "regression/glm_residuals__gamma_pearson.png",
           "width": 1350,
           "height": 900,
-          "sha256": "7beff787257dfeac155d2dc0ac9b9600e2d8309174d141cddaa1a872b7f1c70e",
+          "sha256": "a845af197f76a0b9aee162b130775229bb5e0d9297a08d3b801dc962de2afd4e",
           "parameters": {
             "title": "",
             "color": "C0",
@@ -1456,7 +1457,7 @@
           "image": "regression/glm_residuals__gamma_deviance.png",
           "width": 1350,
           "height": 900,
-          "sha256": "d66ec308b7fd4854f60388ce71b7bb5b812003a196e1039eb2102cb66b4a7dc5",
+          "sha256": "8eaa4ccd18fe2111dc2e2f9bba7e4a5591203d6f4de48924e172196bae041da0",
           "parameters": {
             "title": "",
             "color": "C0",
@@ -1481,7 +1482,7 @@
       "image": "regression/leverage.png",
       "width": 1350,
       "height": 900,
-      "sha256": "cfc4064cfcaec16ca8ced76ffff43c3a23df56b9721bcc75368fe05622b87205",
+      "sha256": "6f73c9583c1700bed50de8f92b80e080ba461465aa124806f4e3aaa839e99db8",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1506,7 +1507,7 @@
       "image": "regression/model_comparison.png",
       "width": 1350,
       "height": 900,
-      "sha256": "4bbe34e1311f9188dcfa316073124f57d26e7c919c4ce3318e764d43b9ca3350",
+      "sha256": "7a87097664514512d09e529f57e8426b7a55b743207f97e1437e96648f7dc157",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1528,7 +1529,7 @@
       "image": "regression/observed_predicted.png",
       "width": 1350,
       "height": 900,
-      "sha256": "9e849e899cb594c0ce2dab30dc11748ba8b68ae510be13162cff72e7b1a777bc",
+      "sha256": "0cf4887296103b56cabf03f791424f9a6de8b90dcd11d8ea46c4374bae084d0d",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1554,7 +1555,7 @@
       "image": "regression/partial_residual.png",
       "width": 1350,
       "height": 900,
-      "sha256": "852a7b58724af0c892ad638240a0919ab3fdd1969e64fa1fd3a149f0a44210b9",
+      "sha256": "7511be9ff331119c93bb3a4c16e86c1df4755078f3192ca2347405e73407b12b",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1577,7 +1578,7 @@
       "image": "regression/prediction_interval.png",
       "width": 1350,
       "height": 900,
-      "sha256": "dd0d53fbdf94d32d50ae0b6ae4923038d73d11f5c0af89dfa3aaba81b825c9cb",
+      "sha256": "7f4cc30536e0f56825248db3590db08772e4b79396a413bf3a6862ae866c91cc",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1602,7 +1603,7 @@
       "image": "regression/residual_fitted.png",
       "width": 1350,
       "height": 900,
-      "sha256": "0add41eb685f9fffa832b8274f3b7aedaacf136360af0c963ffd1502d759acef",
+      "sha256": "ead04e5a0b613fdead3053ff2fe2b84df99fe87c73afed91573270970a8b459c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1625,7 +1626,7 @@
       "image": "regression/residual_order.png",
       "width": 1350,
       "height": 900,
-      "sha256": "6eb56ad19e78c35c6727da91b1e582adacd6c42b6ff75608a8c3ecfc1931010d",
+      "sha256": "048d1a161c45975179f296656e3acb2976ac4478bd5e53c41f76d31d55244a3a",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1647,7 +1648,7 @@
       "image": "regression/scale_location.png",
       "width": 1350,
       "height": 900,
-      "sha256": "2b9a76a7dd635be97340bc94f857ca9fd32d9d27e0cefbd123f9f21b928f9e2f",
+      "sha256": "8e1461dd04a5fa1b25b3625c97b4ea006de75d7e18eee1f4e7d19da9bc6dca2c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1669,7 +1670,7 @@
       "image": "regression/vif.png",
       "width": 1350,
       "height": 900,
-      "sha256": "0c28c03b0098c6c937a8d37d7f27270d6ab76011cde6b18e6994277c96a89d7e",
+      "sha256": "ebe4dbb774076df36ac8649bd7468b7863736dd3294f336c9249ad4188219221",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1691,7 +1692,7 @@
       "image": "relationships/correlation.png",
       "width": 1350,
       "height": 900,
-      "sha256": "21646f7e8fc9d3dd7a5ff59529a06284fa48b28e1f8b38c3cef3d83c1bd1e247",
+      "sha256": "b25b94e39a811a9d04b1223d79b95942403f8386c5733ea42c4423690b5a8937",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1715,7 +1716,7 @@
       "image": "relationships/hexbin.png",
       "width": 1350,
       "height": 900,
-      "sha256": "ffe6f856a6a6f04556332f802069744c1a4a8c66f5587e5f27cbbbc49e8d3b85",
+      "sha256": "75d4c415f8e3a6952aa1e5e0b0b9b394695e3b97403ef664b1992b1d19577b8a",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1736,7 +1737,7 @@
       "image": "relationships/scatter.png",
       "width": 1350,
       "height": 900,
-      "sha256": "72d0aaf36cae400dedcb94940d1fb03564dd8bbf90f2aecda54c09f4252e03b1",
+      "sha256": "09180098fb6b2cffb0365045518d759009a26ddcce3ef28c73b5700726c823fa",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1760,7 +1761,7 @@
       "image": "selection/feature_importance.png",
       "width": 1350,
       "height": 900,
-      "sha256": "bae6d3a4e6d76d8718969eb5cad7544be4dd3f64e63ef5ad66b1daab894db530",
+      "sha256": "2a53a75e6e00e6b2247c11ec1d74086e26467c3e509c5d4460e68737de35ee2e",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1784,7 +1785,7 @@
       "image": "selection/validation_curve.png",
       "width": 1350,
       "height": 900,
-      "sha256": "3911e90ffdd96cee67b578276c9f239bf58b36c92edc07129e9bdc77c0912d93",
+      "sha256": "a3888d4c42b76348b85187c4eaaacd9248f36d288818a3fbc3f0e10a31449b1f",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1814,7 +1815,7 @@
       "image": "time_series/autocorrelation.png",
       "width": 1350,
       "height": 900,
-      "sha256": "fd1a3580dc37ee04b5ac65537c9c87014b91a1681a5b84818237939e833f345f",
+      "sha256": "6bfc6b4cc5bd2d948e6b7c26f531c8f24a09d21f9691568c16335cab4dc6795c",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1839,7 +1840,7 @@
       "image": "time_series/lag.png",
       "width": 1350,
       "height": 900,
-      "sha256": "30178ca0a2032db5927fc6161bccde6d9abdee0a39ee51eb8775fd04b0dacaa9",
+      "sha256": "3db780afd3d34da04d125fb8751301b9bfdf287090ea03d1226b5e6425fb78b0",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1861,7 +1862,7 @@
       "image": "time_series/seasonal.png",
       "width": 1350,
       "height": 900,
-      "sha256": "0e641e7081ceaef1e16986a6addc6e48e708ba791181ba508feaa98c44547e7a",
+      "sha256": "58927dfe0311b4a0175038d2930bc07f4e16a947e268dc97efae336a1a529aeb",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1884,7 +1885,7 @@
       "image": "time_series/timeline.png",
       "width": 1350,
       "height": 900,
-      "sha256": "d8e4920c3062cc0a7eb4d2a675df6b1b59c6aca5350a6b96bf4145f11be7bbed",
+      "sha256": "dd7735e6b89c2e59078a0f782b779dfee0ea4c201d1c466f7bfd4f2aa9cc15a3",
       "parameters": {
         "title": "",
         "color": "C0",
@@ -1910,7 +1911,7 @@
       "modules": [
         "association.rules"
       ],
-      "sha256": "24a347c7f25f77550fcce80245969643d0cb617c9807b3aa4ea9183fc22356d7"
+      "sha256": "f670d0393cbaff1190c7b3fa3646580e07fa79a4701dec434467f58c468f7909"
     },
     "categorical": {
       "image": "dashboards/categorical.png",
@@ -1922,7 +1923,7 @@
         "categorical.mosaic",
         "categorical.pareto"
       ],
-      "sha256": "f6baaa4a73ada6a3946157da24b370cac57b7c09e87c04cb17df266f210171bc"
+      "sha256": "0421fcde25992d68edcf1323093b7f579d9f4799a664ace9945877a2ea9fb24f"
     },
     "classification": {
       "image": "dashboards/classification.png",
@@ -1933,7 +1934,7 @@
         "classification.roc",
         "classification.threshold"
       ],
-      "sha256": "990fd9df8eadaaa7cc7a69392fc26385887499b81b0296535217efc808cde0d7"
+      "sha256": "49b684daed8f1be74e2a8b945af57e038e97a377a7674fadcf4ea573d368c605"
     },
     "clustering": {
       "image": "dashboards/clustering.png",
@@ -1943,7 +1944,7 @@
         "clustering.k_distance",
         "clustering.silhouette"
       ],
-      "sha256": "f9e137c8282f7e137f6f802174def96fad92f0531ff5d3a30e09ca09fbfff256"
+      "sha256": "13586f1b1c0cc00b4199d96a1ec033e786ca68350a2119f966bed407c55c1d2d"
     },
     "decomposition": {
       "image": "dashboards/decomposition.png",
@@ -1951,14 +1952,14 @@
         "decomposition.explained_variance",
         "decomposition.loadings"
       ],
-      "sha256": "694724d75da66ccfb22fc8719d367aa58fdbae2fea3ed6e37d8b030eabd32110"
+      "sha256": "c04e11199d0325ae6c1454d0d4f007dbc25ee64b9bbf03d80175be2204ea4763"
     },
     "networks": {
       "image": "dashboards/networks.png",
       "modules": [
         "networks.graph"
       ],
-      "sha256": "b541b064b46877b32da49c7bed4d8a3c1525c6c2b697fffcb44a8ee3f29551a2"
+      "sha256": "ef794fd830ae43ba3b15fbd9eded9d086a21b895d78018a1eb76327cc9cf1e27"
     },
     "numeric": {
       "image": "dashboards/numeric.png",
@@ -1968,14 +1969,14 @@
         "numeric.kde",
         "numeric.qq"
       ],
-      "sha256": "c8012a0aeac8e7020b85b0e2b0224b1293099e831e306cfd83c1b0165c942054"
+      "sha256": "9bfce750b6fcb93a41f4b60a0e005898c4545ad532325ebfa28fe6d1f5b8d0fe"
     },
     "optimization": {
       "image": "dashboards/optimization.png",
       "modules": [
         "optimization.convergence"
       ],
-      "sha256": "d01858387cbe2c1766048cabfa15baa19326134fb97413bb74f49cb877fe5ee2"
+      "sha256": "ccfa8207a3bfef3427120a9100723eddcb5c970b96f0db5e0bd08457c51a0206"
     },
     "qq": {
       "image": "dashboards/qq.png",
@@ -1994,7 +1995,7 @@
         "qq.uniform",
         "qq.weibull"
       ],
-      "sha256": "db529913c008ec5bc3dbfe56945043036e203e3be49baf47ab65bc92d58bfb3b"
+      "sha256": "6a86521ec3ccb6e5a1f2355beb277c3b8d59732b16668ca88b443239e86ec0b8"
     },
     "quality": {
       "image": "dashboards/quality.png",
@@ -2003,7 +2004,7 @@
         "quality.missing_matrix",
         "quality.missingness"
       ],
-      "sha256": "025965d6251938a73f93dc774f0a110eb44e67a4cdf13c5626096b0b2192c097"
+      "sha256": "ff593d14ca04b59bcad31b21f278ac89a22cb80bc6513364953a7eb6f828cc49"
     },
     "regression": {
       "image": "dashboards/regression.png",
@@ -2021,7 +2022,7 @@
         "regression.scale_location",
         "regression.vif"
       ],
-      "sha256": "089cf14a099f5a7a742b60bbf77d40cef04e34f46e563ea85c5f35df0802f11c"
+      "sha256": "145fbe9349330cd8ad9d9cbc93cbb05c807553bdeffbf66895ac56d740420956"
     },
     "relationships": {
       "image": "dashboards/relationships.png",
@@ -2030,7 +2031,7 @@
         "relationships.hexbin",
         "relationships.scatter"
       ],
-      "sha256": "a9bf9e968e2af902b25151630f39301458f6815e5abe9cbd8b26696b4e829e19"
+      "sha256": "5b476ef513a3cb18d6f3be855e7830b160e56da4a11efa66bb5cc093a8ad6778"
     },
     "selection": {
       "image": "dashboards/selection.png",
@@ -2038,7 +2039,7 @@
         "selection.feature_importance",
         "selection.validation_curve"
       ],
-      "sha256": "0352973956d1a3ad4775d194ec33be4edf2cbc1964dbf78b382bedbcbd353f56"
+      "sha256": "ab82d682245edf890594e664537cf6a3bfccb3587168f8466ca01a4cad38acf0"
     },
     "time_series": {
       "image": "dashboards/time_series.png",
@@ -2048,7 +2049,7 @@
         "time_series.seasonal",
         "time_series.timeline"
       ],
-      "sha256": "8be24634b101770d0f0ee17e056ab5cf9018086c3b9e7222b5c664bb58a9ca79"
+      "sha256": "980f42bc47943388ead531e4a762f88e650e249572cda3b0ce704360aaf99e32"
     }
   },
   "module_count": 61,

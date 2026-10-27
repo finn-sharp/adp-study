@@ -19,7 +19,6 @@ visualization_gallery.py - 각 모듈 __main__에서 PNG를 저장하고 전체 
 import argparse
 import ast
 from contextlib import contextmanager
-from functools import lru_cache
 from hashlib import sha256
 import importlib
 import json
@@ -52,33 +51,12 @@ def registered_plots():
     return dict(sorted(plots.items()))
 
 
-@lru_cache(maxsize=1)
-def _font_name():
-    """저장소에 포함된 한글 폰트를 등록하며 네트워크를 사용하지 않습니다."""
-    from matplotlib import font_manager
-
-    path = ROOT / "기출문제/공통/NanumGothic-Regular.ttf"
-    font_manager.fontManager.addfont(str(path))
-    return font_manager.FontProperties(fname=str(path)).get_name()
-
-
 @contextmanager
 def _style():
-    """호출자 전역 스타일과 GUI backend를 변경하지 않는 저장 스타일."""
-    import matplotlib
+    """예제와 외부 subplot에 재사용할 수 있는 보고서 테마를 적용합니다."""
+    from src.Visualization.theme import analysis_theme
 
-    with matplotlib.rc_context(
-        {
-            "font.family": _font_name(),
-            "axes.unicode_minus": False,
-            "font.size": 10,
-            "axes.titlesize": 12,
-            "axes.labelsize": 10,
-            "figure.facecolor": "white",
-            "axes.facecolor": "white",
-            "savefig.facecolor": "white",
-        }
-    ):
+    with analysis_theme():
         yield
 
 
@@ -103,6 +81,174 @@ def _description(path):
     )
 
 
+_GROUPS = {
+    "numeric": ("수치 분포", "중심·산포·분포의 형태를 함께 살펴봅니다."),
+    "categorical": ("범주별 비교", "집단의 크기와 분포, 발생률을 비교합니다."),
+    "classification": ("분류 성능", "식별력·확률·임계값을 같은 자료에서 확인합니다."),
+    "clustering": ("군집 구조", "집단의 분리도와 군집 수 후보를 검토합니다."),
+    "decomposition": ("차원과 성분", "설명분산과 변수별 성분 계수를 비교합니다."),
+    "quality": ("데이터 품질", "누락의 크기와 공동 결측 패턴을 확인합니다."),
+    "regression": ("회귀모형 진단", "잔차·계수·영향 관측을 함께 확인합니다."),
+    "relationships": ("변수 간 관계", "관측의 밀도와 변수 사이의 관계를 살펴봅니다."),
+    "selection": ("변수와 학습량", "중요도와 학습량별 점수를 비교합니다."),
+    "time_series": ("시간 패턴", "추세와 반복 구조, 지연 관계를 확인합니다."),
+    "qq": ("분포별 Q–Q", "관측 분위수와 이론 분위수를 비교합니다."),
+    "association": ("연관규칙", "빈도·신뢰도·향상도를 함께 살펴봅니다."),
+    "networks": ("연결 구조", "연결된 집단과 고립된 관측을 확인합니다."),
+    "optimization": ("최적화 과정", "세대별 실행가능 최우수 목적값을 살펴봅니다."),
+}
+_TITLES = {
+    "histogram": "값의 분포",
+    "kde": "분포 밀도",
+    "ecdf": "누적 분포",
+    "qq": "정규분포 Q–Q",
+    "count": "범주별 관측 수",
+    "pareto": "범주별 비중과 누적 비중",
+    "grouped_distribution": "집단별 분포",
+    "contingency": "범주 간 구성비",
+    "mosaic": "범주별 구성과 규모",
+    "category_rate": "범주별 양성 비율",
+    "missingness": "변수별 결측률",
+    "missing_matrix": "관측별 결측 패턴",
+    "missing_association": "공동 결측의 연관",
+    "scatter": "변수 간 관계",
+    "hexbin": "관측 밀도",
+    "correlation": "상관계수",
+    "dendrogram": "계층적 군집 구조",
+    "silhouette": "군집 분리도",
+    "k_distance": "이웃 거리",
+    "elbow": "군집 수별 개선 폭",
+    "explained_variance": "성분별 설명분산",
+    "loadings": "변수별 성분 계수",
+    "confusion": "실제와 예측의 구성비",
+    "roc": "ROC 곡선",
+    "precision_recall": "정밀도·재현율",
+    "threshold": "임계값별 성능",
+    "calibration": "예측확률과 실제 발생률",
+    "rules": "빈도·신뢰도·향상도",
+    "graph": "관측 간 연결",
+    "feature_importance": "변수 중요도",
+    "validation_curve": "학습량별 점수",
+    "timeline": "시간에 따른 변화",
+    "lag": "지연 관계",
+    "autocorrelation": "자기상관",
+    "seasonal": "요일별 분포",
+    "coefficient_intervals": "회귀계수와 구간",
+    "cooks_distance": "관측별 영향력",
+    "leverage": "레버리지와 잔차",
+    "model_comparison": "같은 검증 구간의 모형 비교",
+    "observed_predicted": "관측값과 적합값",
+    "partial_residual": "변수의 부분 잔차",
+    "prediction_interval": "평균 구간과 예측구간",
+    "residual_fitted": "적합값과 잔차",
+    "residual_order": "관측 순서별 잔차",
+    "scale_location": "잔차의 크기",
+    "vif": "변수 간 공선성",
+    "glm_residuals": "GLM 잔차",
+    "convergence": "최우수 목적값의 변화",
+}
+
+
+def _title(path, variant=None):
+    group, name = path.split(".")
+    title = (
+        (name.replace("_", " ").title() + " Q–Q")
+        if group == "qq"
+        else _TITLES.get(name, name.replace("_", " ").title())
+    )
+    if variant:
+        title += " · " + variant.replace("_", " / ")
+    return title
+
+
+def _value(value):
+    if isinstance(value, int):
+        return format(value, ",")
+    if isinstance(value, float):
+        return format(value, ".3g")
+    return str(value)
+
+
+def _metrics(group, entries):
+    """실제 DTO의 진단값만 요약합니다. 없으면 지표를 만들어 넣지 않습니다."""
+    choices = {
+        "numeric": [
+            ("histogram", "n", "관측 수"),
+            ("histogram", "mean", "평균"),
+            ("histogram", "median", "중앙값"),
+        ],
+        "categorical": [
+            ("count", "n", "관측 수"),
+            ("count", "n_categories", "범주 수"),
+        ],
+        "classification": [
+            ("roc", "roc_auc", "ROC AUC"),
+            ("precision_recall", "average_precision", "Average precision"),
+            ("calibration", "brier_score", "Brier score"),
+        ],
+        "clustering": [
+            ("silhouette", "n", "관측 수"),
+            ("silhouette", "mean_silhouette", "평균 silhouette"),
+        ],
+        "decomposition": [
+            ("loadings", "n_features", "변수 수"),
+            ("loadings", "n_components", "성분 수"),
+        ],
+        "quality": [
+            ("missingness", "n_rows", "관측 수"),
+            ("missingness", "complete_rows", "완전 관측"),
+            ("missing_matrix", "missing_cells", "결측 셀"),
+        ],
+        "regression": [
+            ("observed_predicted", "r2", "학습 R²"),
+            ("cooks_distance", "flagged", "영향 관측 후보"),
+            ("observed_predicted", "n", "관측 수"),
+        ],
+        "relationships": [
+            ("scatter", "n", "관측 수"),
+            ("correlation", "n_features", "변수 수"),
+        ],
+        "networks": [
+            ("graph", "n_nodes", "노드 수"),
+            ("graph", "n_edges", "연결 수"),
+            ("graph", "isolates", "고립 노드"),
+        ],
+        "selection": [("feature_importance", "n_features", "변수 수")],
+        "time_series": [
+            ("timeline", "n", "관측 수"),
+            ("timeline", "rolling_window_in_rows", "후행 요약 구간"),
+        ],
+        "association": [
+            ("rules", "input_rules", "입력 규칙"),
+            ("rules", "displayed_rules", "표시 규칙"),
+        ],
+        "optimization": [("convergence", "best_objective", "최우수 목적값")],
+        "qq": [("normal", "n", "분포별 관측 수")],
+    }
+    result = []
+    for name, key, label in choices.get(group, []):
+        entry = entries.get(group + "." + name)
+        if entry is not None:
+            value = entry.get("diagnostics", {}).get(key)
+            if value is not None:
+                result.append((label, _value(value)))
+    return result[:3]
+
+
+def _rule(figure, y, left=0.055, right=0.95):
+    from matplotlib.lines import Line2D
+
+    figure.add_artist(
+        Line2D(
+            [left, right],
+            [y, y],
+            transform=figure.transFigure,
+            color="#E3E9ED",
+            linewidth=0.7,
+        )
+    )
+
+
 def _draw(path, plotter, case, output, variant=None):
     """한 예제를 기존 plot 함수에 전달하고 PNG와 진단 메타데이터를 만듭니다."""
     with _style():
@@ -124,33 +270,66 @@ def _draw(path, plotter, case, output, variant=None):
                 2 if cax is not None else 1
             ):
                 raise AssertionError("예제는 전달한 단일 ax를 사용해야 합니다.")
-            figure.suptitle(
-                path + ((" / " + variant) if variant else ""),
-                fontsize=14,
-                fontweight="bold",
-                y=0.98,
+            from src.Visualization.theme import style_axes
+
+            style_axes(ax, kind=path)
+            ax.set_title("")
+            group = path.split(".")[0]
+            figure.text(
+                0.075,
+                0.955,
+                _GROUPS[group][0],
+                fontsize=9,
+                color="#2E746E",
+                weight="bold",
             )
             figure.text(
-                0.06,
-                0.035,
-                textwrap.fill("예시 자료: " + case["note"], width=65),
-                fontsize=9,
+                0.075,
+                0.902,
+                _title(path, variant),
+                fontsize=17,
+                color="#293D46",
+                weight="bold",
+            )
+            n = result.diagnostics.get(
+                "n",
+                result.diagnostics.get("n_samples", result.diagnostics.get("n_rows")),
+            )
+            if n is not None:
+                figure.text(
+                    0.935, 0.945, "관측 수", fontsize=8, color="#788891", ha="right"
+                )
+                figure.text(
+                    0.935, 0.901, _value(n), fontsize=16, color="#293D46", ha="right"
+                )
+            _rule(figure, 0.845, left=0.075, right=0.935)
+            _rule(figure, 0.13, left=0.075, right=0.935)
+            figure.text(
+                0.075,
+                0.052,
+                textwrap.fill(case["note"], width=75),
+                fontsize=8,
+                color="#788891",
                 ha="left",
                 va="bottom",
             )
             bottom = (
-                0.25
+                0.27
                 if any(label.get_rotation() for label in ax.get_xticklabels())
-                else 0.19
+                else 0.22
             )
             figure.subplots_adjust(
-                left=0.12,
-                right=0.82 if cax is not None else 0.96,
+                left=0.115,
+                right=0.82 if cax is not None else 0.935,
                 bottom=bottom,
-                top=0.86,
+                top=0.79,
             )
             if cax is not None:
-                cax.set_position([0.87, bottom, 0.025, 0.86 - bottom])
+                cax.set_position([0.865, bottom, 0.016, 0.79 - bottom])
+                for spine in cax.spines.values():
+                    spine.set_visible(False)
+                cax.tick_params(length=0, labelsize=8, colors="#788891")
+                cax.yaxis.label.set_color("#63757F")
             group, name = path.split(".")
             filename = name + (("__" + variant) if variant else "") + ".png"
             destination = output / group / filename
@@ -213,9 +392,13 @@ def _dashboard(group, paths, cases, output):
     columns = 2 if len(paths) == 4 else min(3, len(paths))
     rows = (len(paths) + columns - 1) // columns
     with _style():
-        figure = _figure(6.2 * columns, 4.8 * rows + 1.0)
+        height = 4.25 * rows + 1.65
+        figure = _figure(5.8 * columns, height)
         axes = figure.subplots(rows, columns, squeeze=False)
         try:
+            entries = {}
+            from src.Visualization.theme import style_axes
+
             for path, ax in zip(paths, axes.flat):
                 module = importlib.import_module("src.Visualization." + path)
                 cax = (
@@ -235,20 +418,61 @@ def _dashboard(group, paths, cases, output):
                     cax.tick_params(labelsize=7)
                 if result.axes is not ax:
                     raise AssertionError("subplot 소유권 오류")
-                ax.set_title(path.split(".")[-1], fontsize=12)
-                ax.tick_params(labelsize=8)
+                style_axes(ax, kind=path)
+                ax.set_title(_title(path), fontsize=11, loc="left", pad=14)
+                entries[path] = {
+                    "diagnostics": result.to_dict(json_safe=True)["diagnostics"]
+                }
+                if cax is not None:
+                    for spine in cax.spines.values():
+                        spine.set_visible(False)
+                    cax.tick_params(length=0, labelsize=7, colors="#788891")
             for ax in list(axes.flat)[len(paths) :]:
                 ax.set_axis_off()
-            figure.suptitle(
-                group + " / subplot examples", fontsize=17, fontweight="bold", y=0.99
-            )
+            title, subtitle = _GROUPS[group]
             figure.text(
-                0.04,
-                0.015,
-                "고정 합성 예시 자료 · 각 PNG의 자료 설명과 해석 조건을 함께 확인하세요.",
-                fontsize=11,
+                0.055,
+                1 - 0.38 / height,
+                title,
+                fontsize=18,
+                weight="bold",
+                color="#293D46",
             )
-            figure.tight_layout(rect=(0, 0.04, 1, 0.96), h_pad=3.0, w_pad=2.0)
+            figure.text(0.055, 1 - 0.77 / height, subtitle, fontsize=9, color="#788891")
+            metrics = _metrics(group, entries)
+            for i, (label, value) in enumerate(metrics):
+                x = 0.65 + 0.12 * i
+                figure.text(
+                    x,
+                    1 - 0.28 / height,
+                    label,
+                    fontsize=7.5,
+                    color="#788891",
+                    ha="center",
+                )
+                figure.text(
+                    x,
+                    1 - 0.66 / height,
+                    value,
+                    fontsize=16,
+                    weight="bold",
+                    color="#293D46",
+                    ha="center",
+                )
+            _rule(figure, 1 - 1.08 / height)
+            _rule(figure, 0.48 / height)
+            figure.text(
+                0.055,
+                0.18 / height,
+                "고정 합성 자료 예시 · 자료 설명과 해석 조건은 개별 이미지 및 갤러리에서 확인하세요.",
+                fontsize=8,
+                color="#788891",
+            )
+            figure.tight_layout(
+                rect=(0.025, 0.67 / height, 0.985, 1 - 1.26 / height),
+                h_pad=3.0,
+                w_pad=2.8,
+            )
             destination = output / "dashboards" / (group + ".png")
             destination.parent.mkdir(parents=True, exist_ok=True)
             figure.savefig(
@@ -283,7 +507,7 @@ def _markdown(manifest):
         "python -m examples.visualization_gallery --check  # 파일·해시·등록부 누락 검사",
         "```",
         "",
-        "기본 출력은 `docs/images/visualization/`입니다. 단일 모듈은 자기 PNG만 갱신하므로 출력 환경·예제 입력을 변경한 경우 전체 생성 명령으로 manifest와 안내도 갱신하세요. 한글은 저장소의 NanumGothic 폰트를 사용합니다.",
+        "기본 출력은 `docs/images/visualization/`입니다. 단일 모듈은 자기 PNG만 갱신하므로 출력 환경·예제 입력을 변경한 경우 전체 생성 명령으로 manifest와 안내도 갱신하세요. 흰 바탕·얇은 격자·절제된 팔레트의 보고서 테마를 사용하며, 한글은 저장소의 NanumGothic 폰트로 표시합니다. [공통 테마 사용법](VISUALIZATION_THEME.md)을 참고하세요.",
         "",
         "[EDA 명세](EDA_VISUALIZATION_MODULES.md) · [회귀·분포 명세](REGRESSION_DISTRIBUTION_MODULES.md) · [이미지·설정·진단 manifest](images/visualization/manifest.json)",
         "",
@@ -364,6 +588,7 @@ def build_gallery(output_dir=DEFAULT_OUTPUT, markdown_path=None):
     dashboards = {g: _dashboard(g, paths, cases, output) for g, paths in groups.items()}
     manifest = dict(
         schema_version=1,
+        theme="analysis-report-v2",
         seed=20261027,
         modules=modules,
         dashboards=dashboards,

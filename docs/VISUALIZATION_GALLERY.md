@@ -11,7 +11,7 @@ python -m examples.visualization_gallery  # 전체 PNG·manifest·이 안내 재
 python -m examples.visualization_gallery --check  # 파일·해시·등록부 누락 검사
 ```
 
-기본 출력은 `docs/images/visualization/`입니다. 단일 모듈은 자기 PNG만 갱신하므로 출력 환경·예제 입력을 변경한 경우 전체 생성 명령으로 manifest와 안내도 갱신하세요. 한글은 저장소의 NanumGothic 폰트를 사용합니다.
+기본 출력은 `docs/images/visualization/`입니다. 단일 모듈은 자기 PNG만 갱신하므로 출력 환경·예제 입력을 변경한 경우 전체 생성 명령으로 manifest와 안내도 갱신하세요. 흰 바탕·얇은 격자·절제된 팔레트의 보고서 테마를 사용하며, 한글은 저장소의 NanumGothic 폰트로 표시합니다. [공통 테마 사용법](VISUALIZATION_THEME.md)을 참고하세요.
 
 [EDA 명세](EDA_VISUALIZATION_MODULES.md) · [회귀·분포 명세](REGRESSION_DISTRIBUTION_MODULES.md) · [이미지·설정·진단 manifest](images/visualization/manifest.json)
 
