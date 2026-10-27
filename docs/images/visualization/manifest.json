@@ -1,0 +1,2056 @@
+{
+  "schema_version": 1,
+  "seed": 20261027,
+  "modules": {
+    "association.rules": {
+      "image": "association/rules.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "63423370513f33031317ceb1615d1b47854a7ea1aef450553fc9effd86df8d99",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "min_support": 0.0,
+        "min_confidence": 0.0,
+        "min_lift": 0.0,
+        "max_rules": 200
+      },
+      "diagnostics": {
+        "input_rules": 6,
+        "eligible_rules": 6,
+        "displayed_rules": 6,
+        "color": "lift",
+        "size": "support"
+      },
+      "warnings": [
+        "높은 lift의 낮은 support 규칙은 희소성을 확인하세요. 규칙은 인과·수익성을 보장하지 않습니다."
+      ],
+      "note": "설명용 사전 계산 규칙 지표; support와 lift를 함께 검토",
+      "variants": {},
+      "recipe_key": "plot-association-rules"
+    },
+    "categorical.category_rate": {
+      "image": "categorical/category_rate.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "58baeda5ebf042f126a555d5e1cf2d88ff5d3d55037a4e58e5abfdd83e16ce4a",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "positive_label": 1,
+        "confidence": 0.95,
+        "max_categories": 20
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "positive_label": 1,
+        "confidence": 0.95
+      },
+      "warnings": [
+        "독립 이항 관측의 개별 구간이며 다중비교 보정·인과·일반화 평가를 뜻하지 않습니다."
+      ],
+      "note": "합성 범주별 표본 수·분포·발생률; 인과 해석 아님",
+      "variants": {},
+      "recipe_key": "plot-categorical-category-rate"
+    },
+    "categorical.contingency": {
+      "image": "categorical/contingency.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "0bbf605081be1001108596cee94d385662fce1d08120edd66cb0d712e49a918c",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "normalization": "row",
+        "annotate": true,
+        "max_categories": 20
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "counts": {
+          "columns": [
+            "0",
+            "1"
+          ],
+          "index": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "data": [
+            [
+              48,
+              7
+            ],
+            [
+              26,
+              6
+            ],
+            [
+              9,
+              12
+            ],
+            [
+              1,
+              11
+            ]
+          ]
+        },
+        "normalization": "row"
+      },
+      "warnings": [
+        "비율과 원 빈도를 함께 보세요. 색 차이 자체는 유의성 검정이 아닙니다."
+      ],
+      "note": "합성 범주별 표본 수·분포·발생률; 인과 해석 아님",
+      "variants": {},
+      "recipe_key": "plot-categorical-contingency"
+    },
+    "categorical.count": {
+      "image": "categorical/count.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "3599330fd27950dc8ada230f88fb2b5a4ff135224615c03c6915833ba8d8e1f6",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "max_categories": 20,
+        "proportion": false
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "omitted_rows": 0,
+        "n_categories": 4
+      },
+      "warnings": [],
+      "note": "합성 범주별 표본 수·분포·발생률; 인과 해석 아님",
+      "variants": {},
+      "recipe_key": "plot-categorical-count"
+    },
+    "categorical.grouped_distribution": {
+      "image": "categorical/grouped_distribution.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "360cf767df4b5d18557c1d609907c4024b8994b44740c8e464c3c7728235fa41",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "kind": "box",
+        "max_categories": 20,
+        "whisker": 1.5,
+        "random_state": 1234
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "outliers_are_not_errors": true
+      },
+      "warnings": [
+        "그룹 표본 수를 함께 확인하세요. box 이상치는 자동 삭제 기준이 아닙니다."
+      ],
+      "note": "합성 범주별 표본 수·분포·발생률; 인과 해석 아님",
+      "variants": {},
+      "recipe_key": "plot-categorical-grouped-distribution"
+    },
+    "categorical.mosaic": {
+      "image": "categorical/mosaic.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "a7ae4c65f551909bb286dc16086479831b0a2d8f218fcc3fbfd5726f5961c5f2",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "max_categories": 12,
+        "annotate": true
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "area_denominator": "all valid rows"
+      },
+      "warnings": [
+        "면적은 공동 비율, 높이는 X 안에서의 Y 비율입니다."
+      ],
+      "note": "합성 범주별 표본 수·분포·발생률; 인과 해석 아님",
+      "variants": {},
+      "recipe_key": "plot-categorical-mosaic"
+    },
+    "categorical.pareto": {
+      "image": "categorical/pareto.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "0e6b57be987a32f78ac3db56429ae1e0f1e5be7374bc3fc591e20e60b8d50986",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "coverage": 0.8,
+        "max_categories": 20
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "categories_to_coverage": 3,
+        "omitted_rows": 0
+      },
+      "warnings": [],
+      "note": "합성 범주별 표본 수·분포·발생률; 인과 해석 아님",
+      "variants": {},
+      "recipe_key": "plot-categorical-pareto"
+    },
+    "classification.calibration": {
+      "image": "classification/calibration.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "b5c0d1b2390f2c8a42fdd69feffd854050747a3269186802f2b60b4866c340b6",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "positive_label": 1,
+        "n_bins": 10
+      },
+      "diagnostics": {
+        "brier_score": 0.16793375477755942,
+        "ece": 0.08565121047839348,
+        "n": 120,
+        "missing_removed": 0
+      },
+      "warnings": [
+        "빈 구간은 표시하지 않으며 n을 반환합니다. ECE는 구간 정의에 의존하고 보류 확률을 사용해야 합니다."
+      ],
+      "note": "고정 합성 정답·확률; 실제 학습 모형의 보류 성능 주장 아님",
+      "variants": {},
+      "recipe_key": "plot-classification-calibration"
+    },
+    "classification.confusion": {
+      "image": "classification/confusion.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "bfed78235a8a2cb14248d99156cf3e87ac76c51878b68c0687e58b357e00e066",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "normalization": "true",
+        "annotate": true
+      },
+      "diagnostics": {
+        "counts": {
+          "columns": [
+            0,
+            1
+          ],
+          "index": [
+            0,
+            1
+          ],
+          "data": [
+            [
+              43,
+              14
+            ],
+            [
+              18,
+              45
+            ]
+          ]
+        },
+        "n": 120,
+        "missing_removed": 0,
+        "accuracy": 0.7333333333333333,
+        "normalization": "true"
+      },
+      "warnings": [
+        "보류/외부 예측으로 평가하세요. 정규화 분모와 클래스 표본 수를 함께 확인하세요."
+      ],
+      "note": "합성 정답·확률에 임계값0.5 적용; 양성 라벨1",
+      "variants": {},
+      "recipe_key": "plot-classification-confusion"
+    },
+    "classification.precision_recall": {
+      "image": "classification/precision_recall.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "1f820951e11fa159bd99b27ee9688f9b02f9e6fce4b1478fe5b45e3d027809f9",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "positive_label": 1
+      },
+      "diagnostics": {
+        "average_precision": 0.8538313086246523,
+        "n": 120,
+        "positive_fraction": 0.525,
+        "missing_removed": 0
+      },
+      "warnings": [
+        "AP는 사다리꼴 PR 면적과 다릅니다. 불균형 표본의 양성 비율을 함께 확인하세요."
+      ],
+      "note": "고정 합성 정답·확률; 실제 학습 모형의 보류 성능 주장 아님",
+      "variants": {},
+      "recipe_key": "plot-classification-precision-recall"
+    },
+    "classification.roc": {
+      "image": "classification/roc.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "0eb5355f49c908e1e9519558993d071591703550ec0bed055e1b720a46eb3469",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "positive_label": 1
+      },
+      "diagnostics": {
+        "roc_auc": 0.833194096351991,
+        "n": 120,
+        "positive_fraction": 0.525,
+        "missing_removed": 0
+      },
+      "warnings": [
+        "이진 score 순위 평가입니다. 보류/외부 점수를 사용하고 비용에 맞는 임계값은 별도로 선택하세요."
+      ],
+      "note": "고정 합성 정답·확률; 실제 학습 모형의 보류 성능 주장 아님",
+      "variants": {},
+      "recipe_key": "plot-classification-roc"
+    },
+    "classification.threshold": {
+      "image": "classification/threshold.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "18529b90b3130e8a88d2b6e3ad102e35daaa8fe5469c1cefdf9795ad4f37884f",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "positive_label": 1,
+        "false_positive_cost": 1.0,
+        "false_negative_cost": 1.0,
+        "max_thresholds": 200
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "minimum_cost_threshold": 0.40696346814970313,
+        "minimum_cost_per_sample": 0.21666666666666667,
+        "tie_rule": "first ascending threshold",
+        "n_candidates": 122,
+        "displayed_candidates": 122
+      },
+      "warnings": [
+        "이 자료에서 임계값을 선택하면 같은 자료의 성능은 선택 편향을 포함합니다. 선택용 검증 자료와 최종 테스트를 분리하세요. 비용은 평균 비용이며 통계 신뢰구간이 아닙니다."
+      ],
+      "note": "고정 합성 정답·확률; 실제 학습 모형의 보류 성능 주장 아님",
+      "variants": {},
+      "recipe_key": "plot-classification-threshold"
+    },
+    "clustering.dendrogram": {
+      "image": "clustering/dendrogram.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "af6ae018a95a35f09edcc00b58fcc9de3fdb25f42997107c1b57eb9ab6247a22",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "method": "ward",
+        "metric": "euclidean",
+        "input_kind": "observations",
+        "cut_height": 6.0,
+        "max_samples": 1000,
+        "truncate_last": 18
+      },
+      "diagnostics": {
+        "n_samples": 60,
+        "displayed_leaves": [
+          "(3)",
+          "(5)",
+          "(2)",
+          "(2)",
+          "(3)",
+          "(5)",
+          "22",
+          "(4)",
+          "28",
+          "(6)",
+          "(5)",
+          "(3)",
+          "(7)",
+          "17",
+          "(2)",
+          "(3)",
+          "1",
+          "(6)"
+        ],
+        "leaf_order": [
+          85,
+          94,
+          95,
+          99,
+          81,
+          92,
+          22,
+          98,
+          28,
+          96,
+          93,
+          100,
+          101,
+          17,
+          61,
+          90,
+          1,
+          97
+        ],
+        "cluster_labels": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "method": "ward",
+        "metric": "euclidean"
+      },
+      "warnings": [
+        "거리/스케일/연결 기준에 민감합니다. 절단 높이는 탐색 기준이며 최적 군집 수를 자동 결정하지 않습니다."
+      ],
+      "note": "합성 세 집단: 절단 높이는 검토 후보",
+      "variants": {},
+      "recipe_key": "plot-clustering-dendrogram"
+    },
+    "clustering.elbow": {
+      "image": "clustering/elbow.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "bf98eb6d912c8c996947ef5cded571b68fad5c7a125dbe0d498fbcc376d56e7a",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8
+      },
+      "diagnostics": {
+        "relative_improvement": [
+          0.5625,
+          0.12380952380952381,
+          0.08695652173913049,
+          0.059523809523809534
+        ]
+      },
+      "warnings": [
+        "같은 학습 Feature·스케일·표본에서 계산한 inertia만 비교하세요. 무릎을 자동 최적 k로 표시하지 않습니다."
+      ],
+      "note": "설명용 사전 계산 inertia; 그림에서 모형을 재적합하지 않음",
+      "variants": {},
+      "recipe_key": "plot-clustering-elbow"
+    },
+    "clustering.k_distance": {
+      "image": "clustering/k_distance.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "8b6acb95c09cf795c196079bb7c5b8eb12818b0abf0e778d6a0893fcb4c9c659",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "k": 5,
+        "metric": "euclidean",
+        "eps": null
+      },
+      "diagnostics": {
+        "k": 5,
+        "self_included": true,
+        "fraction_within_eps": null
+      },
+      "warnings": [
+        "무릎은 eps 후보의 시각적 기준이며 자동 최적값이 아닙니다. scaling과 metric을 먼저 결정하세요."
+      ],
+      "note": "자기 자신 포함 k번째 이웃 거리; eps 후보 검토",
+      "variants": {},
+      "recipe_key": "plot-clustering-k-distance"
+    },
+    "clustering.silhouette": {
+      "image": "clustering/silhouette.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "7879dbc42833ffc21a245dae3c12312eb9965af3aa116f018b3502feca464959",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "metric": "euclidean",
+        "noise_label": -1,
+        "max_samples": 5000
+      },
+      "diagnostics": {
+        "mean_silhouette": 0.7564650784620361,
+        "negative_fraction": 0.0,
+        "noise_excluded": 0,
+        "n": 60
+      },
+      "warnings": [
+        "noise 제외 후 군집 구조를 평가합니다. 서로 다른 거리/Feature 공간의 점수를 직접 비교하지 않습니다."
+      ],
+      "note": "주어진 합성 군집 라벨과 같은 거리 공간의 분리도",
+      "variants": {},
+      "recipe_key": "plot-clustering-silhouette"
+    },
+    "decomposition.explained_variance": {
+      "image": "decomposition/explained_variance.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "f6a8de6b51152bcd954b4355497b177be674a562e954333eae4ee96cb24d507f",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "target_fraction": 0.9
+      },
+      "diagnostics": {
+        "components_to_target": 3,
+        "covered_fraction": 1.0
+      },
+      "warnings": [
+        "미제공 성분의 분산은 추정하지 않습니다. 설명분산 자체는 예측 품질이 아닙니다."
+      ],
+      "note": "설명용 사전 계산 분산 비율과 누적 비율",
+      "variants": {},
+      "recipe_key": "plot-decomposition-explained-variance"
+    },
+    "decomposition.loadings": {
+      "image": "decomposition/loadings.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "6541e0f9c6ae4bb7da2168a14fb3999ec2b55e2dc1e7ffc23be3a90319094275",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "annotate": false
+      },
+      "diagnostics": {
+        "n_components": 3,
+        "n_features": 4
+      },
+      "warnings": [
+        "입력은 components_/명시 loading 행렬입니다. 성분의 전체 부호는 임의이며 서로 다른 적합 결과의 부호를 직접 비교하지 않습니다."
+      ],
+      "note": "설명용 사전 계산 성분 계수; 전체 성분 부호는 임의",
+      "variants": {},
+      "recipe_key": "plot-decomposition-loadings"
+    },
+    "networks.graph": {
+      "image": "networks/graph.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "fb5851b255ae265cdc9aef622c80f00262480f7c178e3f95cf43fcc04738f5f1",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "max_nodes": 100,
+        "random_state": 1234,
+        "show_labels": true
+      },
+      "diagnostics": {
+        "n_nodes": 7,
+        "n_edges": 7,
+        "directed": false,
+        "isolates": 1
+      },
+      "warnings": [
+        "배치 거리와 node 크기는 탐색 표현입니다. degree 크기는 영향력·인과를 뜻하지 않습니다."
+      ],
+      "note": "합성 가중 무방향 그래프; 배치는 실제 공간 거리가 아님",
+      "variants": {},
+      "recipe_key": "plot-networks-graph"
+    },
+    "numeric.ecdf": {
+      "image": "numeric/ecdf.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "f60385bcff69765a6a82c34013e1c8573bf804e332b81061ae0e0ba350a4cf55",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "q25_q50_q75": [
+          -0.1845202395528512,
+          0.2109435143525854,
+          1.3566854389987812
+        ]
+      },
+      "warnings": [],
+      "note": "고정 합성 혼합분포: 중심·꼬리·다봉성 검토",
+      "variants": {},
+      "recipe_key": "plot-numeric-ecdf"
+    },
+    "numeric.histogram": {
+      "image": "numeric/histogram.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "c9649eaffb5bba3e71be390775d1871b1aea45cabe2526f7cad2d3c19d78abac",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "bins": 20,
+        "density": false
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "mean": 0.5962971094897063,
+        "median": 0.2109435143525854
+      },
+      "warnings": [],
+      "note": "고정 합성 혼합분포: 중심·꼬리·다봉성 검토",
+      "variants": {},
+      "recipe_key": "plot-numeric-histogram"
+    },
+    "numeric.kde": {
+      "image": "numeric/kde.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "dab4a9ac8a94fee3b852edb29c62eaacedba56f5bd3d725297a3895aa3177242",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "points": 200,
+        "bandwidth": 1.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "bandwidth_factor": 0.38385194963737745
+      },
+      "warnings": [
+        "KDE는 경계 밖에도 밀도를 배정하며 bandwidth에 따라 모양이 달라집니다."
+      ],
+      "note": "고정 합성 혼합분포: 중심·꼬리·다봉성 검토",
+      "variants": {},
+      "recipe_key": "plot-numeric-kde"
+    },
+    "numeric.qq": {
+      "image": "numeric/qq.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "15cf06e423cb882fda225c416f8690554c66cb7d1ab177323ba0eaa0771be607",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "distribution": "norm"
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "reference_slope": 1.0203312592744118,
+        "reference_intercept": 0.5962971094897059,
+        "quantile_r": 0.954198749332755
+      },
+      "warnings": [
+        "기준선은 분위수 비교용이며 회귀 모델 결과 또는 정규성 검정 p 값이 아닙니다."
+      ],
+      "note": "고정 합성 혼합분포: 중심·꼬리·다봉성 검토",
+      "variants": {},
+      "recipe_key": "plot-numeric-qq"
+    },
+    "optimization.convergence": {
+      "image": "optimization/convergence.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "8fa2fc476d0b84ddd0ba74ef821cf5602827ffedd303ab7c51e16ce8a8a7e67b",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8
+      },
+      "diagnostics": {
+        "feasible": true,
+        "maximize": false,
+        "best_objective": 6.677373428307112e-09,
+        "stop_reason": "generations"
+      },
+      "warnings": [
+        "실행가능 후보가 없는 세대는 목적값 곡선을 그리지 않습니다. 곡선 정체는 전역 최적성 증명이 아닙니다."
+      ],
+      "note": "실제 소규모 GA 실행 이력; 정체가 전역 최적성의 증거는 아님",
+      "variants": {},
+      "recipe_key": "plot-optimization-convergence"
+    },
+    "qq.bernoulli": {
+      "image": "qq/bernoulli.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "c03cc09bf091f7b4bd23a857403a80c14e19e3d235750ceed3ae635815910563",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0,
+        "success_probability": 0.5
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "bernoulli",
+        "distribution_parameters": {
+          "p": 0.5,
+          "loc": 0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다.",
+        "이산 분포의 계단·동률은 정상적인 구조입니다. 직선 근접만으로 분포/독립 가정을 판정하지 않습니다."
+      ],
+      "note": "기본 모수의 bernoulli 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-bernoulli"
+    },
+    "qq.beta": {
+      "image": "qq/beta.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "9f0bf165ed130f3f5fd9a9c11d7517f718f685157fffcf17c5b8cc426ace400a",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0,
+        "shape_a": 2.0,
+        "shape_b": 2.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "beta",
+        "distribution_parameters": {
+          "a": 2.0,
+          "b": 2.0,
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 beta 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-beta"
+    },
+    "qq.binomial": {
+      "image": "qq/binomial.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "e12f26de06ea280c4aabbdd5e9c0446800c687e27ba2cf60e4a163adf493a39e",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0,
+        "n_trials": 10,
+        "success_probability": 0.5
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "binomial",
+        "distribution_parameters": {
+          "n": 10,
+          "p": 0.5,
+          "loc": 0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다.",
+        "이산 분포의 계단·동률은 정상적인 구조입니다. 직선 근접만으로 분포/독립 가정을 판정하지 않습니다."
+      ],
+      "note": "기본 모수의 binomial 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-binomial"
+    },
+    "qq.chi_square": {
+      "image": "qq/chi_square.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "7470300473d4ec9c6bc61870d775168c6f359b97d19dd60d000beca3e403a0ed",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0,
+        "df": 5.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "chi_square",
+        "distribution_parameters": {
+          "df": 5.0,
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 chi_square 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-chi-square"
+    },
+    "qq.exponential": {
+      "image": "qq/exponential.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "c6b064a446a7e0c362e0237481bfbf1936d3b5bef87e5e555816c63fa666b3c9",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "exponential",
+        "distribution_parameters": {
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 exponential 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-exponential"
+    },
+    "qq.gamma": {
+      "image": "qq/gamma.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "ffde942bdcd07e0ead2824ede3e543b59d24dd1813872d7300d7918c644b50ff",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0,
+        "shape": 2.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "gamma",
+        "distribution_parameters": {
+          "a": 2.0,
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 gamma 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-gamma"
+    },
+    "qq.logistic": {
+      "image": "qq/logistic.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "d4e340e34ab58e65a8949bda639a540c3f5ab0b179a91985e9ba6fdb6d9503ab",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "logistic",
+        "distribution_parameters": {
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 logistic 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-logistic"
+    },
+    "qq.lognormal": {
+      "image": "qq/lognormal.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "1f8523d70e3135503b88539cd8ed330a03ecb30946bf14fcdbeda68e780e2c94",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0,
+        "shape": 1.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "lognormal",
+        "distribution_parameters": {
+          "s": 1.0,
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 lognormal 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-lognormal"
+    },
+    "qq.normal": {
+      "image": "qq/normal.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "b169110df558dbe0b72d34e104c012c57f6cc911578d4813da34512852dad0ac",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "normal",
+        "distribution_parameters": {
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 normal 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-normal"
+    },
+    "qq.poisson": {
+      "image": "qq/poisson.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "b36d266fbf4b7676e3a2f2c4dce4f0330bd99486eb13a8efb54f1a2a9ebe68a3",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0,
+        "mu": 1.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "poisson",
+        "distribution_parameters": {
+          "mu": 1.0,
+          "loc": 0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다.",
+        "이산 분포의 계단·동률은 정상적인 구조입니다. 직선 근접만으로 분포/독립 가정을 판정하지 않습니다."
+      ],
+      "note": "기본 모수의 poisson 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-poisson"
+    },
+    "qq.student_t": {
+      "image": "qq/student_t.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "bb26ff302aeafcf9fb9793b664ef6946a3a2747f312b2ec722652fda2667834d",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0,
+        "df": 5.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "student_t",
+        "distribution_parameters": {
+          "df": 5.0,
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 student_t 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-student-t"
+    },
+    "qq.uniform": {
+      "image": "qq/uniform.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "ecd06a80017cd87962636d1c544679f58c94966ff4451f8d443bef2c5081f792",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "uniform",
+        "distribution_parameters": {
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 uniform 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-uniform"
+    },
+    "qq.weibull": {
+      "image": "qq/weibull.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "93016d0122dca74b1402d64d6f4346064d524024f64cda5676232bec5b0abde4",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "reference": "identity",
+        "fit_parameters": false,
+        "loc": 0.0,
+        "scale": 1.0,
+        "shape": 1.5
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "distribution": "weibull",
+        "distribution_parameters": {
+          "c": 1.5,
+          "loc": 0.0,
+          "scale": 1.0
+        },
+        "plotting_position": "(i + 0.5) / n, i=0..n-1",
+        "outside_support": 0,
+        "reference_slope": 1.0,
+        "reference_intercept": 0.0
+      },
+      "warnings": [
+        "Q-Q는 시각적 적합 진단이며 p 값이나 분포 검정의 자동 결론을 제공하지 않습니다."
+      ],
+      "note": "기본 모수의 weibull 합성 표본; 그림만으로 분포 가정을 확정하지 않음",
+      "variants": {},
+      "recipe_key": "plot-qq-weibull"
+    },
+    "quality.missing_association": {
+      "image": "quality/missing_association.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "7787255806be3f511a249cf384dd56d131d7474992e7418f0149b3a05995f998",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "annotate": true
+      },
+      "diagnostics": {
+        "n_rows": 120,
+        "undefined_features": [
+          "amount",
+          "score"
+        ],
+        "missing_counts": {
+          "name": null,
+          "index": [
+            "amount",
+            "duration",
+            "frequency",
+            "score"
+          ],
+          "data": [
+            0,
+            30,
+            43,
+            0
+          ]
+        }
+      },
+      "warnings": [
+        "결측 여부 지표의 상관입니다. 항상/절대 결측 열은 NaN이고 결측 발생 원인은 식별하지 않습니다."
+      ],
+      "note": "합성 공동 결측: 빈도와 패턴 확인; 결측 원인 판정 아님",
+      "variants": {},
+      "recipe_key": "plot-quality-missing-association"
+    },
+    "quality.missing_matrix": {
+      "image": "quality/missing_matrix.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "af2c05ff19b65f5545e06b482a0c42a30e016923d364af7ee7aa7f89b7cd7bf7",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "max_rows": 500
+      },
+      "diagnostics": {
+        "n_rows": 120,
+        "displayed_rows": 120,
+        "missing_cells": 73
+      },
+      "warnings": [
+        "원 행 순서를 보존합니다. 표시 한도 이후 행도 반환 data에 포함됩니다."
+      ],
+      "note": "합성 공동 결측: 빈도와 패턴 확인; 결측 원인 판정 아님",
+      "variants": {},
+      "recipe_key": "plot-quality-missing-matrix"
+    },
+    "quality.missingness": {
+      "image": "quality/missingness.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "b05c85296142058b8c637d43520405a03baf9cc7b54386e53019a8da3c94ff47",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8
+      },
+      "diagnostics": {
+        "n_rows": 120,
+        "complete_rows": 77
+      },
+      "warnings": [
+        "결측률만으로 컬럼 삭제 또는 MCAR/MAR/MNAR를 결정하지 않습니다."
+      ],
+      "note": "합성 공동 결측: 빈도와 패턴 확인; 결측 원인 판정 아님",
+      "variants": {},
+      "recipe_key": "plot-quality-missingness"
+    },
+    "regression.coefficient_intervals": {
+      "image": "regression/coefficient_intervals.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "615e9fa9f63477923e068354fd2166509fc86c37303de5d99c8c1b1552a4d04f",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "confidence": 0.95,
+        "include_intercept": false
+      },
+      "diagnostics": {
+        "confidence": 0.95,
+        "cov_type": "nonrobust",
+        "df_resid": 116.0
+      },
+      "warnings": [
+        "계수는 변환 Feature/y 좌표계입니다. 규모를 비교하려면 단위·표준화를 확인하고 선택 후 구간을 무조건적 유의성으로 읽지 마세요."
+      ],
+      "note": "합성 학습 OLS: 공선성·영향 관측을 포함; 자동 행 제거 아님",
+      "variants": {},
+      "recipe_key": "plot-regression-coefficient-intervals"
+    },
+    "regression.cooks_distance": {
+      "image": "regression/cooks_distance.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "6848f0316f9ad3bcea877ed5efa490862a15774d66f3c887d9e7c924cd108433",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "threshold": null
+      },
+      "diagnostics": {
+        "threshold": 0.03333333333333333,
+        "flagged": 6,
+        "n": 120
+      },
+      "warnings": [
+        "영향 관측은 오류/결측과 다릅니다. 이 함수는 표시만 하며 자동 삭제하지 않습니다."
+      ],
+      "note": "합성 학습 OLS: 공선성·영향 관측을 포함; 자동 행 제거 아님",
+      "variants": {},
+      "recipe_key": "plot-regression-cooks-distance"
+    },
+    "regression.glm_residuals": {
+      "image": "regression/glm_residuals.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "eca334e852ef183b9452e75481a0960a73153750853f3b5a0557734a94c3f2c9",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.6,
+        "residual": "pearson"
+      },
+      "diagnostics": {
+        "family": "poisson",
+        "link": "log",
+        "residual": "pearson",
+        "pearson_dispersion": 1.0295903487794391
+      },
+      "warnings": [
+        "이항/Poisson/Gamma 잔차에 OLS 정규성을 일괄 요구하지 않습니다. 분포·평균 링크·분산과 영향도를 함께 검토하세요."
+      ],
+      "note": "합성 Poisson GLM의 Pearson 잔차; OLS 정규성 조건과 구분",
+      "variants": {
+        "logistic_pearson": {
+          "image": "regression/glm_residuals__logistic_pearson.png",
+          "width": 1350,
+          "height": 900,
+          "sha256": "9a29dea9a3f9aec06d7b03e6bc8da30ad3e8e7cfe4731ea865499e6bc67b3abe",
+          "parameters": {
+            "title": "",
+            "color": "C0",
+            "alpha": 0.6,
+            "residual": "pearson"
+          },
+          "diagnostics": {
+            "family": "logistic",
+            "link": "logit",
+            "residual": "pearson",
+            "pearson_dispersion": 1.0274994144936505
+          },
+          "warnings": [
+            "이항/Poisson/Gamma 잔차에 OLS 정규성을 일괄 요구하지 않습니다. 분포·평균 링크·분산과 영향도를 함께 검토하세요."
+          ],
+          "note": "합성 logistic GLM의 pearson 잔차; 분포별 조건부 분산 확인"
+        },
+        "logistic_deviance": {
+          "image": "regression/glm_residuals__logistic_deviance.png",
+          "width": 1350,
+          "height": 900,
+          "sha256": "18999375d707931f57190cfee0561bcf6f7a2ab03e836cd512a12e3a217b689c",
+          "parameters": {
+            "title": "",
+            "color": "C0",
+            "alpha": 0.6,
+            "residual": "deviance"
+          },
+          "diagnostics": {
+            "family": "logistic",
+            "link": "logit",
+            "residual": "deviance",
+            "pearson_dispersion": 1.0274994144936505
+          },
+          "warnings": [
+            "이항/Poisson/Gamma 잔차에 OLS 정규성을 일괄 요구하지 않습니다. 분포·평균 링크·분산과 영향도를 함께 검토하세요."
+          ],
+          "note": "합성 logistic GLM의 deviance 잔차; 분포별 조건부 분산 확인"
+        },
+        "poisson_deviance": {
+          "image": "regression/glm_residuals__poisson_deviance.png",
+          "width": 1350,
+          "height": 900,
+          "sha256": "c24c22644a584e1bd51888100d3ba137c7e14e7601e70994d4f634b1eef45e39",
+          "parameters": {
+            "title": "",
+            "color": "C0",
+            "alpha": 0.6,
+            "residual": "deviance"
+          },
+          "diagnostics": {
+            "family": "poisson",
+            "link": "log",
+            "residual": "deviance",
+            "pearson_dispersion": 1.0295903487794391
+          },
+          "warnings": [
+            "이항/Poisson/Gamma 잔차에 OLS 정규성을 일괄 요구하지 않습니다. 분포·평균 링크·분산과 영향도를 함께 검토하세요."
+          ],
+          "note": "합성 poisson GLM의 deviance 잔차; 분포별 조건부 분산 확인"
+        },
+        "gamma_pearson": {
+          "image": "regression/glm_residuals__gamma_pearson.png",
+          "width": 1350,
+          "height": 900,
+          "sha256": "7beff787257dfeac155d2dc0ac9b9600e2d8309174d141cddaa1a872b7f1c70e",
+          "parameters": {
+            "title": "",
+            "color": "C0",
+            "alpha": 0.6,
+            "residual": "pearson"
+          },
+          "diagnostics": {
+            "family": "gamma",
+            "link": "log",
+            "residual": "pearson",
+            "pearson_dispersion": 0.34619130598190884
+          },
+          "warnings": [
+            "이항/Poisson/Gamma 잔차에 OLS 정규성을 일괄 요구하지 않습니다. 분포·평균 링크·분산과 영향도를 함께 검토하세요."
+          ],
+          "note": "합성 gamma GLM의 pearson 잔차; 분포별 조건부 분산 확인"
+        },
+        "gamma_deviance": {
+          "image": "regression/glm_residuals__gamma_deviance.png",
+          "width": 1350,
+          "height": 900,
+          "sha256": "d66ec308b7fd4854f60388ce71b7bb5b812003a196e1039eb2102cb66b4a7dc5",
+          "parameters": {
+            "title": "",
+            "color": "C0",
+            "alpha": 0.6,
+            "residual": "deviance"
+          },
+          "diagnostics": {
+            "family": "gamma",
+            "link": "log",
+            "residual": "deviance",
+            "pearson_dispersion": 0.34619130598190884
+          },
+          "warnings": [
+            "이항/Poisson/Gamma 잔차에 OLS 정규성을 일괄 요구하지 않습니다. 분포·평균 링크·분산과 영향도를 함께 검토하세요."
+          ],
+          "note": "합성 gamma GLM의 deviance 잔차; 분포별 조건부 분산 확인"
+        }
+      },
+      "recipe_key": "plot-regression-glm-residuals"
+    },
+    "regression.leverage": {
+      "image": "regression/leverage.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "cfc4064cfcaec16ca8ced76ffff43c3a23df56b9721bcc75368fe05622b87205",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "cook_levels": null
+      },
+      "diagnostics": {
+        "p_including_intercept": 4,
+        "cook_levels": [
+          0.5,
+          1.0
+        ]
+      },
+      "warnings": [
+        "등고선은 D=t_internal² h/[p(1-h)]의 기술 관계입니다. leverage가 높다는 이유만으로 삭제하지 않습니다."
+      ],
+      "note": "합성 학습 OLS: 공선성·영향 관측을 포함; 자동 행 제거 아님",
+      "variants": {},
+      "recipe_key": "plot-regression-leverage"
+    },
+    "regression.model_comparison": {
+      "image": "regression/model_comparison.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "4bbe34e1311f9188dcfa316073124f57d26e7c919c4ce3318e764d43b9ca3350",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "metric": "cv_r2"
+      },
+      "diagnostics": {
+        "metric": "cv_r2",
+        "n_models": 3
+      },
+      "warnings": [
+        "같은 분할·같은 원 반응 단위의 점수만 함께 비교하세요. 그림이 모델 선택이나 검정을 자동 수행하지 않습니다."
+      ],
+      "note": "동일 합성 자료·동일4-fold의 실제 CV R²; 최종 평가 자료 아님",
+      "variants": {},
+      "recipe_key": "plot-regression-model-comparison"
+    },
+    "regression.observed_predicted": {
+      "image": "regression/observed_predicted.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "9e849e899cb594c0ce2dab30dc11748ba8b68ae510be13162cff72e7b1a777bc",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "sample_role": "train"
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0,
+        "sample_role": "train",
+        "rmse": 0.4187874068119007,
+        "mae": 0.31270738910094226,
+        "r2": 0.9547927397789409
+      },
+      "warnings": [
+        "identity 기준선입니다. 입력은 같은 y 단위·대응 행이어야 하며 train 점수는 일반화 성능이 아닙니다."
+      ],
+      "note": "합성 학습 적합값; 보류 성능과 구분",
+      "variants": {},
+      "recipe_key": "plot-regression-observed-predicted"
+    },
+    "regression.partial_residual": {
+      "image": "regression/partial_residual.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "852a7b58724af0c892ad638240a0919ab3fdd1969e64fa1fd3a149f0a44210b9",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "smooth": true,
+        "fraction": 0.5
+      },
+      "diagnostics": {
+        "feature": "x1",
+        "coefficient": 2.0985387721950977
+      },
+      "warnings": [
+        "추가 변수/상호작용·변환이 있으면 한 항의 component 해석에 주의하세요. 상관 Feature와 공선성은 함수형 해석을 불안정하게 합니다."
+      ],
+      "note": "다른 선형 항을 보정한 부분 잔차; 공선성 조건 확인",
+      "variants": {},
+      "recipe_key": "plot-regression-partial-residual"
+    },
+    "regression.prediction_interval": {
+      "image": "regression/prediction_interval.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "dd0d53fbdf94d32d50ae0b6ae4923038d73d11f5c0af89dfa3aaba81b825c9cb",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "confidence": 0.95,
+        "max_points": 200
+      },
+      "diagnostics": {
+        "confidence": 0.95,
+        "n_new": 32,
+        "displayed": 32,
+        "cov_type": "nonrobust"
+      },
+      "warnings": [
+        "평균 CI와 관측 PI를 구별합니다. 좌표계는 적합 y와 같고 로그 inverse/smearing을 자동 적용하지 않습니다. robust 공분산의 관측 PI도 일정 오차분산 근사임을 확인하세요."
+      ],
+      "note": "새 합성 관측의 조건부 평균 구간과 관측 예측구간",
+      "variants": {},
+      "recipe_key": "plot-regression-prediction-interval"
+    },
+    "regression.residual_fitted": {
+      "image": "regression/residual_fitted.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "0add41eb685f9fffa832b8274f3b7aedaacf136360af0c963ffd1502d759acef",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "smooth": true,
+        "fraction": 0.5
+      },
+      "diagnostics": {
+        "n": 120,
+        "response_scale": "fitted model target"
+      },
+      "warnings": [
+        "곡률·깔때기 형태는 검토 신호입니다. LOWESS는 탐색 요약이며 선형성/등분산 검정의 p가 아닙니다."
+      ],
+      "note": "합성 학습 OLS: 공선성·영향 관측을 포함; 자동 행 제거 아님",
+      "variants": {},
+      "recipe_key": "plot-regression-residual-fitted"
+    },
+    "regression.residual_order": {
+      "image": "regression/residual_order.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "6eb56ad19e78c35c6727da91b1e582adacd6c42b6ff75608a8c3ecfc1931010d",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "ordered": false
+      },
+      "diagnostics": {
+        "n": 120,
+        "ordered": false
+      },
+      "warnings": [
+        "시간 순·간격이 명시되지 않으면 입력 행 패턴일 뿐입니다. 자기상관 또는 독립성의 자동 검정이 아닙니다."
+      ],
+      "note": "합성 학습 OLS: 공선성·영향 관측을 포함; 자동 행 제거 아님",
+      "variants": {},
+      "recipe_key": "plot-regression-residual-order"
+    },
+    "regression.scale_location": {
+      "image": "regression/scale_location.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "2b9a76a7dd635be97340bc94f857ca9fd32d9d27e0cefbd123f9f21b928f9e2f",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "smooth": true,
+        "fraction": 0.5
+      },
+      "diagnostics": {
+        "n": 120
+      },
+      "warnings": [
+        "증가하는 산포는 이분산 검토 신호이며 BP/White와 자료 설계를 함께 확인하세요."
+      ],
+      "note": "합성 학습 OLS: 공선성·영향 관측을 포함; 자동 행 제거 아님",
+      "variants": {},
+      "recipe_key": "plot-regression-scale-location"
+    },
+    "regression.vif": {
+      "image": "regression/vif.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "0c28c03b0098c6c937a8d37d7f27270d6ab76011cde6b18e6994277c96a89d7e",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "display_cap": 20.0
+      },
+      "diagnostics": {
+        "display_cap": 20.0,
+        "above_cap": 2
+      },
+      "warnings": [
+        "상한은 렌더링에만 적용됩니다. VIF는 p 검정·관측 영향도가 아니며 inf는 완전 공선성/상수의 검토 신호입니다."
+      ],
+      "note": "합성 공선성 진단; VIF만으로 기계적인 변수 제거 금지",
+      "variants": {},
+      "recipe_key": "plot-regression-vif"
+    },
+    "relationships.correlation": {
+      "image": "relationships/correlation.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "21646f7e8fc9d3dd7a5ff59529a06284fa48b28e1f8b38c3cef3d83c1bd1e247",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "annotate": true,
+        "mask_upper": true,
+        "max_p_value": null
+      },
+      "diagnostics": {
+        "n_features": 4,
+        "p_filter": null
+      },
+      "warnings": [
+        "입력 계수와 p를 사용합니다. 시각화가 상관을 재추정하거나 추가 검정을 수행하지 않습니다."
+      ],
+      "note": "사전 계산 Pearson 계수; 상관만으로 변수 제거하지 않음",
+      "variants": {},
+      "recipe_key": "plot-relationships-correlation"
+    },
+    "relationships.hexbin": {
+      "image": "relationships/hexbin.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "ffe6f856a6a6f04556332f802069744c1a4a8c66f5587e5f27cbbbc49e8d3b85",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "gridsize": 30,
+        "log_counts": false
+      },
+      "diagnostics": {
+        "n": 120,
+        "missing_removed": 0
+      },
+      "warnings": [],
+      "note": "합성 관측의 밀집 구간 확인",
+      "variants": {},
+      "recipe_key": "plot-relationships-hexbin"
+    },
+    "relationships.scatter": {
+      "image": "relationships/scatter.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "72d0aaf36cae400dedcb94940d1fb03564dd8bbf90f2aecda54c09f4252e03b1",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "max_points": 5000,
+        "size": 16.0
+      },
+      "diagnostics": {
+        "n": 120,
+        "displayed_rows": 120,
+        "missing_removed": 0
+      },
+      "warnings": [
+        "회귀선·예측·잔차를 생성하지 않는 원 변수 관계 탐색입니다."
+      ],
+      "note": "대응 행을 유지한 합성 변수 관계",
+      "variants": {},
+      "recipe_key": "plot-relationships-scatter"
+    },
+    "selection.feature_importance": {
+      "image": "selection/feature_importance.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "bae6d3a4e6d76d8718969eb5cad7544be4dd3f64e63ef5ad66b1daab894db530",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "max_features": 20,
+        "error_multiplier": 1.0
+      },
+      "diagnostics": {
+        "n_features": 4,
+        "displayed_features": 4,
+        "error_multiplier": 1.0
+      },
+      "warnings": [
+        "입력 중요도의 정의·평가 split·오차 의미를 확인하세요. 상관 Feature의 중요도는 분산되며 크기는 인과 기여가 아닙니다."
+      ],
+      "note": "설명용 사전 계산 중요도·반복 표준편차; 신뢰구간 아님",
+      "variants": {},
+      "recipe_key": "plot-selection-feature-importance"
+    },
+    "selection.validation_curve": {
+      "image": "selection/validation_curve.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "3911e90ffdd96cee67b578276c9f239bf58b36c92edc07129e9bdc77c0912d93",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "x_label": "Training samples / model setting",
+        "score_label": "Classification score (higher is better)",
+        "error_multiplier": 1.0
+      },
+      "diagnostics": {
+        "train_validation_gap": [
+          0.35,
+          0.21000000000000008,
+          0.12,
+          0.06999999999999995,
+          0.04999999999999993
+        ],
+        "x_spacing": "original numeric values"
+      },
+      "warnings": [
+        "같은 split/CV·평가 지표의 사전 계산 값만 비교합니다. 표시 오차는 자동 CI가 아니며 테스트 자료로 설정을 선택하지 마세요."
+      ],
+      "note": "설명용 사전 계산 학습량별 점수·표준편차; 실제 CV 실험 아님",
+      "variants": {},
+      "recipe_key": "plot-selection-validation-curve"
+    },
+    "time_series.autocorrelation": {
+      "image": "time_series/autocorrelation.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "fd1a3580dc37ee04b5ac65537c9c87014b91a1681a5b84818237939e833f345f",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "nlags": 20,
+        "kind": "acf",
+        "confidence": 0.95
+      },
+      "diagnostics": {
+        "n": 112,
+        "confidence": 0.95,
+        "band_center": "zero reference; DTO intervals centered on estimates"
+      },
+      "warnings": [
+        "정상성·동일 시간 간격을 확인하세요. 근사 개별 구간으로 다중 지연 검정/모델 차수를 자동 확정하지 않습니다."
+      ],
+      "note": "동일 간격·시간순 합성 자료의 지연 구조",
+      "variants": {},
+      "recipe_key": "plot-time-series-autocorrelation"
+    },
+    "time_series.lag": {
+      "image": "time_series/lag.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "30178ca0a2032db5927fc6161bccde6d9abdee0a39ee51eb8775fd04b0dacaa9",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "lag": 1
+      },
+      "diagnostics": {
+        "lag_rows": 1,
+        "n_pairs": 111
+      },
+      "warnings": [
+        "입력 행은 시간 순이며 일정 간격이어야 합니다. 결측을 제거해 시간축을 압축하지 않습니다."
+      ],
+      "note": "동일 간격·시간순 합성 자료의 지연 구조",
+      "variants": {},
+      "recipe_key": "plot-time-series-lag"
+    },
+    "time_series.seasonal": {
+      "image": "time_series/seasonal.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "0e641e7081ceaef1e16986a6addc6e48e708ba791181ba508feaa98c44547e7a",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "period": "weekday"
+      },
+      "diagnostics": {
+        "n": 112,
+        "missing_removed": 0,
+        "period": "weekday"
+      },
+      "warnings": [
+        "집계 분포는 추세·표본 구성·노출량 차이를 보정하지 않습니다. 미관측 기간은 생성하지 않습니다."
+      ],
+      "note": "요일별 합성 관측 분포; 관측되지 않은 기간을 만들지 않음",
+      "variants": {},
+      "recipe_key": "plot-time-series-seasonal"
+    },
+    "time_series.timeline": {
+      "image": "time_series/timeline.png",
+      "width": 1350,
+      "height": 900,
+      "sha256": "d8e4920c3062cc0a7eb4d2a675df6b1b59c6aca5350a6b96bf4145f11be7bbed",
+      "parameters": {
+        "title": "",
+        "color": "C0",
+        "alpha": 0.8,
+        "rolling_window": 7
+      },
+      "diagnostics": {
+        "n": 112,
+        "missing_removed": 0,
+        "rolling_window_in_rows": 7
+      },
+      "warnings": [
+        "이동평균은 후행 관측 요약이며 예측값이 아닙니다. 행 간격이 일정한지 별도로 확인하세요."
+      ],
+      "note": "고정 합성 일별 추세·주기; 후행 요약만 사용",
+      "variants": {},
+      "recipe_key": "plot-time-series-timeline"
+    }
+  },
+  "dashboards": {
+    "association": {
+      "image": "dashboards/association.png",
+      "modules": [
+        "association.rules"
+      ],
+      "sha256": "24a347c7f25f77550fcce80245969643d0cb617c9807b3aa4ea9183fc22356d7"
+    },
+    "categorical": {
+      "image": "dashboards/categorical.png",
+      "modules": [
+        "categorical.category_rate",
+        "categorical.contingency",
+        "categorical.count",
+        "categorical.grouped_distribution",
+        "categorical.mosaic",
+        "categorical.pareto"
+      ],
+      "sha256": "f6baaa4a73ada6a3946157da24b370cac57b7c09e87c04cb17df266f210171bc"
+    },
+    "classification": {
+      "image": "dashboards/classification.png",
+      "modules": [
+        "classification.calibration",
+        "classification.confusion",
+        "classification.precision_recall",
+        "classification.roc",
+        "classification.threshold"
+      ],
+      "sha256": "990fd9df8eadaaa7cc7a69392fc26385887499b81b0296535217efc808cde0d7"
+    },
+    "clustering": {
+      "image": "dashboards/clustering.png",
+      "modules": [
+        "clustering.dendrogram",
+        "clustering.elbow",
+        "clustering.k_distance",
+        "clustering.silhouette"
+      ],
+      "sha256": "f9e137c8282f7e137f6f802174def96fad92f0531ff5d3a30e09ca09fbfff256"
+    },
+    "decomposition": {
+      "image": "dashboards/decomposition.png",
+      "modules": [
+        "decomposition.explained_variance",
+        "decomposition.loadings"
+      ],
+      "sha256": "694724d75da66ccfb22fc8719d367aa58fdbae2fea3ed6e37d8b030eabd32110"
+    },
+    "networks": {
+      "image": "dashboards/networks.png",
+      "modules": [
+        "networks.graph"
+      ],
+      "sha256": "b541b064b46877b32da49c7bed4d8a3c1525c6c2b697fffcb44a8ee3f29551a2"
+    },
+    "numeric": {
+      "image": "dashboards/numeric.png",
+      "modules": [
+        "numeric.ecdf",
+        "numeric.histogram",
+        "numeric.kde",
+        "numeric.qq"
+      ],
+      "sha256": "c8012a0aeac8e7020b85b0e2b0224b1293099e831e306cfd83c1b0165c942054"
+    },
+    "optimization": {
+      "image": "dashboards/optimization.png",
+      "modules": [
+        "optimization.convergence"
+      ],
+      "sha256": "d01858387cbe2c1766048cabfa15baa19326134fb97413bb74f49cb877fe5ee2"
+    },
+    "qq": {
+      "image": "dashboards/qq.png",
+      "modules": [
+        "qq.bernoulli",
+        "qq.beta",
+        "qq.binomial",
+        "qq.chi_square",
+        "qq.exponential",
+        "qq.gamma",
+        "qq.logistic",
+        "qq.lognormal",
+        "qq.normal",
+        "qq.poisson",
+        "qq.student_t",
+        "qq.uniform",
+        "qq.weibull"
+      ],
+      "sha256": "db529913c008ec5bc3dbfe56945043036e203e3be49baf47ab65bc92d58bfb3b"
+    },
+    "quality": {
+      "image": "dashboards/quality.png",
+      "modules": [
+        "quality.missing_association",
+        "quality.missing_matrix",
+        "quality.missingness"
+      ],
+      "sha256": "025965d6251938a73f93dc774f0a110eb44e67a4cdf13c5626096b0b2192c097"
+    },
+    "regression": {
+      "image": "dashboards/regression.png",
+      "modules": [
+        "regression.coefficient_intervals",
+        "regression.cooks_distance",
+        "regression.glm_residuals",
+        "regression.leverage",
+        "regression.model_comparison",
+        "regression.observed_predicted",
+        "regression.partial_residual",
+        "regression.prediction_interval",
+        "regression.residual_fitted",
+        "regression.residual_order",
+        "regression.scale_location",
+        "regression.vif"
+      ],
+      "sha256": "089cf14a099f5a7a742b60bbf77d40cef04e34f46e563ea85c5f35df0802f11c"
+    },
+    "relationships": {
+      "image": "dashboards/relationships.png",
+      "modules": [
+        "relationships.correlation",
+        "relationships.hexbin",
+        "relationships.scatter"
+      ],
+      "sha256": "a9bf9e968e2af902b25151630f39301458f6815e5abe9cbd8b26696b4e829e19"
+    },
+    "selection": {
+      "image": "dashboards/selection.png",
+      "modules": [
+        "selection.feature_importance",
+        "selection.validation_curve"
+      ],
+      "sha256": "0352973956d1a3ad4775d194ec33be4edf2cbc1964dbf78b382bedbcbd353f56"
+    },
+    "time_series": {
+      "image": "dashboards/time_series.png",
+      "modules": [
+        "time_series.autocorrelation",
+        "time_series.lag",
+        "time_series.seasonal",
+        "time_series.timeline"
+      ],
+      "sha256": "8be24634b101770d0f0ee17e056ab5cf9018086c3b9e7222b5c664bb58a9ca79"
+    }
+  },
+  "module_count": 61,
+  "image_count": 80
+}

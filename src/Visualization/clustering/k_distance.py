@@ -3,15 +3,17 @@
 k_distance.py - 밀도 군집 eps 후보와 거리의 급격한 변화를 검토합니다.
 ================================================================================
 설명:
+    - 직접 실행(__main__) 시 고정 합성 입력으로 PNG 예시를 저장합니다.
     - Profile → JSON → 단일 ax 시각화 → 수치 근거·runtime DTO.
 분석 가정:
-    - 사용자가 전달한 2D Axes에만 그리며 figure 생성·show·save·예측 모델 재학습을 수행하지 않습니다.
+    - plot 함수는 사용자가 전달한 2D Axes에만 그리며 figure 생성·show·save·예측 모델 재학습을 수행하지 않습니다.
 작성 정보:
     - 작성자: 김재현(Finn) (penguin.klg@gmail.com)
     - 작성일: 2026-10-12
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    직접 실행 PNG 예시 저장 추가
     2026-10-12  김재현(Finn)     v1.0.0    Axes 조합 EDA·의사결정 시각화 추가
     2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
@@ -209,3 +211,9 @@ def plot_k_distance(
 # ---------------------------------------------------------------------------
 # 실행 예제는 src.Visualization.skeleton.clustering에 있으며 사용자 subplots의 축에 연결합니다.
 # 예: result = plot_k_distance(..., ax=axes[0, 0]); result.axes is axes[0, 0]
+
+
+if __name__ == "__main__":
+    from examples.visualization_gallery import save_example
+
+    save_example("clustering.k_distance", plot_k_distance)

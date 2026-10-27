@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | 모듈·자료 읽기 | [가독성 기준](READABILITY.md) | 리팩터링 책임·도메인 사전·문제/풀이/해설 구성·생성/검증 |
 | 전체 분석 설계 | [파이프라인](ANALYSIS_PIPELINE.md) | 분할·학습/CV·Feature·sampling·예측 후 처리·DTO 연결·목적별 분기 |
+| PNG 예시 탐색 | [전체 시각화 갤러리](VISUALIZATION_GALLERY.md) | 시각화61개·PNG80개·모듈 직접 실행·subplot 조합 |
 | 모듈 명세 기준 | [전수 명세 기준](MODULE_SPECIFICATIONS.md) | 전체 파일 분류·Python 헤더·생성 코드·CI 검사 |
 | 파일 데이터 로딩 | [데이터 로딩](DATA_LOADING.md) | 지원 형식·입력/출력·스키마·예제·선택 의존성 |
 | 전체 모듈 선택 | [기능 카탈로그](ANALYSIS_CATALOG.md) | 등록 모듈268개의 기능·입력·대표 결과, 로딩 및 기존 10단계 분류 |

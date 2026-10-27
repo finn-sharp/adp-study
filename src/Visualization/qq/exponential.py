@@ -3,6 +3,7 @@
 exponential.py - exponential 분포 전용 Q-Q 비교
 ================================================================================
 설명:
+    - 직접 실행(__main__) 시 고정 합성 입력으로 PNG 예시를 저장합니다.
     - 전용 Profile → JSON → 검증·실행 → 전용 Output DTO.
 분석 가정:
     - 사용자가 전달한 ax에만 그립니다. 분포 fitting은 시각 진단이며 정식 p 검정이 아닙니다.
@@ -12,6 +13,7 @@ exponential.py - exponential 분포 전용 Q-Q 비교
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    직접 실행 PNG 예시 저장 추가
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
     2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
@@ -195,3 +197,9 @@ def plot_exponential(values, *, ax, profile=None, recipe_path=None, overrides=No
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 # 실제 자료 연결은 분야별 skeleton과 전체 명세에서 제공합니다.
+
+
+if __name__ == "__main__":
+    from examples.visualization_gallery import save_example
+
+    save_example("qq.exponential", plot_exponential)

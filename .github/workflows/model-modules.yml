@@ -143,6 +143,8 @@ jobs:
           python -m examples.regression_distribution_examples
           python -m examples.applied_model_examples
           python -m src.Optimization.skeleton.production_allocation
+      - name: Audit every visualization PNG example
+        run: python -m examples.visualization_gallery --check
       - name: Execute Axes visualization examples
         run: python -m examples.eda_visualization_examples
       - name: Verify legacy CLI compatibility

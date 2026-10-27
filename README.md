@@ -2,6 +2,7 @@
 
 ADP 실기 학습을 위한 재사용 분석 모듈과 문제지·실행 풀이를 관리합니다. 현재 표준 모듈은 **268개**, 모델·목적별 JSON은 **295개**이며 학습 자료는 **46묶음·453문항·499개 코드 셀·175개 그림·206쪽 문제지**입니다.
 
+- [전체 시각화 PNG 갤러리](docs/VISUALIZATION_GALLERY.md): 모듈61개·PNG80개, 모듈 직접 실행과 subplot 예시
 - [모듈 명세 기준](docs/MODULE_SPECIFICATIONS.md): 전체 Python 헤더와 파일 형식별 명세 검사
 - [파일 데이터 로딩](docs/DATA_LOADING.md): 형식별 입력·Profile·DTO·스켈레톤 연결
 - [전체 분석 파이프라인](docs/ANALYSIS_PIPELINE.md): Dataset→Feature→학습/CV 전처리·sampling→모형→예측 후 처리→평가, Recipe/Profile/DTO의 역할

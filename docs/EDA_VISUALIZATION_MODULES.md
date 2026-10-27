@@ -1,5 +1,8 @@
 # Axes 기반 EDA·의사결정 시각화
 
+[전체 PNG 갤러리](VISUALIZATION_GALLERY.md)에서 개별 모듈과 subplot 결과를 확인할 수 있습니다. 각 시각화 모듈을 직접 실행하면 `__main__` 예제에서 PNG를 저장하고, 일반 import/plot 호출은 파일을 저장하지 않습니다.
+
+
 35개 단일 pane 모듈은 `JSON → Profile → plot 함수 → 전용 Output DTO`를 사용합니다.
 각 모듈은 기존 메타데이터·7개 섹션·전체 Attributes·Args/Returns/Raises 명세를 유지합니다.
 한 호출은 하나의 사용자가 전달한 `ax`에만 그립니다. 숫자 계산과 그림을 분리해 확인할 수
