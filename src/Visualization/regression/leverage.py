@@ -3,6 +3,7 @@
 leverage.py - leverage·studentized 잔차·Cook 등고선
 ================================================================================
 설명:
+    - 직접 실행(__main__) 시 고정 합성 입력으로 PNG 예시를 저장합니다.
     - 전용 Profile → JSON → 검증·실행 → 전용 Output DTO.
 분석 가정:
     - 그리기 함수는 사용자 ax만 사용하며 모형을 다시 적합하거나 관측을 삭제하지 않습니다.
@@ -12,6 +13,7 @@ leverage.py - leverage·studentized 잔차·Cook 등고선
     - 라이선스: Proprietary
 변경 이력 (Revision History):
     DATE        AUTHOR          VERSION   DESCRIPTION
+    2026-10-27  김재현(Finn)     v1.0.0    직접 실행 PNG 예시 저장 추가
     2026-10-12  김재현(Finn)     v1.0.0    별도 회귀/분포 모듈·명세·레시피 추가
     2026-10-27  김재현(Finn)     v1.0.0    모듈 명세 헤더 표준화
 ================================================================================
@@ -216,3 +218,9 @@ def plot_leverage(model, *, ax, profile=None, recipe_path=None, overrides=None):
 # 7. Example Execution
 # ---------------------------------------------------------------------------
 # 실제 자료 연결은 분야별 skeleton과 전체 명세에서 제공합니다.
+
+
+if __name__ == "__main__":
+    from examples.visualization_gallery import save_example
+
+    save_example("regression.leverage", plot_leverage)

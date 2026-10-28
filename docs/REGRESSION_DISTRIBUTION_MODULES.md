@@ -1,5 +1,8 @@
 # 회귀 추론·분포별 Naive Bayes·QQ 모듈
 
+[전체 PNG 갤러리](VISUALIZATION_GALLERY.md)에서 개별 모듈과 subplot 결과를 확인할 수 있습니다. 각 시각화 모듈을 직접 실행하면 `__main__` 예제에서 PNG를 저장하고, 일반 import/plot 호출은 파일을 저장하지 않습니다.
+
+
 회귀 추론·가정 진단·전처리·CV 비교·조건별 GLM/FGLS·비선형 factory와 분포별 Naive Bayes·QQ의 기능을 정리합니다. 적용 모듈의 정확한 Profile/DTO 필드는 아래에 모으며, 공통 실행 흐름은 [분석 파이프라인](ANALYSIS_PIPELINE.md)을 따릅니다. 모델·진단·전처리·그림은 각 도메인의 별도 파일로 관리합니다.
 
 ## 회귀 절차와 해석
